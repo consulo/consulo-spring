@@ -33,7 +33,7 @@ public class SpringAdviceMethodConverter extends SpringBeanMethodConverter{
   @Nonnull
   @Override
   public LocalizeValue buildUnresolvedMessage(@Nullable String s, ConvertContext context) {
-    if (getPsiClass(context) == null) return LocalizeValue.of();
+    if (getPsiClass(context) == null) return LocalizeValue.empty();
     return super.buildUnresolvedMessage(s, context);
   }
 
