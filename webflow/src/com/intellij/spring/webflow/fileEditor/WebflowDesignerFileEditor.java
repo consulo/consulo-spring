@@ -4,7 +4,7 @@ import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.openapi.graph.builder.util.GraphViewUtil;
 import com.intellij.openapi.graph.view.Graph2DView;
 import com.intellij.openapi.project.Project;
-import consulo.ide.impl.idea.openapi.util.Disposer;
+import consulo.disposer.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlFile;

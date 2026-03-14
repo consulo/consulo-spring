@@ -3,7 +3,7 @@ package com.intellij.spring.webflow;
 import com.intellij.codeInspection.InspectionToolProvider;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ApplicationComponent;
-import consulo.ide.impl.idea.openapi.util.Disposer;
+import consulo.disposer.Disposer;
 import com.intellij.spring.factories.SpringFactoryBeansManager;
 import com.intellij.spring.factories.resolvers.SingleObjectTypeResolver;
 import com.intellij.spring.webflow.config.model.xml.version2_0.FlowExecutor;

@@ -3,7 +3,7 @@ package com.intellij.spring.security.model;
 import com.intellij.codeInspection.InspectionToolProvider;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ApplicationComponent;
-import consulo.ide.impl.idea.openapi.util.Disposer;
+import consulo.disposer.Disposer;
 import com.intellij.spring.SpringDomFileDescription;
 import com.intellij.spring.security.SpringSecurityBundle;
 import com.intellij.spring.security.constants.SpringSecurityConstants;

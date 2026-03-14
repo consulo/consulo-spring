@@ -14,7 +14,7 @@ import com.intellij.openapi.graph.view.Graph2DView;
 import com.intellij.openapi.graph.view.Overview;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Splitter;
-import consulo.ide.impl.idea.openapi.util.Disposer;
+import consulo.disposer.Disposer;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.webflow.graph.*;
 import com.intellij.spring.webflow.graph.actions.MoveSelectionModeAction;
