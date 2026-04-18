@@ -9,7 +9,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.testFramework.IdeaTestUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import consulo.ide.impl.idea.openapi.vfs.VfsUtil;
+import consulo.virtualFileSystem.util.VirtualFileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -36,7 +36,7 @@ public class SpringHighlightingPerformanceTest extends SpringHighlightingTestCas
 
   public void testLargeProject() throws Throwable {
     myFixture.copyFileToProject("performance.xml");
-    final String fileText = consulo.ide.impl.idea.openapi.vfs.VfsUtil.loadText(myFixture.getTempDirFixture().getFile("performance.xml"));
+    final String fileText = VirtualFileUtil.loadText(myFixture.getTempDirFixture().getFile("performance.xml"));
     final SpringFileSet fileSet = configureFileSet();
     final String path = myFixture.getTempDirFixture().getTempDirPath();
     final List<PsiFile> files = new ArrayList<PsiFile>();
@@ -45,7 +45,7 @@ public class SpringHighlightingPerformanceTest extends SpringHighlightingTestCas
       final File file = new File(path, fileName);
       file.createNewFile();
       final VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
-      VfsUtil.saveText(vFile, fileText);
+      VirtualFileUtil.saveText(vFile, fileText);
 
       fileSet.addFile(vFile);
       files.add(PsiManager.getInstance(myProject).findFile(vFile));

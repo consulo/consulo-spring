@@ -22,7 +22,7 @@ import consulo.language.psi.PsiManager;
 import consulo.module.Module;
 import consulo.util.lang.ref.Ref;
 import consulo.document.util.TextRange;
-import consulo.ide.impl.idea.openapi.vfs.VfsUtil;
+import consulo.virtualFileSystem.util.VirtualFileUtil;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.spring.aop.SpringAopInjector;
@@ -274,7 +274,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   private XmlFile createXmlFile(final String text) throws IOException {
     final VirtualFile file = myFixture.getTempDirFixture().createFile("a.xml");
-    consulo.ide.impl.idea.openapi.vfs.VfsUtil.saveText(file, text);
+    VirtualFileUtil.saveText(file, text);
     return (XmlFile)PsiManager.getInstance(getProject()).findFile(file);
   }
 

@@ -9,7 +9,7 @@ import com.intellij.testFramework.IdeaTestUtil;
 import consulo.application.util.function.Processor;
 import consulo.language.editor.WriteCommandAction;
 import consulo.component.extension.Extensions;
-import consulo.ide.impl.idea.openapi.vfs.VfsUtil;
+import consulo.virtualFileSystem.util.VirtualFileUtil;
 import consulo.virtualFileSystem.VirtualFile;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
@@ -156,7 +156,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
       protected void run(Result<VirtualFile> result) throws Throwable {
         final VirtualFile file = myRoot.createChildData(this, "Aspects.java");
 
-        consulo.ide.impl.idea.openapi.vfs.VfsUtil.saveText(file, text);
+        VirtualFileUtil.saveText(file, text);
         result.setResult(file);
       }
     }.execute().getResultObject();
