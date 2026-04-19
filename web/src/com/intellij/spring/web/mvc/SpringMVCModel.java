@@ -8,7 +8,6 @@ import com.intellij.javaee.web.ServletMappingInfo;
 import com.intellij.javaee.web.facet.WebFacet;
 import com.intellij.openapi.extensions.Extensions;
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
 import consulo.util.dataholder.Key;
 import consulo.ide.impl.idea.openapi.util.NotNullLazyValue;
 import com.intellij.openapi.util.Pair;
@@ -59,7 +58,7 @@ public class SpringMVCModel {
 
   @Nullable
   public static SpringMVCModel getModel(final PsiElement element) {
-    final Module module = ModuleUtil.findModuleForPsiElement(element);
+    final Module module = element.getModule();
     if (module == null) {
       return null;
     }
