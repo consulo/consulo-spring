@@ -62,8 +62,6 @@
                         <dependency>com.intellij.regexp</dependency>
                         <dependency>org.jetbrains.idea.maven</dependency>
                         <dependency>consulo.java</dependency>
-                        <dependency>org.jetbrains.plugins.yaml</dependency>
-                        <dependency>consulo.json</dependency>
                     </dependencies>
                     <packaging>
                         <skip>${dev.mode}</skip>
@@ -116,6 +114,23 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>com.intellij.spring.spel.language.impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- shared spring API + optional format impls (json/yaml) -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.intellij.spring.api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.intellij.spring-json.impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.intellij.spring-yaml.impl</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -456,20 +471,6 @@
             <groupId>consulo.internal</groupId>
             <artifactId>forms_rt</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>org.jetbrains.plugins.yaml</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>consulo.json.api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

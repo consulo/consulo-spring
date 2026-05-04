@@ -27,6 +27,8 @@ import consulo.language.psi.PsiManager;
 import consulo.module.Module;
 import consulo.module.content.ModuleRootManager;
 import consulo.project.Project;
+import consulo.spring.boot.MetadataProperty;
+import consulo.spring.boot.SpringConfigPropertyContributor;
 import consulo.virtualFileSystem.VirtualFile;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -37,8 +39,12 @@ import java.util.List;
 
 /**
  * Project-scoped service for resolving Spring Boot configuration properties.
- * Searches application.properties / application.yml in resource roots,
- * and spring-configuration-metadata.json in library JARs.
+ * <p>
+ * Searches {@code application.properties} natively, and delegates to
+ * {@link SpringConfigPropertyContributor} extensions for non-properties
+ * formats (yaml/json) so that those format plugins remain optional.
+ * Library-jar metadata ({@code spring-configuration-metadata.json}) is
+ * also pulled in via the contributor extensions.
  */
 @ServiceAPI(ComponentScope.PROJECT)
 @ServiceImpl
@@ -47,7 +53,8 @@ public class SpringConfigurationPropertySearch {
     private static final String[] CONFIG_FILENAMES = {
         "application.properties",
         "application.yml",
-        "application.yaml"
+        "application.yaml",
+        "application.json"
     };
 
     private static final String[] CONFIG_DIRS = {"", "config/"};
@@ -65,7 +72,8 @@ public class SpringConfigurationPropertySearch {
 
     /**
      * Resolve a property key to its definition(s) in config files.
-     * Returns IProperty elements from .properties files and YAMLKeyValue from .yml files.
+     * Returns {@link IProperty} elements for {@code .properties} files and
+     * format-specific PSI for other formats (e.g. {@code YAMLKeyValue}).
      */
     public List<PsiElement> resolvePropertyKey(String key, @Nullable Module module) {
         if (module == null) {
@@ -77,15 +85,22 @@ public class SpringConfigurationPropertySearch {
 
         for (VirtualFile configFile : findConfigFiles(module)) {
             PsiFile psiFile = psiManager.findFile(configFile);
+            if (psiFile == null) {
+                continue;
+            }
+
             if (psiFile instanceof PropertiesFile propertiesFile) {
                 List<? extends IProperty> properties = propertiesFile.findPropertiesByKey(key);
                 for (IProperty property : properties) {
                     results.add(property.getPsiElement());
                 }
+                continue;
             }
-            else {
-                // try YAML
-                resolveYamlKey(psiFile, key, results);
+
+            for (SpringConfigPropertyContributor contributor : SpringConfigPropertyContributor.EP_NAME.getExtensions()) {
+                if (contributor.accepts(psiFile)) {
+                    contributor.resolveKey(psiFile, key, results);
+                }
             }
         }
 
@@ -105,6 +120,10 @@ public class SpringConfigurationPropertySearch {
 
         for (VirtualFile configFile : findConfigFiles(module)) {
             PsiFile psiFile = psiManager.findFile(configFile);
+            if (psiFile == null) {
+                continue;
+            }
+
             if (psiFile instanceof PropertiesFile propertiesFile) {
                 for (IProperty property : propertiesFile.getProperties()) {
                     String propKey = property.getKey();
@@ -112,15 +131,21 @@ public class SpringConfigurationPropertySearch {
                         keys.add(propKey);
                     }
                 }
+                continue;
             }
-            else {
-                collectYamlKeys(psiFile, keys);
+
+            for (SpringConfigPropertyContributor contributor : SpringConfigPropertyContributor.EP_NAME.getExtensions()) {
+                if (contributor.accepts(psiFile)) {
+                    contributor.collectKeys(psiFile, keys);
+                }
             }
         }
 
-        // also add keys from spring-configuration-metadata.json in library JARs
-        for (SpringMetadataPropertyLoader.MetadataProperty metaProp : SpringMetadataPropertyLoader.loadFromModule(module)) {
-            keys.add(metaProp.name());
+        // library-side metadata (spring-configuration-metadata.json), supplied by the json sub-plugin if installed
+        for (SpringConfigPropertyContributor contributor : SpringConfigPropertyContributor.EP_NAME.getExtensions()) {
+            for (MetadataProperty metaProp : contributor.loadMetadata(module)) {
+                keys.add(metaProp.name());
+            }
         }
 
         return keys;
@@ -148,7 +173,7 @@ public class SpringConfigurationPropertySearch {
                 for (VirtualFile child : configDir.getChildren()) {
                     String name = child.getName();
                     if (name.startsWith("application-") &&
-                        (name.endsWith(".properties") || name.endsWith(".yml") || name.endsWith(".yaml"))) {
+                        (name.endsWith(".properties") || name.endsWith(".yml") || name.endsWith(".yaml") || name.endsWith(".json"))) {
                         files.add(child);
                     }
                 }
@@ -156,70 +181,5 @@ public class SpringConfigurationPropertySearch {
         }
 
         return files;
-    }
-
-    private void resolveYamlKey(PsiFile psiFile, String key, List<PsiElement> results) {
-        try {
-            Class<?> yamlFileClass = Class.forName("org.jetbrains.yaml.psi.YAMLFile");
-            Class<?> yamlUtilClass = Class.forName("org.jetbrains.yaml.YAMLUtil");
-
-            if (!yamlFileClass.isInstance(psiFile)) {
-                return;
-            }
-
-            // YAMLUtil.getQualifiedKeyInFile(yamlFile, key.split("\\."))
-            java.lang.reflect.Method method = yamlUtilClass.getMethod("getQualifiedKeyInFile",
-                yamlFileClass, String[].class);
-            Object result = method.invoke(null, psiFile, key.split("\\."));
-            if (result instanceof PsiElement element) {
-                results.add(element);
-            }
-        }
-        catch (Exception ignored) {
-            // YAML plugin not available
-        }
-    }
-
-    private void collectYamlKeys(PsiFile psiFile, List<String> keys) {
-        try {
-            Class<?> yamlFileClass = Class.forName("org.jetbrains.yaml.psi.YAMLFile");
-            if (!yamlFileClass.isInstance(psiFile)) {
-                return;
-            }
-
-            collectYamlKeysRecursive(psiFile, keys);
-        }
-        catch (Exception ignored) {
-            // YAML plugin not available
-        }
-    }
-
-    private void collectYamlKeysRecursive(PsiElement element, List<String> keys) {
-        try {
-            Class<?> yamlKeyValueClass = Class.forName("org.jetbrains.yaml.psi.YAMLKeyValue");
-            Class<?> yamlUtilClass = Class.forName("org.jetbrains.yaml.YAMLUtil");
-            Class<?> yamlPsiElementClass = Class.forName("org.jetbrains.yaml.psi.YAMLPsiElement");
-
-            if (yamlKeyValueClass.isInstance(element)) {
-                // check if this is a leaf (scalar value, not a mapping)
-                java.lang.reflect.Method getValueMethod = yamlKeyValueClass.getMethod("getValue");
-                Object value = getValueMethod.invoke(element);
-                Class<?> yamlScalarClass = Class.forName("org.jetbrains.yaml.psi.YAMLScalar");
-                if (value != null && yamlScalarClass.isInstance(value)) {
-                    java.lang.reflect.Method getConfigFullName = yamlUtilClass.getMethod("getConfigFullName", yamlPsiElementClass);
-                    Object fullName = getConfigFullName.invoke(null, element);
-                    if (fullName instanceof String key && !key.isEmpty()) {
-                        keys.add(key);
-                    }
-                }
-            }
-
-            for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
-                collectYamlKeysRecursive(child, keys);
-            }
-        }
-        catch (Exception ignored) {
-            // YAML plugin not available
-        }
     }
 }

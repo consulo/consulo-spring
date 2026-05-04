@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package consulo.spring.impl.boot.properties;
+package consulo.spring.impl.json;
 
 import com.intellij.json.psi.*;
+import consulo.content.base.BinariesOrderRootType;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
 import consulo.module.Module;
-import consulo.module.content.layer.orderEntry.OrderEntryType;
-import consulo.content.library.Library;
 import consulo.module.content.ModuleRootManager;
+import consulo.spring.boot.MetadataProperty;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.virtualFileSystem.archive.ArchiveVfsUtil;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Reads spring-configuration-metadata.json from library JARs using JSON plugin PSI.
+ * Reads {@code META-INF/spring-configuration-metadata.json} from library JARs
+ * using the JSON plugin's PSI. Loaded only when the consulo.json plugin is
+ * present (gated by {@code plugin-requires.xml}).
  */
 public final class SpringMetadataPropertyLoader {
-    public record MetadataProperty(String name, @Nullable String type, @Nullable String description) {
-    }
-
     public static List<MetadataProperty> loadFromModule(Module module) {
         List<MetadataProperty> result = new ArrayList<>();
         PsiManager psiManager = PsiManager.getInstance(module.getProject());
 
         ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary(library -> {
-            VirtualFile[] files = library.getFiles(consulo.content.base.BinariesOrderRootType.getInstance());
+            VirtualFile[] files = library.getFiles(BinariesOrderRootType.getInstance());
             for (VirtualFile root : files) {
                 VirtualFile archiveRoot = ArchiveVfsUtil.getArchiveRootForLocalFile(root);
                 if (archiveRoot == null) {
@@ -66,13 +63,11 @@ public final class SpringMetadataPropertyLoader {
             return;
         }
 
-        // top-level value should be a JSON object
         JsonValue topValue = jsonFile.getTopLevelValue();
         if (!(topValue instanceof JsonObject topObject)) {
             return;
         }
 
-        // find "properties" array
         JsonProperty propertiesProp = topObject.findProperty("properties");
         if (propertiesProp == null) {
             return;

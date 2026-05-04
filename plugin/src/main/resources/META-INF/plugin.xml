@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <consulo-plugin url="https://github.com/consulo/consulo-spring">
   <id>com.intellij.spring</id>
-  <name>Spring Framework</name>
+  <name>Spring &amp; Spring Boot</name>
   <description>The Spring Framework provides a comprehensive programming and configuration model for modern Java-based enterprise
       applications - on any kind of deployment platform.</description>
   <category>Web/JavaEE Technologies</category>
@@ -14,8 +14,8 @@
   <depends>consulo.java</depends>
   <depends>com.intellij.xml</depends>
   <depends optional="true">org.jetbrains.idea.maven</depends>
-  <depends>org.jetbrains.plugins.yaml</depends>
-  <depends>consulo.json</depends>
+  <depends optional="true">org.jetbrains.plugins.yaml</depends>
+  <depends optional="true">consulo.json</depends>
 
   <tags>
     <tag>software.framework</tag>
