@@ -1,7 +1,6 @@
 package com.intellij.spring.web.mvc;
 
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.impl.source.jsp.JspImplicitVariableImpl;
@@ -20,7 +19,7 @@ import java.util.Collection;
 public class SpringMVCVariablesProvider extends ElVariablesProvider {
 
   public boolean processImplicitVariables(@NotNull final PsiElement element, @NotNull final ELExpressionHolder containingFile, @NotNull final ELElementProcessor processor) {
-    final Module module = ModuleUtil.findModuleForPsiElement(containingFile);
+    final Module module = containingFile.getModule();
     if (module != null) {
       final Collection<SpringMVCModelAttribute> attributes = SpringMVCJamModel.getModel(module).getModelAttributes();
       for (SpringMVCModelAttribute attribute : attributes) {

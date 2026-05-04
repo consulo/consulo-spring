@@ -16,7 +16,7 @@
 package com.intellij.spring.model.xml.custom;
 
 import consulo.ide.impl.idea.openapi.application.PathManager;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
+import consulo.language.util.ModuleUtilCore;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.XmlElementFactory;
@@ -292,7 +292,7 @@ public class CustomNamespaceHandlerTest extends SpringHighlightingTestCase<JavaM
 
   private XmlTag createTag(final String text) throws IncorrectOperationException {
     final XmlTag tag = XmlElementFactory.getInstance(myProject).createTagFromText(text);
-    tag.getContainingFile().putUserData(ModuleUtil.KEY_MODULE, myModule);
+    tag.getContainingFile().putUserData(ModuleUtilCore.KEY_MODULE, myModule);
     return tag;
   }
 }

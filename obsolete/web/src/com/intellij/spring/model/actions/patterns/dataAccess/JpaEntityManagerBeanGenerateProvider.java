@@ -13,7 +13,6 @@ import com.intellij.javaee.model.xml.persistence.PersistenceUnit;
 import com.intellij.jpa.facet.JpaFacet;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiDocumentManager;
@@ -77,7 +76,7 @@ public class JpaEntityManagerBeanGenerateProvider extends SpringBeanGenerateProv
         final Project project = context.getProject();
         final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(context.getEditor().getDocument());
         if(psiFile == null) return LookupElement.EMPTY_ARRAY;
-        final Module module = ModuleUtil.findModuleForPsiElement(psiFile);
+        final Module module = psiFile.getModule();
 
         if(module == null) return LookupElement.EMPTY_ARRAY;
 

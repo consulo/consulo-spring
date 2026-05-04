@@ -4,7 +4,7 @@ import consulo.ide.impl.idea.openapi.application.PathManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.vfs.VfsUtil;
+import consulo.virtualFileSystem.util.VirtualFileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiJavaFile;
@@ -88,7 +88,7 @@ public class SpringJavaModelTest extends IdeaTestCase {
       protected void run(Result<VirtualFile> result) throws Throwable {
         final VirtualFile file = myRoot.createChildData(this, "FooJavaConfig.java");
 
-        VfsUtil.saveText(file, text);
+        VirtualFileUtil.saveText(file, text);
         result.setResult(file);
       }
     }.execute().getResultObject();

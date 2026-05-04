@@ -1,7 +1,7 @@
 package com.intellij.spring.security.references;
 
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
+import consulo.language.util.ModuleUtilCore;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteralExpression;
@@ -49,7 +49,7 @@ public abstract class SpringSecurityRolePsiReferenceProvider<T extends PsiElemen
   }
 
   public static PsiReference[] getSecurityRolesReferences(@NotNull PsiElement element, @Nullable String value) {
-    Module module = ModuleUtil.findModuleForPsiElement(element);
+    Module module = ModuleUtilCore.findModuleForPsiElement(element);
     if (module != null && !StringUtil.isEmptyOrSpaces(value)) {
         List<PsiReference> references = new ArrayList<PsiReference>();
         for (String token : StringUtil.tokenize(value, ",")) {

@@ -1,7 +1,6 @@
 package com.intellij.spring.webflow.model.converters;
 
 import com.intellij.openapi.module.Module;
-import consulo.ide.impl.idea.openapi.module.ModuleUtil;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
@@ -27,7 +26,7 @@ public class WebflowScopeVariableReference extends PsiReferenceBase<PsiElement> 
   public PsiElement resolve() {
     final String value = getValue();
 
-    final Module module = ModuleUtil.findModuleForPsiElement(myElement);
+    final Module module = myElement.getModule();
     assert module != null;
 
     final WebflowScopeProviderManager service = WebflowScopeProviderManager.getService(module);
