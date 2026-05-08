@@ -1,0 +1,209 @@
+/*
+ * Copyright 2013-2026 consulo.io
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+{
+  parserClass            = "consulo.spring.spel.language.impl.parser.SpELParser"
+  extends                = "consulo.spring.spel.language.impl.psi.SpELElementImpl"
+  version                = "3"
+
+  psiClassPrefix         = "SpEL"
+  psiImplClassSuffix     = "Impl"
+  psiPackage             = "consulo.spring.spel.language.psi"
+  psiImplPackage         = "consulo.spring.spel.language.impl.psi"
+  psiVisitorName         = "SpELElementVisitor"
+
+  elementTypeHolderClass = "consulo.spring.spel.language.psi.SpELTypes"
+  elementTypeClass       = "consulo.spring.spel.language.SpELElementType"
+  tokenTypeClass         = "consulo.spring.spel.language.SpELTokenType"
+
+  implements(".*expression") = "consulo.spring.spel.language.psi.SpELElement"
+
+  tokens = [
+    // literals
+    INTEGER_LITERAL
+    REAL_LITERAL
+    STRING_LITERAL
+
+    // keywords (remapped from IDENTIFIER by SpELLexer)
+    TRUE          = 'true'
+    FALSE         = 'false'
+    NULL          = 'null'
+    NEW           = 'new'
+    INSTANCEOF    = 'instanceof'
+    MATCHES       = 'matches'
+    AND           = 'and'
+    OR            = 'or'
+    NOT           = 'not'
+    T_KEYWORD     = 'T'
+
+    // operators
+    PLUS          = '+'
+    MINUS         = '-'
+    STAR          = '*'
+    DIV           = '/'
+    MOD           = '%'
+    POWER         = '^'
+    EQ            = '=='
+    NE            = '!='
+    LT            = '<'
+    GT            = '>'
+    LE            = '<='
+    GE            = '>='
+    ASSIGN        = '='
+    QMARK         = '?'
+    COLON         = ':'
+    ELVIS         = '?:'
+    SAFE_NAV      = '?.'
+    BANG          = '!'
+    AND_AND       = '&&'
+    OR_OR         = '||'
+
+    // delimiters
+    LPAREN        = '('
+    RPAREN        = ')'
+    LBRACKET      = '['
+    RBRACKET      = ']'
+    LBRACE        = '{'
+    RBRACE        = '}'
+    DOT           = '.'
+    COMMA         = ','
+    HASH          = '#'
+    AT            = '@'
+
+    // special composite tokens
+    PROJECTION    = '.!['
+    SELECTION     = '.?['
+    SELECT_LAST   = '.$['
+    SELECT_FIRST  = '.^['
+
+    IDENTIFIER
+  ]
+}
+
+// root rule
+spelExpression ::= expression
+
+// expression precedence (low to high)
+expression ::= assignmentExpression
+
+assignmentExpression ::= ternaryExpression ('=' ternaryExpression)* {
+  pin(".*")=1
+}
+
+ternaryExpression ::= elvisExpression ('?' expression ':' expression)* {
+  pin(".*")=1
+}
+
+elvisExpression ::= logicalOrExpression ('?:' logicalOrExpression)* {
+  pin(".*")=1
+}
+
+logicalOrExpression ::= logicalAndExpression (('||' | 'or') logicalAndExpression)* {
+  pin(".*")=1
+}
+
+logicalAndExpression ::= equalityExpression (('&&' | 'and') equalityExpression)* {
+  pin(".*")=1
+}
+
+equalityExpression ::= relationalExpression (('==' | '!=') relationalExpression)* {
+  pin(".*")=1
+}
+
+relationalExpression ::= additiveExpression (relationalOperator additiveExpression)* {
+  pin(".*")=1
+}
+
+private relationalOperator ::= '<=' | '>=' | '<' | '>' | 'instanceof' | 'matches'
+
+additiveExpression ::= multiplicativeExpression (('+' | '-') multiplicativeExpression)* {
+  pin(".*")=1
+}
+
+multiplicativeExpression ::= powerExpression (('*' | '/' | '%') powerExpression)* {
+  pin(".*")=1
+}
+
+powerExpression ::= unaryExpression ('^' unaryExpression)* {
+  pin(".*")=1
+}
+
+unaryExpression ::= ('-' | '!' | 'not') unaryExpression | postfixExpression
+
+postfixExpression ::= primaryExpression postfixOp*
+
+private postfixOp ::= dotAccess
+                     | safeNavAccess
+                     | indexAccess
+                     | projectionAccess
+                     | selectionAccess
+                     | selectLastAccess
+                     | selectFirstAccess
+
+dotAccess ::= '.' (methodCall | IDENTIFIER)
+
+safeNavAccess ::= '?.' (methodCall | IDENTIFIER)
+
+indexAccess ::= '[' expression ']'
+
+projectionAccess ::= '.![' expression ']'
+
+selectionAccess ::= '.?[' expression ']'
+
+selectLastAccess ::= '.$[' expression ']'
+
+selectFirstAccess ::= '.^[' expression ']'
+
+// primary expressions
+private primaryExpression ::= literalExpression
+                            | parenthesizedExpression
+                            | typeReference
+                            | constructorCall
+                            | beanReference
+                            | variableReference
+                            | inlineList
+                            | inlineMap
+                            | methodCall
+                            | IDENTIFIER
+
+literalExpression ::= INTEGER_LITERAL
+                    | REAL_LITERAL
+                    | STRING_LITERAL
+                    | 'true'
+                    | 'false'
+                    | 'null'
+
+parenthesizedExpression ::= '(' expression ')'
+
+typeReference ::= 'T' '(' qualifiedName ')'
+
+qualifiedName ::= IDENTIFIER ('.' IDENTIFIER)*
+
+constructorCall ::= 'new' qualifiedName '(' argumentList? ')'
+
+argumentList ::= expression (',' expression)*
+
+beanReference ::= '@' IDENTIFIER
+
+variableReference ::= '#' IDENTIFIER
+
+inlineList ::= '{' [expression (',' expression)*] '}'
+
+inlineMap ::= '{' mapEntry (',' mapEntry)* '}'
+
+mapEntry ::= expression ':' expression
+
+methodCall ::= IDENTIFIER '(' argumentList? ')'
