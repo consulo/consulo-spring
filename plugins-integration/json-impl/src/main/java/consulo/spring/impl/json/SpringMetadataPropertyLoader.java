@@ -40,7 +40,7 @@ public final class SpringMetadataPropertyLoader {
         PsiManager psiManager = PsiManager.getInstance(module.getProject());
 
         ModuleRootManager.getInstance(module).orderEntries().librariesOnly().forEachLibrary(library -> {
-            VirtualFile[] files = library.getFiles(BinariesOrderRootType.getInstance());
+            VirtualFile[] files = library.getFiles(BinariesOrderRootType.ID);
             for (VirtualFile root : files) {
                 VirtualFile archiveRoot = ArchiveVfsUtil.getArchiveRootForLocalFile(root);
                 if (archiveRoot == null) {
