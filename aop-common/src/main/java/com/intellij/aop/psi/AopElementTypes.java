@@ -16,19 +16,15 @@
 
 package com.intellij.aop.psi;
 
+import consulo.language.ast.*;
 import jakarta.annotation.Nonnull;
 
-import consulo.language.ast.IFileElementType;
-import consulo.language.ast.ILeafElementType;
-import consulo.language.ast.TokenType;
-import consulo.language.ast.TokenSet;
-import consulo.language.ast.ASTNode;
 import consulo.language.impl.psi.PsiWhiteSpaceImpl;
 
 /**
  * @author peter
  */
-public interface AopElementTypes extends TokenType {
+public interface AopElementTypes extends StandardTokenTypes {
   AopElementType AOP_ASTERISK = new AopElementType("AOP_ASTERISK");//*
   AopElementType AOP_DOT = new AopElementType("AOP_DOT");//.
   AopElementType AOP_DOT_DOT = new AopElementType("AOP_DOT_DOT");//..
