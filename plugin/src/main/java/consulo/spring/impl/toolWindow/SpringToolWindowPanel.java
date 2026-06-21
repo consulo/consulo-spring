@@ -5,6 +5,8 @@ import consulo.annotation.component.ServiceAPI;
 import consulo.annotation.component.ServiceImpl;
 import consulo.component.messagebus.MessageBusConnection;
 import consulo.dataContext.DataProvider;
+import consulo.dataContext.DataSink;
+import consulo.dataContext.UiDataProvider;
 import consulo.disposer.Disposable;
 import consulo.module.Module;
 import consulo.module.content.layer.event.ModuleRootEvent;
@@ -38,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 @ServiceAPI(ComponentScope.PROJECT)
 @ServiceImpl
-public class SpringToolWindowPanel implements Disposable, DataProvider {
+public class SpringToolWindowPanel implements Disposable, UiDataProvider {
     public static final Key<SpringToolWindowPanel> KEY = Key.of(SpringToolWindowPanel.class);
 
     private final Tree myTree;
@@ -108,13 +110,9 @@ public class SpringToolWindowPanel implements Disposable, DataProvider {
         return myRootPanel;
     }
 
-    @Nullable
     @Override
-    public Object getData(@Nonnull Key<?> key) {
-        if (KEY == key) {
-            return this;
-        }
-        return null;
+    public void uiDataSnapshot(DataSink sink) {
+        sink.set(KEY, this);
     }
 
     @Override

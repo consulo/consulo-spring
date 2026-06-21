@@ -44,7 +44,7 @@ public class SpringToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         contentManager.addContent(content);
 
-        contentManager.addDataProvider(panel);
+        contentManager.addUiDataProvider(panel);
     }
 
     @Override

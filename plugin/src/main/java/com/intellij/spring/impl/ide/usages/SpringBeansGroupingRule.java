@@ -5,7 +5,7 @@ import com.intellij.spring.impl.ide.SpringManager;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.DomSpringBean;
 import consulo.dataContext.DataSink;
-import consulo.dataContext.TypeSafeDataProvider;
+import consulo.dataContext.UiDataProvider;
 import consulo.language.editor.LangDataKeys;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
@@ -22,134 +22,146 @@ import consulo.usage.rule.UsageGroupingRule;
 import consulo.util.dataholder.Key;
 import consulo.virtualFileSystem.status.FileStatus;
 import consulo.virtualFileSystem.status.FileStatusManager;
-import consulo.xml.language.psi.XmlElement;
-import consulo.xml.language.psi.XmlFile;
 import consulo.xml.dom.DomElement;
 import consulo.xml.dom.DomUtil;
-
+import consulo.xml.language.psi.XmlElement;
+import consulo.xml.language.psi.XmlFile;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public class SpringBeansGroupingRule implements UsageGroupingRule {
-  private static final Logger LOG = Logger.getInstance(SpringBeansGroupingRule.class);
+    private static final Logger LOG = Logger.getInstance(SpringBeansGroupingRule.class);
 
-  public UsageGroup groupUsage(Usage usage) {
-    if (usage instanceof PsiElementUsage) {
-      PsiElement psiElement = ((PsiElementUsage)usage).getElement();
+    @Override
+    public UsageGroup groupUsage(Usage usage) {
+        if (usage instanceof PsiElementUsage) {
+            PsiElement psiElement = ((PsiElementUsage) usage).getElement();
 
-      final PsiFile psiFile = psiElement.getContainingFile();
-      final Project project = psiElement.getProject();
-      if (psiFile instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile)psiFile)) {
-        final DomElement domElement = DomUtil.getDomElement(psiElement);
-        if (domElement != null) {
-          final DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
-          if (springBean != null) {
-            return new SpringBeansUsageGroup(springBean);
-          }
+            final PsiFile psiFile = psiElement.getContainingFile();
+            final Project project = psiElement.getProject();
+            if (psiFile instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile) psiFile)) {
+                final DomElement domElement = DomUtil.getDomElement(psiElement);
+                if (domElement != null) {
+                    final DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
+                    if (springBean != null) {
+                        return new SpringBeansUsageGroup(springBean);
+                    }
+                }
+            }
         }
-      }
-    }
-    return null;
-  }
-
-  private static class SpringBeansUsageGroup implements UsageGroup, TypeSafeDataProvider {
-    private final String myName;
-    private final DomSpringBean myBean;
-
-    public SpringBeansUsageGroup(@Nonnull DomSpringBean bean) {
-      myBean = bean;
-      final String beanName = bean.getPresentation().getElementName();
-      myName = beanName == null ? SpringBundle.message("spring.bean.with.unknown.name") : beanName;
-
-      update();
+        return null;
     }
 
-    public void update() {
-    }
+    private static class SpringBeansUsageGroup implements UsageGroup, UiDataProvider {
+        private final String myName;
+        private final DomSpringBean myBean;
 
-    public boolean equals(final Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+        public SpringBeansUsageGroup(@Nonnull DomSpringBean bean) {
+            myBean = bean;
+            final String beanName = bean.getPresentation().getElementName();
+            myName = beanName == null ? SpringBundle.message("spring.bean.with.unknown.name") : beanName;
 
-      final SpringBeansUsageGroup that = (SpringBeansUsageGroup)o;
-
-      if (!myBean.equals(that.myBean)) return false;
-      if (!myName.equals(that.myName)) return false;
-
-      return true;
-    }
-
-    public int hashCode() {
-      int result;
-      result = myName.hashCode();
-      result = 31 * result + myBean.hashCode();
-      return result;
-    }
-
-    public Image getIcon() {
-      return SpringIcons.SpringBean;
-    }
-
-    @Nonnull
-    public String getText(UsageView view) {
-      return myName;
-    }
-
-    @Nonnull
-    public DomSpringBean getBean() {
-      return myBean;
-    }
-
-    public FileStatus getFileStatus() {
-      return isValid() ? FileStatusManager.getInstance(myBean.getPsiManager().getProject())
-                                          .getStatus(DomUtil.getFile(getBean()).getVirtualFile()) : null;
-    }
-
-    public boolean isValid() {
-      return getBean().isValid();
-    }
-
-    public void navigate(boolean focus) throws UnsupportedOperationException {
-      if (canNavigate()) {
-        SpringUtils.navigate(myBean);
-      }
-    }
-
-    public boolean canNavigate() {
-      return isValid();
-    }
-
-    public boolean canNavigateToSource() {
-      return canNavigate();
-    }
-
-    public int compareTo(UsageGroup usageGroup) {
-      if (!(usageGroup instanceof SpringBeansUsageGroup)) {
-        LOG.error("MethodUsageGroup expected but " + usageGroup.getClass() + " found");
-      }
-
-      return myName.compareTo(((SpringBeansUsageGroup)usageGroup).myName);
-    }
-
-    public void calcData(final Key<?> key, final DataSink sink) {
-      if (!isValid()) return;
-      if (LangDataKeys.PSI_ELEMENT == key) {
-        final XmlElement element = getPsiElement();
-        if (element != null && element.isValid()) {
-          sink.put(LangDataKeys.PSI_ELEMENT, element);
+            update();
         }
-      }
-      if (UsageView.USAGE_INFO_KEY == key) {
-        PsiElement element = getPsiElement();
-        if (element != null && element.isValid()) {
-          sink.put(UsageView.USAGE_INFO_KEY, new UsageInfo(element));
-        }
-      }
-    }
 
-    @Nullable
-    private XmlElement getPsiElement() {
-      return getBean().getXmlElement();
+        @Override
+        public void update() {
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            final SpringBeansUsageGroup that = (SpringBeansUsageGroup) o;
+
+            if (!myBean.equals(that.myBean)) {
+                return false;
+            }
+            if (!myName.equals(that.myName)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result;
+            result = myName.hashCode();
+            result = 31 * result + myBean.hashCode();
+            return result;
+        }
+
+        @Override
+        public Image getIcon() {
+            return SpringIcons.SpringBean;
+        }
+
+        @Override
+        @Nonnull
+        public String getText(UsageView view) {
+            return myName;
+        }
+
+        @Nonnull
+        public DomSpringBean getBean() {
+            return myBean;
+        }
+
+        @Override
+        public FileStatus getFileStatus() {
+            return isValid() ? FileStatusManager.getInstance(myBean.getPsiManager().getProject())
+                .getStatus(DomUtil.getFile(getBean()).getVirtualFile()) : null;
+        }
+
+        @Override
+        public boolean isValid() {
+            return getBean().isValid();
+        }
+
+        @Override
+        public void navigate(boolean focus) throws UnsupportedOperationException {
+            if (canNavigate()) {
+                SpringUtils.navigate(myBean);
+            }
+        }
+
+        @Override
+        public boolean canNavigate() {
+            return isValid();
+        }
+
+        @Override
+        public boolean canNavigateToSource() {
+            return canNavigate();
+        }
+
+        @Override
+        public int compareTo(UsageGroup usageGroup) {
+            if (!(usageGroup instanceof SpringBeansUsageGroup)) {
+                LOG.error("MethodUsageGroup expected but " + usageGroup.getClass() + " found");
+            }
+
+            return myName.compareTo(((SpringBeansUsageGroup) usageGroup).myName);
+        }
+
+        @Override
+        public void uiDataSnapshot(DataSink sink) {
+            sink.lazy(LangDataKeys.PSI_ELEMENT, this::getPsiElement);
+            sink.lazy(UsageView.USAGE_INFO_KEY, () -> {
+                PsiElement element = getPsiElement();
+                return element != null ? new UsageInfo(element) : null;
+            });
+        }
+
+        @Nullable
+        private XmlElement getPsiElement() {
+            return getBean().getXmlElement();
+        }
     }
-  }
 }
