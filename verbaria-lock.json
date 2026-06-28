@@ -1,0 +1,21 @@
+{
+  "lockVersion" : 1,
+  "project" : "consulo-spring",
+  "projectVersion" : "master",
+  "sourceLocale" : "en-US",
+  "generatedAt" : "2026-06-28T16:14:59.518613689Z",
+  "documents" : {
+    "consulo.aop.AopLocalize" : {
+      "source" : {
+        "revision" : 1,
+        "sig" : "26e1f70df4ac2abada6e02fecd55acdf"
+      }
+    },
+    "consulo.spring.SpringLocalize" : {
+      "source" : {
+        "revision" : 1,
+        "sig" : "2115317d1f0f140d076242dd63b61f21"
+      }
+    }
+  }
+}
