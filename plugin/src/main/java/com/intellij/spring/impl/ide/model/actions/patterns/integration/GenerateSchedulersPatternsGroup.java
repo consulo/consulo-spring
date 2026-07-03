@@ -1,42 +1,35 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.integration;
 
-import consulo.ui.ex.action.DefaultActionGroup;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.model.actions.GenerateSpringDomElementAction;
 import com.intellij.spring.impl.ide.model.actions.generate.SpringBeanGenerateProvider;
 import com.intellij.spring.impl.ide.model.actions.patterns.PatternIcons;
-import consulo.ui.ex.action.AnActionEvent;
+import consulo.spring.localize.SpringLocalize;
+import consulo.ui.ex.action.DefaultActionGroup;
 
-public class GenerateSchedulersPatternsGroup  extends DefaultActionGroup
-{
+public class GenerateSchedulersPatternsGroup extends DefaultActionGroup {
 
-  public GenerateSchedulersPatternsGroup() {
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message(
-      "spring.patterns.integration.opensymphony.job.detail.bean"), "quartz-job-detail"), PatternIcons.SCHEDULER_ICON)) ;
-    add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringBundle.message("spring.patterns.integration.opensymphony.method.invoking.factory.bean")) {
-      protected String getClassName() {
-        return "org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean";
-      }
-    }, PatternIcons.SCHEDULER_ICON)) ;
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message("spring.patterns.integration.opensymphony.simple.trigger"), "quartz-simple-trigger"), PatternIcons.SCHEDULER_ICON)) ;
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message("spring.patterns.integration.opensymphony.cron.trigger"), "quartz-cron-trigger"), PatternIcons.SCHEDULER_ICON)) ;
+    public GenerateSchedulersPatternsGroup() {
+        super(SpringLocalize.springPatternsSchedulingGroupName(), SpringLocalize.springPatternsSchedulingGroupName(), PatternIcons.SCHEDULER_ICON);
 
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message("spring.patterns.integration.opensymphony.scheduler"), "quartz-scheduler-factory"), PatternIcons.SCHEDULER_ICON)) ;
-    addSeparator();
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message("spring.patterns.integration.jdk.scheduled.timer.task"), "jdk-scheduled-timer-task"), PatternIcons.JDK_ICON)) ;
-    add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringBundle.message("spring.patterns.integration.jdk.method.invoking.factory.bean")) {
-      protected String getClassName() {
-        return "org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean";
-      }
-    }, PatternIcons.JDK_ICON)) ;
-    add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringBundle.message("spring.patterns.integration.jdk.timer.factory.bean"), "jdk-timer-factory-bean"), PatternIcons.JDK_ICON)) ;
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyJobDetailBean().get(), "quartz-job-detail"), PatternIcons.SCHEDULER_ICON));
+        add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationOpensymphonyMethodInvokingFactoryBean().get()) {
+            protected String getClassName() {
+                return "org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean";
+            }
+        }, PatternIcons.SCHEDULER_ICON));
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonySimpleTrigger().get(), "quartz-simple-trigger"), PatternIcons.SCHEDULER_ICON));
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyCronTrigger().get(), "quartz-cron-trigger"), PatternIcons.SCHEDULER_ICON));
 
-    setPopup(true);
-  }
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyScheduler().get(), "quartz-scheduler-factory"), PatternIcons.SCHEDULER_ICON));
+        addSeparator();
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkScheduledTimerTask().get(), "jdk-scheduled-timer-task"), PatternIcons.JDK_ICON));
+        add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationJdkMethodInvokingFactoryBean().get()) {
+            protected String getClassName() {
+                return "org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean";
+            }
+        }, PatternIcons.JDK_ICON));
+        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkTimerFactoryBean().get(), "jdk-timer-factory-bean"), PatternIcons.JDK_ICON));
 
-  public void update(final AnActionEvent e) {
-    super.update(e);
-    e.getPresentation().setText(SpringBundle.message("spring.patterns.scheduling.group.name"));
-    e.getPresentation().setIcon(PatternIcons.SCHEDULER_ICON);
-  }
+        setPopup(true);
+    }
 }
