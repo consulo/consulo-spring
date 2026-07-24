@@ -24,7 +24,7 @@ public abstract class AopAspectImpl implements AopAspect, JamElement {
     JamChildrenQuery.annotatedFields(AopConstants.DECLARE_PARENTS_ANNO, AopIntroductionImpl.class);
 
   public static final JamAnnotationMeta ASPECT_ANNO_META = new JamAnnotationMeta(AopConstants.ASPECT_ANNO);
-  public static final JamClassMeta<AopAspectImpl> ASPECT_META = new JamClassMeta<AopAspectImpl>(AopAspectImpl.class).
+  public static final JamClassMeta<AopAspectImpl> ASPECT_META = new JamClassMeta<>(AopAspectImpl.class).
     addAnnotation(ASPECT_ANNO_META).
     addChildrenQuery(INTRODUCTIONS_QUERY);
 
@@ -36,21 +36,23 @@ public abstract class AopAspectImpl implements AopAspect, JamElement {
     ASPECT_META.addAnnotatedMethodsQuery(AopAdviceMetas.AFTER_THROWING_META, AopAfterThrowingAdviceImpl.class)
   );
 
-
+  @Override
   public PsiElement getIdentifyingPsiElement() {
     return ASPECT_ANNO_META.getAnnotation(getPsiClass());
   }
 
   @Nonnull
+  @Override
   @JamPsiConnector
   public abstract PsiClass getPsiClass();
 
+  @Override
   public List<AopAdviceImpl> getAdvices() {
     return ADVICE_QUERY.findChildren(PsiElementRef.real(getPsiClass()));
   }
 
+  @Override
   public List<AopIntroductionImpl> getIntroductions() {
     return INTRODUCTIONS_QUERY.findChildren(PsiElementRef.real(getPsiClass()));
   }
-
 }

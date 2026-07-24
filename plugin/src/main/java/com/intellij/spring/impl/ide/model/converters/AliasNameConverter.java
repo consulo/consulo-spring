@@ -18,21 +18,23 @@ import jakarta.annotation.Nonnull;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class AliasNameConverter implements CustomReferenceConverter<String> {
-
   @Nonnull
+  @Override
   public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
                                          final PsiElement element,
                                          final ConvertContext context) {
-    return new PsiReference[]{new PsiReferenceBase<PsiElement>(element) {
-
+    return new PsiReference[]{new PsiReferenceBase<>(element) {
+      @Override
       public PsiElement resolve() {
         return getElement().getParent().getParent();
       }
 
+      @Override
       public boolean isSoft() {
         return true;
       }
 
+      @Override
       public Object[] getVariants() {
         final Alias alias = genericDomValue.getParentOfType(Alias.class, false);
 

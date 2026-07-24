@@ -4,14 +4,17 @@ import com.intellij.spring.impl.ide.SpringManager;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBeanPointer;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.codeEditor.Editor;
 import consulo.dataContext.DataContext;
 import consulo.language.editor.LangDataKeys;
 import consulo.language.editor.PlatformDataKeys;
 import consulo.language.psi.PsiDocumentManager;
 import consulo.language.psi.PsiFile;
+import consulo.localize.LocalizeValue;
 import consulo.module.Module;
 import consulo.project.Project;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.action.AnAction;
 import consulo.ui.ex.action.AnActionEvent;
 import consulo.ui.ex.action.Presentation;
@@ -21,7 +24,8 @@ import jakarta.annotation.Nullable;
 import java.util.Collection;
 
 public abstract class FrameworkIntegrationAction extends AnAction {
-
+  @Override
+  @RequiredUIAccess
   public void actionPerformed(AnActionEvent e) {
     final DataContext dataContext = e.getDataContext();
 
@@ -58,6 +62,7 @@ public abstract class FrameworkIntegrationAction extends AnAction {
   }
 
   @Nullable
+  @RequiredReadAction
   protected static XmlFile getXmlFile(final Project project, final Editor editor) {
     if (project == null || editor == null) return null;
 
@@ -106,6 +111,5 @@ public abstract class FrameworkIntegrationAction extends AnAction {
     return null;
   }
 
-  protected abstract String getDescription();
-
+  protected abstract LocalizeValue getDescription();
 }

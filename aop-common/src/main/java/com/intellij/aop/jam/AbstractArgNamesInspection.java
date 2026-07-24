@@ -18,6 +18,7 @@ import consulo.util.lang.Pair;
  * @author peter
  */
 public abstract class AbstractArgNamesInspection extends AbstractAopInspection {
+    @Override
     protected void checkAopMethod(
         final PsiMethod pointcutMethod,
         final LocalAopModel model,

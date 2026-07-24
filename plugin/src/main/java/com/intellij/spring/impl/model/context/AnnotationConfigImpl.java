@@ -8,18 +8,19 @@ import org.jetbrains.annotations.NonNls;
 import jakarta.annotation.Nullable;
 
 /**
- * User: Sergey.Vasiliev
+ * @author Sergey.Vasiliev
  */
 @SuppressWarnings({"AbstractClassNeverImplemented"})
 public abstract class AnnotationConfigImpl extends DomSpringBeanImpl implements AnnotationConfig {
-  @NonNls
-  public String getBeanName() {
-    final XmlTag tag = getXmlTag();
-    return tag == null ? "context:annotation-config" : tag.getName();
-  }
+    @Override
+    public String getBeanName() {
+        XmlTag tag = getXmlTag();
+        return tag == null ? "context:annotation-config" : tag.getName();
+    }
 
-  @Nullable
-  public String getClassName() {
-    return null;
-  }
+    @Nullable
+    @Override
+    public String getClassName() {
+        return null;
+    }
 }

@@ -24,7 +24,6 @@ import java.util.Set;
  * @author peter
  */
 public abstract class AbstractDomSpringBean implements CommonSpringBean {
-
   @Nullable
   public GenericValue<PsiMethod> getFactoryMethod() {
     return null;
@@ -39,21 +38,26 @@ public abstract class AbstractDomSpringBean implements CommonSpringBean {
   public abstract String getClassName();
 
   @Nullable
+  @Override
   public PsiClass getBeanClass() {
     return getBeanClass(null, true);
   }
 
+  @Override
   public abstract PsiManager getPsiManager();
 
   @Nullable
+  @Override
   public PsiClass getBeanClass(boolean considerFactories) {
     return getBeanClass(null, considerFactories);
   }
 
   @Nullable
+  @Override
   public abstract Module getModule();
 
   @Nullable
+  @Override
   public abstract PsiFile getContainingFile();
 
   @Nullable
@@ -90,9 +94,8 @@ public abstract class AbstractDomSpringBean implements CommonSpringBean {
     return ClassValueConverter.getScope(getPsiManager().getProject(), getModule(), getContainingFile());
   }
 
+  @Override
   public SpringQualifier getSpringQualifier() {
     return null;
   }
-
-  
 }

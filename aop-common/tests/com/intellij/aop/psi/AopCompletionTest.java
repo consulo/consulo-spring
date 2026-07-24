@@ -59,12 +59,14 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
 
     final AopPointcutImpl somePointcut = new AopPointcutImpl() {
       @Nonnull
+      @Override
       public PsiMethod getPsiElement() {
         return somePointcutMethod;
       }
     };
     final AopPointcutImpl ObjsomePointcut = new AopPointcutImpl() {
       @Nonnull
+      @Override
       public PsiMethod getPsiElement() {
         return ObjsomePointcutMethod;
       }
@@ -81,6 +83,7 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
     };
 
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         final FileTypeManager manager = FileTypeManager.getInstance();
         if (manager.getFileTypeByExtension(AopPointcutExpressionFileType.INSTANCE.getDefaultExtension()) != AopPointcutExpressionFileType.INSTANCE) {
@@ -100,6 +103,7 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
   @AfterClass
   public void globalTearDown() {
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         FileTypeManager.getInstance()
           .removeAssociatedExtension(AopPointcutExpressionFileType.INSTANCE, AopPointcutExpressionFileType.INSTANCE.getDefaultExtension());

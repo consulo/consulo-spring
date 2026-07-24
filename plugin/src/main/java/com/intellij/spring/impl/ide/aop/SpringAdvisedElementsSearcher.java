@@ -8,11 +8,9 @@ import com.intellij.aop.jam.AopConstants;
 import com.intellij.java.indexing.impl.search.MethodSuperSearcher;
 import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiMethod;
-import com.intellij.java.language.psi.PsiModifier;
 import com.intellij.java.language.psi.PsiModifierList;
 import com.intellij.java.language.psi.search.searches.SuperMethodsSearch;
 import com.intellij.java.language.psi.util.InheritanceUtil;
-import com.intellij.java.language.psi.util.MethodSignatureBackedByPsiMethod;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringModelVisitor;
 import com.intellij.spring.impl.ide.model.SpringUtils;
@@ -23,28 +21,27 @@ import com.intellij.spring.impl.ide.model.xml.beans.Beans;
 import com.intellij.spring.impl.ide.model.xml.beans.DomSpringBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBaseBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.tx.AnnotationDriven;
-import consulo.application.ApplicationManager;
+import consulo.application.Application;
 import consulo.application.progress.ProgressManager;
 import consulo.application.util.AtomicNotNullLazyValue;
 import consulo.application.util.CachedValue;
 import consulo.application.util.CachedValueProvider;
 import consulo.application.util.CachedValuesManager;
-import consulo.application.util.function.Computable;
-import consulo.application.util.function.Processor;
 import consulo.language.psi.PsiManager;
 import consulo.language.psi.PsiModificationTracker;
 import consulo.util.dataholder.Key;
 import consulo.xml.dom.DomElement;
 import consulo.xml.dom.DomFileElement;
 import consulo.xml.dom.DomUtil;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * @author peter
@@ -60,17 +57,15 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
         for (final DomFileElement<Beans> root : model.getRoots()) {
           CachedValue<Boolean> value = root.getUserData(CGLIB_PROXYING);
           if (value == null) {
-            root.putUserData(CGLIB_PROXYING, value = CachedValuesManager.getManager(getManager().getProject()).createCachedValue(new CachedValueProvider<Boolean>() {
-              public Result<Boolean> compute() {
-                return Result.create(isCglib(root), root);
-              }
-            }, false));
+            root.putUserData(
+              CGLIB_PROXYING,
+              value = CachedValuesManager.getManager(getManager().getProject())
+                .createCachedValue(() -> CachedValueProvider.Result.create(isCglib(root), root), false));
           }
-          if (value.getValue().booleanValue()) {
+          if (value.getValue()) {
             return true;
           }
         }
-
       }
       return false;
     }
@@ -84,24 +79,24 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
 
   private static boolean isCglib(DomFileElement<Beans> root) {
     final DomElement element = root.getRootElement();
-        for (final AopConfig config : DomUtil.getDefinedChildrenOfType(element, AopConfig.class)) {
-          if (Boolean.TRUE.equals(config.getProxyTargetClass().getValue())) {
-            return true;
-          }
-        }
+    for (final AopConfig config : DomUtil.getDefinedChildrenOfType(element, AopConfig.class)) {
+      if (Boolean.TRUE.equals(config.getProxyTargetClass().getValue())) {
+        return true;
+      }
+    }
 
-        for (final CommonSpringBean springBean : SpringUtils.getChildBeans(element, false)) {
-          if (springBean instanceof AnnotationDriven && Boolean.TRUE.equals(((AnnotationDriven)springBean).getProxyTargetClass().getValue()) ||
-              springBean instanceof AspectjAutoproxy && Boolean.TRUE.equals(((AspectjAutoproxy)springBean).getProxyTargetClass().getValue())) {
-            return true;
-          }
-        }
+    for (final CommonSpringBean springBean : SpringUtils.getChildBeans(element, false)) {
+      if (springBean instanceof AnnotationDriven && Boolean.TRUE.equals(((AnnotationDriven)springBean).getProxyTargetClass().getValue()) ||
+          springBean instanceof AspectjAutoproxy && Boolean.TRUE.equals(((AspectjAutoproxy)springBean).getProxyTargetClass().getValue())) {
+        return true;
+      }
+    }
     return false;
   }
 
+  @Override
   public boolean isAcceptable(final PsiClass psiClass) {
     return _isAcceptable(psiClass) && isSpringBeanClass(psiClass);
-
   }
 
   protected boolean isSpringBeanClass(PsiClass psiClass) {
@@ -112,7 +107,7 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   }
 
   private static boolean _isAcceptable(final PsiClass psiClass) {
-    if (psiClass == null || psiClass.isInterface() || psiClass.hasModifierProperty(PsiModifier.FINAL)) return false;
+    if (psiClass == null || psiClass.isInterface() || psiClass.isFinal()) return false;
 
     if (isAopClass(psiClass)) return false;
 
@@ -121,36 +116,31 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     return true;
   }
 
-  public boolean process(final Processor<PsiClass> processor) {
+  @Override
+  public boolean test(Predicate<PsiClass> processor) {
     final MyBeanVisitor visitor = new MyBeanVisitor(processor);
-    final Set<SpringModel> visited = new HashSet<SpringModel>();
+    final Set<SpringModel> visited = new HashSet<>();
     for (final SpringModel model : myModels) {
       ProgressManager.getInstance().checkCanceled();
       if (!visited.add(model)) continue;
 
       final Collection<? extends SpringBaseBeanPointer> beans =
-        ApplicationManager.getApplication().runReadAction(new Computable<Collection<? extends SpringBaseBeanPointer>>() {
-          public Collection<? extends SpringBaseBeanPointer> compute() {
-            return model.getAllCommonBeans(true);
-          }
-        });
+        Application.get().runReadAction((Supplier<Collection<? extends SpringBaseBeanPointer>>) () -> model.getAllCommonBeans(true));
 
       for (final SpringBaseBeanPointer pointer : beans) {
         ProgressManager.getInstance().checkCanceled();
 
         final boolean[] stop = new boolean[]{false};
-        ApplicationManager.getApplication().runReadAction(new Runnable() {
-          public void run() {
-            if (!pointer.isValid()) {
-              return;
-            }
+        Application.get().runReadAction(() -> {
+          if (!pointer.isValid()) {
+            return;
+          }
 
-            if (pointer instanceof DomSpringBeanPointer) {
-              stop[0] = !SpringModelVisitor.visitBean(visitor, ((DomSpringBeanPointer)pointer).getSpringBean());
-            }
-            else {
-              stop[0] = !visitor.processBeanClass(pointer.getBeanClass());
-            }
+          if (pointer instanceof DomSpringBeanPointer) {
+            stop[0] = !SpringModelVisitor.visitBean(visitor, ((DomSpringBeanPointer)pointer).getSpringBean());
+          }
+          else {
+            stop[0] = !visitor.processBeanClass(pointer.getBeanClass());
           }
         });
         if (stop[0]) {
@@ -163,12 +153,13 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   }
 
   private static class MyBeanVisitor extends SpringModelVisitor {
-    private final Processor<PsiClass> myProcessor;
+    private final Predicate<PsiClass> myProcessor;
 
-    private MyBeanVisitor(final Processor<PsiClass> processor) {
+    private MyBeanVisitor(Predicate<PsiClass> processor) {
       myProcessor = processor;
     }
 
+    @Override
     protected boolean visitBean(final CommonSpringBean bean) {
       ProgressManager.getInstance().checkCanceled();
       return processBeanClass(bean.getBeanClass()) && super.visitBean(bean);
@@ -177,28 +168,23 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     final boolean processBeanClass(@Nullable final PsiClass beanClass) {
       return !_isAcceptable(beanClass) || InheritanceUtil.processSupers(beanClass, true, myProcessor);
     }
-
   }
 
   private static boolean isAopClass(@Nonnull final PsiClass psiClass) {
     CachedValue<Boolean> value = psiClass.getUserData(INHERITANCE_CACHE_KEY);
     if (value == null) {
-      value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(new CachedValueProvider<Boolean>() {
-        public Result<Boolean> compute() {
-          final boolean result = !InheritanceUtil.processSupers(psiClass, true, new Processor<PsiClass>() {
-            public boolean process(final PsiClass psiClass) {
-              @NonNls final String qname = psiClass.getQualifiedName();
-              return !"org.springframework.aop.Advisor".equals(qname) &&
-                     !"org.aopalliance.aop.Advice".equals(qname) &&
-                     !"org.springframework.aop.framework.AopInfrastructureBean".equals(qname);
-            }
-          });
-          return Result.create(result, PsiModificationTracker.MODIFICATION_COUNT);
-        }
+      value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(() -> {
+        boolean result = !InheritanceUtil.processSupers(psiClass, true, psiClass1 -> {
+          String qName = psiClass1.getQualifiedName();
+          return !"org.springframework.aop.Advisor".equals(qName)
+              && !"org.aopalliance.aop.Advice".equals(qName)
+              && !"org.springframework.aop.framework.AopInfrastructureBean".equals(qName);
+        });
+        return CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT);
       }, false);
       psiClass.putUserData(INHERITANCE_CACHE_KEY, value);
     }
-    return value.getValue().booleanValue();
+    return value.getValue();
   }
 
   private static boolean hasInterfaces(@Nonnull final PsiClass psiClass, @Nonnull Set<PsiClass> visited) {
@@ -207,19 +193,19 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     return superClass != null && visited.add(superClass) && hasInterfaces(superClass, visited);
   }
 
+  @Override
   public boolean acceptsBoundMethod(@Nonnull final PsiMethod method) {
-    if (!super.acceptsBoundMethod(method)) return false;
-    if (method.hasModifierProperty(PsiModifier.STATIC)) return false;
-    if (method.hasModifierProperty(PsiModifier.FINAL)) return false;
-    if (method.hasModifierProperty(PsiModifier.PRIVATE)) return false;
-    return true;
+    return super.acceptsBoundMethod(method)
+      && !method.isStatic()
+      && !method.isFinal()
+      && !method.isPrivate();
   }
 
   @Override
   public boolean acceptsBoundMethodHeavy(@Nonnull PsiMethod method) {
     if (isJdkProxyType()) {
       final PsiClass psiClass = method.getContainingClass();
-      if (psiClass == null || hasInterfaces(psiClass, new HashSet<PsiClass>()) && !isFromInterface(method, psiClass)) return false;
+      if (psiClass == null || hasInterfaces(psiClass, new HashSet<>()) && !isFromInterface(method, psiClass)) return false;
     }
     return super.acceptsBoundMethodHeavy(method);
   }
@@ -229,16 +215,13 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   }
 
   private static boolean isFromInterface(final PsiMethod method, final PsiClass psiClass) {
-    return !new MethodSuperSearcher().execute(new SuperMethodsSearch.SearchParameters(method, psiClass, true, false), new Processor<MethodSignatureBackedByPsiMethod>() {
-      public boolean process(final MethodSignatureBackedByPsiMethod signature) {
-        final PsiClass aClass = signature.getMethod().getContainingClass();
-        return aClass == null || !aClass.isInterface();
-      }
+    return !new MethodSuperSearcher().execute(new SuperMethodsSearch.SearchParameters(method, psiClass, true, false), signature -> {
+      final PsiClass aClass = signature.getMethod().getContainingClass();
+      return aClass == null || !aClass.isInterface();
     });
   }
 
   public List<SpringModel> getSpringModels() {
     return myModels;
   }
-
 }

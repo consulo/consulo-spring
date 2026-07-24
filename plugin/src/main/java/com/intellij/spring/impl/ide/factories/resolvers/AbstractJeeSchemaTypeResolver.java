@@ -12,6 +12,7 @@ public abstract class AbstractJeeSchemaTypeResolver implements ObjectTypeResolve
   private FactoryPropertiesDependentTypeResolver myPropertyDependentResolver;
 
   @Nonnull
+  @Override
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     if (context instanceof SpringJeeElement) {
       return getJeeObjectType(context);
@@ -21,7 +22,7 @@ public abstract class AbstractJeeSchemaTypeResolver implements ObjectTypeResolve
     }
   }
 
-
+  @Override
   public boolean accept(@Nonnull String factoryClassName) {
     return getFactoryClasses().contains(factoryClassName);
   }
@@ -33,10 +34,9 @@ public abstract class AbstractJeeSchemaTypeResolver implements ObjectTypeResolve
     return myPropertyDependentResolver;
   }
 
-  protected abstract Set<String> getJeeObjectType(final CommonSpringBean context);
+  protected abstract Set<String> getJeeObjectType(CommonSpringBean context);
 
   protected abstract List<String> getProperties();
 
   protected abstract List<String> getFactoryClasses();
-
 }

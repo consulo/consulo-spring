@@ -7,42 +7,48 @@ import com.intellij.java.language.psi.JavaPsiFacade;
 import com.intellij.java.language.psi.PsiJavaPackage;
 import com.intellij.java.language.psi.PsiType;
 import com.intellij.java.language.psi.PsiWildcardType;
-import consulo.application.util.function.Processor;
 import consulo.language.psi.PsiManager;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * @author peter
  */
 public abstract class AopPsiTypePattern {
   public static final AopPsiTypePattern FALSE = new AopPsiTypePattern() {
+    @Override
     public boolean accepts(@Nonnull final PsiType type) {
       return false;
     }
 
     @Nonnull
+    @Override
     public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
       return PointcutMatchDegree.FALSE;
     }
   };
   public static final AopPsiTypePattern TRUE = new AopPsiTypePattern() {
+    @Override
     public boolean accepts(@Nonnull final PsiType type) {
       return true;
     }
 
+    @Override
     public boolean accepts(@Nonnull final String qualifiedName) {
       return true;
     }
 
-    public boolean processPackages(final PsiManager manager, final Processor<PsiJavaPackage> processor) {
+    @Override
+    public boolean processPackages(PsiManager manager, Predicate<PsiJavaPackage> processor) {
       return processSubPackages(JavaPsiFacade.getInstance(manager.getProject()).findPackage(""), processor);
     }
     
     @Nonnull
+    @Override
     public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
       return PointcutMatchDegree.TRUE;
     }
@@ -54,13 +60,13 @@ public abstract class AopPsiTypePattern {
     return false;
   }
 
-  public boolean processPackages(PsiManager manager, Processor<PsiJavaPackage> processor) {
+  public boolean processPackages(PsiManager manager, Predicate<PsiJavaPackage> processor) {
     return true;
   }
 
   @Nonnull
   public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
-    return canBeAssignableFrom(type, new HashSet<PsiType>());
+    return canBeAssignableFrom(type, new HashSet<>());
   }
 
   private PointcutMatchDegree canBeAssignableFrom(final PsiType type, final Set<PsiType> visited) {
@@ -84,8 +90,8 @@ public abstract class AopPsiTypePattern {
     return type.getSuperTypes();
   }
 
-  protected static boolean processSubPackages(final PsiJavaPackage pkg, final Processor<PsiJavaPackage> processor) {
-    if (!processor.process(pkg)) return false;
+  protected static boolean processSubPackages(final PsiJavaPackage pkg, Predicate<PsiJavaPackage> processor) {
+    if (!processor.test(pkg)) return false;
     for (final PsiJavaPackage aPackage : pkg.getSubPackages()) {
       if (!processSubPackages(aPackage, processor)) return false;
     }

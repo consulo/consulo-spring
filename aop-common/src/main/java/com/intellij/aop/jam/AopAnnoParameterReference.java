@@ -9,6 +9,7 @@ import com.intellij.java.language.psi.PsiAnnotationMemberValue;
 import com.intellij.java.language.psi.PsiLiteral;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.aop.localize.AopLocalize;
 import consulo.language.psi.EmptyResolveMessageProvider;
 import consulo.language.psi.PsiElement;
@@ -30,16 +31,21 @@ public class AopAnnoParameterReference extends PsiReferenceBase<PsiAnnotationMem
     myMethod = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
   }
 
+  @Override
+  @RequiredReadAction
   public final PsiElement resolve() {
     return AopAdviceImpl.findParameter(myMethod, getCanonicalText());
   }
 
+  @Override
+  @RequiredReadAction
   public Object[] getVariants() {
     final PsiParameter[] parameters = myMethod.getParameterList().getParameters();
     return parameters.length > 0 && LocalAopModel.isJoinPointParamer(parameters[0]) ? ArrayUtil.remove(parameters, 0) : parameters;
   }
 
   @Nonnull
+  @Override
   public final String getCanonicalText() {
     return StringUtil.notNullize(JamCommonUtil.getObjectValue(getElement(), String.class));
   }

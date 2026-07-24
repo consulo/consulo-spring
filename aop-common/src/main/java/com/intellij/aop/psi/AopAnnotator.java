@@ -3,7 +3,6 @@
  */
 package com.intellij.aop.psi;
 
-import com.intellij.aop.AopBundle;
 import com.intellij.aop.AopPointcut;
 import com.intellij.aop.jam.AopConstants;
 import com.intellij.aop.jam.AopModuleService;
@@ -11,6 +10,8 @@ import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
 import com.intellij.java.language.psi.util.PsiUtil;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.aop.localize.AopLocalize;
 import consulo.document.util.TextRange;
 import consulo.language.editor.annotation.AnnotationHolder;
 import consulo.language.editor.annotation.Annotator;
@@ -18,11 +19,11 @@ import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiRecursiveElementVisitor;
 import consulo.language.psi.ResolveResult;
 import consulo.language.psi.util.PsiTreeUtil;
+import consulo.localize.LocalizeValue;
 import consulo.util.lang.ref.Ref;
 import consulo.xml.language.psi.XmlElement;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +31,8 @@ import java.util.Set;
  * @author peter
  */
 public class AopAnnotator implements Annotator {
+  @Override
+  @RequiredReadAction
   public void annotate(final PsiElement psiElement, final AnnotationHolder holder) {
     if (((AopPointcutExpressionFile)psiElement.getContainingFile()).getAopModel().getAdvisedElementsSearcher().shouldSuppressErrors())
       return;
@@ -41,18 +44,18 @@ public class AopAnnotator implements Annotator {
     if (psiElement instanceof AopParameterList && !(parent instanceof PsiExecutionExpression)) {
       checkEllipsisAllowance(psiElement, holder);
     }
-    if (psiElement instanceof AopArrayExpression) {
-      if (((AopArrayExpression)psiElement).isVarargs()) {
-        if (!(parent instanceof AopReferenceHolder) || parent.getParent() instanceof AopTypeParameterList || parent.getParent() instanceof AopParameterList && parent
-          .getParent()
-          .getParent() instanceof PsiArgsExpression) {
-          holder.createErrorAnnotation(psiElement.getLastChild(), AopBundle.message("error.varargs.not.allowed.here"));
+    if (psiElement instanceof AopArrayExpression arrayExpr) {
+      if (arrayExpr.isVarargs()) {
+        if (!(parent instanceof AopReferenceHolder)
+            || parent.getParent() instanceof AopTypeParameterList
+            || parent.getParent() instanceof AopParameterList && parent.getParent().getParent() instanceof PsiArgsExpression) {
+          holder.newError(AopLocalize.errorVarargsNotAllowedHere()).range(psiElement.getLastChild()).create();
           return;
         }
-        else if (parent.getParent() instanceof AopParameterList) {
-          final PsiElement[] parameters = ((AopParameterList)parent.getParent()).getParameters();
+        else if (parent.getParent() instanceof AopParameterList paramList) {
+          PsiElement[] parameters = paramList.getParameters();
           if (parent != parameters[parameters.length - 1]) {
-            holder.createErrorAnnotation(psiElement.getLastChild(), AopBundle.message("error.varargs.not.last"));
+            holder.newError(AopLocalize.errorVarargsNotLast()).range(psiElement.getLastChild()).create();
             return;
           }
         }
@@ -60,14 +63,13 @@ public class AopAnnotator implements Annotator {
 
       final PsiPointcutExpression expression = PsiTreeUtil.getParentOfType(psiElement, PsiPointcutExpression.class);
       if (expression instanceof PsiThisExpression || expression instanceof PsiTargetExpression || expression instanceof PsiWithinExpression) {
-        holder.createErrorAnnotation(psiElement.getLastChild(), AopBundle.message("error.arrays.not.allowed.here"));
+        holder.newError(AopLocalize.errorArraysNotAllowedHere()).range(psiElement.getLastChild()).create();
       }
     }
-    if (psiElement instanceof AopGenericTypeExpression) {
+    if (psiElement instanceof AopGenericTypeExpression genericTypeExpr) {
       final PsiPointcutExpression expression = PsiTreeUtil.getParentOfType(psiElement, PsiPointcutExpression.class);
       if (expression instanceof PsiThisExpression || expression instanceof PsiTargetExpression || expression instanceof PsiWithinExpression) {
-        holder.createErrorAnnotation(((AopGenericTypeExpression)psiElement).getTypeParameterList(),
-                                     AopBundle.message("error.generics.not.allowed.here"));
+        holder.newError(AopLocalize.errorGenericsNotAllowedHere()).range(genericTypeExpr.getTypeParameterList()).create();
       }
     }
 
@@ -75,7 +77,7 @@ public class AopAnnotator implements Annotator {
       PsiTreeUtil.getParentOfType(psiElement, PsiArgsExpression.class) != null &&
       PsiTreeUtil.getParentOfType(psiElement, AopTypeParameterList.class) != null &&
       PsiTreeUtil.getParentOfType(psiElement, AopParameterList.class) != null) {
-      holder.createErrorAnnotation(psiElement.getLastChild(), AopBundle.message("error.wildcards.not.allowed.here"));
+      holder.newError(AopLocalize.errorWildcardsNotAllowedHere()).range(psiElement.getLastChild()).create();
     }
     else if (psiElement instanceof PsiPointcutReferenceExpression) {
       checkPointcutArgumentCount(psiElement, holder);
@@ -85,6 +87,7 @@ public class AopAnnotator implements Annotator {
     }
   }
 
+  @RequiredReadAction
   private static boolean checkReference(final PsiElement psiElement, final AnnotationHolder holder, final PsiElement parent) {
     final AopReferenceExpression referenceExpression = (AopReferenceExpression)psiElement;
     if (referenceExpression.getResolvability() != AopReferenceExpression.Resolvability.PLAIN) return true;
@@ -95,8 +98,8 @@ public class AopAnnotator implements Annotator {
       for (final ResolveResult result : results) {
         final PsiElement target = result.getElement();
         if (referenceExpression.isPointcutReference()) {
-          if (!(target instanceof PsiMethod) || ((PsiMethod)target).getModifierList().findAnnotation(AopConstants.POINTCUT_ANNO) == null) {
-            holder.createErrorAnnotation(range, AopBundle.message("error.cannot.resolve.pointcut", referenceExpression.getReferenceName()));
+          if (!(target instanceof PsiMethod method) || method.getModifierList().findAnnotation(AopConstants.POINTCUT_ANNO) == null) {
+            holder.newError(AopLocalize.errorCannotResolvePointcut(referenceExpression.getReferenceName())).range(range).create();
             return true;
           }
 
@@ -104,7 +107,7 @@ public class AopAnnotator implements Annotator {
           if (pointcutMethod != null) {
             final AopPointcut pointcut = AopModuleService.getPointcut(pointcutMethod);
             if (pointcut != null && isRecursivePointcutRef(referenceExpression, pointcut, 3)) {
-              holder.createErrorAnnotation(range, AopBundle.message("error.recursive.pointcut.reference", referenceExpression));
+              holder.newError(AopLocalize.errorRecursivePointcutReference()).range(range).create();
               return true;
             }
           }
@@ -112,11 +115,11 @@ public class AopAnnotator implements Annotator {
 
         if (referenceExpression.isAnnotationReference()) {
           final boolean error;
-          if (target instanceof PsiClass) {
-            error = !((PsiClass)target).isAnnotationType();
+          if (target instanceof PsiClass psiClass) {
+            error = !psiClass.isAnnotationType();
           }
-          else if (target instanceof PsiParameter) {
-            final PsiClass psiClass = PsiUtil.resolveClassInType(((PsiParameter)target).getType());
+          else if (target instanceof PsiParameter param) {
+            PsiClass psiClass = PsiUtil.resolveClassInType(param.getType());
             error = psiClass == null || !psiClass.isAnnotationType();
           }
           else {
@@ -124,11 +127,10 @@ public class AopAnnotator implements Annotator {
           }
 
           if (error) {
-            holder.createErrorAnnotation(range, AopBundle.message("error.anno.expected"));
+            holder.newError(AopLocalize.errorAnnoExpected()).range(range).create();
             return true;
           }
         }
-
       }
       return true;
     }
@@ -139,14 +141,14 @@ public class AopAnnotator implements Annotator {
       if (parent instanceof AopMemberReferenceExpression) return true;
     }
 
-    final String message;
+    LocalizeValue message;
     if (referenceExpression.isPointcutReference()) {
-      message = AopBundle.message("error.cannot.resolve.pointcut", referenceExpression.getReferenceName());
+      message = AopLocalize.errorCannotResolvePointcut(referenceExpression.getReferenceName());
     }
     else {
-      message = AopBundle.message("error.cannot.resolve.symbol", referenceExpression.getReferenceName());
+      message = AopLocalize.errorCannotResolveSymbol(referenceExpression.getReferenceName());
     }
-    holder.createErrorAnnotation(range, message);
+    holder.newError(message).range(range).create();
     return false;
   }
 
@@ -180,21 +182,23 @@ public class AopAnnotator implements Annotator {
     return result.get();
   }
 
+  @RequiredReadAction
   private static void checkEllipsisAllowance(final PsiElement psiElement, final AnnotationHolder holder) {
     final AopParameterList list = (AopParameterList)psiElement;
-    final Set<PsiElement> ellipsises = new HashSet<PsiElement>();
+    Set<PsiElement> ellipses = new HashSet<>();
     for (final PsiElement parameter : list.getParameters()) {
       if (parameter.getNode().getElementType() == AopElementTypes.AOP_DOT_DOT) {
-        ellipsises.add(parameter);
+        ellipses.add(parameter);
       }
     }
-    if (ellipsises.size() > 1) {
-      for (final PsiElement ellipsis : ellipsises) {
-        holder.createErrorAnnotation(ellipsis, AopBundle.message("error.double.ellipsis.prohibited"));
+    if (ellipses.size() > 1) {
+      for (final PsiElement ellipsis : ellipses) {
+        holder.newError(AopLocalize.errorDoubleEllipsisProhibited()).range(ellipsis).create();
       }
     }
   }
 
+  @RequiredReadAction
   private static void checkPointcutArgumentCount(final PsiElement psiElement, final AnnotationHolder holder) {
     final PsiPointcutReferenceExpression expression = (PsiPointcutReferenceExpression)psiElement;
     final AopReferenceExpression referenceExpression = expression.getReferenceExpression();
@@ -208,7 +212,7 @@ public class AopAnnotator implements Annotator {
             final PsiElement[] elements = parameterList.getParameters();
             final int actual = elements.length;
             if (actual != expected) {
-              holder.createErrorAnnotation(parameterList, AopBundle.message("error.invalid.number.of.arguments", expected, actual));
+              holder.newError(AopLocalize.errorInvalidNumberOfArguments(expected, actual)).range(parameterList).create();
             }
           }
         }
@@ -216,13 +220,14 @@ public class AopAnnotator implements Annotator {
     }
   }
 
+  @RequiredReadAction
   private static void checkAndOrNot(final PsiElement psiElement, final AnnotationHolder holder) {
     if (psiElement instanceof AopBinaryExpression) {
       final PsiElement token = ((AopBinaryExpression)psiElement).getOpToken();
       if (token != null) {
-        @NonNls final String text = token.getText();
+        String text = token.getText();
         if ("and".equals(text) || "or".equals(text)) {
-          holder.createErrorAnnotation(token, AopBundle.message("error.0.or.1.expected", "&&", "||"));
+          holder.newError(AopLocalize.error0Or1Expected("&&", "||")).range(token).create();
         }
       }
     }
@@ -230,7 +235,7 @@ public class AopAnnotator implements Annotator {
       final AopNotExpression expression = (AopNotExpression)psiElement;
       final PsiElement token = expression.getNotToken();
       if ("not".equals(token.getText())) {
-        holder.createErrorAnnotation(token, AopBundle.message("error.0.expected", "!"));
+        holder.newError(AopLocalize.error0Expected("!")).range(token).create();
       }
     }
   }

@@ -12,10 +12,12 @@ import consulo.language.psi.PsiManager;
 
 import jakarta.annotation.Nonnull;
 
+import java.util.function.Predicate;
+
 /**
  * @author peter
  */
-public abstract class AopAdvisedElementsSearcher implements Processor<Processor<PsiClass>> {
+public abstract class AopAdvisedElementsSearcher implements Predicate<Predicate<PsiClass>> {
   private final PsiManager myManager;
 
   protected AopAdvisedElementsSearcher(PsiManager manager) {
@@ -26,14 +28,15 @@ public abstract class AopAdvisedElementsSearcher implements Processor<Processor<
     return myManager;
   }
 
-  public abstract boolean process(final Processor<PsiClass> processor);
+  @Override
+  public abstract boolean test(Predicate<PsiClass> processor);
 
   public boolean shouldSuppressErrors() {
     return false;
   }
 
   public boolean acceptsBoundMethod(@Nonnull final PsiMethod method) {
-    if (method.isConstructor() || method.hasModifierProperty(PsiModifier.ABSTRACT)) return false;
+    if (method.isConstructor() || method.isAbstract()) return false;
 
     final PsiClass containingClass = method.getContainingClass();
     if (containingClass == null) return false;
@@ -48,5 +51,4 @@ public abstract class AopAdvisedElementsSearcher implements Processor<Processor<
   public boolean isAcceptable(final PsiClass psiClass) {
     return false;
   }
-
 }

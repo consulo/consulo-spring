@@ -13,6 +13,7 @@ import com.intellij.spring.impl.ide.model.xml.aop.AfterReturningAdvice;
  * @author peter
  */
 public abstract class AfterReturningAdviceImpl extends BasicAdviceImpl implements AfterReturningAdvice {
+  @Override
   public PointcutMatchDegree accepts(final PsiMethod method) {
     final PsiParameter parameter = getReturning().getValue();
     if (parameter != null) {

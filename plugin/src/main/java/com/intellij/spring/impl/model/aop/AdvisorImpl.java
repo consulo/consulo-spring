@@ -28,40 +28,48 @@ import java.util.List;
  * @author peter
  */
 public abstract class AdvisorImpl extends DomSpringBeanImpl implements Advisor {
+  @Override
   public String getClassName() {
     return "com.intellij.spring.model.xml.aop.Advisor";
   }
 
   @Nullable
+  @Override
   public PsiPointcutExpression getPointcutExpression() {
     final AopPointcut aopPointcut = getPointcutRef().getValue();
     return aopPointcut != null ? aopPointcut.getExpression().getValue() : getPointcut().getValue();
   }
 
   @Nonnull
+  @Override
   public SpringAdvisedElementsSearcher getSearcher() {
     return new SpringAdvisedElementsSearcher(getPsiManager(), SpringUtils.getNonEmptySpringModelsByFile(DomUtil.getFile(this)));
   }
 
   @Nonnull
+  @Override
   public AopAdviceType getAdviceType() {
     return AopAdviceType.AROUND;
   }
 
+  @Override
   public PointcutMatchDegree accepts(final PsiMethod method) {
     final PsiPointcutExpression expression = getPointcutExpression();
     return expression != null ? expression.acceptsSubject(new PointcutContext(), method) : PointcutMatchDegree.FALSE;
   }
 
+  @Override
   public List<? extends AopAdvice> getAdvices() {
     return Collections.singletonList(this);
   }
 
+  @Override
   public List<? extends AopIntroduction> getIntroductions() {
     return Collections.emptyList();
   }
 
   @Nullable
+  @Override
   public PsiClass getPsiClass() {
     final SpringBeanPointer pointer = getAdviceRef().getValue();
     return pointer == null ? null : pointer.getBeanClass();

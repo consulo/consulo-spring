@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiMethod;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.collection.ContainerUtil;
 
@@ -22,14 +22,16 @@ public class AopAnnotationHolder extends AopElementBase {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopAnnotationHolder";
   }
 
+  @RequiredReadAction
   public final Collection<AopPsiTypePattern> getPatterns() {
     List<AopPsiTypePattern> result = Collections.emptyList();
     for (final AopAnnotationPattern expression : getAnnotationPatterns()) {
-      List<AopPsiTypePattern> portion = new ArrayList<AopPsiTypePattern>();
+      List<AopPsiTypePattern> portion = new ArrayList<>();
       for (final AopPsiTypePattern pattern : expression.getPatterns()) {
         if (pattern instanceof AndPsiTypePattern) {
           portion.add(new AndPsiTypePattern(ContainerUtil.map2Array(((AndPsiTypePattern)pattern).getPatterns(), AopPsiTypePattern.class,
@@ -43,7 +45,7 @@ public class AopAnnotationHolder extends AopElementBase {
         result = portion;
       }
       else {
-        final ArrayList<AopPsiTypePattern> newResult = new ArrayList<AopPsiTypePattern>();
+        final ArrayList<AopPsiTypePattern> newResult = new ArrayList<>();
         AopBinaryExpression.conjunctPatterns(result, portion, newResult);
         result = newResult;
       }
@@ -73,8 +75,8 @@ public class AopAnnotationHolder extends AopElementBase {
     return false;
   }
 
+  @RequiredReadAction
   private AopAnnotationPattern[] getAnnotationPatterns() {
     return findChildrenByClass(AopAnnotationPattern.class);
   }
-
 }

@@ -14,8 +14,8 @@ public enum Acknowledge implements NamedEnum {
     this.value = value;
   }
 
+  @Override
   public String getValue() {
     return value;
   }
-
 }

@@ -1,84 +1,120 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import jakarta.annotation.Nullable;
-
-import consulo.language.editor.template.TemplateSettings;
-import org.jetbrains.annotations.NonNls;
-import consulo.java.ex.facet.LibraryInfo;
-import consulo.module.Module;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringIcons;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.LibrariesInfo;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.TemplateInfo;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.util.LibrariesConfigurationManager;
+import consulo.java.ex.facet.LibraryInfo;
+import consulo.language.editor.template.TemplateSettings;
+import consulo.localize.LocalizeValue;
+import consulo.module.Module;
+import consulo.spring.localize.SpringLocalize;
 import consulo.ui.image.Image;
+import jakarta.annotation.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
-  @NonNls private static final String WEBFLOW_STRING_ID = "webflow";
+    private static final String WEBFLOW_STRING_ID = "webflow";
 
-  @NonNls
-  protected String[] getBeansClassNames() {
-    return new String[]{"org.springframework.webflow.definition.registry.FlowDefinitionRegistry"};
-  }
+    @Override
+    protected String[] getBeansClassNames() {
+        return new String[]{"org.springframework.webflow.definition.registry.FlowDefinitionRegistry"};
+    }
 
-  protected LibrariesInfo getLibrariesInfo(final Module module) {
-    final LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos(WEBFLOW_STRING_ID);
+    @Override
+    protected LibrariesInfo getLibrariesInfo(Module module) {
+        LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos(WEBFLOW_STRING_ID);
 
-    return new LibrariesInfo(libraryInfos, module, WEBFLOW_STRING_ID);
-  }
+        return new LibrariesInfo(libraryInfos, module, WEBFLOW_STRING_ID);
+    }
 
-  protected List<TemplateInfo> getTemplateInfos(final Module module) {
-    List<TemplateInfo> infos = new LinkedList<TemplateInfo>();
+    @Override
+    protected List<TemplateInfo> getTemplateInfos(Module module) {
+        List<TemplateInfo> infos = new LinkedList<>();
 
-    final TemplateSettings settings = TemplateSettings.getInstance();
+        TemplateSettings settings = TemplateSettings.getInstance();
 
-    final TemplateInfo flowRegistry = new TemplateInfo(module, settings.getTemplateById("flow-registry"),
-                                                     SpringBundle.message("spring.patterns.webflow.registry"), null);
+        TemplateInfo flowRegistry = new TemplateInfo(
+            module,
+            settings.getTemplateById("flow-registry"),
+            SpringLocalize.springPatternsWebflowRegistry()
+        );
 
-    final TemplateInfo flowExecutor = new TemplateInfo(module, settings.getTemplateById("flow-executor"),
-                                                     SpringBundle.message("spring.patterns.webflow.executor"), null);
+        TemplateInfo flowExecutor = new TemplateInfo(
+            module,
+            settings.getTemplateById("flow-executor"),
+            SpringLocalize.springPatternsWebflowExecutor()
+        );
 
-    final TemplateInfo flowBuilderServices = new TemplateInfo(module, settings.getTemplateById("flow-builder-serices"),
-                                                     SpringBundle.message("spring.patterns.webflow.builder.services"), null);
+        TemplateInfo flowBuilderServices = new TemplateInfo(
+            module,
+            settings.getTemplateById("flow-builder-serices"),
+            SpringLocalize.springPatternsWebflowBuilderServices()
+        );
 
+        TemplateInfo conversationService = new TemplateInfo(
+            module,
+            settings.getTemplateById("conversation-service"),
+            SpringLocalize.springPatternsWebflowServicesConversionService(),
+            LocalizeValue.empty(),
+            false
+        );
 
-    final TemplateInfo conversationService = new TemplateInfo(module, settings.getTemplateById("conversation-service"),
-                                                         SpringBundle.message("spring.patterns.webflow.services.conversion.service"), null, false);
+        TemplateInfo expressionParser = new TemplateInfo(
+            module,
+            settings.getTemplateById("expression-parser"),
+            SpringLocalize.springPatternsWebflowServicesExpressionParser(),
+            LocalizeValue.empty(),
+            false
+        );
 
-    final TemplateInfo expresiionParser = new TemplateInfo(module, settings.getTemplateById("expression-parser"),
-                                                         SpringBundle.message("spring.patterns.webflow.services.expression.parser"), null, false);
+        TemplateInfo factoryCreator = new TemplateInfo(
+            module,
+            settings.getTemplateById("factory-creator"),
+            SpringLocalize.springPatternsWebflowServicesViewFactoryCreator(),
+            LocalizeValue.empty(),
+            false
+        );
 
-    final TemplateInfo factoryCreator = new TemplateInfo(module, settings.getTemplateById("factory-creator"),
-                                                         SpringBundle.message("spring.patterns.webflow.services.view.factory.creator"), null, false);
+        TemplateInfo formatterRegistry = new TemplateInfo(
+            module,
+            settings.getTemplateById("formatter-registry"),
+            SpringLocalize.springPatternsWebflowServicesViewFormatterRegistry(),
+            LocalizeValue.empty(),
+            false
+        );
 
-    final TemplateInfo formatterRegistry = new TemplateInfo(module, settings.getTemplateById("formatter-registry"),
-                                                         SpringBundle.message("spring.patterns.webflow.services.view.formatter.registry"), null, false);
+        TemplateInfo exeListener = new TemplateInfo(
+            module,
+            settings.getTemplateById("flow-execution-listener"),
+            SpringLocalize.springPatternsWebflowExecutionListener(),
+            null,
+            false
+        );
 
-    final TemplateInfo exeListener = new TemplateInfo(module, settings.getTemplateById("flow-execution-listener"),
-                                                         SpringBundle.message("spring.patterns.webflow.execution.listener"), null, false);
+        infos.add(flowBuilderServices);
+        infos.add(flowRegistry);
+        infos.add(exeListener);
+        infos.add(flowExecutor);
 
+        infos.add(conversationService);
+        infos.add(expressionParser);
+        infos.add(factoryCreator);
+        infos.add(formatterRegistry);
 
-    infos.add(flowBuilderServices);
-    infos.add(flowRegistry);
-    infos.add(exeListener);
-    infos.add(flowExecutor);
+        return infos;
+    }
 
-    infos.add(conversationService);
-    infos.add(expresiionParser);
-    infos.add(factoryCreator);
+    @Override
+    protected LocalizeValue getDescription() {
+        return SpringLocalize.springPatternsWebflowGroupName();
+    }
 
-    return infos;
-  }
-
-  protected String getDescription() {
-    return SpringBundle.message("spring.patterns.webflow.group.name");
-  }
-
-  @Nullable
-  protected Image getIcon() {
-    return SpringIcons.SPRING_ICON;
-  }
+    @Nullable
+    @Override
+    protected Image getIcon() {
+        return SpringIcons.SPRING_ICON;
+    }
 }

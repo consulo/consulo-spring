@@ -3,16 +3,15 @@
  */
 package com.intellij.spring.impl.ide.model.xml.aop;
 
-import com.intellij.aop.AopBundle;
 import com.intellij.aop.jam.AopAdviceImpl;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.aop.localize.AopLocalize;
 import consulo.xml.dom.ConvertContext;
 import consulo.xml.dom.ResolvingConverter;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +21,7 @@ import java.util.Collections;
  */
 public class AdviceParameterConverter extends ResolvingConverter<PsiParameter> {
   @Nonnull
+  @Override
   public Collection<? extends PsiParameter> getVariants(final ConvertContext context) {
     final BasicAdvice advice = (BasicAdvice)context.getInvocationElement().getParent();
     final PsiMethod method = advice.getMethod().getValue();
@@ -33,13 +33,15 @@ public class AdviceParameterConverter extends ResolvingConverter<PsiParameter> {
   }
 
   public String getErrorMessage(@Nullable final String s, final ConvertContext context) {
-    return AopBundle.message("error.cannot.resolve.parameter", s);
+    return AopLocalize.errorCannotResolveParameter(s).get();
   }
 
-  public PsiParameter fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  @Override
+  public PsiParameter fromString(@Nullable String s, ConvertContext context) {
     return s == null ? null : AopAdviceImpl.findParameter(((BasicAdvice)context.getInvocationElement().getParent()).getMethod().getValue(), s);
   }
 
+  @Override
   public String toString(@Nullable PsiParameter psiParameter, final ConvertContext context) {
     return psiParameter == null ? null : psiParameter.getName();
   }

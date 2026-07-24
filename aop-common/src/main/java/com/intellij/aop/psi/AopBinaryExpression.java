@@ -4,12 +4,13 @@
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiMember;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
-import consulo.util.lang.Pair;
-
+import consulo.util.lang.Couple;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,30 +25,36 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
   }
 
   @Nullable
-  public final Pair<AopPatternContainer,AopPatternContainer> getOperands() {
+  @RequiredReadAction
+  public final Couple<AopPatternContainer> getOperands() {
     final AopPatternContainer[] containers = findChildrenByClass(AopPatternContainer.class);
     if (containers.length != 2) return null;
-    return Pair.create(containers[0], containers[1]);
+    return Couple.of(containers[0], containers[1]);
   }
 
   @Nonnull
+  @RequiredReadAction
   public AopOperation getOperation() {
     return findChildByType(AopElementTypes.AOP_OR) != null ? AopOperation.OR : AopOperation.AND;
   }
 
   @Nullable
+  @RequiredReadAction
   public PsiElement getOpToken() {
     final PsiElement or = findChildByType(AopElementTypes.AOP_OR);
     return or != null ? or : findChildByType(AopElementTypes.AOP_AND);
   }
 
+  @Override
   public String toString() {
     return "AopBinaryExpression";
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
-    final Pair<AopPatternContainer, AopPatternContainer> pair = getOperands();
+    Couple<AopPatternContainer> pair = getOperands();
     if (pair == null || !(pair.first instanceof PsiPointcutExpression)) return PointcutMatchDegree.FALSE;
 
     final PsiPointcutExpression leftOperand = (PsiPointcutExpression)pair.first;
@@ -67,13 +74,15 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
-    final Pair<AopPatternContainer, AopPatternContainer> pair = getOperands();
+    Couple<AopPatternContainer> pair = getOperands();
     if (pair == null) return Collections.emptyList();
 
     final Collection<AopPsiTypePattern> leftPatterns = pair.first.getPatterns();
     final Collection<AopPsiTypePattern> rightPatterns = pair.second.getPatterns();
-    final Collection<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
+    Collection<AopPsiTypePattern> result = new HashSet<>();
     if (getOperation() == AopOperation.AND) {
       conjunctPatterns(leftPatterns, rightPatterns, result);
     } else {
@@ -83,6 +92,8 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
     return result;
   }
 
+  @Override
+  @RequiredReadAction
   public String getTypePattern() {
     final AopTypeExpression[] expressions = findChildrenByClass(AopTypeExpression.class);
     if (expressions.length != 2) return null;
@@ -91,7 +102,7 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
     final String pattern1 = expressions[1].getTypePattern();
     if (pattern0 == null || pattern1 == null) return null;
 
-    final Pair<AopPatternContainer, AopPatternContainer> pair = getOperands();
+    Couple<AopPatternContainer> pair = getOperands();
     if (pair == null) return null;
 
     return "'_:[is(\"" + pattern0 + "\") " + (getOperation() == AopOperation.AND ? "&&" : "||") + " is(\"" + pattern1 + "\")]";

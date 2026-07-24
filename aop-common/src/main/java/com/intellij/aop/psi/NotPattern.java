@@ -5,10 +5,10 @@ package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiJavaPackage;
 import com.intellij.java.language.psi.PsiType;
-import consulo.application.util.function.Processor;
 import consulo.language.psi.PsiManager;
-
 import jakarta.annotation.Nonnull;
+
+import java.util.function.Predicate;
 
 /**
  * @author peter
@@ -16,7 +16,7 @@ import jakarta.annotation.Nonnull;
 public class NotPattern extends AopPsiTypePattern{
   private final AopPsiTypePattern myInnerPattern;
 
-  public NotPattern(final AopPsiTypePattern innerPattern) {
+  public NotPattern(AopPsiTypePattern innerPattern) {
     myInnerPattern = innerPattern;
   }
 
@@ -24,15 +24,18 @@ public class NotPattern extends AopPsiTypePattern{
     return myInnerPattern;
   }
 
+  @Override
   public boolean accepts(@Nonnull PsiType type) {
     return !myInnerPattern.accepts(type);
   }
 
-  public boolean accepts(@Nonnull final String qualifiedName) {
+  @Override
+  public boolean accepts(@Nonnull String qualifiedName) {
     return !myInnerPattern.accepts(qualifiedName);
   }
 
-  public boolean processPackages(final PsiManager manager, final Processor<PsiJavaPackage> processor) {
+  @Override
+  public boolean processPackages(PsiManager manager, Predicate<PsiJavaPackage> processor) {
     return TRUE.processPackages(manager, processor);
   }
 }
