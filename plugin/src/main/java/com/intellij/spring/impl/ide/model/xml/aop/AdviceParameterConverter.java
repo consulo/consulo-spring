@@ -7,6 +7,7 @@ import com.intellij.aop.jam.AopAdviceImpl;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
 import consulo.aop.localize.AopLocalize;
+import consulo.localize.LocalizeValue;
 import consulo.xml.dom.ConvertContext;
 import consulo.xml.dom.ResolvingConverter;
 import jakarta.annotation.Nonnull;
@@ -32,8 +33,9 @@ public class AdviceParameterConverter extends ResolvingConverter<PsiParameter> {
     return Collections.emptyList();
   }
 
-  public String getErrorMessage(@Nullable final String s, final ConvertContext context) {
-    return AopLocalize.errorCannotResolveParameter(s).get();
+  @Override
+  public LocalizeValue buildUnresolvedMessage(@Nullable String s, ConvertContext context) {
+    return AopLocalize.errorCannotResolveParameter(s);
   }
 
   @Override
