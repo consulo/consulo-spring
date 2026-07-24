@@ -17,5 +17,5 @@ public interface WebflowScopeProvider {
   Set<DomElement> getScopes(@Nullable DomElement domElement);
 
   @Nullable
-  PsiElement getOrCreateScopeVariable(final XmlFile psiFile, final String varName, final PsiElement host);
+  PsiElement getOrCreateScopeVariable(XmlFile psiFile, String varName, PsiElement host);
 }

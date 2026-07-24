@@ -17,7 +17,7 @@ public class ConcatenationPattern extends AopPsiTypePattern{
   private final AopPsiTypePattern myRight;
   private final boolean myDoubleDot;
 
-  public ConcatenationPattern(final AopPsiTypePattern left, final AopPsiTypePattern right, final boolean doubleDot) {
+  public ConcatenationPattern(AopPsiTypePattern left, AopPsiTypePattern right, boolean doubleDot) {
     myLeft = left;
     myRight = right;
     myDoubleDot = doubleDot;
@@ -37,10 +37,10 @@ public class ConcatenationPattern extends AopPsiTypePattern{
 
   public boolean accepts(@Nonnull PsiType type) {
     if (type instanceof PsiClassType) {
-      final PsiClassType classType = (PsiClassType)type;
-      final PsiClass psiClass = classType.resolve();
+      PsiClassType classType = (PsiClassType)type;
+      PsiClass psiClass = classType.resolve();
       if (psiClass != null) {
-        final String qname = psiClass.getQualifiedName();
+        String qname = psiClass.getQualifiedName();
         if (qname != null && accepts(qname)) {
           return true;
         }
@@ -49,9 +49,9 @@ public class ConcatenationPattern extends AopPsiTypePattern{
     return false;
   }
 
-  public boolean accepts(@Nonnull final String qualifiedName) {
-    final String[] strings = qualifiedName.split("\\.");
-    final int[] indices = new int[strings.length];
+  public boolean accepts(@Nonnull String qualifiedName) {
+    String[] strings = qualifiedName.split("\\.");
+    int[] indices = new int[strings.length];
     indices[0] = -1;
     for (int i = 1; i < indices.length; i++) {
       indices[i] = indices[i - 1] + strings[i - 1].length() + 1;
@@ -64,7 +64,7 @@ public class ConcatenationPattern extends AopPsiTypePattern{
     }
 
     for (int i = 1; i < indices.length; i++) {
-      final int index = indices[i];
+      int index = indices[i];
       if (myLeft.accepts(qualifiedName.substring(0, index))) {
         if (myDoubleDot) {
           for (int j = i; j < indices.length; j++) {

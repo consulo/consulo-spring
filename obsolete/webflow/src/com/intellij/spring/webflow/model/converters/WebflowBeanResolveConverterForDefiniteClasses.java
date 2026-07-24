@@ -15,22 +15,22 @@ import java.util.List;
 
 public abstract class WebflowBeanResolveConverterForDefiniteClasses extends SpringBeanResolveConverterForDefiniteClasses {
 
-  protected SpringModel getSpringModel(final ConvertContext context) {
-    final SpringModel model = super.getSpringModel(context);
+  protected SpringModel getSpringModel(ConvertContext context) {
+    SpringModel model = super.getSpringModel(context);
 
     return model == null ? getModel(context.getModule()) : model;
   }
 
   @Nullable
-  protected Beans getBeans(final GenericDomValue<SpringBeanPointer> genericDomValue) {
-    final Beans beans = super.getBeans(genericDomValue);
+  protected Beans getBeans(GenericDomValue<SpringBeanPointer> genericDomValue) {
+    Beans beans = super.getBeans(genericDomValue);
 
     if (beans != null) return beans;
 
-    final SpringModel springModel = getModel(genericDomValue.getModule());
+    SpringModel springModel = getModel(genericDomValue.getModule());
     if (springModel == null) return null;
 
-    final List<DomFileElement<Beans>> elementList = springModel.getRoots();
+    List<DomFileElement<Beans>> elementList = springModel.getRoots();
     if (elementList.size() > 0) {
       return elementList.get(0).getRootElement();
     }
@@ -38,7 +38,7 @@ public abstract class WebflowBeanResolveConverterForDefiniteClasses extends Spri
   }
 
   @Nullable
-  private static SpringModel getModel(@Nullable final Module module) {
+  private static SpringModel getModel(@Nullable Module module) {
     return module == null ? null : SpringManager.getInstance(module.getProject()).getCombinedModel(module);
   }
 }

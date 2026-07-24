@@ -28,21 +28,21 @@ public abstract class ConstructorArgImpl extends SpringInjectionImpl implements 
 
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final PsiType type = getType().getValue();
+    PsiType type = getType().getValue();
     if (type != null) {
       return Collections.singletonList(type);
     }
-    final SpringBean springBean = (SpringBean)getParent();
+    SpringBean springBean = (SpringBean)getParent();
     assert springBean != null;
-    final GenericAttributeValue<Integer> index = getIndex();
+    GenericAttributeValue<Integer> index = getIndex();
     if (index.getValue() != null) {
-      final PsiParameter parameter = ConstructorArgIndexConverter.resolve(index, springBean);
+      PsiParameter parameter = ConstructorArgIndexConverter.resolve(index, springBean);
       return parameter == null ? Collections.<PsiType>emptyList() : Collections.singletonList(parameter.getType());
     }
-    final ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
-    final PsiMethod resolvedMethod = resolvedArgs.getResolvedMethod();
+    ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+    PsiMethod resolvedMethod = resolvedArgs.getResolvedMethod();
     if (resolvedMethod != null) {
-      final PsiParameter parameter = resolvedArgs.getResolvedArgs(resolvedMethod).get(this);
+      PsiParameter parameter = resolvedArgs.getResolvedArgs(resolvedMethod).get(this);
       if (parameter != null) {
         return Collections.singletonList(parameter.getType());
       }
@@ -50,19 +50,19 @@ public abstract class ConstructorArgImpl extends SpringInjectionImpl implements 
     return Collections.emptyList();
   }
 
-  public boolean isAssignable(final @Nonnull PsiType to) {
+  public boolean isAssignable(@Nonnull PsiType to) {
     PsiType[] types = getTypesByValue();
     if (types == null) {
       return true;
     }
     for (PsiType typeByValue : types) {
       if (to instanceof PsiClassType && typeByValue instanceof PsiClassType) {
-        final PsiClass psiClass = ((PsiClassType)typeByValue).resolve();
+        PsiClass psiClass = ((PsiClassType)typeByValue).resolve();
         if (psiClass != null && SpringFactoryBeansManager.isBeanFactory(psiClass)) {
-          final SpringBean springBean = (SpringBean)getParent();
+          SpringBean springBean = (SpringBean)getParent();
           assert springBean != null;
-          final PsiClass requiredClass = ((PsiClassType)to).resolve();
-          final SpringBeanPointer factoryBean = SpringUtils.getReferencedSpringBean(this);
+          PsiClass requiredClass = ((PsiClassType)to).resolve();
+          SpringBeanPointer factoryBean = SpringUtils.getReferencedSpringBean(this);
           if (requiredClass != null && factoryBean != null) {
             return SpringFactoryBeansManager.getInstance().canProduce(psiClass, requiredClass, factoryBean.getSpringBean());
           }
@@ -79,17 +79,17 @@ public abstract class ConstructorArgImpl extends SpringInjectionImpl implements 
   }
 
   public int hashCode() {
-    final Integer value = getIndex().getValue();
+    Integer value = getIndex().getValue();
     return value == null ? 0 : value.hashCode();
   }
 
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     if (!(obj instanceof ConstructorArg)) return false;
 
-    final ConstructorArg that = (ConstructorArg)obj;
+    ConstructorArg that = (ConstructorArg)obj;
     if (getXmlTag().equals(that.getXmlTag())) return true;
     
-    final Integer indec = getIndex().getValue();
+    Integer indec = getIndex().getValue();
     return indec != null && ComparatorUtil.equalsNullable(indec, that.getIndex().getValue());
   }
 }

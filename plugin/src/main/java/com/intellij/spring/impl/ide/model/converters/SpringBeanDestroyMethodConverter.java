@@ -12,14 +12,14 @@ import com.intellij.java.language.psi.PsiType;
 //@see org.springframework.beans.factory.support.DisposableBeanAdapter#invokeCustomDestroyMethod
 public class SpringBeanDestroyMethodConverter extends SpringBeanMethodConverter {
 
-  protected boolean checkParameterList(final PsiMethod method) {
-    final PsiParameterList parameterList = method.getParameterList();
+  protected boolean checkParameterList(PsiMethod method) {
+    PsiParameterList parameterList = method.getParameterList();
 
     return parameterList.getParametersCount() == 0 ||
            (parameterList.getParametersCount() == 1 && PsiType.BOOLEAN.equals(parameterList.getParameters()[0].getType()));
   }
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return !method.hasModifierProperty(PsiModifier.ABSTRACT);
   }
 }

@@ -107,7 +107,7 @@ public class SpringAopHighlightingTest extends JavaCodeInsightFixtureTestCase {
     doTest(getTestName(true) + ".xml", new ArgNamesErrorsInspection());
   }
 
-  private void doTest(final String fileName, final LocalInspectionTool... inspections) throws Throwable {
+  private void doTest(String fileName, LocalInspectionTool... inspections) throws Throwable {
     myFixture.enableInspections(inspections);
     myFixture.copyFileToProject(fileName);
     myFixture.testHighlighting(true, false, false, fileName);

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class ExpressionParserConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[]{FlowBuilderServices.EXPRESSION_PARSER_CLASS};
   }
 }

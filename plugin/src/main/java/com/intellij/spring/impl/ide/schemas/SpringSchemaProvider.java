@@ -56,13 +56,13 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
   }
 
   @Nullable
-  public XmlFile getSchema(@Nonnull @NonNls final String url, @Nullable consulo.module.Module module, @Nonnull final PsiFile baseFile) {
-    final String schemaLocation = FALLBACK_SCHEMALOCATIONS.get(url);
+  public XmlFile getSchema(@Nonnull @NonNls String url, @Nullable consulo.module.Module module, @Nonnull PsiFile baseFile) {
+    String schemaLocation = FALLBACK_SCHEMALOCATIONS.get(url);
     if (schemaLocation != null) {
       return getSchema(schemaLocation, module, baseFile);
     }
     if (module == null) {
-      final PsiDirectory directory = baseFile.getParent();
+      PsiDirectory directory = baseFile.getParent();
       if (directory != null) {
         module = ModuleUtilCore.findModuleForPsiElement(directory);
       }
@@ -70,38 +70,38 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
     if (module == null) {
       return null;
     }
-    final Map<String, VirtualFile> schemas = getSchemas(module);
-    final Project project = module.getProject();
-    final VirtualFile file = schemas.get(url);
+    Map<String, VirtualFile> schemas = getSchemas(module);
+    Project project = module.getProject();
+    VirtualFile file = schemas.get(url);
     if (file == null) return null;
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+    PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
     if (!(psiFile instanceof XmlFile)) return null;
     return (XmlFile)psiFile;
   }
 
-  public boolean isAvailable(final @Nonnull XmlFile file) {
-    final boolean isSpring = SpringManager.getInstance(file.getProject()).isSpringBeans(file);
+  public boolean isAvailable(@Nonnull XmlFile file) {
+    boolean isSpring = SpringManager.getInstance(file.getProject()).isSpringBeans(file);
     if (isSpring) {
       return true;
     }
-    final VirtualFile virtualFile = file.getVirtualFile();
+    VirtualFile virtualFile = file.getVirtualFile();
     if (virtualFile == null) {
       return false;
     }
-    final String extension = virtualFile.getExtension();
+    String extension = virtualFile.getExtension();
     return extension != null && extension.equals("xsd");
   }
 
   @Nonnull
-  public Set<String> getAvailableNamespaces(@Nonnull final XmlFile file, final String tagName) {
-    final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(file);
+  public Set<String> getAvailableNamespaces(@Nonnull XmlFile file, String tagName) {
+    consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(file);
     if (module == null) {
       return Collections.emptySet();
     }
-    final Map<String, VirtualFile> map = getSchemas(module);
-    final HashSet<String> strings = new HashSet<String>(map.size());
+    Map<String, VirtualFile> map = getSchemas(module);
+    HashSet<String> strings = new HashSet<String>(map.size());
     for (VirtualFile virtualFile : map.values()) {
-      final String namespace = getNamespace(virtualFile, file.getProject());
+      String namespace = getNamespace(virtualFile, file.getProject());
       if (namespace != null) {
         strings.add(namespace);
       }
@@ -110,12 +110,12 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
   }
 
   @Nullable
-  private static String getNamespace(final VirtualFile virtualFile, final Project project) {
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+  private static String getNamespace(VirtualFile virtualFile, Project project) {
+    PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
     if (psiFile instanceof XmlFile) {
-      final XmlDocument document = ((XmlFile)psiFile).getDocument();
+      XmlDocument document = ((XmlFile)psiFile).getDocument();
       if (document != null) {
-        final PsiMetaData metaData = document.getMetaData();
+        PsiMetaData metaData = document.getMetaData();
         if (metaData instanceof XmlNSDescriptorImpl) {
           return ((XmlNSDescriptorImpl)metaData).getDefaultNamespace();
         }
@@ -124,21 +124,21 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
     return null;
   }
 
-  public String getDefaultPrefix(@Nonnull @NonNls final String namespace, @Nonnull final XmlFile context) {
+  public String getDefaultPrefix(@Nonnull @NonNls String namespace, @Nonnull XmlFile context) {
     if (!SpringManager.getInstance(context.getProject()).isSpringBeans(context))
       return null;
-    final String[] strings = namespace.split("/");
+    String[] strings = namespace.split("/");
     return strings[strings.length - 1];
   }
 
-  public Set<String> getLocations(@Nonnull @NonNls final String namespace, @Nonnull final XmlFile context) {
-    final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(context);
+  public Set<String> getLocations(@Nonnull @NonNls String namespace, @Nonnull XmlFile context) {
+    consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(context);
     if (module == null) {
       return null;
     }
-    final Map<String, VirtualFile> schemas = getSchemas(module);
+    Map<String, VirtualFile> schemas = getSchemas(module);
     for (Map.Entry<String, VirtualFile> entry : schemas.entrySet()) {
-      final String s = getNamespace(entry.getValue(), context.getProject());
+      String s = getNamespace(entry.getValue(), context.getProject());
       if (s != null && s.equals(namespace)) {
         return Collections.singleton(entry.getKey());
       }
@@ -148,9 +148,9 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
 
   @Nonnull
   public static Map<String, VirtualFile> getSchemas(@Nonnull final Module module) {
-    final Project project = module.getProject();
-    final CachedValuesManager manager = CachedValuesManager.getManager(project);
-    final Map<String, VirtualFile> bundle =
+    Project project = module.getProject();
+    CachedValuesManager manager = CachedValuesManager.getManager(project);
+    Map<String, VirtualFile> bundle =
       manager.getCachedValue(module, SCHEMAS_BUNDLE_KEY, new CachedValueProvider<Map<String, VirtualFile>>() {
         public Result<Map<String, VirtualFile>> compute() {
           return computeSchemas(module);
@@ -160,27 +160,27 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
   }
 
   @Nonnull
-  public static Map<String, String> getHandlers(@Nonnull final consulo.module.Module module) {
+  public static Map<String, String> getHandlers(@Nonnull consulo.module.Module module) {
     return computeHandlers(module);
   }
 
   @Nonnull
-  private static CachedValueProvider.Result<Map<String, VirtualFile>> computeSchemas(@Nonnull final consulo.module.Module module) {
-    final PsiJavaPackage psiPackage =
+  private static CachedValueProvider.Result<Map<String, VirtualFile>> computeSchemas(@Nonnull consulo.module.Module module) {
+    PsiJavaPackage psiPackage =
       JavaPsiFacade.getInstance(module.getProject()).findPackage("META-INF");
     if (psiPackage != null) {
-      final PsiDirectory[] directories =
+      PsiDirectory[] directories =
         psiPackage.getDirectories(GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false));
       Map<String, VirtualFile> map = new HashMap<String, VirtualFile>();
       ArrayList<Object> dependencies = new ArrayList<Object>();
       dependencies.add(ProjectRootManager.getInstance(module.getProject()));
       for (PsiDirectory directory : directories) {
-        final PsiFile psiFile = directory.findFile("spring.schemas");
+        PsiFile psiFile = directory.findFile("spring.schemas");
         if (psiFile != null) {
-          final VirtualFile schemasFile = psiFile.getVirtualFile();
+          VirtualFile schemasFile = psiFile.getVirtualFile();
           assert schemasFile != null;
           dependencies.add(psiFile);
-          final PsiDirectory parent = directory.getParent();
+          PsiDirectory parent = directory.getParent();
           assert parent != null;
           String root = parent.getVirtualFile().getUrl();
           if (!root.endsWith("/")) {
@@ -189,13 +189,13 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
           InputStream inputStream = null;
           try {
             inputStream = schemasFile.getInputStream();
-            final PropertyResourceBundle bundle = new PropertyResourceBundle(inputStream);
-            final Enumeration<String> keys = bundle.getKeys();
+            PropertyResourceBundle bundle = new PropertyResourceBundle(inputStream);
+            Enumeration<String> keys = bundle.getKeys();
             while (keys.hasMoreElements()) {
-              final String key = keys.nextElement();
-              final String location = (String)bundle.handleGetObject(key);
-              final String schemaUrl = root + location;
-              final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(schemaUrl);
+              String key = keys.nextElement();
+              String location = (String)bundle.handleGetObject(key);
+              String schemaUrl = root + location;
+              VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(schemaUrl);
               if (file != null) {
                 map.put(key, file);
               }
@@ -223,20 +223,20 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
   }
 
   @Nonnull
-  private static Map<String, String> computeHandlers(@Nonnull final consulo.module.Module module) {
-    final Project project = module.getProject();
-    final PsiManager psiManager = PsiManager.getInstance(project);
-    final PsiPackage psiPackage = JavaPsiFacade.getInstance(psiManager.getProject()).findPackage("META-INF");
+  private static Map<String, String> computeHandlers(@Nonnull consulo.module.Module module) {
+    Project project = module.getProject();
+    PsiManager psiManager = PsiManager.getInstance(project);
+    PsiPackage psiPackage = JavaPsiFacade.getInstance(psiManager.getProject()).findPackage("META-INF");
     if (psiPackage != null) {
-      final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false);
-      final PsiDirectory[] directories = psiPackage.getDirectories(scope);
+      GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false);
+      PsiDirectory[] directories = psiPackage.getDirectories(scope);
       Map<String, String> map = new HashMap<String, String>();
       for (PsiDirectory directory : directories) {
-        final PsiFile psiFile = directory.findFile("spring.handlers");
+        PsiFile psiFile = directory.findFile("spring.handlers");
         if (psiFile != null) {
-          final VirtualFile handlersFile = psiFile.getVirtualFile();
+          VirtualFile handlersFile = psiFile.getVirtualFile();
           assert handlersFile != null;
-          final PsiDirectory parent = directory.getParent();
+          PsiDirectory parent = directory.getParent();
           assert parent != null;
           String root = parent.getVirtualFile().getUrl();
           if (!root.endsWith("/")) {
@@ -245,10 +245,10 @@ public class SpringSchemaProvider extends XmlSchemaProvider implements DumbAware
           InputStream inputStream = null;
           try {
             inputStream = handlersFile.getInputStream();
-            final PropertyResourceBundle bundle = new PropertyResourceBundle(inputStream);
-            final Enumeration<String> keys = bundle.getKeys();
+            PropertyResourceBundle bundle = new PropertyResourceBundle(inputStream);
+            Enumeration<String> keys = bundle.getKeys();
             while (keys.hasMoreElements()) {
-              final String key = keys.nextElement();
+              String key = keys.nextElement();
               map.put(key, (String)bundle.handleGetObject(key));
             }
           }

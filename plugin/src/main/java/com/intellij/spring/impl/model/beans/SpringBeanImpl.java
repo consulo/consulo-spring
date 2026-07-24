@@ -48,14 +48,14 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
    */
   @Nullable
   public String getBeanName() {
-    final String id = getId().getStringValue();
+    String id = getId().getStringValue();
     if (id != null) {
       return id;
     }
     else {
-      final String name = getName().getStringValue();
+      String name = getName().getStringValue();
       if (name != null) {
-        final List<String> list = SpringUtils.tokenize(name);
+        List<String> list = SpringUtils.tokenize(name);
         return list.size() > 0 ? list.get(0) : null;
       }
     }
@@ -69,10 +69,10 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
 
   @Nonnull
   public String[] getAliases() {
-    final String name = getName().getStringValue();
+    String name = getName().getStringValue();
     if (name != null) {
-      final List<String> list = SpringUtils.tokenize(name);
-      final String id = getId().getStringValue();
+      List<String> list = SpringUtils.tokenize(name);
+      String id = getId().getStringValue();
       if (id == null && list.size() > 1) {
         list.remove(0);
       }
@@ -82,14 +82,14 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
   }
 
   public void setName(@Nonnull String newName) {
-    final String id = getId().getStringValue();
+    String id = getId().getStringValue();
     if (id != null) {
       getId().setStringValue(newName);
     }
     else {
-      final String name = getName().getStringValue();
+      String name = getName().getStringValue();
       if (name != null) {
-        final int first = StringUtil.findFirst(name, SpringUtils.ourFilter);
+        int first = StringUtil.findFirst(name, SpringUtils.ourFilter);
         if (first >= 0) {
           String newValue = newName + name.substring(first);
           getName().setStringValue(newValue);
@@ -111,19 +111,19 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
   public abstract GenericAttributeValue<PsiMethod> getFactoryMethod();
 
   @Nullable
-  public PsiClass getBeanClass(@Nullable Set<AbstractDomSpringBean> visited, final boolean considerFactories) {
+  public PsiClass getBeanClass(@Nullable Set<AbstractDomSpringBean> visited, boolean considerFactories) {
     if (visited != null && visited.contains(this)) return null;
 
-    final PsiClass psiClass = super.getBeanClass(visited, considerFactories);
+    PsiClass psiClass = super.getBeanClass(visited, considerFactories);
     if (psiClass != null) return psiClass;
 
-    final SpringBeanPointer parent = getParentBean().getValue();
+    SpringBeanPointer parent = getParentBean().getValue();
     if (parent != null) {
       if (visited == null) {
         visited = new HashSet<AbstractDomSpringBean>();
       }
       visited.add(this);
-      final CommonSpringBean bean = parent.getSpringBean();
+      CommonSpringBean bean = parent.getSpringBean();
       if (bean instanceof DomSpringBeanImpl) {
         return ((DomSpringBeanImpl)bean).getBeanClass(visited, considerFactories);
       }
@@ -132,7 +132,7 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
   }
 
   public List<SpringPropertyDefinition> getAllProperties() {
-    final Set<SpringPropertyDefinition> list = SpringUtils.getMergedSet(this, PROPERTIES_GETTER);
+    Set<SpringPropertyDefinition> list = SpringUtils.getMergedSet(this, PROPERTIES_GETTER);
     return new ArrayList<SpringPropertyDefinition>(list);
   }
 
@@ -143,7 +143,7 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
   @Nonnull
   public ResolvedConstructorArgs getResolvedConstructorArgs() {
     if (myResolvedConstructorArgs == null) {
-      final CachedValuesManager cachedValuesManager = CachedValuesManager.getManager(getManager().getProject());
+      CachedValuesManager cachedValuesManager = CachedValuesManager.getManager(getManager().getProject());
       myResolvedConstructorArgs = cachedValuesManager.createCachedValue(new CachedValueProvider<ResolvedConstructorArgsImpl>() {
         public Result<ResolvedConstructorArgsImpl> compute() {
           return Result.createSingleDependency(new ResolvedConstructorArgsImpl(SpringBeanImpl.this),
@@ -151,20 +151,20 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
         }
       }, false);
     }
-    final ResolvedConstructorArgs resolvedConstructorArgs = myResolvedConstructorArgs.getValue();
+    ResolvedConstructorArgs resolvedConstructorArgs = myResolvedConstructorArgs.getValue();
     assert resolvedConstructorArgs != null;
     return resolvedConstructorArgs;
   }
 
   public boolean isAbstract() {
-    final Boolean value = getAbstract().getValue();
+    Boolean value = getAbstract().getValue();
     return value != null && value.booleanValue();
   }
 
   public Autowire getBeanAutowire() {
     Autowire autowire = getAutowire().getValue();
     if (autowire == null) {
-      final Beans beans = getParentOfType(Beans.class, false);
+      Beans beans = getParentOfType(Beans.class, false);
       assert beans != null;
       autowire = Autowire.fromDefault(beans.getDefaultAutowire().getValue());
     }
@@ -178,12 +178,12 @@ public abstract class SpringBeanImpl extends DomSpringBeanImpl implements Spring
 
   @NonNls
   public String toString() {
-    final String beanName = getBeanName();
+    String beanName = getBeanName();
     return beanName == null ? "Unknown" : beanName;
   }
 
   public SpringQualifier getSpringQualifier() {
-    final SpringDomQualifier qualifier = getQualifier();
+    SpringDomQualifier qualifier = getQualifier();
     return !DomUtil.hasXml(qualifier) ? null : qualifier;
   }
 }

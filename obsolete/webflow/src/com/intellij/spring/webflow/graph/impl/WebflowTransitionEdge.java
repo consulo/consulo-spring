@@ -10,24 +10,24 @@ import org.jetbrains.annotations.NotNull;
  * User: plt
  */
 public class WebflowTransitionEdge extends WebflowBasicEdge<Transition> {
-  public WebflowTransitionEdge(final WebflowNode source, final WebflowNode target, final Transition transition) {
+  public WebflowTransitionEdge(WebflowNode source, WebflowNode target, Transition transition) {
     super(source, target, transition);
   }
 
   @NotNull
   public String getName() {
     if (isOnEventTransition()) {
-      final String value = getIdentifyingElement().getOn().getStringValue();
+      String value = getIdentifyingElement().getOn().getStringValue();
       if (value != null) return value;
     } else {
-      final PsiClass psiClass = getIdentifyingElement().getOnException().getValue();
+      PsiClass psiClass = getIdentifyingElement().getOnException().getValue();
       if (psiClass != null) {
-        final String name = psiClass.getName();
+        String name = psiClass.getName();
         if (name != null) {
           return name;
         }
       } else {
-        final String value = getIdentifyingElement().getOnException().getStringValue();
+        String value = getIdentifyingElement().getOnException().getStringValue();
         if (value != null) return value;
       }
     }

@@ -12,8 +12,8 @@ import java.util.Collection;
 @ExtensionImpl(order = "first")
 public class SpringFactoryBeansEffectiveTypesProviders extends SpringBeanEffectiveTypeProvider {
 
-  public void processEffectiveTypes(@Nonnull final CommonSpringBean bean, final Collection<PsiClass> result) {
-    final PsiClass beanClass = bean.getBeanClass();
+  public void processEffectiveTypes(@Nonnull CommonSpringBean bean, Collection<PsiClass> result) {
+    PsiClass beanClass = bean.getBeanClass();
     if (beanClass == null || !SpringFactoryBeansManager.isBeanFactory(beanClass)) return;
 
     result.clear();

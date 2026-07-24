@@ -25,7 +25,7 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
     return false;
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     addSpringJar(moduleBuilder);
     moduleBuilder.addLibraryJars("SpringJavaConfig", PathManager.getHomePath().replace(File.separatorChar, '/') + super.getBasePath(),
@@ -33,7 +33,7 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
   }
 
   public void testJamExternalBeansHighlighting() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "jam_external_beans.xml");
     myFixture.testHighlighting(true, false, false, "JavaConfigExternalBeans.java", "FooBean.java");
   }
@@ -65,7 +65,7 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
                                    "JavaConfigExternalBeans2.java","FooBean.java", "FooBean3.java");
         fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename.xml"));
         fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename2.xml"));
-        final DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
+        DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
         assertNotNull(springBean);
         SpringExternalBeanReferencesRenameHandler.doRename(springBean, "externalBean_new_name", false);
         myFixture.checkResultByFile("JavaConfigExternalBeanRename1.java", "JavaConfigExternalBeansRename1_after.java", true);
@@ -83,7 +83,7 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
         myFixture.configureByFiles("jam_external_beans_rename.xml","jam_external_beans_rename2.xml","JavaConfigExternalBeanRename1.java","JavaConfigExternalBeans2.java");
         fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename.xml"));
         fileSet2.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename2.xml"));
-        final DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
+        DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
         assertNotNull(springBean);
 
         SpringExternalBeanReferencesRenameHandler.doRename(springBean, "externalBean_new_name", false);
@@ -104,7 +104,7 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
         myFixture.configureByFiles("jam_external_beans_rename.xml","jam_external_beans_rename_no_java_config.xml","JavaConfigExternalBeanRename1.java","JavaConfigExternalBeans2.java");
         fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename.xml"));
         fileSet2.addFile(myFixture.getTempDirFixture().getFile("jam_external_beans_rename_no_java_config.xml"));
-        final DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
+        DomSpringBean springBean = SpringBeanUtil.getTargetSpringBean();
         assertNotNull(springBean);
 
         SpringExternalBeanReferencesRenameHandler.doRename(springBean, "externalBean_new_name", false);
@@ -116,18 +116,18 @@ public class JamAndXmlConfigurationTest extends SpringHighlightingTestCase<JavaM
     }.execute().throwException();
   }
   public void testExternalBeanRename() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
 
     myFixture.configureByFiles("JavaConfigExternalBeans.java","jam_external_bean_rename1.xml","jam_external_bean_rename2.xml","JavaConfigExternalBeanRename1.java","JavaConfigExternalBeans2.java");
     fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_bean_rename1.xml"));
     fileSet.addFile(myFixture.getTempDirFixture().getFile("jam_external_bean_rename2.xml"));
-    final Editor editor = myFixture.getEditor();
-    final PsiFile file = myFixture.getFile();
+    Editor editor = myFixture.getEditor();
+    PsiFile file = myFixture.getFile();
 
     int offset = editor.getCaretModel().getOffset();
     PsiElement element = file.findElementAt(offset);
 
-    final PsiMethod psiMethod = (PsiMethod)element.getParent();
+    PsiMethod psiMethod = (PsiMethod)element.getParent();
     assertNotNull(psiMethod);
     assertTrue(SpringJamUtils.isExternalBean(psiMethod));
     final SpringJavaExternalBean externalBean = SpringJamUtils.getExternalBean(psiMethod);

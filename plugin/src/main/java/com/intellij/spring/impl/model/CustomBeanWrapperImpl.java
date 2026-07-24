@@ -31,16 +31,16 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
   private final NotNullLazyValue<List<CustomBean>> myBeans = new NotNullLazyValue<List<CustomBean>>() {
     @Nonnull
     protected List<CustomBean> compute() {
-      final XmlTag tag = getXmlTag();
-      final List<CustomBeanInfo> infos = CustomBeanRegistry.getInstance(getPsiManager().getProject()).getParseResult(tag);
+      XmlTag tag = getXmlTag();
+      List<CustomBeanInfo> infos = CustomBeanRegistry.getInstance(getPsiManager().getProject()).getParseResult(tag);
       if (infos == null || infos.isEmpty()) {
         CustomBean bean = getExportingBean(tag);
         return bean != null ? Collections.singletonList(bean) : Collections.<CustomBean>emptyList();
       }
 
-      final ArrayList<CustomBean> result = new ArrayList<CustomBean>(infos.size());
-      final Module module = getModule();
-      for (final CustomBeanInfo info : infos) {
+      ArrayList<CustomBean> result = new ArrayList<CustomBean>(infos.size());
+      Module module = getModule();
+      for (CustomBeanInfo info : infos) {
         result.add(new CustomNamespaceSpringBean(info, module, CustomBeanWrapperImpl.this));
       }
       return result;
@@ -48,11 +48,11 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
   };
 
   @Nullable
-  private CustomBean getExportingBean(final XmlTag tag) {
-    final XmlElementDescriptor descriptor = tag.getDescriptor();
+  private CustomBean getExportingBean(XmlTag tag) {
+    XmlElementDescriptor descriptor = tag.getDescriptor();
     if (descriptor == null) return null;
 
-    final PsiElement declaration = descriptor.getDeclaration();
+    PsiElement declaration = descriptor.getDeclaration();
     if (!(declaration instanceof XmlTag)) return null;
 
     XmlTag declTag = (XmlTag) declaration;
@@ -68,12 +68,12 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
     }
     if (annotationTag == null) return null;
 
-    final XmlTag[] exports = annotationTag.findSubTags("exports", SpringConstants.TOOL_NAMESPACE);
+    XmlTag[] exports = annotationTag.findSubTags("exports", SpringConstants.TOOL_NAMESPACE);
     if (exports.length == 0) return null;
 
-    final CustomBeanInfo info = new CustomBeanInfo();
+    CustomBeanInfo info = new CustomBeanInfo();
     info.beanClassName = exports[0].getAttributeValue("type", SpringConstants.TOOL_NAMESPACE);
-    final String idPtr = exports[0].getAttributeValue("identifier", SpringConstants.TOOL_NAMESPACE);
+    String idPtr = exports[0].getAttributeValue("identifier", SpringConstants.TOOL_NAMESPACE);
     if (idPtr == null) {
       info.idAttribute = "id";
     }
@@ -110,7 +110,7 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
   }
 
   public boolean isParsed() {
-    final List<CustomBean> customBeans = getCachedValue();
+    List<CustomBean> customBeans = getCachedValue();
     return !customBeans.isEmpty() || customBeans != Collections.<CustomBean>emptyList();
   }
 

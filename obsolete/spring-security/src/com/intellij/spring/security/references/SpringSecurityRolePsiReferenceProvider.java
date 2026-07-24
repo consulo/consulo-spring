@@ -42,8 +42,8 @@ public abstract class SpringSecurityRolePsiReferenceProvider<T extends PsiElemen
   }
 
   @NotNull
-  public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull final ProcessingContext context) {
-    final String value = getStringValue(element);
+  public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+    String value = getStringValue(element);
 
     return getSecurityRolesReferences(element, value);
   }

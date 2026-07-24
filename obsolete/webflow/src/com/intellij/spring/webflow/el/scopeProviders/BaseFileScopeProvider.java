@@ -22,14 +22,14 @@ import java.util.Set;
 
 public abstract class BaseFileScopeProvider implements WebflowScopeProvider {
 
-  public boolean accept(@Nullable final DomElement domElement) {
+  public boolean accept(@Nullable DomElement domElement) {
      return getScopes(domElement).size() > 0;
   }
 
   @NotNull
-  public Set<DomElement> getScopes(@Nullable final DomElement domElement) {
+  public Set<DomElement> getScopes(@Nullable DomElement domElement) {
     if(domElement != null) {
-      final Flow flow = domElement.getParentOfType(Flow.class, false);
+      Flow flow = domElement.getParentOfType(Flow.class, false);
       if (flow != null) {
         return Collections.<DomElement>singleton(flow);
       }
@@ -37,7 +37,7 @@ public abstract class BaseFileScopeProvider implements WebflowScopeProvider {
     return Collections.emptySet();
   }
 
-  public PsiElement getOrCreateScopeVariable(final XmlFile psiFile, final String varName, final PsiElement host) {
+  public PsiElement getOrCreateScopeVariable(final XmlFile psiFile, String varName, PsiElement host) {
     CachedValue<Map<String, PsiElement>> cachedValue = host.getContainingFile().getUserData(getScopeVariablesKey());
     if (cachedValue == null) {
       cachedValue = PsiManager.getInstance(psiFile.getProject()).getCachedValuesManager()
@@ -51,7 +51,7 @@ public abstract class BaseFileScopeProvider implements WebflowScopeProvider {
       psiFile.putUserData(getScopeVariablesKey(), cachedValue);
     }
 
-    final Map<String, PsiElement> map = cachedValue.getValue();
+    Map<String, PsiElement> map = cachedValue.getValue();
 
     assert map != null;
 
@@ -61,7 +61,7 @@ public abstract class BaseFileScopeProvider implements WebflowScopeProvider {
   // collect scope variables for current file
   private Map<String, PsiElement> collectScopeVariables(final XmlFile psiFile) {
     Map<String, PsiElement> map = new HashMap<String, PsiElement>();
-    final WebflowModel webflowModel = WebflowDomModelManager.getInstance(psiFile.getProject()).getWebflowModel(psiFile);
+    WebflowModel webflowModel = WebflowDomModelManager.getInstance(psiFile.getProject()).getWebflowModel(psiFile);
 
     if (webflowModel != null) {
       for (final Evaluate evaluate : ELVariablesCollectorUtils.collectEvaluates(webflowModel, false)) {

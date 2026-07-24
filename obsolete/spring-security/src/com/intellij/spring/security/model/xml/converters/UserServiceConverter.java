@@ -5,7 +5,7 @@ import com.intellij.spring.security.constants.SpringSecurityClassesConstants;
 import com.intellij.util.xml.ConvertContext;
 
 public class UserServiceConverter extends SpringBeanResolveConverterForDefiniteClasses {
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[] {SpringSecurityClassesConstants.USER_DETAILS_SERVICE};
   }
 }

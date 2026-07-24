@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NonNls;
 public class ViewStateDynamicContextProvider implements DynamicContextProvider {
   @NonNls public static String[] prefixes = new String[]{"forward:", "redirect:"};
 
-  public int getOffset(final PsiElement psiElement, int offset, final String elementText) {
+  public int getOffset(PsiElement psiElement, int offset, String elementText) {
     if (elementText != null) {
       for (String prefix : prefixes) {
         if (elementText.contains(prefix)) {
-          final DomElement element = DomUtil.getDomElement(psiElement);
+          DomElement element = DomUtil.getDomElement(psiElement);
           if (element != null && element.getParentOfType(WebflowDomElement.class, false) != null) {
             return offset + prefix.length();
           }

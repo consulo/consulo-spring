@@ -19,11 +19,11 @@ public class SpringJsfVariableResolverProvider implements CustomJsfVariableResol
                                                                                   "org.springframework.web.jsf.SpringBeanVariableResolver",
                                                                                   "org.springframework.web.jsf.el.SpringBeanFacesELResolver");
 
-  public boolean acceptVariableResolver(final String className) {
+  public boolean acceptVariableResolver(String className) {
     return VARIABLE_RESOLVER_CLASSNAMES.contains(className);
   }
 
-  public void addVars(final List<JspImplicitVariable> resultVars, final Module module) {
+  public void addVars(List<JspImplicitVariable> resultVars, Module module) {
     SpringBeansAsJsfVariableUtil.addVariables(resultVars, module);
   }
 }

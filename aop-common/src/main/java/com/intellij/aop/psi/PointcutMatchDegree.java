@@ -18,7 +18,7 @@ public enum PointcutMatchDegree {
   }
 
   public static PointcutMatchDegree not(PointcutMatchDegree d1) {
-    final PointcutMatchDegree[] constants = PointcutMatchDegree.class.getEnumConstants();
+    PointcutMatchDegree[] constants = PointcutMatchDegree.class.getEnumConstants();
     return constants[constants.length - 1 - d1.ordinal()];
   }
 

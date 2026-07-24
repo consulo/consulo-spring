@@ -25,18 +25,18 @@ import jakarta.annotation.Nonnull;
 public class PointcutMethodStyleInspection extends AbstractAopInspection {
     @Override
     protected void checkAopMethod(
-        final PsiMethod pointcutMethod,
-        final LocalAopModel model,
-        final ProblemsHolder holder,
-        final AopPointcutExpressionFile aopFile
+        PsiMethod pointcutMethod,
+        LocalAopModel model,
+        ProblemsHolder holder,
+        AopPointcutExpressionFile aopFile
     ) {
         if (model.getArgNamesManipulator().getAdviceType() != null) {
             return;
         }
 
-        final PsiElement problemElement = model.getArgNamesManipulator().getCommonProblemElement();
+        PsiElement problemElement = model.getArgNamesManipulator().getCommonProblemElement();
         if (pointcutMethod.getReturnType() != PsiType.VOID) {
-            final PsiPointcutExpression expression = aopFile.getPointcutExpression();
+            PsiPointcutExpression expression = aopFile.getPointcutExpression();
             if (expression instanceof PsiIfPointcutExpression && PsiType.BOOLEAN.equals(pointcutMethod.getReturnType())) {
                 return;
             }
@@ -54,7 +54,7 @@ public class PointcutMethodStyleInspection extends AbstractAopInspection {
             return;
         }
 
-        final PsiCodeBlock body = pointcutMethod.getBody();
+        PsiCodeBlock body = pointcutMethod.getBody();
         if (body != null && body.getStatements().length > 0) {
             holder.newProblem(AopLocalize.pointcutMethodsShouldHaveEmptyBody())
                 .range(problemElement)

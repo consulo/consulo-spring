@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class FormatterRegistryConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[]{FlowBuilderServices.FORMATTER_REGISTRY_CLASS};
   }
 }

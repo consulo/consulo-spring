@@ -30,7 +30,7 @@ class MyBeanDefinitionsRegistry extends DefaultListableBeanFactory implements Re
     return myResult;
   }
 
-  public void registerBeanDefinition(String beanName, final BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
+  public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException {
     super.registerBeanDefinition(beanName, beanDefinition);
     if (beanDefinition.getRole() == BeanDefinition.ROLE_INFRASTRUCTURE) {
       myResult.set(0, "has_infrastructures");
@@ -45,16 +45,16 @@ class MyBeanDefinitionsRegistry extends DefaultListableBeanFactory implements Re
     info.add(String.valueOf(beanDefinition.getConstructorArgumentValues().getArgumentCount()));
 
     if (beanDefinition instanceof AbstractBeanDefinition) {
-      final AbstractBeanDefinition definition = (AbstractBeanDefinition)beanDefinition;
+      AbstractBeanDefinition definition = (AbstractBeanDefinition)beanDefinition;
       appendTag(info, definition.getFactoryMethodName(), "factoryMethodName");
       appendTag(info, definition.getFactoryBeanName(), "factoryBeanName");
     }
-    final Object source = beanDefinition.getSource();
+    Object source = beanDefinition.getSource();
 
     if (source instanceof int[]) {
       info.add("path");
       StringBuilder path = new StringBuilder("x"); //x: otherwise string may be empty
-      final int[] ints = (int[])source;
+      int[] ints = (int[])source;
       for (int i = 0; i < ints.length; i++) {
         if (i > 0) path.append(";");
         path.append(ints[i]);
@@ -64,7 +64,7 @@ class MyBeanDefinitionsRegistry extends DefaultListableBeanFactory implements Re
     myResult.add(info);
   }
 
-  private static void appendTag(final List info, final String value, final String tagName) {
+  private static void appendTag(List info, String value, String tagName) {
     if (value == null) return;
 
     info.add(tagName);
@@ -75,7 +75,7 @@ class MyBeanDefinitionsRegistry extends DefaultListableBeanFactory implements Re
     return getClass().getClassLoader();
   }
 
-  public Resource getResource(final String location) {
+  public Resource getResource(String location) {
     return myDelegate.getResource(location);
   }
 }

@@ -20,10 +20,10 @@ import java.util.List;
 public class EntryKeyConverter extends PropertyValueConverter {
 
   @Nonnull
-  public List<? extends PsiType> getValueTypes(final GenericDomValue domValue) {
+  public List<? extends PsiType> getValueTypes(GenericDomValue domValue) {
     SpringEntry entry = (SpringEntry)domValue.getParent();
     assert entry != null;
-    final PsiClass psiClass = entry.getRequiredKeyClass();
+    PsiClass psiClass = entry.getRequiredKeyClass();
     return psiClass == null ? Collections.<PsiType>emptyList() : Collections.singletonList(JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass));
   }
 }

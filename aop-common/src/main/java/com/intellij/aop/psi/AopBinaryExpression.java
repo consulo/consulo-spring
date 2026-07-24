@@ -20,14 +20,14 @@ import java.util.HashSet;
  */
 public class AopBinaryExpression extends AopElementBase implements PsiPointcutExpression, AopTypeExpression {
 
-  public AopBinaryExpression(@Nonnull final ASTNode node) {
+  public AopBinaryExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
   @Nullable
   @RequiredReadAction
   public final Couple<AopPatternContainer> getOperands() {
-    final AopPatternContainer[] containers = findChildrenByClass(AopPatternContainer.class);
+    AopPatternContainer[] containers = findChildrenByClass(AopPatternContainer.class);
     if (containers.length != 2) return null;
     return Couple.of(containers[0], containers[1]);
   }
@@ -41,7 +41,7 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
   @Nullable
   @RequiredReadAction
   public PsiElement getOpToken() {
-    final PsiElement or = findChildByType(AopElementTypes.AOP_OR);
+    PsiElement or = findChildByType(AopElementTypes.AOP_OR);
     return or != null ? or : findChildByType(AopElementTypes.AOP_AND);
   }
 
@@ -53,14 +53,14 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
   @Nonnull
   @Override
   @RequiredReadAction
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     Couple<AopPatternContainer> pair = getOperands();
     if (pair == null || !(pair.first instanceof PsiPointcutExpression)) return PointcutMatchDegree.FALSE;
 
-    final PsiPointcutExpression leftOperand = (PsiPointcutExpression)pair.first;
-    final PsiPointcutExpression rightOperand = (PsiPointcutExpression)pair.second;
+    PsiPointcutExpression leftOperand = (PsiPointcutExpression)pair.first;
+    PsiPointcutExpression rightOperand = (PsiPointcutExpression)pair.second;
 
-    final boolean and = getOperation() == AopOperation.AND;
+    boolean and = getOperation() == AopOperation.AND;
     PointcutMatchDegree leftResult = leftOperand.acceptsSubject(context, member);
     if (and && leftResult == PointcutMatchDegree.FALSE) {
       return PointcutMatchDegree.FALSE;
@@ -80,8 +80,8 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
     Couple<AopPatternContainer> pair = getOperands();
     if (pair == null) return Collections.emptyList();
 
-    final Collection<AopPsiTypePattern> leftPatterns = pair.first.getPatterns();
-    final Collection<AopPsiTypePattern> rightPatterns = pair.second.getPatterns();
+    Collection<AopPsiTypePattern> leftPatterns = pair.first.getPatterns();
+    Collection<AopPsiTypePattern> rightPatterns = pair.second.getPatterns();
     Collection<AopPsiTypePattern> result = new HashSet<>();
     if (getOperation() == AopOperation.AND) {
       conjunctPatterns(leftPatterns, rightPatterns, result);
@@ -95,11 +95,11 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
   @Override
   @RequiredReadAction
   public String getTypePattern() {
-    final AopTypeExpression[] expressions = findChildrenByClass(AopTypeExpression.class);
+    AopTypeExpression[] expressions = findChildrenByClass(AopTypeExpression.class);
     if (expressions.length != 2) return null;
 
-    final String pattern0 = expressions[0].getTypePattern();
-    final String pattern1 = expressions[1].getTypePattern();
+    String pattern0 = expressions[0].getTypePattern();
+    String pattern1 = expressions[1].getTypePattern();
     if (pattern0 == null || pattern1 == null) return null;
 
     Couple<AopPatternContainer> pair = getOperands();
@@ -108,11 +108,11 @@ public class AopBinaryExpression extends AopElementBase implements PsiPointcutEx
     return "'_:[is(\"" + pattern0 + "\") " + (getOperation() == AopOperation.AND ? "&&" : "||") + " is(\"" + pattern1 + "\")]";
   }
 
-  public static void conjunctPatterns(final Collection<AopPsiTypePattern> leftPatterns,
-                                     final Collection<AopPsiTypePattern> rightPatterns,
-                                     final Collection<AopPsiTypePattern> result) {
-    for (final AopPsiTypePattern leftPattern : leftPatterns) {
-      for (final AopPsiTypePattern rightPattern : rightPatterns) {
+  public static void conjunctPatterns(Collection<AopPsiTypePattern> leftPatterns,
+                                      Collection<AopPsiTypePattern> rightPatterns,
+                                      Collection<AopPsiTypePattern> result) {
+    for (AopPsiTypePattern leftPattern : leftPatterns) {
+      for (AopPsiTypePattern rightPattern : rightPatterns) {
         result.add(AopPsiTypePatternsUtil.conjunctPatterns(leftPattern, rightPattern));
       }
     }

@@ -43,7 +43,7 @@ public class CustomNamespaceSpringBean extends AbstractDomSpringBean implements 
   private final CustomBeanWrapper myWrapper;
   private final XmlAttribute myIdAttribute;
 
-  public CustomNamespaceSpringBean(@Nonnull final CustomBeanInfo info, final consulo.module.Module module, @Nonnull CustomBeanWrapper wrapper) {
+  public CustomNamespaceSpringBean(@Nonnull CustomBeanInfo info, consulo.module.Module module, @Nonnull CustomBeanWrapper wrapper) {
     myInfo = info;
     myModule = module;
     myWrapper = wrapper;
@@ -66,11 +66,11 @@ public class CustomNamespaceSpringBean extends AbstractDomSpringBean implements 
 
   @Nullable
   public GenericValue<SpringBeanPointer> getFactoryBean() {
-    final String beanName = myInfo.factoryBeanName;
+    String beanName = myInfo.factoryBeanName;
     if (beanName != null) {
-      final SpringModel model = SpringManager.getInstance(getPsiManager().getProject()).getSpringModelByFile((XmlFile)getContainingFile());
+      SpringModel model = SpringManager.getInstance(getPsiManager().getProject()).getSpringModelByFile((XmlFile)getContainingFile());
       if (model != null) {
-        final SpringBeanPointer beanPointer = SpringUtils.getBeanPointer(model, beanName);
+        SpringBeanPointer beanPointer = SpringUtils.getBeanPointer(model, beanName);
         if (beanPointer != null) {
           return ReadOnlyGenericValue.getInstance(beanPointer);
         }
@@ -86,11 +86,11 @@ public class CustomNamespaceSpringBean extends AbstractDomSpringBean implements 
 
   @Nullable
   public GenericValue<PsiMethod> getFactoryMethod() {
-    final String name = myInfo.factoryMethodName;
+    String name = myInfo.factoryMethodName;
     if (name != null) {
-      final PsiClass beanClass = getBeanClass(false);
+      PsiClass beanClass = getBeanClass(false);
       if (beanClass != null) {
-        final PsiMethod method = findMatchingFactoryMethod(name, beanClass);
+        PsiMethod method = findMatchingFactoryMethod(name, beanClass);
         if (method != null) {
           return ReadOnlyGenericValue.getInstance(method);
         }
@@ -100,11 +100,11 @@ public class CustomNamespaceSpringBean extends AbstractDomSpringBean implements 
   }
 
   @Nullable
-  private PsiMethod findMatchingFactoryMethod(final String name, final PsiClass beanClass) {
+  private PsiMethod findMatchingFactoryMethod(String name, PsiClass beanClass) {
     PsiMethod result = null;
     PsiType returnType = null;
-    final int count = myInfo.constructorArgumentCount;
-    for (final PsiMethod method : beanClass.findMethodsByName(name, true)) {
+    int count = myInfo.constructorArgumentCount;
+    for (PsiMethod method : beanClass.findMethodsByName(name, true)) {
       if (method.getParameterList().getParametersCount() == count && method.hasModifierProperty(PsiModifier.STATIC)) {
         if (returnType == null) {
           result = method;

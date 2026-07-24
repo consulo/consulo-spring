@@ -18,16 +18,16 @@ import java.util.Collection;
  */
 public class SpringMVCVariablesProvider extends ElVariablesProvider {
 
-  public boolean processImplicitVariables(@NotNull final PsiElement element, @NotNull final ELExpressionHolder containingFile, @NotNull final ELElementProcessor processor) {
-    final Module module = containingFile.getModule();
+  public boolean processImplicitVariables(@NotNull PsiElement element, @NotNull ELExpressionHolder containingFile, @NotNull ELElementProcessor processor) {
+    Module module = containingFile.getModule();
     if (module != null) {
-      final Collection<SpringMVCModelAttribute> attributes = SpringMVCJamModel.getModel(module).getModelAttributes();
+      Collection<SpringMVCModelAttribute> attributes = SpringMVCJamModel.getModel(module).getModelAttributes();
       for (SpringMVCModelAttribute attribute : attributes) {
-        final PsiType type = attribute.getType();
+        PsiType type = attribute.getType();
         if (type == null) {
           continue;
         }
-        final String name = attribute.getName();
+        String name = attribute.getName();
         if (name != null) {
           processor.processVariable(new JspImplicitVariableImpl(containingFile, name, type, attribute.getAnnotation(), JspImplicitVariableImpl.NESTED_RANGE));
         }

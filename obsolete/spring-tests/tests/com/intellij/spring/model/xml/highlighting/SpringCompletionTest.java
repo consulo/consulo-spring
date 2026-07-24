@@ -37,7 +37,7 @@ public class SpringCompletionTest extends SpringHighlightingTestCase<JavaModuleF
     super.tearDown();
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
     if (getTestName(false).contains("TagNameCompletion")) {
@@ -94,7 +94,7 @@ public class SpringCompletionTest extends SpringHighlightingTestCase<JavaModuleF
   private void doTestPackagePrefix() throws Throwable {
     new WriteCommandAction(myProject) {
       protected void run(Result result) throws Throwable {
-        final ModifiableRootModel model = ModuleRootManager.getInstance(myModule).getModifiableModel();
+        ModifiableRootModel model = ModuleRootManager.getInstance(myModule).getModifiableModel();
         model.getContentEntries()[0].getSourceFolders()[0].setPackagePrefix("xxx.yyy.zzz");
         model.commit();
       }
@@ -106,14 +106,14 @@ public class SpringCompletionTest extends SpringHighlightingTestCase<JavaModuleF
   }
 
   public void testListOrSetReferences() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "list_or_set_references.xml");
     addFileToSet(fileSet, "list_or_set_references2.xml");
 
-    final SpringBean springBean = getBeanFromFile("list_or_set_references.xml", "listBean");
+    SpringBean springBean = getBeanFromFile("list_or_set_references.xml", "listBean");
 
-    final SpringPropertyDefinition listProperty = SpringUtils.findPropertyByName(springBean, "list");
-    final SpringPropertyDefinition genericsListProperty = SpringUtils.findPropertyByName(springBean, "genericsList");
+    SpringPropertyDefinition listProperty = SpringUtils.findPropertyByName(springBean, "list");
+    SpringPropertyDefinition genericsListProperty = SpringUtils.findPropertyByName(springBean, "genericsList");
 
     assertListOrSetVariants(((SpringProperty)listProperty).getList(), 7, 2);
     assertListOrSetVariants(((SpringProperty)genericsListProperty).getList(), 7, 2);
@@ -126,12 +126,12 @@ public class SpringCompletionTest extends SpringHighlightingTestCase<JavaModuleF
     myFixture.testCompletion("collectionReferenceBefore.xml", "collectionReferenceAfter.xml");
   }
 
-  private void assertListOrSetVariants(ListOrSet listOrSet, final int beanVariantsCount, final int localVariantsCount) {
-    final List<SpringRef> list = listOrSet.getRefs();
-    final SpringRef beanRef = list.get(0);
-    final SpringRef localRef = list.get(1);
-    final Object[] beanVariants = beanRef.getBean().getXmlAttributeValue().getReferences()[0].getVariants();
-    final Object[] localVariants = localRef.getLocal().getXmlAttributeValue().getReferences()[0].getVariants();
+  private void assertListOrSetVariants(ListOrSet listOrSet, int beanVariantsCount, int localVariantsCount) {
+    List<SpringRef> list = listOrSet.getRefs();
+    SpringRef beanRef = list.get(0);
+    SpringRef localRef = list.get(1);
+    Object[] beanVariants = beanRef.getBean().getXmlAttributeValue().getReferences()[0].getVariants();
+    Object[] localVariants = localRef.getLocal().getXmlAttributeValue().getReferences()[0].getVariants();
 
     assertEquals(beanVariantsCount, beanVariants.length);
     assertEquals(localVariantsCount, localVariants.length);

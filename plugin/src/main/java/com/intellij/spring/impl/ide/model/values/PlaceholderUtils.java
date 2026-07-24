@@ -66,7 +66,7 @@ public class PlaceholderUtils {
     private PlaceholderUtils() {
     }
 
-    public static List<SpringBaseBeanPointer> getPlaceholderConfigurerBeans(final DomElement domElement) {
+    public static List<SpringBaseBeanPointer> getPlaceholderConfigurerBeans(DomElement domElement) {
         Project project = domElement.getManager().getProject();
         PsiClass placeholderClass =
             JavaPsiFacade.getInstance(project).findClass(PLACEHOLDER_CONFIGURER_CLASS, GlobalSearchScope.allScope(project));
@@ -75,7 +75,7 @@ public class PlaceholderUtils {
             return Collections.emptyList();
         }
 
-        final SpringModel model = SpringConverterUtil.getSpringModel(domElement);
+        SpringModel model = SpringConverterUtil.getSpringModel(domElement);
         if (model == null) {
             return Collections.emptyList();
         }
@@ -85,9 +85,9 @@ public class PlaceholderUtils {
         return configurers == null ? Collections.<SpringBaseBeanPointer>emptyList() : configurers;
     }
 
-    public static List<PropertiesFile> getResources(final CommonSpringBean configurerBean) {
+    public static List<PropertiesFile> getResources(CommonSpringBean configurerBean) {
         List<PropertiesFile> resources = new ArrayList<PropertiesFile>();
-        final List<Pair<String, PsiElement>> locations = getLocations(configurerBean);
+        List<Pair<String, PsiElement>> locations = getLocations(configurerBean);
 
         boolean hasNotResolvedLocations = false;
 
@@ -102,7 +102,7 @@ public class PlaceholderUtils {
         }
         if (locations.size() > 0 && hasNotResolvedLocations) {
             //some locations were not resolved, so we'll try load all properties files(IDEADEV-16888)
-            final PsiManager psiManager = configurerBean.getPsiManager();
+            PsiManager psiManager = configurerBean.getPsiManager();
             PropertiesFilesManager.getInstance(psiManager.getProject()).processAllPropertiesFiles((s, propertiesFile) -> {
                 if (!resources.contains(propertiesFile)) {
                     resources.add(propertiesFile);
@@ -114,17 +114,17 @@ public class PlaceholderUtils {
     }
 
     @Nullable
-    private static Set<PropertiesFile> getPropertiesFile(final Pair<String, PsiElement> location) {
+    private static Set<PropertiesFile> getPropertiesFile(Pair<String, PsiElement> location) {
         return ResourceResolverUtils
             .addResourceFilesFrom(location.second, location.first, ",", new HashSet<PropertiesFile>(), new Condition<PsiFileSystemItem>() {
                 @Override
-                public boolean value(final PsiFileSystemItem item) {
+                public boolean value(PsiFileSystemItem item) {
                     return item instanceof PropertiesFile;
                 }
             });
     }
 
-    private static List<Pair<String, PsiElement>> getLocations(final CommonSpringBean configurerBean) {
+    private static List<Pair<String, PsiElement>> getLocations(CommonSpringBean configurerBean) {
         List<Pair<String, PsiElement>> locations = new ArrayList<Pair<String, PsiElement>>();
 
         if (configurerBean instanceof PropertyPlaceholder) {
@@ -134,28 +134,28 @@ public class PlaceholderUtils {
             }
         }
         else {
-            final SpringPropertyDefinition locationProperty = SpringUtils.findPropertyByName(configurerBean, LOCATION_PROPERTY_NAME);
+            SpringPropertyDefinition locationProperty = SpringUtils.findPropertyByName(configurerBean, LOCATION_PROPERTY_NAME);
             if (locationProperty != null) {
-                final Pair<String, PsiElement> value = SpringUtils.getPropertyValue(locationProperty);
+                Pair<String, PsiElement> value = SpringUtils.getPropertyValue(locationProperty);
                 if (value != null) {
                     locations.add(value);
                 }
             }
-            final SpringPropertyDefinition locationsProperty = SpringUtils.findPropertyByName(configurerBean, LOCATIONS_PROPERTY_NAME);
+            SpringPropertyDefinition locationsProperty = SpringUtils.findPropertyByName(configurerBean, LOCATIONS_PROPERTY_NAME);
             if (locationsProperty instanceof SpringProperty) {
-                final Pair<String, PsiElement> propertyValue = SpringUtils.getPropertyValue(locationsProperty);
+                Pair<String, PsiElement> propertyValue = SpringUtils.getPropertyValue(locationsProperty);
                 if (propertyValue != null) {
                     locations.add(propertyValue);
                 }
                 else {
-                    final ListOrSet list = ((SpringProperty) locationsProperty).getList();
+                    ListOrSet list = ((SpringProperty) locationsProperty).getList();
 
                     for (SpringValue value : list.getValues()) {
                         if (!StringUtil.isEmptyOrSpaces(value.getStringValue())) {
                             locations.add(new Pair<String, PsiElement>(value.getStringValue(), value.getXmlElement()));
                         }
                     }
-                    final ListOrSet set = ((SpringProperty) locationsProperty).getSet();
+                    ListOrSet set = ((SpringProperty) locationsProperty).getSet();
                     for (SpringValue value : set.getValues()) {
                         if (!StringUtil.isEmptyOrSpaces(value.getStringValue())) {
                             locations.add(new Pair<String, PsiElement>(value.getStringValue(), value.getXmlElement()));
@@ -164,28 +164,28 @@ public class PlaceholderUtils {
                 }
             }
         }
-        final SpringPropertyDefinition propertiesProperty = SpringUtils.findPropertyByName(configurerBean, PROPERTIES_PROPERTY_NAME);
+        SpringPropertyDefinition propertiesProperty = SpringUtils.findPropertyByName(configurerBean, PROPERTIES_PROPERTY_NAME);
         if (propertiesProperty != null) {
-            final GenericDomValue<SpringBeanPointer> element = propertiesProperty.getRefElement();
+            GenericDomValue<SpringBeanPointer> element = propertiesProperty.getRefElement();
             if (element != null) {
                 addLocations(locations, element.getValue());
             }
         }
 
-        final SpringPropertyDefinition propertiesArrayProperty = SpringUtils.findPropertyByName(configurerBean, PROPERTIES_ARRAY_PROPERTY_NAME);
+        SpringPropertyDefinition propertiesArrayProperty = SpringUtils.findPropertyByName(configurerBean, PROPERTIES_ARRAY_PROPERTY_NAME);
         if (propertiesArrayProperty != null) {
-            final GenericDomValue<SpringBeanPointer> element = propertiesArrayProperty.getRefElement();
+            GenericDomValue<SpringBeanPointer> element = propertiesArrayProperty.getRefElement();
             if (element != null) {
                 addLocations(locations, element.getValue());
             }
             if (propertiesArrayProperty instanceof SpringProperty) {
-                final ListOrSet list = ((SpringProperty) propertiesArrayProperty).getList();
+                ListOrSet list = ((SpringProperty) propertiesArrayProperty).getList();
                 for (SpringRef value : list.getRefs()) {
                     addLocations(locations, value.getBean().getValue());
                     addLocations(locations, value.getLocal().getValue());
                 }
 
-                final ListOrSet set = ((SpringProperty) propertiesArrayProperty).getSet();
+                ListOrSet set = ((SpringProperty) propertiesArrayProperty).getSet();
                 for (SpringRef value : set.getRefs()) {
                     addLocations(locations, value.getBean().getValue());
                     addLocations(locations, value.getLocal().getValue());
@@ -196,7 +196,7 @@ public class PlaceholderUtils {
         return locations;
     }
 
-    private static void addLocations(final List<Pair<String, PsiElement>> locations, final SpringBeanPointer beanPointer) {
+    private static void addLocations(List<Pair<String, PsiElement>> locations, SpringBeanPointer beanPointer) {
         if (beanPointer != null) {
             CommonSpringBean springBean = beanPointer.getSpringBean();
             GenericDomValue<String> location = getLocationDomElementValue(springBean);
@@ -208,7 +208,7 @@ public class PlaceholderUtils {
     }
 
     @Nullable
-    private static GenericDomValue<String> getLocationDomElementValue(final CommonSpringBean springBean) {
+    private static GenericDomValue<String> getLocationDomElementValue(CommonSpringBean springBean) {
         if (springBean instanceof UtilProperties) {
             UtilProperties utilProperties = (UtilProperties) springBean;
             return utilProperties.getLocation();
@@ -226,9 +226,9 @@ public class PlaceholderUtils {
         return null;
     }
 
-    public static boolean isPlaceholder(final GenericDomValue genericDomValue) {
+    public static boolean isPlaceholder(GenericDomValue genericDomValue) {
 
-        final String stringValue = genericDomValue.getStringValue();
+        String stringValue = genericDomValue.getStringValue();
 
         if (stringValue != null && !StringUtil.isEmptyOrSpaces(stringValue)) {
             List<SpringBaseBeanPointer> configurers = getPlaceholderConfigurerBeans(genericDomValue);
@@ -238,12 +238,12 @@ public class PlaceholderUtils {
         return false;
     }
 
-    public static boolean isPlaceholder(final String stringValue, final List<SpringBaseBeanPointer> configurers) {
+    public static boolean isPlaceholder(String stringValue, List<SpringBaseBeanPointer> configurers) {
         for (SpringBaseBeanPointer configurer : configurers) {
-            final CommonSpringBean bean = configurer.getSpringBean();
+            CommonSpringBean bean = configurer.getSpringBean();
             if (bean instanceof DomSpringBean) {
-                final Pair<String, String> prefixAndSuffix = getPlaceholderPrefixAndSuffix((DomSpringBean) bean);
-                final int prefixPos = stringValue.indexOf(prefixAndSuffix.first);
+                Pair<String, String> prefixAndSuffix = getPlaceholderPrefixAndSuffix((DomSpringBean) bean);
+                int prefixPos = stringValue.indexOf(prefixAndSuffix.first);
                 if (prefixPos >= 0 && prefixPos < stringValue.indexOf(prefixAndSuffix.second)) {
                     return true;
                 }
@@ -273,19 +273,19 @@ public class PlaceholderUtils {
         String prefix = DEFAULT_PLACEHOLDER_PREFIX;
         String suffix = DEFAULT_PLACEHOLDER_SUFFIX;
 
-        final SpringPropertyDefinition userDefinedPrefixProperty =
+        SpringPropertyDefinition userDefinedPrefixProperty =
             SpringUtils.findPropertyByName(placeholderBean, PLACEHOLDER_PREFIX_PROPERTY_NAME);
         if (userDefinedPrefixProperty != null) {
-            final String value = SpringUtils.getStringPropertyValue(userDefinedPrefixProperty);
+            String value = SpringUtils.getStringPropertyValue(userDefinedPrefixProperty);
             if (!StringUtil.isEmptyOrSpaces(value)) {
                 prefix = value;
             }
         }
 
-        final SpringPropertyDefinition userDefinedSuffixProperty =
+        SpringPropertyDefinition userDefinedSuffixProperty =
             SpringUtils.findPropertyByName(placeholderBean, PLACEHOLDER_SUFFIX_PROPERTY_NAME);
         if (userDefinedSuffixProperty != null) {
-            final String value = SpringUtils.getStringPropertyValue(userDefinedSuffixProperty);
+            String value = SpringUtils.getStringPropertyValue(userDefinedSuffixProperty);
             if (!StringUtil.isEmptyOrSpaces(value)) {
                 suffix = value;
             }
@@ -296,29 +296,29 @@ public class PlaceholderUtils {
 
     @Nonnull
     public static PsiReference[] createPlaceholderPropertiesReferences(GenericDomValue genericDomValue) {
-        final Map<TextRange, Info> textRanges = getTextRanges(genericDomValue);
+        Map<TextRange, Info> textRanges = getTextRanges(genericDomValue);
         if (textRanges.isEmpty()) {
             return PsiReference.EMPTY_ARRAY;
         }
 
-        final XmlElement valueElement = DomUtil.getValueElement(genericDomValue);
-        final List<PsiReference> references = new ArrayList<PsiReference>();
+        XmlElement valueElement = DomUtil.getValueElement(genericDomValue);
+        List<PsiReference> references = new ArrayList<PsiReference>();
         for (TextRange textRange : textRanges.keySet()) {
-            final Info info = textRanges.get(textRange);
+            Info info = textRanges.get(textRange);
             references.add(createPropertyReference(valueElement, textRange, info.text, info.placeholders));
         }
         return references.toArray(new PsiReference[references.size()]);
     }
 
-    private static PropertyReference createPropertyReference(final PsiElement element,
-                                                             final TextRange textRange,
-                                                             final String value,
-                                                             final List<SpringBaseBeanPointer> placeholders) {
+    private static PropertyReference createPropertyReference(PsiElement element,
+                                                             TextRange textRange,
+                                                             String value,
+                                                             List<SpringBaseBeanPointer> placeholders) {
         return new PlaceholderPropertyReference(element, textRange, value, placeholders);
     }
 
-    private static Map<TextRange, Info> getTextRanges(final GenericDomValue domValue) {
-        final List<SpringBaseBeanPointer> configurerBeans = getPlaceholderConfigurerBeans(domValue);
+    private static Map<TextRange, Info> getTextRanges(GenericDomValue domValue) {
+        List<SpringBaseBeanPointer> configurerBeans = getPlaceholderConfigurerBeans(domValue);
         if (configurerBeans.size() > 0) {
             PsiElement psiElement = DomUtil.getValueElement(domValue);
             return getTextRanges(configurerBeans, psiElement);
@@ -326,23 +326,23 @@ public class PlaceholderUtils {
         return Collections.emptyMap();
     }
 
-    private static Map<TextRange, Info> getTextRanges(final List<SpringBaseBeanPointer> configurers, final PsiElement element) {
+    private static Map<TextRange, Info> getTextRanges(List<SpringBaseBeanPointer> configurers, PsiElement element) {
         Map<TextRange, Info> textRanges = new HashMap<TextRange, Info>();
         for (SpringBaseBeanPointer configurer : configurers) {
-            final CommonSpringBean bean = configurer.getSpringBean();
+            CommonSpringBean bean = configurer.getSpringBean();
             if (!(bean instanceof DomSpringBean)) {
                 continue;
             }
 
             String text = element.getText();
-            final Pair<String, String> prefixAndSuffix = getPlaceholderPrefixAndSuffix((DomSpringBean) bean);
+            Pair<String, String> prefixAndSuffix = getPlaceholderPrefixAndSuffix((DomSpringBean) bean);
             int prefixIndex = text.indexOf(prefixAndSuffix.first);
             int suffixIndex = text.indexOf(prefixAndSuffix.second);
             while (prefixIndex >= 0 && prefixIndex < suffixIndex) {
-                final int offset = prefixIndex + prefixAndSuffix.first.length();
-                final int length = suffixIndex - prefixIndex - prefixAndSuffix.first.length();
+                int offset = prefixIndex + prefixAndSuffix.first.length();
+                int length = suffixIndex - prefixIndex - prefixAndSuffix.first.length();
 
-                final TextRange textRange = TextRange.from(offset, length);
+                TextRange textRange = TextRange.from(offset, length);
                 List<SpringBaseBeanPointer> placeholders =
                     textRanges.get(textRange) != null ? textRanges.get(textRange).placeholders : new ArrayList<SpringBaseBeanPointer>();
                 placeholders.add(configurer);
@@ -366,7 +366,7 @@ public class PlaceholderUtils {
         final List<SpringBaseBeanPointer> placeholders;
         final TextRange fullTextRange;
 
-        public Info(final String text, final List<SpringBaseBeanPointer> placeholders, final TextRange fullTextRange) {
+        public Info(String text, List<SpringBaseBeanPointer> placeholders, TextRange fullTextRange) {
             this.text = text;
             this.placeholders = placeholders;
             this.fullTextRange = fullTextRange;
@@ -379,15 +379,15 @@ public class PlaceholderUtils {
 
         public PlaceholderPropertyReference(@Nonnull PsiElement psiElement,
                                             @Nonnull TextRange textRange,
-                                            @Nonnull final String key,
-                                            final List<SpringBaseBeanPointer> placeholders) {
+                                            @Nonnull String key,
+                                            List<SpringBaseBeanPointer> placeholders) {
             super(key, psiElement, null, true, textRange);
 
             myKey = key;
             myPlaceholders = placeholders;
         }
 
-        protected void addVariantsFromFile(final PropertiesFile propertiesFile, final Set<Object> variants) {
+        protected void addVariantsFromFile(PropertiesFile propertiesFile, Set<Object> variants) {
             if (propertiesFile == null) return;
             if (!ProjectRootManager.getInstance(myElement.getProject()).getFileIndex().isInContent(propertiesFile.getVirtualFile())) return;
             List<? extends IProperty> properties = propertiesFile.getProperties();
@@ -406,11 +406,11 @@ public class PlaceholderUtils {
             }
 
             for (SpringBaseBeanPointer placeholder : myPlaceholders) {
-                final CommonSpringBean placeholderBean = placeholder.getSpringBean();
-                final SpringPropertyDefinition propertyDefinition = SpringUtils.findPropertyByName(placeholderBean, "properties");
+                CommonSpringBean placeholderBean = placeholder.getSpringBean();
+                SpringPropertyDefinition propertyDefinition = SpringUtils.findPropertyByName(placeholderBean, "properties");
                 if (propertyDefinition instanceof SpringProperty) {
                     for (Prop prop : ((SpringProperty) propertyDefinition).getProps().getProps()) {
-                        final String keyValue = prop.getKey().getStringValue();
+                        String keyValue = prop.getKey().getStringValue();
                         if (!StringUtil.isEmptyOrSpaces(keyValue)) {
                             variants.add(keyValue);
                         }
@@ -428,9 +428,9 @@ public class PlaceholderUtils {
         }
 
         @Nonnull
-        private static Properties getValueProperties(final SpringProperty property) {
+        private static Properties getValueProperties(SpringProperty property) {
             Properties props = new Properties();
-            final String value = property.getValue().getStringValue();
+            String value = property.getValue().getStringValue();
             if (!StringUtil.isEmptyOrSpaces(value)) {
                 try {
                     props.load(new ByteArrayInputStream(value.getBytes()));
@@ -443,7 +443,7 @@ public class PlaceholderUtils {
 
         @Override
         @Nonnull
-        public ResolveResult[] multiResolve(final boolean incompleteCode) {
+        public ResolveResult[] multiResolve(boolean incompleteCode) {
             Set<IProperty> properties = new HashSet<IProperty>();
             for (SpringBaseBeanPointer placeholder : myPlaceholders) {
                 for (PropertiesFile resource : getResources(placeholder.getSpringBean())) {
@@ -453,7 +453,7 @@ public class PlaceholderUtils {
 
             Set<DomElement> configurerProperties = getPlaceholderConfigurerProperties(myKey, myPlaceholders);  // IDEADEV-29790 && IDEADEV-31411
 
-            final ResolveResult[] result = new ResolveResult[properties.size() + configurerProperties.size()];
+            ResolveResult[] result = new ResolveResult[properties.size() + configurerProperties.size()];
             if (properties.size() > 0 || configurerProperties.size() > 0) {
                 int i = 0;
                 for (IProperty property : properties) {
@@ -470,12 +470,12 @@ public class PlaceholderUtils {
         }
 
         @Nonnull
-        private static Set<DomElement> getPlaceholderConfigurerProperties(@Nonnull final String key,
-                                                                          final List<SpringBaseBeanPointer> placeholders) {
-            final Set<DomElement> proprs = new HashSet<DomElement>();
+        private static Set<DomElement> getPlaceholderConfigurerProperties(@Nonnull String key,
+                                                                          List<SpringBaseBeanPointer> placeholders) {
+            Set<DomElement> proprs = new HashSet<DomElement>();
             for (SpringBaseBeanPointer placeholder : placeholders) {
-                final CommonSpringBean placeholderBean = placeholder.getSpringBean();
-                final SpringPropertyDefinition propertyDefinition = SpringUtils.findPropertyByName(placeholderBean, "properties");
+                CommonSpringBean placeholderBean = placeholder.getSpringBean();
+                SpringPropertyDefinition propertyDefinition = SpringUtils.findPropertyByName(placeholderBean, "properties");
                 if (propertyDefinition instanceof SpringProperty) {
                     for (Prop prop : ((SpringProperty) propertyDefinition).getProps().getProps()) {
                         if (key.equals(prop.getKey().getStringValue())) {
@@ -508,45 +508,45 @@ public class PlaceholderUtils {
     }
 
     @RequiredReadAction
-    public static Collection<String> getExpandedVariants(final GenericDomValue value) {
-        final String stringValue = value.getStringValue();
-        final Map<TextRange, Info> textRanges = getTextRanges(value);
+    public static Collection<String> getExpandedVariants(GenericDomValue value) {
+        String stringValue = value.getStringValue();
+        Map<TextRange, Info> textRanges = getTextRanges(value);
         if (textRanges.isEmpty()) {
             return ContainerUtil.createMaybeSingletonList(stringValue);
         }
 
-        final TextRange[] ranges = textRanges.keySet().toArray(new TextRange[textRanges.size()]);
+        TextRange[] ranges = textRanges.keySet().toArray(new TextRange[textRanges.size()]);
         Arrays.sort(ranges, (o1, o2) -> o1.getStartOffset() - o2.getStartOffset());
-        final XmlElement valueElement = DomUtil.getValueElement(value);
+        XmlElement valueElement = DomUtil.getValueElement(value);
         assert valueElement != null;
-        final HashSet<String> result = new HashSet<String>();
-        final ResolveResult[][] variants = new ResolveResult[ranges.length][];
+        HashSet<String> result = new HashSet<String>();
+        ResolveResult[][] variants = new ResolveResult[ranges.length][];
         for (int i = 0; i < ranges.length; i++) {
-            final TextRange range = ranges[i];
-            final Info info = textRanges.get(range);
-            final PropertyReference reference = createPropertyReference(valueElement, range, info.text, info.placeholders);
-            final ResolveResult[] results = reference.multiResolve(false);
+            TextRange range = ranges[i];
+            Info info = textRanges.get(range);
+            PropertyReference reference = createPropertyReference(valueElement, range, info.text, info.placeholders);
+            ResolveResult[] results = reference.multiResolve(false);
             variants[i] = results;
         }
-        final int[] indices = new int[ranges.length];
-        final ElementManipulator<XmlElement> manipulator = ElementManipulators.getManipulator(valueElement);
+        int[] indices = new int[ranges.length];
+        ElementManipulator<XmlElement> manipulator = ElementManipulators.getManipulator(valueElement);
         assert manipulator != null;
-        final int offsetBase = -manipulator.getRangeInElement(valueElement).getStartOffset();
+        int offsetBase = -manipulator.getRangeInElement(valueElement).getStartOffset();
         while (true) {
             int offset = offsetBase;
-            final StringBuilder sb = new StringBuilder(stringValue);
+            StringBuilder sb = new StringBuilder(stringValue);
             for (int i = 0; i < indices.length; i++) {
-                final Info info = textRanges.get(ranges[i]);
+                Info info = textRanges.get(ranges[i]);
                 if (variants[i].length == 0) {
                     continue;
                 }
-                final ResolveResult resolveResult = variants[i][indices[i]];
-                final PsiElement element = resolveResult.getElement();
+                ResolveResult resolveResult = variants[i][indices[i]];
+                PsiElement element = resolveResult.getElement();
                 if (!(element instanceof Property)) {
                     continue;
                 }
-                final Property property = (Property) element;
-                final String replacement = property.getValue();
+                Property property = (Property) element;
+                String replacement = property.getValue();
                 if (replacement == null) {
                     continue;
                 }

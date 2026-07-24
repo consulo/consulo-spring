@@ -25,13 +25,13 @@ public class SpringStructureViewComponent extends StructureViewComponent {
   @Override
   public Promise<AbstractTreeNode> expandPathToElement(Object element) {
     if (element instanceof XmlElement) {
-      final XmlElement xmlElement = (XmlElement) element;
+      XmlElement xmlElement = (XmlElement) element;
       XmlTag tag = PsiTreeUtil.getParentOfType(xmlElement, XmlTag.class);
 
       while (tag != null) {
-        final DomElement domElement = DomManager.getDomManager(xmlElement.getProject()).getDomElement(tag);
+        DomElement domElement = DomManager.getDomManager(xmlElement.getProject()).getDomElement(tag);
         if (domElement != null) {
-          final DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
+          DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
           if (springBean != null) {
             if (springBean.getParent() instanceof Beans) {
               return super.expandPathToElement(springBean.getXmlElement());

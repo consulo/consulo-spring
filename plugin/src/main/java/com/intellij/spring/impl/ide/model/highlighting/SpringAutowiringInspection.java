@@ -36,15 +36,15 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
     }
 
     private static void checkAutowiring(
-        @Nonnull final SpringBean springBean,
-        @Nonnull final SpringModel springModel,
-        final DomElementAnnotationHolder holder
+        @Nonnull SpringBean springBean,
+        @Nonnull SpringModel springModel,
+        DomElementAnnotationHolder holder
     ) {
 
         if (springBean.getBeanClass() == null) {
             return;
         }
-        final Autowire autowire = springBean.getBeanAutowire();
+        Autowire autowire = springBean.getBeanAutowire();
 
         if (autowire.equals(Autowire.BY_TYPE)) {
             checkByTypeAutowire(springBean, springModel, holder);
@@ -54,16 +54,16 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static void checkByConstructorAutowire(@Nonnull final SpringBean springBean, @Nonnull final DomElementAnnotationHolder holder) {
-        final ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
-        final List<PsiMethod> methods = resolvedArgs.getCheckedMethods();
+    private static void checkByConstructorAutowire(@Nonnull SpringBean springBean, @Nonnull DomElementAnnotationHolder holder) {
+        ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+        List<PsiMethod> methods = resolvedArgs.getCheckedMethods();
         if (resolvedArgs.isResolved() || methods == null) {
             return;
         }
-        for (final PsiMethod checkedMethod : methods) {
-            final Map<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = resolvedArgs.getAutowiredParams(checkedMethod);
+        for (PsiMethod checkedMethod : methods) {
+            Map<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = resolvedArgs.getAutowiredParams(checkedMethod);
             if (autowiredParams != null && autowiredParams.size() > 0) {
-                final Set<Map.Entry<PsiParameter, Collection<SpringBaseBeanPointer>>> entries = autowiredParams.entrySet();
+                Set<Map.Entry<PsiParameter, Collection<SpringBaseBeanPointer>>> entries = autowiredParams.entrySet();
                 for (Map.Entry<PsiParameter, Collection<SpringBaseBeanPointer>> entry : entries) {
                     checkAutowire(springBean, holder, checkedMethod, entry.getKey(), entry.getValue());
                 }
@@ -72,11 +72,11 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
     }
 
     private static void checkAutowire(
-        final SpringBean springBean,
-        final DomElementAnnotationHolder holder,
-        final PsiMethod checkedMethod,
-        final PsiParameter psiParameter,
-        final Collection<SpringBaseBeanPointer> springBeans
+        SpringBean springBean,
+        DomElementAnnotationHolder holder,
+        PsiMethod checkedMethod,
+        PsiParameter psiParameter,
+        Collection<SpringBaseBeanPointer> springBeans
     ) {
         if (springBeans != null && springBeans.size() > 1) {
             List<String> beanNames = new ArrayList<String>();
@@ -98,7 +98,7 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
                 StringUtil.join(beanNames, ","),
                 methodName
             );
-            final DomElement problemElement;
+            DomElement problemElement;
             if (DomUtil.hasXml(springBean.getClazz())) {
                 problemElement = springBean.getClazz();
             }
@@ -113,11 +113,11 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
     }
 
     private static void checkByTypeAutowire(
-        @Nonnull final SpringBean springBean,
-        @Nonnull final SpringModel springModel,
-        @Nonnull final DomElementAnnotationHolder holder
+        @Nonnull SpringBean springBean,
+        @Nonnull SpringModel springModel,
+        @Nonnull DomElementAnnotationHolder holder
     ) {
-        final PsiClass beanClass = springBean.getBeanClass();
+        PsiClass beanClass = springBean.getBeanClass();
         if (beanClass == null) {
             return;
         }
@@ -125,8 +125,8 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
         Map<PsiType, List<PsiMethod>> propertyTypes = new HashMap<PsiType, List<PsiMethod>>();
         for (PsiMethod psiMethod : beanClass.getAllMethods()) {
             if (PropertyUtil.isSimplePropertySetter(psiMethod)) {
-                final PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-                final PsiType type = parameter.getType();
+                PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
+                PsiType type = parameter.getType();
                 if (propertyTypes.get(type) == null) {
                     propertyTypes.put(type, new ArrayList<PsiMethod>());
                 }
@@ -136,12 +136,12 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
         }
 
         for (PsiType psiType : propertyTypes.keySet()) {
-            final Collection<SpringBaseBeanPointer> beans = SpringAutowireUtil.autowireByType(springModel, psiType);
+            Collection<SpringBaseBeanPointer> beans = SpringAutowireUtil.autowireByType(springModel, psiType);
             if (beans.size() > 1) {
                 List<String> properties = new ArrayList<String>();
                 for (PsiMethod psiMethod : propertyTypes.get(psiType)) {
                     boolean isPropertyDefined = false;
-                    final String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
+                    String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
                     for (SpringPropertyDefinition springProperty : springBean.getAllProperties()) {
                         if (propertyName.equals(springProperty.getPropertyName())) {
                             isPropertyDefined = true;
@@ -177,12 +177,12 @@ public class SpringAutowiringInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel model,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel model,
         Object state
     ) {
-        final Boolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
+        Boolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
         if (autoWireCandidate != null && !autoWireCandidate.booleanValue()) {
             return;
         }

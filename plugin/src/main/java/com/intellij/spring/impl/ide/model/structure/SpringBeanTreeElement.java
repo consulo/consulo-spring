@@ -29,9 +29,9 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
   @NonNls
   private static final String UNKNOWN_BEAN_NAME = "Bean";
 
-  public SpringBeanTreeElement(final DomSpringBean springBean,
-                               final DomElementNavigationProvider navigationProvider,
-                               final boolean showBeanStructure) {
+  public SpringBeanTreeElement(DomSpringBean springBean,
+                               DomElementNavigationProvider navigationProvider,
+                               boolean showBeanStructure) {
     myBean = springBean;
     myNavigationProvider = navigationProvider;
     myShowBeanStructure = showBeanStructure;
@@ -50,10 +50,10 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
     if (!myBean.isValid()) return "";
 
     String name = myBean.getBeanName();
-    final PsiClass[] psiClass = getPsiClasses();
+    PsiClass[] psiClass = getPsiClasses();
     String psiClassName = StringUtil.join(Arrays.asList(psiClass), it -> {
       if (it == null) return "";
-      final String s = it.getName();
+      String s = it.getName();
       return s == null ? "" : s;
     }, ",");
     if (StringUtil.isEmptyOrSpaces(name)) {
@@ -68,9 +68,9 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
   }
 
   private PsiClass[] getPsiClasses() {
-    final PsiClass beanClass = myBean.getBeanClass();
+    PsiClass beanClass = myBean.getBeanClass();
     if (beanClass != null && SpringFactoryBeansManager.isBeanFactory(beanClass)) {
-      final PsiClass[] classes = SpringFactoryBeansManager.getInstance().getProductTypes(beanClass, myBean);
+      PsiClass[] classes = SpringFactoryBeansManager.getInstance().getProductTypes(beanClass, myBean);
       if (classes.length > 0) {
         return classes;
       }
@@ -83,7 +83,7 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
   }
 
   public Image getIcon() {
-    final Image icon = myBean.getPresentation().getIcon();
+    Image icon = myBean.getPresentation().getIcon();
     return icon == null ? SpringIcons.SPRING_BEAN_ICON : icon;
   }
 
@@ -106,7 +106,7 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
     return children.toArray(new SpringInjectionTreeElement[children.size()]);
   }
 
-  public void navigate(final boolean requestFocus) {
+  public void navigate(boolean requestFocus) {
     if (myNavigationProvider != null) {
       myNavigationProvider.navigate(myBean, requestFocus);
     }

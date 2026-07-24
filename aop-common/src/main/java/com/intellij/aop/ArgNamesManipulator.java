@@ -35,7 +35,7 @@ public abstract class ArgNamesManipulator {
 
   @Nullable
   public PsiParameter getReturningParameter() {
-    final PsiReference psiReference = getReturningReference();
+    PsiReference psiReference = getReturningReference();
     return psiReference == null ? null : (PsiParameter)psiReference.resolve();
   }
 
@@ -44,7 +44,7 @@ public abstract class ArgNamesManipulator {
 
   @Nullable
   public PsiParameter getThrowingParameter() {
-    final PsiReference psiReference = getThrowingReference();
+    PsiReference psiReference = getThrowingReference();
     return psiReference == null ? null : (PsiParameter)psiReference.resolve();
   }
 

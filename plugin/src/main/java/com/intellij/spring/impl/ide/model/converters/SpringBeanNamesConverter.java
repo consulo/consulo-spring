@@ -24,11 +24,11 @@ import java.util.List;
 @SuppressWarnings({"UnusedDeclaration"})
 public class SpringBeanNamesConverter extends Converter<List<String>> implements CustomReferenceConverter<List<String>> {
 
-  public String toString(final List<String> strings, final ConvertContext context) {
+  public String toString(List<String> strings, ConvertContext context) {
     return StringUtil.join(strings, ",");
   }
 
-  public List<String> fromString(final String s, final ConvertContext context) {
+  public List<String> fromString(String s, ConvertContext context) {
     if (s == null) return null;
 
     return SpringUtils.tokenize(s);
@@ -38,7 +38,7 @@ public class SpringBeanNamesConverter extends Converter<List<String>> implements
   public PsiReference[] createReferences(final GenericDomValue<List<String>> genericDomValue,
                                          final PsiElement element,
                                          final ConvertContext context) {
-    final List<String> strings = genericDomValue.getValue();
+    List<String> strings = genericDomValue.getValue();
     if (strings != null) {
       List<PsiReference> references = new ArrayList<PsiReference>();
       for (String string : strings) {
@@ -56,8 +56,8 @@ public class SpringBeanNamesConverter extends Converter<List<String>> implements
             return SpringUtils.suggestBeanNames(SpringConverterUtil.getCurrentBean(context));
           }
 
-          public PsiElement handleElementRename(final String newElementName) throws IncorrectOperationException {
-            final SpringBean bean = (SpringBean)genericDomValue.getParent();
+          public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+            SpringBean bean = (SpringBean)genericDomValue.getParent();
             assert bean != null;
             bean.setName(newElementName);
             return element;

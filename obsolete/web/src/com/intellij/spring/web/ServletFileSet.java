@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 */
 public abstract class ServletFileSet extends SpringFileSet {
 
-  public ServletFileSet(@NonNls @NotNull String id, @NotNull String name, @NotNull final SpringFacetConfiguration parent) {
+  public ServletFileSet(@NonNls @NotNull String id, @NotNull String name, @NotNull SpringFacetConfiguration parent) {
     super(id, name, parent);
   }
 

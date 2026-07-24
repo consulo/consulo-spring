@@ -78,12 +78,12 @@ public abstract class SpringModelVisitor {
 
   }
 
-  private static boolean visitElementsHolder(final SpringModelVisitor visitor, final SpringElementsHolder elementsHolder) {
+  private static boolean visitElementsHolder(SpringModelVisitor visitor, SpringElementsHolder elementsHolder) {
     if (!DomUtil.hasXml(elementsHolder)) return true;
     if (!visitBean(visitor, elementsHolder.getBean())) return false;
-    final SpringRef ref = elementsHolder.getRef();
+    SpringRef ref = elementsHolder.getRef();
     if (DomUtil.hasXml(ref) && !visitor.visitRef(ref)) return false;
-    final Idref idref = elementsHolder.getIdref();
+    Idref idref = elementsHolder.getIdref();
     if (DomUtil.hasXml(idref) && !visitor.visitIdref(idref)) return false;
     if (!visitCollection(visitor, elementsHolder.getList())) return false;
     if (!visitCollection(visitor, elementsHolder.getSet())) return false;
@@ -120,7 +120,7 @@ public abstract class SpringModelVisitor {
     for (SpringEntry entry : map.getEntries()) {
       if (!visitor.visitMapEntry(entry)) return false;
       if (!visitValueHolder(visitor, entry)) return false;
-      final SpringKey key = entry.getKey();
+      SpringKey key = entry.getKey();
       if (DomUtil.hasXml(key) && !visitElementsHolder(visitor, key)) return false;
     }
     return true;

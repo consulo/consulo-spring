@@ -19,7 +19,7 @@ import java.util.List;
 public class GenerateSpringBeanDependenciesActionHandler implements CodeInsightActionHandler {
   private final boolean mySetterDependency;
 
-  public GenerateSpringBeanDependenciesActionHandler(final boolean setterDependency) {
+  public GenerateSpringBeanDependenciesActionHandler(boolean setterDependency) {
     mySetterDependency = setterDependency;
   }
 
@@ -33,9 +33,9 @@ public class GenerateSpringBeanDependenciesActionHandler implements CodeInsightA
     if (element != null) {
       final PsiClass psiClass = PsiTreeUtil.getParentOfType(element, PsiClass.class);
 
-      final List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = new WriteCommandAction<List<Pair<SpringInjection,SpringGenerateTemplatesHolder>>>(psiClass.getProject()) {
+      List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = new WriteCommandAction<List<Pair<SpringInjection,SpringGenerateTemplatesHolder>>>(psiClass.getProject()) {
         protected void run(Result<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>> result) throws Throwable {
-          final List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = GenerateSpringBeanDependenciesUtil
+          List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = GenerateSpringBeanDependenciesUtil
                   .generateDependenciesFor(GenerateSpringBeanDependenciesUtil.getSpringModel(psiClass), psiClass, mySetterDependency);
 
           result.setResult(list);

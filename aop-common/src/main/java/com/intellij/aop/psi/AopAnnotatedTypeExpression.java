@@ -17,7 +17,7 @@ import java.util.Set;
  * @author peter
  */
 public class AopAnnotatedTypeExpression extends AopElementBase implements AopTypeExpression{
-  public AopAnnotatedTypeExpression(@Nonnull final ASTNode node) {
+  public AopAnnotatedTypeExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -59,15 +59,15 @@ public class AopAnnotatedTypeExpression extends AopElementBase implements AopTyp
   }
 
   @RequiredReadAction
-  private Collection<AopPsiTypePattern> getPatterns(final AopTypeExpression typeExpression) {
+  private Collection<AopPsiTypePattern> getPatterns(AopTypeExpression typeExpression) {
     if (typeExpression == null) return Collections.emptyList();
 
-    final AopAnnotationHolder annotationHolder = getAnnotationHolder();
+    AopAnnotationHolder annotationHolder = getAnnotationHolder();
     if (annotationHolder == null) return Collections.emptyList();
 
-    final Collection<AopPsiTypePattern> typePatterns = typeExpression.getPatterns();
-    final Collection<AopPsiTypePattern> annoPatterns = annotationHolder.getPatterns();
-    final Set<AopPsiTypePattern> result = new HashSet<>();
+    Collection<AopPsiTypePattern> typePatterns = typeExpression.getPatterns();
+    Collection<AopPsiTypePattern> annoPatterns = annotationHolder.getPatterns();
+    Set<AopPsiTypePattern> result = new HashSet<>();
     AopBinaryExpression.conjunctPatterns(typePatterns, annoPatterns, result);
     return result;
   }

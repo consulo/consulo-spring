@@ -29,7 +29,7 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
   @NonNls
   private static final String PROPERTY_TAG = "property";
 
-  public SpringInjectionTreeElement(final @Nonnull SpringValueHolderDefinition injection) {
+  public SpringInjectionTreeElement(@Nonnull SpringValueHolderDefinition injection) {
     myInjection = injection;
   }
 
@@ -46,10 +46,10 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
       return CONSTRUCTOR_ARG;
     }
     else {
-      final SpringProperty springProperty = (SpringProperty)myInjection;
+      SpringProperty springProperty = (SpringProperty)myInjection;
       String propertyName = springProperty.getName().getStringValue();
       if (propertyName == null) propertyName = PROPERTY_TAG;
-      final PsiType type = getPropertyType(springProperty);
+      PsiType type = getPropertyType(springProperty);
       if (type != null) {
         propertyName += ": " + type.getCanonicalText();
       }
@@ -59,7 +59,7 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
 
   @Nullable
   private static PsiType getPropertyType(SpringProperty property) {
-    final List<BeanProperty> value = property.getName().getValue();
+    List<BeanProperty> value = property.getName().getValue();
     if (value != null && !value.isEmpty()) {
       return value.get(0).getPropertyType();
     }
@@ -86,8 +86,8 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
     return new TreeElement[0];
   }
 
-  public void navigate(final boolean requestFocus) {
-    final DomElementNavigationProvider navigationProvider = DomElementsNavigationManager.getManager(myInjection.getManager().getProject())
+  public void navigate(boolean requestFocus) {
+    DomElementNavigationProvider navigationProvider = DomElementsNavigationManager.getManager(myInjection.getManager().getProject())
                                                                                         .getDomElementsNavigateProvider(
                                                                                           DomElementsNavigationManager.DEFAULT_PROVIDER_NAME);
 
@@ -108,13 +108,13 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
 
   @Nullable
   private String getValueText() {
-    final GenericDomValue<?> element = myInjection.getValueElement();
+    GenericDomValue<?> element = myInjection.getValueElement();
     return element == null ? null : element.getStringValue();
   }
 
   @Nullable
   private String getRefText() {
-    final GenericDomValue<SpringBeanPointer> refElement = myInjection.getRefElement();
+    GenericDomValue<SpringBeanPointer> refElement = myInjection.getRefElement();
     return refElement != null ? refElement.getStringValue() : null;
   }
 }

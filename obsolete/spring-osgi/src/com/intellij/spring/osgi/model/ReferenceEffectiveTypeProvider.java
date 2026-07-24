@@ -18,14 +18,14 @@ import java.util.Collection;
 public class ReferenceEffectiveTypeProvider extends SpringBeanEffectiveTypeProvider {
   @NonNls private final String[] UnboxingReferencesClassNames = new String[]{"org.osgi.framework.ServiceReference"};
 
-  public void processEffectiveTypes(@NotNull final CommonSpringBean bean, final Collection<PsiClass> result) {
+  public void processEffectiveTypes(@NotNull CommonSpringBean bean, Collection<PsiClass> result) {
     if (!(bean instanceof BaseOsgiReference)) return;
 
     result.clear();
-    final Project project = bean.getPsiManager().getProject();
+    Project project = bean.getPsiManager().getProject();
 
-    final BaseOsgiReference reference = (BaseOsgiReference)bean;
-    final PsiClass psiClass = reference.getInterface().getValue();
+    BaseOsgiReference reference = (BaseOsgiReference)bean;
+    PsiClass psiClass = reference.getInterface().getValue();
     ContainerUtil.addIfNotNull(psiClass, result);
     for (SpringValue value : reference.getInterfaces().getValues()) {
       addClass(result, project, value.getStringValue());
@@ -36,9 +36,9 @@ public class ReferenceEffectiveTypeProvider extends SpringBeanEffectiveTypeProvi
     }
   }
 
-  private static void addClass(final Collection<PsiClass> classes, final Project project, final String className) {
+  private static void addClass(Collection<PsiClass> classes, Project project, String className) {
     if (!StringUtil.isEmptyOrSpaces(className)) {
-      final PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project));
+      PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project));
       ContainerUtil.addIfNotNull(aClass, classes);
     }
   }

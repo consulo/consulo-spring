@@ -25,7 +25,7 @@ public class SpringAopDomExtender extends DomExtender<SpringModelElement> {
     return SpringModelElement.class;
   }
 
-  public void registerExtensions(@Nonnull final SpringModelElement element, @Nonnull final DomExtensionsRegistrar registrar) {
+  public void registerExtensions(@Nonnull SpringModelElement element, @Nonnull DomExtensionsRegistrar registrar) {
     registrar.registerCollectionChildrenExtension(new XmlName("config", SpringConstants.AOP_NAMESPACE_KEY), AopConfig.class);
   }
 

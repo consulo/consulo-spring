@@ -33,7 +33,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   private final XmlFile myFile;
   @NonNls private static final String UNDEFINED_NAME = "Undefined";
 
-  public WebflowDataModel(final XmlFile file) {
+  public WebflowDataModel(XmlFile file) {
     myFile = file;
     myProject = file.getProject();
   }
@@ -60,22 +60,22 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   @NotNull
-  public WebflowNode getSourceNode(final WebflowEdge webflowEdge) {
+  public WebflowNode getSourceNode(WebflowEdge webflowEdge) {
     return webflowEdge.getSource();
   }
 
   @NotNull
-  public WebflowNode getTargetNode(final WebflowEdge webflowBasicEdge) {
+  public WebflowNode getTargetNode(WebflowEdge webflowBasicEdge) {
     return webflowBasicEdge.getTarget();
   }
 
   @NotNull
-  public String getNodeName(final WebflowNode webflowBasicNode) {
+  public String getNodeName(WebflowNode webflowBasicNode) {
     return "";
   }
 
   @NotNull
-  public String getEdgeName(final WebflowEdge webflowBasicEdge) {
+  public String getEdgeName(WebflowEdge webflowBasicEdge) {
     return webflowBasicEdge.getName();
   }
 
@@ -86,8 +86,8 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
    * @param to   target node
    * @return {@link com.intellij.spring.webflow.graph.impl.WebflowTransitionEdge} instance
    */
-  public WebflowEdge createEdge(@NotNull final WebflowNode from, @NotNull final WebflowNode to) {
-    final DomElement element = from.getIdentifyingElement();
+  public WebflowEdge createEdge(@NotNull WebflowNode from, @NotNull WebflowNode to) {
+    DomElement element = from.getIdentifyingElement();
     if (!element.isValid()) return null;
     if (!isEdgeCreationAllowedForFile(from, to)) return null;
 
@@ -101,15 +101,15 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
     return null;
   }
 
-  private static boolean isEdgeCreationAllowedForFile(final WebflowNode from, final WebflowNode to) {
-    final DomElement fromDomElement = from.getIdentifyingElement();
-    final DomElement toDomElement = to.getIdentifyingElement();
+  private static boolean isEdgeCreationAllowedForFile(WebflowNode from, WebflowNode to) {
+    DomElement fromDomElement = from.getIdentifyingElement();
+    DomElement toDomElement = to.getIdentifyingElement();
 
     if (fromDomElement.isValid() && toDomElement.isValid()) {
       if (DomUtil.getFile(fromDomElement).equals(DomUtil.getFile(toDomElement))) return true;
 
-      final Flow fromFlow = fromDomElement.getParentOfType(Flow.class, true);
-      final Flow toFlow = toDomElement.getParentOfType(Flow.class, true);
+      Flow fromFlow = fromDomElement.getParentOfType(Flow.class, true);
+      Flow toFlow = toDomElement.getParentOfType(Flow.class, true);
 
       return WebflowUtil.getAllParentFlows(fromFlow).contains(toFlow);
 
@@ -119,19 +119,19 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   @Nullable
-  private WebflowEdge createIfTransition(final WebflowNode from, final WebflowNode to, final DomElement element) {
-    final DecisionState state = (DecisionState)element;
+  private WebflowEdge createIfTransition(WebflowNode from, WebflowNode to, DomElement element) {
+    DecisionState state = (DecisionState)element;
 
-    final List<If> ifs = state.getIfs();
+    List<If> ifs = state.getIfs();
     if (ifs.size() != 1) {
       return createIfThenTransition(from, to, state);
     }
     else {
 
-      final If anIf = ifs.get(0);
+      If anIf = ifs.get(0);
 
       if (!DomUtil.hasXml(anIf.getElse())) {
-        final int i = Messages.showDialog(WebflowBundle.message("messages.transition.type.question"), WebflowBundle.message("messages.transition.type.title"),
+        int i = Messages.showDialog(WebflowBundle.message("messages.transition.type.question"), WebflowBundle.message("messages.transition.type.title"),
                                           new String[]{WebflowBundle.message("messages.transition.type.else"), WebflowBundle.message("messages.transition.type.new.if")}, 0, Messages.getQuestionIcon());
         if (i == 0) {
           createIfElseTransition(from, to, anIf);
@@ -145,10 +145,10 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   private WebflowEdge createIfThenTransition(final WebflowNode from, final WebflowNode to, final DecisionState state) {
-    final WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
-      protected void run(final Result<WebflowEdge> result) throws Throwable {
-        final String toName = to.getName();
-        final If ifTag = state.addIf();
+    WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
+      protected void run(Result<WebflowEdge> result) throws Throwable {
+        String toName = to.getName();
+        If ifTag = state.addIf();
         ifTag.getThen().setStringValue(toName);
         ifTag.getTest().ensureXmlElementExists();
         result.setResult(new WebflowIfEdge.Then(from, to, (If)ifTag.createStableCopy(), ifTag.getThen()));
@@ -159,9 +159,9 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   private WebflowEdge createIfElseTransition(final WebflowNode from, final WebflowNode to, final If anIf) {
-    final WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
-      protected void run(final Result<WebflowEdge> result) throws Throwable {
-        final String toName = to.getName();
+    WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
+      protected void run(Result<WebflowEdge> result) throws Throwable {
+        String toName = to.getName();
         anIf.getElse().setStringValue(toName);
         anIf.getTest().ensureXmlElementExists();
         result.setResult(new WebflowIfEdge.Else(from, to, (If)anIf.createStableCopy(), anIf.getElse()));
@@ -172,10 +172,10 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   private WebflowEdge createTransition(final WebflowNode from, final WebflowNode to, final DomElement element) {
-    final WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
-      protected void run(final Result<WebflowEdge> result) throws Throwable {
-        final String toName = to.getName();
-        final Transition transition = ((TransitionOwner)element).addTransition();
+    WriteCommandAction<WebflowEdge> action = new WriteCommandAction<WebflowEdge>(myProject) {
+      protected void run(Result<WebflowEdge> result) throws Throwable {
+        String toName = to.getName();
+        Transition transition = ((TransitionOwner)element).addTransition();
         transition.getTo().setStringValue(toName);
         transition.getOn().ensureXmlElementExists();
         result.setResult(new WebflowTransitionEdge(from, to, (Transition)transition.createStableCopy()));
@@ -201,7 +201,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   public void updateDataModel() {
-    final Flow flow = getFlow();
+    Flow flow = getFlow();
 
     if (flow == null) return;
 
@@ -220,12 +220,12 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
     }
   }
 
-  private void addTransitions(final WebflowBasicNode node, final Map<String, List<WebflowBasicNode>> nodes) {
-    final DomElement identifiedElement = node.getIdentifyingElement();
+  private void addTransitions(WebflowBasicNode node, Map<String, List<WebflowBasicNode>> nodes) {
+    DomElement identifiedElement = node.getIdentifyingElement();
     if (identifiedElement instanceof TransitionOwner) {
       TransitionOwner transitionOwner = (TransitionOwner)identifiedElement;
-      for (final Transition transition : transitionOwner.getTransitions()) {
-        final String key = transition.getTo().getStringValue();
+      for (Transition transition : transitionOwner.getTransitions()) {
+        String key = transition.getTo().getStringValue();
         createEdge(node, nodes, getCreatetransitionEdgeFunction(node, transition), key);
 
         /*
@@ -244,12 +244,12 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
     else if (identifiedElement instanceof DecisionState) {
       DecisionState state = (DecisionState)identifiedElement;
       for (If anIf : state.getIfs()) {
-        final String key = anIf.getThen().getStringValue();
+        String key = anIf.getThen().getStringValue();
         if (!StringUtil.isEmptyOrSpaces(key)) {
           createEdge(node, nodes, getCreateIfThenEdgeFunction(node, anIf, anIf.getThen()), key);
         }
 
-        final String elseKey = anIf.getElse().getStringValue();
+        String elseKey = anIf.getElse().getStringValue();
         if (!StringUtil.isEmptyOrSpaces(elseKey)) {
           createEdge(node, nodes, getCreateIfElseEdgeFunction(node, anIf, anIf.getElse()), elseKey);
         }
@@ -260,7 +260,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   private static Function<WebflowNode, WebflowEdge> getCreatetransitionEdgeFunction(final WebflowBasicNode node,
                                                                                     final Transition transition) {
     return new Function<WebflowNode, WebflowEdge>() {
-      public WebflowEdge fun(final WebflowNode targetNode) {
+      public WebflowEdge fun(WebflowNode targetNode) {
         return new WebflowTransitionEdge(node, targetNode, transition);
       }
     };
@@ -270,7 +270,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
                                                                                 final If transition,
                                                                                 final GenericAttributeValue<Object> value) {
     return new Function<WebflowNode, WebflowEdge>() {
-      public WebflowEdge fun(final WebflowNode targetNode) {
+      public WebflowEdge fun(WebflowNode targetNode) {
         return new WebflowIfEdge.Then(node, targetNode, transition, value);
       }
     };
@@ -280,16 +280,16 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
                                                                                 final If transition,
                                                                                 final GenericAttributeValue<Object> value) {
     return new Function<WebflowNode, WebflowEdge>() {
-      public WebflowEdge fun(final WebflowNode targetNode) {
+      public WebflowEdge fun(WebflowNode targetNode) {
         return new WebflowIfEdge.Else(node, targetNode, transition, value);
       }
     };
   }
 
-  private void createEdge(final WebflowBasicNode node,
-                          final Map<String, List<WebflowBasicNode>> nodes,
-                          final Function<WebflowNode, WebflowEdge> function,
-                          final String key) {
+  private void createEdge(WebflowBasicNode node,
+                          Map<String, List<WebflowBasicNode>> nodes,
+                          Function<WebflowNode, WebflowEdge> function,
+                          String key) {
     if (!StringUtil.isEmptyOrSpaces(key)) {
       List<WebflowBasicNode> targetList = nodes.get(key);
       if (targetList != null) {   // TODO: create error node if null list
@@ -301,7 +301,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
     }
   }
 
-  private void addNodes(final Flow flow, final Map<String, List<WebflowBasicNode>> nodes) {
+  private void addNodes(Flow flow, Map<String, List<WebflowBasicNode>> nodes) {
     for (ActionState state : flow.getActionStates()) {
       String name = getNodeName(state);
       ActionStateNode node = new ActionStateNode(name, (ActionState)state.createStableCopy());
@@ -329,13 +329,13 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
     }
 
     // add global transitions  (IDEADEV-26294)
-    final GlobalTransitions globalTransitions = flow.getGlobalTransitions();
+    GlobalTransitions globalTransitions = flow.getGlobalTransitions();
     if (globalTransitions.getTransitions().size() > 0) {
       addNewNode(nodes, GlobalTransitionsNode.GLOBAL_TRANSITIONS_NODE_NAME, new GlobalTransitionsNode(globalTransitions));
     }
   }
 
-  private void addNewNode(final Map<String, List<WebflowBasicNode>> nodes, final String name, final WebflowBasicNode node) {
+  private void addNewNode(Map<String, List<WebflowBasicNode>> nodes, String name, WebflowBasicNode node) {
     List<WebflowBasicNode> namedNodes = (!nodes.containsKey(name)) ? new ArrayList<WebflowBasicNode>() : nodes.get(name);
     namedNodes.add(node);
     nodes.put(name, namedNodes);
@@ -344,7 +344,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
   }
 
   @NotNull
-  private static String getNodeName(final Identified identified) {
+  private static String getNodeName(Identified identified) {
     String name = identified.getId().getStringValue();
     if (StringUtil.isEmptyOrSpaces(name)) {
       name = UNDEFINED_NAME;
@@ -357,7 +357,7 @@ public class WebflowDataModel extends GraphDataModel<WebflowNode, WebflowEdge> {
 
   @Nullable
   public Flow getFlow() {
-    final WebflowModel model = getModel();
+    WebflowModel model = getModel();
     if (model == null || model.getRoots().size() != 1) return null;
 
     return model.getRoots().get(0).getRootElement();

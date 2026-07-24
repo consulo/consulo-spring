@@ -16,22 +16,22 @@ public class WebflowScopeVariableReference extends PsiReferenceBase<PsiElement> 
   private final PsiElement myElement;
   private final String myScopeName;
 
-  public WebflowScopeVariableReference(final PsiElement element, final TextRange range, final GenericDomValue domValue,
-                                       final String scopeName) {
+  public WebflowScopeVariableReference(PsiElement element, TextRange range, GenericDomValue domValue,
+                                       String scopeName) {
     super(element, range, true);
     myElement = element;
     myScopeName = scopeName;
   }
 
   public PsiElement resolve() {
-    final String value = getValue();
+    String value = getValue();
 
-    final Module module = myElement.getModule();
+    Module module = myElement.getModule();
     assert module != null;
 
-    final WebflowScopeProviderManager service = WebflowScopeProviderManager.getService(module);
+    WebflowScopeProviderManager service = WebflowScopeProviderManager.getService(module);
 
-    final WebflowScopeProvider provider = service.getProvider(myScopeName);
+    WebflowScopeProvider provider = service.getProvider(myScopeName);
 
     if (provider == null) return null;
 

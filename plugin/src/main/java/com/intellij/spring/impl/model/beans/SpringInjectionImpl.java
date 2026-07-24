@@ -30,10 +30,10 @@ public abstract class SpringInjectionImpl extends SpringValueHolderImpl implemen
   public PsiType[] getTypesByValue() {
 
     Project project = getManager().getProject();
-    final PsiManager psiManager = PsiManager.getInstance(project);
-    final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+    PsiManager psiManager = PsiManager.getInstance(project);
+    GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
-    final SpringBeanPointer refAttrPointer = getRefAttr().getValue();
+    SpringBeanPointer refAttrPointer = getRefAttr().getValue();
     PsiClass psiClass;
 
     if (DomUtil.hasXml(getValueAttr())) {
@@ -42,7 +42,7 @@ public abstract class SpringInjectionImpl extends SpringValueHolderImpl implemen
         psiClass)};
     }
     else if (refAttrPointer != null) {
-      final PsiClass[] classes = refAttrPointer.getEffectiveBeanType();
+      PsiClass[] classes = refAttrPointer.getEffectiveBeanType();
       return ContainerUtil.map2Array(classes,
                                      PsiType.class,
                                      psiClass1 -> JavaPsiFacade.getInstance(psiManager.getProject())
@@ -55,7 +55,7 @@ public abstract class SpringInjectionImpl extends SpringValueHolderImpl implemen
   }
 
   public GenericDomValue<?> getValueElement() {
-    final SpringValue springValue = getValue();
+    SpringValue springValue = getValue();
     if (!DomUtil.hasXml(springValue)) return getValueAttr();
     return springValue;
   }

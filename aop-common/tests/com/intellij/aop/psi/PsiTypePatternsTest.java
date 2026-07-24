@@ -26,7 +26,7 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testPrimitiveTypes() throws Throwable {
-    final AopPsiTypePattern voidPattern = new PsiPrimitiveTypePattern(PsiType.VOID);
+    AopPsiTypePattern voidPattern = new PsiPrimitiveTypePattern(PsiType.VOID);
     assertTrue(voidPattern.accepts(PsiType.VOID));
     assertFalse(voidPattern.accepts(PsiType.INT));
     assertEquals(PointcutMatchDegree.FALSE, voidPattern.canBeAssignableFrom(PsiType.INT));
@@ -92,11 +92,11 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
     assertFalse(pattern.accepts(fooBarZip));
   }
 
-  private PsiType createPsiType(final String qname) throws IncorrectOperationException {
+  private PsiType createPsiType(String qname) throws IncorrectOperationException {
     return JavaPsiFacade.getInstance(getProject()).getElementFactory().createTypeFromText(qname, null);
   }
 
-  private PsiClassType createPsiType(final PsiClass aClass) {
+  private PsiClassType createPsiType(PsiClass aClass) {
     return JavaPsiFacade.getInstance(getProject()).getElementFactory().createType(aClass);
   }
 
@@ -272,10 +272,10 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
     assertPackages(AopPsiTypePatternsUtil.conjunctPatterns(new PsiClassTypePattern("*.lang"), new PsiClassTypePattern("foo")), "", "foo");
   }
 
-  private void assertPackages(final AopPsiTypePattern pattern, final String... packages) {
+  private void assertPackages(AopPsiTypePattern pattern, String... packages) {
     final Set<String> actual = new THashSet<String>();
     assertTrue(pattern.processPackages(getPsiManager(), new Processor<PsiPackage>() {
-      public boolean process(final PsiPackage psiPackage) {
+      public boolean process(PsiPackage psiPackage) {
         actual.add(psiPackage.getQualifiedName());
         return true;
       }
@@ -284,7 +284,7 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testAnnotatedPattern() throws Throwable {
-    final PsiAnnotatedTypePattern pattern = new PsiAnnotatedTypePattern(new PsiClassTypePattern("*..FooAnno"));
+    PsiAnnotatedTypePattern pattern = new PsiAnnotatedTypePattern(new PsiClassTypePattern("*..FooAnno"));
     assertTrue(pattern.accepts(createPsiType("java.bar.MyList")));
     assertFalse(pattern.accepts(createPsiType("java.lang.Object")));
     assertFalse(pattern.accepts(createPsiType("FooAnno")));

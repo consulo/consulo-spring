@@ -18,13 +18,13 @@ import java.util.List;
 public class ListOrSetValueConverter extends PropertyValueConverter {
 
   @Nonnull
-  public List<? extends PsiType> getValueTypes(final GenericDomValue element) {
+  public List<? extends PsiType> getValueTypes(GenericDomValue element) {
     if (element instanceof SpringValue) {
-      final List<? extends PsiType> psiTypes = ((SpringValue)element).getRequiredTypes();
+      List<? extends PsiType> psiTypes = ((SpringValue)element).getRequiredTypes();
       if (!psiTypes.isEmpty())
       return psiTypes;
     }
-    final ListOrSet parent = (ListOrSet)element.getParent();
+    ListOrSet parent = (ListOrSet)element.getParent();
     assert parent != null;
     return parent.getRequiredTypes();
   }

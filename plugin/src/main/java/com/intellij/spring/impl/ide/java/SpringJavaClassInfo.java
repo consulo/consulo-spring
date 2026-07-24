@@ -32,21 +32,21 @@ public class SpringJavaClassInfo {
   private final CachedValue<List<SpringBaseBeanPointer>> myBeans;
   private final CachedValue<MultiMap<String, SpringPropertyDefinition>> myProperties;
 
-  private SpringJavaClassInfo(final PsiClass psiClass) {
+  private SpringJavaClassInfo(PsiClass psiClass) {
 
     myPsiClass = psiClass;
     final Project project = psiClass.getProject();
 
     myBeans = CachedValuesManager.getManager(project).createCachedValue(new CachedValueProvider<List<SpringBaseBeanPointer>>() {
       public Result<List<SpringBaseBeanPointer>> compute() {
-        final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(myPsiClass);
+        consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(myPsiClass);
         if (module == null) {
           return null;
         }
         final List<SpringBaseBeanPointer> result = new ArrayList<>();
         ModuleUtilCore.visitMeAndDependentModules(module, new Processor<Module>() {
-          public boolean process(final Module module) {
-            final SpringModel model = SpringManager.getInstance(project).getCombinedModel(module);
+          public boolean process(Module module) {
+            SpringModel model = SpringManager.getInstance(project).getCombinedModel(module);
             if (model != null) {
               result.addAll(model.findBeansByEffectivePsiClassWithInheritance(myPsiClass));
               return true;
@@ -60,15 +60,15 @@ public class SpringJavaClassInfo {
 
     myProperties = CachedValuesManager.getManager(project).createCachedValue(new CachedValueProvider<MultiMap<String, SpringPropertyDefinition>>() {
       public Result<MultiMap<String, SpringPropertyDefinition>> compute() {
-        final List<SpringBaseBeanPointer> list = getMappedBeans();
-        final MultiMap<String, SpringPropertyDefinition> map = MultiMap.createConcurrent();
+        List<SpringBaseBeanPointer> list = getMappedBeans();
+        MultiMap<String, SpringPropertyDefinition> map = MultiMap.createConcurrent();
         for (SpringBaseBeanPointer beanPointer : list) {
           if (beanPointer instanceof DomSpringBeanPointer domPointer) {
-            final DomSpringBean bean = domPointer.getSpringBean();
+            DomSpringBean bean = domPointer.getSpringBean();
             if (bean instanceof SpringBean) {
-              final List<SpringPropertyDefinition> properties = ((SpringBean)bean).getAllProperties();
+              List<SpringPropertyDefinition> properties = ((SpringBean)bean).getAllProperties();
               for (SpringPropertyDefinition property : properties) {
-                final String propertyName = property.getPropertyName();
+                String propertyName = property.getPropertyName();
                 if (propertyName != null) {
                   map.putValue(propertyName, property);
                 }
@@ -82,7 +82,7 @@ public class SpringJavaClassInfo {
   }
 
   @Nonnull
-  public static SpringJavaClassInfo getSpringJavaClassInfo(final @Nonnull PsiClass psiClass) {
+  public static SpringJavaClassInfo getSpringJavaClassInfo(@Nonnull PsiClass psiClass) {
     SpringJavaClassInfo info = psiClass.getUserData(KEY);
     if (info == null) {
       info = new SpringJavaClassInfo(psiClass);
@@ -97,13 +97,13 @@ public class SpringJavaClassInfo {
 
   @Nonnull
   public List<SpringBaseBeanPointer> getMappedBeans() {
-    final List<SpringBaseBeanPointer> list = myBeans.getValue();
+    List<SpringBaseBeanPointer> list = myBeans.getValue();
     return list == null ? Collections.emptyList() : list;
   }
 
   @Nonnull
   public Collection<SpringPropertyDefinition> getMappedProperties(String propertyName) {
-    final MultiMap<String, SpringPropertyDefinition> value = myProperties.getValue();
+    MultiMap<String, SpringPropertyDefinition> value = myProperties.getValue();
     if (value == null) {
       return Collections.emptyList();
     }

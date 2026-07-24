@@ -17,7 +17,7 @@ import java.util.Collection;
  */
 public class PsiWithinExpression extends PsiTypedPointcutExpression {
 
-  public PsiWithinExpression(@Nonnull final ASTNode node) {
+  public PsiWithinExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -26,8 +26,8 @@ public class PsiWithinExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
-    final AopReferenceHolder holder = getTypeReference();
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+    AopReferenceHolder holder = getTypeReference();
     if (holder == null) return PointcutMatchDegree.FALSE;
 
     PsiClass psiClass = member.getContainingClass();

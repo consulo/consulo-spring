@@ -15,7 +15,7 @@ public class SpringBeansTemplatesFactory implements FileTemplateGroupDescriptorF
 
   @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
-    final FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor(SpringBundle.message("spring"), SpringIcons.FILESET);
+    FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor(SpringBundle.message("spring"), SpringIcons.FILESET);
 
     group.addTemplate(new FileTemplateDescriptor(SpringSchemaVersion.Spring_1_DTD.getTemplateName(), SpringIcons.CONFIG_FILE));
     group.addTemplate(new FileTemplateDescriptor(SpringSchemaVersion.Spring_2_DTD.getTemplateName(), SpringIcons.CONFIG_FILE));

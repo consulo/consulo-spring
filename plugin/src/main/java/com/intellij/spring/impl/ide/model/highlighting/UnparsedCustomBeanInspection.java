@@ -41,15 +41,15 @@ public class UnparsedCustomBeanInspection extends SpringBeanInspectionBase {
 
     protected SpringModelVisitor createVisitor(
         final DomElementAnnotationHolder holder,
-        final Beans beans,
-        final SpringModel model,
+        Beans beans,
+        SpringModel model,
         Object state
     ) {
         return new SpringModelVisitor() {
 
             protected boolean visitBean(CommonSpringBean bean) {
                 if (bean instanceof CustomBeanWrapper) {
-                    final CustomBeanWrapper wrapper = (CustomBeanWrapper) bean;
+                    CustomBeanWrapper wrapper = (CustomBeanWrapper) bean;
                     if (!wrapper.isParsed()) {
                         holder.createProblem(
                             wrapper,

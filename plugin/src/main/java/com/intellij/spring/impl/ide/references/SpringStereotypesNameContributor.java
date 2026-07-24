@@ -28,20 +28,20 @@ import java.util.List;
 public class SpringStereotypesNameContributor extends PsiReferenceContributor {
   private static final Key<PsiElement> PSI_ELEMENT_KEY = Key.create("PSI_ELEMENT_KEY");
 
-  public void registerReferenceProviders(final PsiReferenceRegistrar registrar) {
+  public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
     registrar.registerReferenceProvider(PsiJavaPatterns.literalExpression().save(PSI_ELEMENT_KEY).annotationParam(
       PlatformPatterns.string().with(new PatternCondition<String>("stereotypeAnnos") {
-        public boolean accepts(@Nonnull final String s, final ProcessingContext context) {
-          final PsiElement element = context.get(PSI_ELEMENT_KEY);
+        public boolean accepts(@Nonnull String s, ProcessingContext context) {
+          PsiElement element = context.get(PSI_ELEMENT_KEY);
 
-          final Module module = ModuleUtilCore.findModuleForPsiElement(element);
+          Module module = ModuleUtilCore.findModuleForPsiElement(element);
 
           return getAnnotaionNames(module).contains(s);
         }
       }), "value"), new SpringStereotypesReferenceProvider());
   }
 
-  private static List<String> getAnnotaionNames(@Nullable final Module module) {
+  private static List<String> getAnnotaionNames(@Nullable Module module) {
     List<String> annos = new ArrayList<String>();
 
     if (module == null) {

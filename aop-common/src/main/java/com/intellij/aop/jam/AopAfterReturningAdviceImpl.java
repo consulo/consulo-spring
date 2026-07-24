@@ -26,10 +26,10 @@ public abstract class AopAfterReturningAdviceImpl extends AopAdviceWithPointcutA
   }
 
   @Override
-  public PointcutMatchDegree accepts(final PsiMethod method) {
-    final PsiParameter parameter = getReturning().getValue();
+  public PointcutMatchDegree accepts(PsiMethod method) {
+    PsiParameter parameter = getReturning().getValue();
     if (parameter != null) {
-      final PsiType returnType = method.getReturnType();
+      PsiType returnType = method.getReturnType();
       if (returnType != null && !parameter.getType().isAssignableFrom(returnType)) return PointcutMatchDegree.FALSE;
     }
     return super.accepts(method);

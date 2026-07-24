@@ -53,12 +53,12 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel,
         Object state
     ) {
-        final PsiClass beanClass = springBean.getBeanClass();
+        PsiClass beanClass = springBean.getBeanClass();
         if (beanClass != null) {
             checkConstructorResolve(springBean, holder, beanClass);
             checkConstructorArgType(springBean, holder);
@@ -69,22 +69,22 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
     // checks if instantiation method matches the args
     private static void checkConstructorResolve(
         @Nonnull SpringBean springBean,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiClass beanClass
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiClass beanClass
     ) {
         if (springBean.isAbstract()) {
             return;
         }
 
-        final ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
+        ResolvedConstructorArgs resolvedArgs = springBean.getResolvedConstructorArgs();
 
         if (!resolvedArgs.isResolved()) {
-            final boolean instantiatedByFactory = isInstantiatedByFactory(springBean);
+            boolean instantiatedByFactory = isInstantiatedByFactory(springBean);
             LocalizeValue message = instantiatedByFactory
                 ? SpringLocalize.cannotFindFactoryMethodWithParametersCount(beanClass.getName())
                 : SpringLocalize.cannotFindBeanConstructorWithParametersCount(beanClass.getName());
 
-            final DomElement element;
+            DomElement element;
             if (!instantiatedByFactory && DomUtil.hasXml(springBean.getClazz())) {
                 element = springBean.getClazz();
             }
@@ -95,9 +95,9 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
                 element = springBean;
             }
 
-            final List<LocalQuickFix> fixes = new ArrayList<LocalQuickFix>();
+            List<LocalQuickFix> fixes = new ArrayList<LocalQuickFix>();
 
-            final SpringBean stableCopy = springBean.createStableCopy();
+            SpringBean stableCopy = springBean.createStableCopy();
             if (!instantiatedByFactory && !(beanClass instanceof PsiCompiledElement)) {
                 fixes.add(createConstructorQuickFix(stableCopy, beanClass));
             }
@@ -107,31 +107,31 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static boolean isInstantiatedByFactory(final SpringBean springBean) {
+    private static boolean isInstantiatedByFactory(SpringBean springBean) {
         return springBean.getFactoryMethod().getXmlAttribute() != null;
     }
 
-    private static void checkConstructorArgType(final SpringBean springBean, final DomElementAnnotationHolder holder) {
-        final List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
+    private static void checkConstructorArgType(SpringBean springBean, DomElementAnnotationHolder holder) {
+        List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
         if (list.size() == 0) {
             return;
         }
-        final List<PsiMethod> instantiationMethods = SpringBeanUtil.getInstantiationMethods(springBean);
+        List<PsiMethod> instantiationMethods = SpringBeanUtil.getInstantiationMethods(springBean);
         args:
-        for (final ConstructorArg arg : list) {
-            final PsiType argType = arg.getType().getValue();
+        for (ConstructorArg arg : list) {
+            PsiType argType = arg.getType().getValue();
             if (argType == null) {
                 continue;
             }
-            final Integer index = arg.getIndex().getValue();
+            Integer index = arg.getIndex().getValue();
             boolean parameterFound = false;
             if (index != null) {
-                final int i = index.intValue();
+                int i = index.intValue();
                 if (i < 0) {
                     continue;
                 }
-                for (final PsiMethod method : instantiationMethods) {
-                    final PsiParameter[] parameters = method.getParameterList().getParameters();
+                for (PsiMethod method : instantiationMethods) {
+                    PsiParameter[] parameters = method.getParameterList().getParameters();
                     if (i < parameters.length) {
                         parameterFound = true;
                         if (parameters[i].getType().isAssignableFrom(argType)) {
@@ -141,8 +141,8 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
                 }
             }
             else {
-                for (final PsiMethod method : instantiationMethods) {
-                    final PsiParameter[] parameters = method.getParameterList().getParameters();
+                for (PsiMethod method : instantiationMethods) {
+                    PsiParameter[] parameters = method.getParameterList().getParameters();
                     for (PsiParameter param : parameters) {
                         if (param.getType().isAssignableFrom(argType)) {
                             continue args;
@@ -157,15 +157,15 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static void checkConstructorArgIndexes(final SpringBean springBean, final DomElementAnnotationHolder holder) {
-        final List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
+    private static void checkConstructorArgIndexes(SpringBean springBean, DomElementAnnotationHolder holder) {
+        List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
 
         Map<Integer, ConstructorArg> argsMap = new HashMap<Integer, ConstructorArg>();
-        final ArrayList<ConstructorArg> firstSeen = new ArrayList<ConstructorArg>();
+        ArrayList<ConstructorArg> firstSeen = new ArrayList<ConstructorArg>();
         for (ConstructorArg arg : list) {
-            final Integer index = arg.getIndex().getValue();
+            Integer index = arg.getIndex().getValue();
             if (index != null) {
-                final ConstructorArg previous = argsMap.put(index, arg);
+                ConstructorArg previous = argsMap.put(index, arg);
                 if (previous != null) {
                     reportNotUniqueIndex(holder, arg);
                     if (!firstSeen.contains(previous)) {
@@ -177,7 +177,7 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static void reportNotUniqueIndex(final DomElementAnnotationHolder holder, final ConstructorArg arg) {
+    private static void reportNotUniqueIndex(DomElementAnnotationHolder holder, ConstructorArg arg) {
         LocalizeValue message = SpringLocalize.incorrectConstructorArgIndexNotUnique();
         holder.createProblem(arg.getIndex(), message.get());
     }
@@ -190,13 +190,13 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
                 return SpringLocalize.modelCreateConstructorQuickfixMessage(getSignature(springBean));
             }
 
-            private String getSignature(final SpringBean springBean) {
-                final String params = SpringConstructorArgResolveUtil.suggestParamsForConstructorArgsAsString(springBean);
+            private String getSignature(SpringBean springBean) {
+                String params = SpringConstructorArgResolveUtil.suggestParamsForConstructorArgsAsString(springBean);
                 return beanClass.getName() + "(" + params + ")";
             }
 
-            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
-                final PsiClass beanClass = springBean.getBeanClass();
+            public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
+                PsiClass beanClass = springBean.getBeanClass();
                 try {
                     assert beanClass != null;
                     if (ReadonlyStatusHandler.getInstance(project)
@@ -204,10 +204,10 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
                         .hasReadonlyFiles()) {
                         return;
                     }
-                    final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
+                    PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
 
-                    final PsiMethod constructor = elementFactory.createConstructor();
-                    final List<PsiParameter> parameters = SpringConstructorArgResolveUtil.suggestParamsForConstructorArgs(springBean);
+                    PsiMethod constructor = elementFactory.createConstructor();
+                    List<PsiParameter> parameters = SpringConstructorArgResolveUtil.suggestParamsForConstructorArgs(springBean);
                     for (PsiParameter parameter : parameters) {
                         constructor.getParameterList().add(parameter);
                     }
@@ -221,7 +221,7 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
         };
     }
 
-    public static List<LocalQuickFix> getConstructroArgsQuickFixes(final @Nonnull SpringBean springBean, @Nonnull PsiMethod[] ctors) {
+    public static List<LocalQuickFix> getConstructroArgsQuickFixes(@Nonnull SpringBean springBean, @Nonnull PsiMethod[] ctors) {
         List<LocalQuickFix> quickFixes = new ArrayList<LocalQuickFix>();
 
         if (SpringUtils.getConstructorArgs(springBean).size() == 0) {
@@ -240,7 +240,7 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
         private final String myMethodName;
         private final SmartPsiElementPointer<PsiMethod> myPointer;
 
-        public AddConstructorArgQuickFix(final PsiMethod ctor, final SpringBean springBean) {
+        public AddConstructorArgQuickFix(PsiMethod ctor, SpringBean springBean) {
             myPointer = SmartPointerManager.getInstance(ctor.getProject()).createSmartPsiElementPointer(ctor);
             mySpringBean = springBean;
             myMethodName = PsiFormatUtil
@@ -253,17 +253,17 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
             return SpringLocalize.modelAddConstructorArgsForMethodQuickfixMessage(myMethodName);
         }
 
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             PsiMethod myCtor = myPointer.getElement();
             if (myCtor == null) {
                 return;
             }
             @SuppressWarnings({"ConstantConditions"})
             PsiMethod[] myAllCtors = myCtor.getContainingClass().getConstructors();
-            final PsiParameter[] parameters = myCtor.getParameterList().getParameters();
-            final SpringModel model = SpringUtils.getSpringModel(mySpringBean);
-            final SpringTemplateBuilder builder = new SpringTemplateBuilder(project);
-            final Editor editor = SpringTemplateBuilder.getEditor(descriptor);
+            PsiParameter[] parameters = myCtor.getParameterList().getParameters();
+            SpringModel model = SpringUtils.getSpringModel(mySpringBean);
+            SpringTemplateBuilder builder = new SpringTemplateBuilder(project);
+            Editor editor = SpringTemplateBuilder.getEditor(descriptor);
             SpringTemplateBuilder.preparePlace(editor, project, mySpringBean.addConstructorArg());
 
             for (int i = 0; i < parameters.length; i++) {
@@ -277,7 +277,7 @@ public class SpringConstructorArgInspection extends SpringBeanInspectionBase {
                     if (ctor == myCtor) {
                         continue;
                     }
-                    final PsiParameter[] params = ctor.getParameterList().getParameters();
+                    PsiParameter[] params = ctor.getParameterList().getParameters();
                     if (params.length == parameters.length) {
                         builder.addTextSegment(" type=\"" + parameters[i].getType().getCanonicalText() + "\"");
                         break;

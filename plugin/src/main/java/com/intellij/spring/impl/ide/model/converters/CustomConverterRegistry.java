@@ -19,7 +19,7 @@ public class CustomConverterRegistry {
 
   @Nullable
   public Converter getCustomConverter(Class aClass, GenericDomValue context) {
-    final Pair<Condition<GenericDomValue>, Converter> pair = myCustomConverters.get(aClass);
+    Pair<Condition<GenericDomValue>, Converter> pair = myCustomConverters.get(aClass);
     if (pair != null && pair.first.value(context)) {
       return pair.second;
     }

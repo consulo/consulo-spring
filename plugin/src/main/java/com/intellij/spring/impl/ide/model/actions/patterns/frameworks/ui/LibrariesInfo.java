@@ -8,7 +8,7 @@ public class LibrariesInfo {
   private Module myModule;
   private String myName;
 
-  public LibrariesInfo(final LibraryInfo[] libs, final Module module, final String name) {
+  public LibrariesInfo(LibraryInfo[] libs, Module module, String name) {
     myLibs = libs;
     myModule = module;
     myName = name;
@@ -18,7 +18,7 @@ public class LibrariesInfo {
     return myLibs;
   }
 
-  public void setLibs(final LibraryInfo[] libs) {
+  public void setLibs(LibraryInfo[] libs) {
     myLibs = libs;
   }
 
@@ -26,7 +26,7 @@ public class LibrariesInfo {
     return myModule;
   }
 
-  public void setModule(final consulo.module.Module module) {
+  public void setModule(consulo.module.Module module) {
     myModule = module;
   }
 
@@ -34,7 +34,7 @@ public class LibrariesInfo {
     return myName;
   }
 
-  public void setName(final String name) {
+  public void setName(String name) {
     myName = name;
   }
 }

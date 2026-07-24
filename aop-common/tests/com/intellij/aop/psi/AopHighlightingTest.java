@@ -104,7 +104,7 @@ public class AopHighlightingTest extends JavaCodeInsightFixtureTestCase {
     myFixture.getJavaFacade().findClass("Context").putUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL, new MockAopModel(new AllAdvisedElementsSearcher(myFixture.getPsiManager())) {
       @Nullable
       public PsiMethod getPointcutMethod() {
-        final String text = "void m(abc.Anno abc, int i) {}";
+        String text = "void m(abc.Anno abc, int i) {}";
         try {
           return myFixture.getJavaFacade().getParserFacade().createMethodFromText(text, null);
         }
@@ -118,7 +118,7 @@ public class AopHighlightingTest extends JavaCodeInsightFixtureTestCase {
 
   public void testAndOrNotInJava() throws Throwable { doTest(); }
   public void testAndOrNotInXml() throws Throwable {
-    final XmlTag tag = XmlElementFactory.getInstance(getProject()).createTagFromText("<a/>");
+    XmlTag tag = XmlElementFactory.getInstance(getProject()).createTagFromText("<a/>");
     myFixture.setFileContext(tag);
     tag.putUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL, new MockAopModel(new AllAdvisedElementsSearcher(myFixture.getPsiManager())) { });
     doTest();
@@ -127,7 +127,7 @@ public class AopHighlightingTest extends JavaCodeInsightFixtureTestCase {
   public void testBeanDesignator() throws Throwable { doTest(); }
 
   public void testResolveInSamePackage() throws Throwable {
-    final PsiClass context = myFixture.addClass("package foo; class Context {}");
+    PsiClass context = myFixture.addClass("package foo; class Context {}");
     myFixture.addClass("package foo; class Foo {}");
     context.putUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL, new MockAopModel(new AllAdvisedElementsSearcher(myFixture.getPsiManager())){});
     myFixture.setFileContext(context);
@@ -136,7 +136,7 @@ public class AopHighlightingTest extends JavaCodeInsightFixtureTestCase {
 
 
   private void doTest() throws Throwable {
-    final String path = PathManagerEx.getTestDataPath() + "/aop/highlighting/" + getTestName(true) + ".txt";
+    String path = PathManagerEx.getTestDataPath() + "/aop/highlighting/" + getTestName(true) + ".txt";
     myFixture.configureByText(AopPointcutExpressionFileType.INSTANCE, LiteFixture.loadFileText(path));
     myFixture.checkHighlighting();
   }

@@ -32,7 +32,7 @@ public abstract class SpringOsgiBaseInspection extends SpringBeanInspectionBase 
   }
 
   protected void checkOsgiReferenceCollection(BaseReferenceCollection baseReferenceCollection, Beans beans, DomElementAnnotationHolder holder, SpringModel model) {}
-  protected void checkOsgiService(Service service, final Beans beans, final DomElementAnnotationHolder holder, final SpringModel springModel) {}
-  protected void checkOsgiReference(BaseOsgiReference reference, final Beans beans, final DomElementAnnotationHolder holder, final SpringModel springModel) {}
+  protected void checkOsgiService(Service service, Beans beans, DomElementAnnotationHolder holder, SpringModel springModel) {}
+  protected void checkOsgiReference(BaseOsgiReference reference, Beans beans, DomElementAnnotationHolder holder, SpringModel springModel) {}
 }
 

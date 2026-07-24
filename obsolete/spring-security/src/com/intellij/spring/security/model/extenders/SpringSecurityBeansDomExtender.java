@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpringSecurityBeansDomExtender extends DomExtender<Beans> {
 
-    public void registerExtensions(@NotNull final Beans element, @NotNull final DomExtensionsRegistrar registrar) {
+    public void registerExtensions(@NotNull Beans element, @NotNull DomExtensionsRegistrar registrar) {
 
       registrar.registerCollectionChildrenExtension(new XmlName("authentication-manager", SpringSecurityConstants.SECURITY_NAMESPACE_KEY), AuthenticationManager.class);
       registrar.registerCollectionChildrenExtension(new XmlName("authentication-provider", SpringSecurityConstants.SECURITY_NAMESPACE_KEY), AuthenticationProvider.class);

@@ -35,32 +35,32 @@ public class SpringWebReferenceContributor extends PsiReferenceContributor {
 
   private static final PsiReferenceProviderBase PROVIDER = new PsiReferenceProviderBase() {
     @NotNull
-    public PsiReference[] getReferencesByElement(@NotNull final PsiElement element, @NotNull final ProcessingContext context) {
+    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
 
       PsiReference[] result = PsiReference.EMPTY_ARRAY;
-      final XmlTag tag = (XmlTag)element;
-      final XmlTag parent = tag.getParentTag();
+      XmlTag tag = (XmlTag)element;
+      XmlTag parent = tag.getParentTag();
       if (parent == null || !(parent.getName().equals(CONTEXT_PARAM) || parent.getName().equals(INIT_PARAM))) {
         return result;
       }
-      final XmlTag nameTag = parent.findFirstSubTag("param-name");
+      XmlTag nameTag = parent.findFirstSubTag("param-name");
       if (nameTag == null) {
         return result;
       }
-      final String name = ElementManipulators.getValueText(nameTag);
+      String name = ElementManipulators.getValueText(nameTag);
       if (!name.equals(SpringWebConstants.CONTEXT_CONFIG_LOCATION)) {
         return result;
       }
 
-      final TextRange[] ranges = XmlTagManipulator.getValueRanges(tag);
+      TextRange[] ranges = XmlTagManipulator.getValueRanges(tag);
       for (TextRange range : ranges) {
-        final String text = range.substring(element.getText());
-        final StringTokenizer tokenizer = new StringTokenizer(text, SpringUtils.SPRING_DELIMITERS + "\n\t");
+        String text = range.substring(element.getText());
+        StringTokenizer tokenizer = new StringTokenizer(text, SpringUtils.SPRING_DELIMITERS + "\n\t");
         while (tokenizer.hasMoreTokens()) {
-          final String s = tokenizer.nextToken();
-          final int end = tokenizer.getCurrentPosition();
-          final int offset = end - s.length() + range.getStartOffset();
-          final PsiReference[] references = ResourceResolverUtils.getReferences(tag, s, true, false, offset, false);
+          String s = tokenizer.nextToken();
+          int end = tokenizer.getCurrentPosition();
+          int offset = end - s.length() + range.getStartOffset();
+          PsiReference[] references = ResourceResolverUtils.getReferences(tag, s, true, false, offset, false);
           result = ArrayUtil.mergeArrays(result, references, PsiReference.class);
         }       
       }
@@ -68,7 +68,7 @@ public class SpringWebReferenceContributor extends PsiReferenceContributor {
     }
   };
 
-  public void registerReferenceProviders(final PsiReferenceRegistrar registrar) {
+  public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
     XmlUtil.registerXmlTagReferenceProvider(registrar, new String[] {"param-value"}, NAMESPACE_WEBAPP, true, PROVIDER);
   }
 }

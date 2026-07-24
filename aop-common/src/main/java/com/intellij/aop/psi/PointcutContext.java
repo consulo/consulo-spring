@@ -26,8 +26,8 @@ public class PointcutContext {
 
   public PointcutContext(@Nullable PsiMethod method) {
     if (method != null) {
-      for (final PsiParameter parameter : method.getParameterList().getParameters()) {
-        final String paramName = parameter.getName();
+      for (PsiParameter parameter : method.getParameterList().getParameters()) {
+        String paramName = parameter.getName();
         if (paramName != null) {
           addParameter(paramName, new AopParameterReferenceTarget(parameter));
         }
@@ -45,9 +45,9 @@ public class PointcutContext {
 
   @Nonnull
   public AopReferenceTarget resolve(@Nonnull AopReferenceHolder pattern) {
-    final AopTypeExpression typeExpression = pattern.getTypeExpression();
+    AopTypeExpression typeExpression = pattern.getTypeExpression();
     if (typeExpression instanceof AopReferenceExpression) {
-      final AopReferenceTarget target = getParameter(pattern.getText());
+      AopReferenceTarget target = getParameter(pattern.getText());
       if (target != null) {
         return target;
       }

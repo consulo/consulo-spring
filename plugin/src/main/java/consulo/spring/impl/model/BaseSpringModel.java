@@ -50,7 +50,7 @@ public abstract class BaseSpringModel implements SpringModel {
     @Override
     protected void compute(PsiClass psiClass, List<SpringBaseBeanPointer> pointers) {
       Collection<? extends SpringBaseBeanPointer> beans = getAllCommonBeans();
-      for (final SpringBaseBeanPointer bean : beans) {
+      for (SpringBaseBeanPointer bean : beans) {
         for (PsiClass beanClass : bean.getEffectiveBeanType()) {
           if (InheritanceUtil.isInheritorOrSelf(beanClass, psiClass, true)) {
             pointers.add(bean);
@@ -73,11 +73,11 @@ public abstract class BaseSpringModel implements SpringModel {
     @Nonnull
     @Override
     protected MultiMap<String, XmlTag> compute() {
-      final MultiMap<String, XmlTag> map = new MultiMap<>();
-      for (final DomFileElement<Beans> element : getRoots()) {
+      MultiMap<String, XmlTag> map = new MultiMap<>();
+      for (DomFileElement<Beans> element : getRoots()) {
         for (CustomBeanWrapper bean : DomUtil.getDefinedChildrenOfType(element.getRootElement(), CustomBeanWrapper.class)) {
           if (!bean.isParsed()) {
-            final XmlTag tag = bean.getXmlTag();
+            XmlTag tag = bean.getXmlTag();
             for (XmlAttribute attribute : tag.getAttributes()) {
               map.putValue(attribute.getDisplayValue(), tag);
             }
@@ -108,8 +108,8 @@ public abstract class BaseSpringModel implements SpringModel {
       @Nonnull
       protected Collection<SpringBaseBeanPointer> compute() {
         Collection<SpringBaseBeanPointer> beans = null;
-        for (final DomFileElement<Beans> element : getRoots()) {
-          final List<CommonSpringBean> springBeanList = SpringUtils.getChildBeans(element.getRootElement(), false);
+        for (DomFileElement<Beans> element : getRoots()) {
+          List<CommonSpringBean> springBeanList = SpringUtils.getChildBeans(element.getRootElement(), false);
           if (beans == null) {
             beans = new ArrayList<>(springBeanList.size());
           }
@@ -126,9 +126,9 @@ public abstract class BaseSpringModel implements SpringModel {
       @Override
       @Nonnull
       protected MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> compute() {
-        final MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> map = MultiMap.createConcurrent();
-        for (final SpringBaseBeanPointer pointer : getAllDomBeans()) {
-          final SpringBeanPointer parentPointer = pointer.getParentPointer();
+        MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> map = MultiMap.createConcurrent();
+        for (SpringBaseBeanPointer pointer : getAllDomBeans()) {
+          SpringBeanPointer parentPointer = pointer.getParentPointer();
           if (parentPointer != null) {
             map.putValue(parentPointer.getBasePointer(), pointer);
           }
@@ -147,12 +147,12 @@ public abstract class BaseSpringModel implements SpringModel {
     boolean visit(SpringModel model);
   }
 
-  public BaseSpringModel(final Module module, final SpringFileSet fileSet) {
+  public BaseSpringModel(Module module, SpringFileSet fileSet) {
     myFileSet = fileSet;
     myModule = module;
   }
 
-  private boolean visitDependencies(final ModelVisitor visitor) {
+  private boolean visitDependencies(ModelVisitor visitor) {
     for (SpringModel dependency : myDependencies) {
       if (!visitor.visit(dependency)) {
         return false;
@@ -165,8 +165,8 @@ public abstract class BaseSpringModel implements SpringModel {
   }
 
   public List<Alias> getAliases(boolean withDeps) {
-    final ArrayList<Alias> list = new ArrayList<>();
-    final ModelVisitor modelVisitor = model -> {
+    ArrayList<Alias> list = new ArrayList<>();
+    ModelVisitor modelVisitor = model -> {
       for (DomFileElement<Beans> fileElement : model.getRoots()) {
         list.addAll(fileElement.getRootElement().getAliases());
       }
@@ -202,7 +202,7 @@ public abstract class BaseSpringModel implements SpringModel {
     return myCustomBeanIdCandidates.getValue().get(id);
   }
 
-  public void setDependencies(@Nonnull final SpringModel[] dependencies) {
+  public void setDependencies(@Nonnull SpringModel[] dependencies) {
     myDependencies = dependencies;
   }
 
@@ -214,9 +214,9 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nullable
-  public SpringBeanPointer findParentBean(@NonNls @Nonnull final String beanName) {
+  public SpringBeanPointer findParentBean(@NonNls @Nonnull String beanName) {
     for (SpringModel dependency : myDependencies) {
-      final SpringBeanPointer springBean = dependency.findBean(beanName);
+      SpringBeanPointer springBean = dependency.findBean(beanName);
       if (springBean != null) {
         return springBean;
       }
@@ -247,9 +247,9 @@ public abstract class BaseSpringModel implements SpringModel {
   @Nonnull
   public Collection<SpringBaseBeanPointer> getAllDomBeans(boolean withDependencies) {
 
-    final Collection<SpringBaseBeanPointer> ownBeans = getOwnBeans();
+    Collection<SpringBaseBeanPointer> ownBeans = getOwnBeans();
     if (withDependencies) {
-      final List<SpringBaseBeanPointer> allBeans = new ArrayList<>(ownBeans);
+      List<SpringBaseBeanPointer> allBeans = new ArrayList<>(ownBeans);
       visitDependencies(model -> {
         allBeans.addAll(model.getOwnBeans());
         return true;
@@ -263,18 +263,18 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public Set<String> getAllBeanNames(@Nonnull final String beanName) {
+  public Set<String> getAllBeanNames(@Nonnull String beanName) {
     return getBeanNamesMapper().getAllBeanNames(beanName);
   }
 
   @Override
-  public boolean isNameDuplicated(@Nonnull final String beanName) {
+  public boolean isNameDuplicated(@Nonnull String beanName) {
     return getBeanNamesMapper().isNameDuplicated(beanName);
   }
 
   @Override
   @Nonnull
-  public synchronized Collection<? extends SpringBaseBeanPointer> getAllCommonBeans(final boolean withDepenedencies) {
+  public synchronized Collection<? extends SpringBaseBeanPointer> getAllCommonBeans(boolean withDepenedencies) {
     if (!withDepenedencies || myDependencies.length == 0) {
       return myBeansWithoutDependencies == null
         ? myBeansWithoutDependencies = calculateBeans(withDepenedencies)
@@ -285,9 +285,9 @@ public abstract class BaseSpringModel implements SpringModel {
     }
   }
 
-  private Collection<SpringBaseBeanPointer> calculateBeans(final boolean withDepenedencies) {
+  private Collection<SpringBaseBeanPointer> calculateBeans(boolean withDepenedencies) {
     Collection<SpringBaseBeanPointer> domBeans = getAllDomBeans(withDepenedencies);
-    final Collection<SpringBaseBeanPointer> allBeans = new ArrayList<>(domBeans);
+    Collection<SpringBaseBeanPointer> allBeans = new ArrayList<>(domBeans);
 
     processNonDomBeans(bean -> {
       ProgressIndicatorProvider.checkCanceled();
@@ -320,7 +320,7 @@ public abstract class BaseSpringModel implements SpringModel {
   @Override
   @Nonnull
   public Collection<? extends SpringBaseBeanPointer> getAllParentBeans() {
-    final Collection<SpringBaseBeanPointer> allBeans = new ArrayList<>();
+    Collection<SpringBaseBeanPointer> allBeans = new ArrayList<>();
 
     visitDependencies(model -> {
       allBeans.addAll(model.getAllCommonBeans());
@@ -332,8 +332,8 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public List<SpringBaseBeanPointer> findQualifiedBeans(@Nonnull final SpringQualifier qualifier) {
-    final List<SpringBaseBeanPointer> pointers = new ArrayList<>(myBeansByQualifier.get(qualifier));
+  public List<SpringBaseBeanPointer> findQualifiedBeans(@Nonnull SpringQualifier qualifier) {
+    List<SpringBaseBeanPointer> pointers = new ArrayList<>(myBeansByQualifier.get(qualifier));
     visitDependencies(model -> {
       pointers.addAll(((BaseSpringModel)model).myBeansByQualifier.get(qualifier));
       return true;
@@ -341,12 +341,12 @@ public abstract class BaseSpringModel implements SpringModel {
     return pointers;
   }
 
-  private List<SpringBaseBeanPointer> computeBeansByQualifier(final SpringQualifier pair) {
-    final List<SpringBaseBeanPointer> beans = new ArrayList<>();
-    final Collection<? extends SpringBaseBeanPointer> pointers = getAllCommonBeans(true);
+  private List<SpringBaseBeanPointer> computeBeansByQualifier(SpringQualifier pair) {
+    List<SpringBaseBeanPointer> beans = new ArrayList<>();
+    Collection<? extends SpringBaseBeanPointer> pointers = getAllCommonBeans(true);
     for (SpringBaseBeanPointer beanPointer : pointers) {
-      final CommonSpringBean bean = beanPointer.getSpringBean();
-      final SpringQualifier qualifier = bean.getSpringQualifier();
+      CommonSpringBean bean = beanPointer.getSpringBean();
+      SpringQualifier qualifier = bean.getSpringQualifier();
       if (qualifier != null) {
         if (SpringUtils.compareQualifiers(qualifier, pair)) {
           beans.add(beanPointer);
@@ -359,8 +359,8 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public List<SpringBaseBeanPointer> findBeansByPsiClass(@Nonnull final PsiClass psiClass) {
-    final List<SpringBaseBeanPointer> pointers = new ArrayList<>(myBeansByClass.get(psiClass));
+  public List<SpringBaseBeanPointer> findBeansByPsiClass(@Nonnull PsiClass psiClass) {
+    List<SpringBaseBeanPointer> pointers = new ArrayList<>(myBeansByClass.get(psiClass));
     visitDependencies(model -> {
       pointers.addAll(((BaseSpringModel)model).myBeansByClass.get(psiClass));
       return true;
@@ -370,8 +370,8 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public List<SpringBaseBeanPointer> findBeansByPsiClassWithInheritance(@Nonnull final PsiClass psiClass) {
-    final ArrayList<SpringBaseBeanPointer> pointers =
+  public List<SpringBaseBeanPointer> findBeansByPsiClassWithInheritance(@Nonnull PsiClass psiClass) {
+    ArrayList<SpringBaseBeanPointer> pointers =
       new ArrayList<>(myBeansByClassWithInheritance.getValue().get(psiClass));
     visitDependencies(model -> {
       pointers.addAll(((BaseSpringModel)model).myBeansByClassWithInheritance.getValue().get(psiClass));
@@ -383,12 +383,12 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public List<SpringBaseBeanPointer> findBeansByEffectivePsiClassWithInheritance(@Nonnull final PsiClass psiClass) {
+  public List<SpringBaseBeanPointer> findBeansByEffectivePsiClassWithInheritance(@Nonnull PsiClass psiClass) {
     return collectBeans(psiClass, springModel -> springModel.myBeansByEffectiveClassWithInheritance);
   }
 
-  private List<SpringBaseBeanPointer> collectBeans(final PsiClass psiClass, final Function<BaseSpringModel, Class2BeansMap> getter) {
-    final ArrayList<SpringBaseBeanPointer> pointers = new ArrayList<>(getter.apply(this).get(psiClass));
+  private List<SpringBaseBeanPointer> collectBeans(PsiClass psiClass, Function<BaseSpringModel, Class2BeansMap> getter) {
+    ArrayList<SpringBaseBeanPointer> pointers = new ArrayList<>(getter.apply(this).get(psiClass));
     visitDependencies(model -> {
       pointers.addAll(getter.apply((BaseSpringModel)model).get(psiClass));
       return true;
@@ -400,10 +400,10 @@ public abstract class BaseSpringModel implements SpringModel {
   @Override
   @Nonnull
   public List<SpringBaseBeanPointer> getChildren(@Nonnull SpringBeanPointer parent) {
-    final SpringBaseBeanPointer baseParent = parent.getBasePointer();
-    final ArrayList<SpringBaseBeanPointer> list = new ArrayList<>();
+    SpringBaseBeanPointer baseParent = parent.getBasePointer();
+    ArrayList<SpringBaseBeanPointer> list = new ArrayList<>();
     for (SpringBaseBeanPointer bean : getAllDomBeans()) {
-      final SpringBeanPointer pointer = bean.getParentPointer();
+      SpringBeanPointer pointer = bean.getParentPointer();
       if (pointer != null && pointer.getBasePointer().equals(baseParent)) {
         list.add(bean);
       }
@@ -414,8 +414,8 @@ public abstract class BaseSpringModel implements SpringModel {
   private static void addDescendants(MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> map,
                                      SpringBaseBeanPointer current,
                                      Set<SpringBaseBeanPointer> result) {
-    final Collection<SpringBaseBeanPointer> pointers = map.get(current);
-    for (final SpringBaseBeanPointer pointer : pointers) {
+    Collection<SpringBaseBeanPointer> pointers = map.get(current);
+    for (SpringBaseBeanPointer pointer : pointers) {
       if (result.add(pointer)) {
         addDescendants(map, pointer, result);
       }
@@ -424,19 +424,19 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public List<SpringBaseBeanPointer> getDescendants(final @Nonnull CommonSpringBean context) {
-    final Set<SpringBaseBeanPointer> visited = new HashSet<>();
-    final SpringBaseBeanPointer pointer = SpringBeanPointer.createSpringBeanPointer(context);
+  public List<SpringBaseBeanPointer> getDescendants(@Nonnull CommonSpringBean context) {
+    Set<SpringBaseBeanPointer> visited = new HashSet<>();
+    SpringBaseBeanPointer pointer = SpringBeanPointer.createSpringBeanPointer(context);
     visited.add(pointer);
-    final MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> map = myDirectInheritorsMap.getValue();
+    MultiMap<SpringBaseBeanPointer, SpringBaseBeanPointer> map = myDirectInheritorsMap.getValue();
     addDescendants(map, pointer, visited);
     return new SmartList<>(visited);
   }
 
-  private List<SpringBaseBeanPointer> computeBeansByPsiClass(@Nonnull final PsiClass psiClass) {
-    final List<SpringBaseBeanPointer> beans = new ArrayList<>();
-    final Consumer<CommonSpringBean> consumer = bean -> {
-      final PsiClass beanClass = bean.getBeanClass();
+  private List<SpringBaseBeanPointer> computeBeansByPsiClass(@Nonnull PsiClass psiClass) {
+    List<SpringBaseBeanPointer> beans = new ArrayList<>();
+    Consumer<CommonSpringBean> consumer = bean -> {
+      PsiClass beanClass = bean.getBeanClass();
       if (beanClass != null && beanClass.equals(psiClass)) {
         beans.add(SpringBeanPointer.createSpringBeanPointer(bean));
       }
@@ -448,28 +448,28 @@ public abstract class BaseSpringModel implements SpringModel {
   }
 
   private void processAllBeans(final Consumer<CommonSpringBean> consumer) {
-    final SpringModelVisitor visitor = new SpringModelVisitor() {
+    SpringModelVisitor visitor = new SpringModelVisitor() {
       @Override
-      public boolean visitBean(final CommonSpringBean bean) {
+      public boolean visitBean(CommonSpringBean bean) {
         consumer.accept(bean);
         return true;
       }
     };
-    for (final DomFileElement<Beans> element : getRoots()) {
+    for (DomFileElement<Beans> element : getRoots()) {
       SpringModelVisitor.visitBeans(visitor, element.getRootElement());
     }
     processNonDomBeans(consumer);
   }
 
   private MultiMap<PsiClass, SpringBaseBeanPointer> computeBeansByPsiClassWithInheritance() {
-    final MultiMap<PsiClass, SpringBaseBeanPointer> result = new MultiMap<>();
-    final Consumer<CommonSpringBean> consumer = bean -> {
-      final PsiClass beanClass = bean.getBeanClass();
+    MultiMap<PsiClass, SpringBaseBeanPointer> result = new MultiMap<>();
+    Consumer<CommonSpringBean> consumer = bean -> {
+      PsiClass beanClass = bean.getBeanClass();
       if (beanClass == null) {
         return;
       }
 
-      final SpringBaseBeanPointer pointer = SpringBeanPointer.createSpringBeanPointer(bean);
+      SpringBaseBeanPointer pointer = SpringBeanPointer.createSpringBeanPointer(bean);
       InheritanceUtil.processSupers(beanClass, true, psiClass -> {
         result.putValue(psiClass, pointer);
         return true;

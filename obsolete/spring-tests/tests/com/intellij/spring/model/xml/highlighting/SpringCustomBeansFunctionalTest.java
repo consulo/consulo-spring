@@ -54,7 +54,7 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    final String homePath = PathManager.getHomePath().replace(File.separatorChar, '/');
+    String homePath = PathManager.getHomePath().replace(File.separatorChar, '/');
     String path = "/" + StringUtil.getPackageName(TestNamespaceHandler.class.getName()).replace('.', '/');
     ExternalResourceManager.getInstance().addResource("foo", homePath + "/svnPlugins/spring/spring-tests/tests" + path + "/test.xsd");
   }
@@ -72,16 +72,16 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
     super.runTest();
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
 
-    final String homePath = PathManager.getHomePath().replace(File.separatorChar, '/');
+    String homePath = PathManager.getHomePath().replace(File.separatorChar, '/');
     moduleBuilder.addLibraryJars("spring", homePath + super.getBasePath(), "spring-2.0.6.jar");
     moduleBuilder.addLibraryJars("logging", homePath + "/lib/dev/", "commons-logging.jar");
 
     String path = "/" + StringUtil.getPackageName(TestNamespaceHandler.class.getName()).replace('.', '/');
-    final String pathToClass = new File(TestNamespaceHandler.class.getResource(".").toURI()).getAbsolutePath().replace('\\', '/');
+    String pathToClass = new File(TestNamespaceHandler.class.getResource(".").toURI()).getAbsolutePath().replace('\\', '/');
     assert pathToClass.endsWith(path) : path + "; " + pathToClass;
     moduleBuilder.addLibrary("testHandler", pathToClass.substring(0, pathToClass.length() - path.length()));
     //moduleBuilder.addLibrary("handlerXsd", homePath + "/svnPlugins/spring/spring-tests/tests" + path);
@@ -96,7 +96,7 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
   }
 
   public void testCustomBeansHighlighting() throws Throwable {
-    final InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
+    InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
     myFixture.disableInspections(inspection);
     myFixture.copyFileToProject("FooBean2.java");
 
@@ -104,7 +104,7 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
     myFixture.checkHighlighting(true, false, false);
   }
 
-  private String configureAndParseBeans(final String filePath) throws Throwable {
+  private String configureAndParseBeans(String filePath) throws Throwable {
     myFixture.copyFileToProject(filePath, "aa.xml");
     myFixture.configureByFile("aa.xml");
 
@@ -118,10 +118,10 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
     }.execute();
     PsiDocumentManager.getInstance(myProject).commitDocument(document);
 
-    final Beans beans = DomManager.getDomManager(myProject).getFileElement((XmlFile)file, Beans.class).getRootElement();
+    Beans beans = DomManager.getDomManager(myProject).getFileElement((XmlFile)file, Beans.class).getRootElement();
     beans.acceptChildren(new DomElementVisitor() {
-      public void visitDomElement(final DomElement element) {
-        final XmlTag tag = element.getXmlTag();
+      public void visitDomElement(DomElement element) {
+        XmlTag tag = element.getXmlTag();
         if (tag == null) return;
         if (element instanceof CustomBeanWrapper) {
           CustomBeanRegistry.getInstance(myProject).parseBean(tag);
@@ -134,7 +134,7 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
   }
 
   public void testToolHighlighting() throws Throwable {
-    final InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
+    InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
     myFixture.disableInspections(inspection);
     myFixture.copyFileToProject("FooBean2.java");
 
@@ -164,8 +164,8 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
 
   public void testGotoTypeDeclaration() throws Throwable {
     myFixture.configureByFile(getTestName(false) + ".xml");
-    final Editor editor = myFixture.getEditor();
-    final PsiElement element = GotoTypeDeclarationAction.findSymbolType(editor, editor.getCaretModel().getOffset());
+    Editor editor = myFixture.getEditor();
+    PsiElement element = GotoTypeDeclarationAction.findSymbolType(editor, editor.getCaretModel().getOffset());
     assertNotNull(element);
     assertEquals("java.util.List", ((PsiClass)element).getQualifiedName());
   }
@@ -173,7 +173,7 @@ public class SpringCustomBeansFunctionalTest extends SpringHighlightingTestCase<
   public void testParseCustomBeanQuickFixOnUnresolvedReference() throws Throwable {
     addFileToSet(configureFileSet("xx", myModule), getTestName(false) + ".xml");
     myFixture.configureByFile(getTestName(false) + ".xml");
-    final IntentionAction intention = myFixture.findSingleIntention("Try parsing custom beans");
+    IntentionAction intention = myFixture.findSingleIntention("Try parsing custom beans");
     myFixture.launchAction(intention);
     assertEmpty(myFixture.filterAvailableIntentions("Try parsing custom beans"));
   }

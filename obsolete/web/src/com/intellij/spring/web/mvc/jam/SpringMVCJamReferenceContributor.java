@@ -14,16 +14,16 @@ import org.jetbrains.annotations.NonNls;
  */
 public class SpringMVCJamReferenceContributor  extends PsiReferenceContributor {
   
-  public void registerReferenceProviders(final PsiReferenceRegistrar registrar) {
+  public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
     registrar.registerReferenceProvider(
         PsiJavaPatterns.literalExpression().with(new PatternCondition<PsiLiteralExpression>("foo") {
           @Override
-          public boolean accepts(@NotNull final PsiLiteralExpression psiLiteralExpression, final ProcessingContext context) {
-            final PsiNameValuePair pair = PsiTreeUtil.getParentOfType(psiLiteralExpression, PsiNameValuePair.class);
+          public boolean accepts(@NotNull PsiLiteralExpression psiLiteralExpression, ProcessingContext context) {
+            PsiNameValuePair pair = PsiTreeUtil.getParentOfType(psiLiteralExpression, PsiNameValuePair.class);
             if (pair != null) {
-              @NonNls final String name = pair.getName();
+              @NonNls String name = pair.getName();
               if (name == null || name.equals("value")) {
-                final String qualifiedName = ((PsiAnnotation)pair.getParent().getParent()).getQualifiedName();
+                String qualifiedName = ((PsiAnnotation)pair.getParent().getParent()).getQualifiedName();
                 return qualifiedName != null &&
                        (qualifiedName.equals(SpringMVCRequestMapping.REQUEST_MAPPING) ||
                         qualifiedName.equals(SpringMVCModelAttribute.MODEL_ATTRIBUTE));
@@ -35,7 +35,7 @@ public class SpringMVCJamReferenceContributor  extends PsiReferenceContributor {
         new PsiReferenceProviderBase() {
           @NotNull
           @Override
-          public PsiReference[] getReferencesByElement(@NotNull final PsiElement element, @NotNull final ProcessingContext context) {
+          public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
             return new PsiReference[] { PsiReferenceBase.createSelfReference(element, PsiTreeUtil.getParentOfType(element, PsiAnnotation.class)) };
           }
         });

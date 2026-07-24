@@ -22,21 +22,21 @@ import java.util.List;
 @SuppressWarnings({"UnusedDeclaration"})
 public class SpringSecurityRolesConverter extends Converter<List<String>> implements CustomReferenceConverter<List<String>> {
 
-  public String toString(final List<String> strings, final ConvertContext context) {
+  public String toString(List<String> strings, ConvertContext context) {
     return StringUtil.join(strings, ",");
   }
 
-  public List<String> fromString(final String s, final ConvertContext context) {
+  public List<String> fromString(String s, ConvertContext context) {
     if (s == null) return null;
 
     return SpringUtils.tokenize(s);
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue<List<String>> genericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
-    final List<String> roleNames = genericDomValue.getValue();
+  public PsiReference[] createReferences(GenericDomValue<List<String>> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
+    List<String> roleNames = genericDomValue.getValue();
     Module module = context.getModule();
     if (roleNames != null && module != null) {
       List<PsiReference> references = new ArrayList<PsiReference>();

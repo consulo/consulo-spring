@@ -22,13 +22,13 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
   private static final String ID_PREFIX = "fileset";
   private boolean myAutodetected;
 
-  public static String getUniqueId(final Set<SpringFileSet> list) {
+  public static String getUniqueId(Set<SpringFileSet> list) {
     int index = 0;
     for (SpringFileSet fileSet : list) {
       if (fileSet.getId().startsWith(ID_PREFIX)) {
-        final String s = fileSet.getId().substring(ID_PREFIX.length());
+        String s = fileSet.getId().substring(ID_PREFIX.length());
         try {
-          final int i = Integer.parseInt(s);
+          int i = Integer.parseInt(s);
           index = Math.max(i, index);
         }
         catch (NumberFormatException ignored) {
@@ -39,11 +39,11 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     return ID_PREFIX + (index + 1);
   }
 
-  public static String getUniqueName(String prefix, final Set<SpringFileSet> list) {
+  public static String getUniqueName(String prefix, Set<SpringFileSet> list) {
     int index = 0;
     for (SpringFileSet fileSet : list) {
       if (fileSet.getName().startsWith(prefix)) {
-        final String s = fileSet.getName().substring(prefix.length());
+        String s = fileSet.getName().substring(prefix.length());
         int i;
         try {
           i = Integer.parseInt(s);
@@ -64,7 +64,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
   private final List<String> myDependencies = new ArrayList<>();
   private boolean myRemoved;
 
-  public SpringFileSet(@Nonnull String id, @Nonnull String name, @Nonnull final Disposable parent) {
+  public SpringFileSet(@Nonnull String id, @Nonnull String name, @Nonnull Disposable parent) {
     myId = id;
     myName = name;
     Disposer.register(parent, this);
@@ -87,7 +87,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     return myAutodetected;
   }
 
-  public void setAutodetected(final boolean autodetected) {
+  public void setAutodetected(boolean autodetected) {
     myAutodetected = autodetected;
   }
 
@@ -104,7 +104,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     return myName;
   }
 
-  public void setName(@Nonnull final String name) {
+  public void setName(@Nonnull String name) {
     myName = name;
   }
 
@@ -126,18 +126,18 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     myDependencies.addAll(dependencies);
   }
 
-  public void addDependency(final String dep) {
+  public void addDependency(String dep) {
     myDependencies.add(dep);
   }
 
   public void addFile(@NonNls String url) {
     if (!StringUtil.isEmptyOrSpaces(url)) {
-      final VirtualFilePointer filePointer = VirtualFilePointerManager.getInstance().create(url, this, null);
+      VirtualFilePointer filePointer = VirtualFilePointerManager.getInstance().create(url, this, null);
       myFiles.put(filePointer.getUrl(), filePointer);
     }
   }
 
-  public void addFile(@Nonnull final VirtualFile file) {
+  public void addFile(@Nonnull VirtualFile file) {
     addFile(file.getUrl());
   }
 
@@ -150,7 +150,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
       return false;
     }
     for (VirtualFilePointer pointer : myFiles.values()) {
-      final VirtualFile virtualFile = pointer.getFile();
+      VirtualFile virtualFile = pointer.getFile();
       if (virtualFile != null && file.equals(virtualFile)) {
         return true;
       }
@@ -182,7 +182,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     return myName;
   }
 
-  public void setRemoved(final boolean removed) {
+  public void setRemoved(boolean removed) {
     myRemoved = removed;
   }
 

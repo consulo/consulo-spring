@@ -16,7 +16,7 @@ import java.util.Collections;
  * @author peter
  */
 public class AopParenthesizedExpression extends AopElementBase implements PsiPointcutExpression, AopTypeExpression, AopReferenceQualifier{
-  public AopParenthesizedExpression(@Nonnull final ASTNode node) {
+  public AopParenthesizedExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -35,24 +35,24 @@ public class AopParenthesizedExpression extends AopElementBase implements PsiPoi
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
-    final PsiPointcutExpression pointcutExpression = getInnerPointcutExpression();
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+    PsiPointcutExpression pointcutExpression = getInnerPointcutExpression();
     return pointcutExpression != null ? pointcutExpression.acceptsSubject(context, member) : PointcutMatchDegree.FALSE;
   }
 
   @Nonnull
   public Collection<AopPsiTypePattern> getPatterns() {
-    final AopTypeExpression typeExpression = getInnerTypeExpression();
+    AopTypeExpression typeExpression = getInnerTypeExpression();
     if (typeExpression != null) return typeExpression.getPatterns();
-    final PsiPointcutExpression pointcutExpression = getInnerPointcutExpression();
+    PsiPointcutExpression pointcutExpression = getInnerPointcutExpression();
     if (pointcutExpression != null) return pointcutExpression.getPatterns();
     return Collections.emptyList();
   }
 
   public String getTypePattern() {
-    final AopTypeExpression expression = getInnerTypeExpression();
+    AopTypeExpression expression = getInnerTypeExpression();
     if (expression != null) {
-      final String pattern = expression.getTypePattern();
+      String pattern = expression.getTypePattern();
       if (pattern == null) return null;
 
       return "'_:[is(\"" + pattern + "\")]";

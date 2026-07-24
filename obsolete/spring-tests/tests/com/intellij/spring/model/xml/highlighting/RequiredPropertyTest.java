@@ -11,7 +11,7 @@ public class RequiredPropertyTest extends SpringHighlightingTestCase<JavaModuleF
     return false;
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
 
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
@@ -20,13 +20,13 @@ public class RequiredPropertyTest extends SpringHighlightingTestCase<JavaModuleF
   }
 
   public void testRequiredAnnotation() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "required_prop.xml");
     myFixture.testHighlighting(true, false, false, "RequiredBean.java");
   }
 
   public void testRequiredProperty() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "required.xml");
     myFixture.copyFileToProject("AnotherBean.java");
     myFixture.testHighlighting(true, false, false, "required.xml");

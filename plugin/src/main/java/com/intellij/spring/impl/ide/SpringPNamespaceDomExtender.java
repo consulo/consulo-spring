@@ -30,14 +30,14 @@ public class SpringPNamespaceDomExtender extends DomExtender<SpringBean> {
     return SpringBean.class;
   }
 
-  public void registerExtensions(@Nonnull final SpringBean bean, @Nonnull final DomExtensionsRegistrar registrar) {
-    final XmlTag tag = bean.getXmlTag();
+  public void registerExtensions(@Nonnull SpringBean bean, @Nonnull DomExtensionsRegistrar registrar) {
+    XmlTag tag = bean.getXmlTag();
     if (tag == null || tag.getPrefixByNamespace(SpringConstants.P_NAMESPACE) == null) {
       return;
     }
-    final PsiClass beanClass = bean.getBeanClass();
+    PsiClass beanClass = bean.getBeanClass();
     if (beanClass != null) {
-      for (final String name : PropertyUtil.getAllProperties(beanClass, true, false).keySet()) {
+      for (String name : PropertyUtil.getAllProperties(beanClass, true, false).keySet()) {
         registrar.registerAttributeChildExtension(new XmlName(name, SpringConstants.P_NAMESPACE_KEY), PNamespaceValue.class);
         registrar.registerAttributeChildExtension(new XmlName(name + "-ref", SpringConstants.P_NAMESPACE_KEY), PNamespaceRefValue.class);
       }

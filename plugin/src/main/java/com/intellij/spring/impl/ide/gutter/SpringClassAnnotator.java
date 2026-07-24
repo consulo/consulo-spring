@@ -52,24 +52,24 @@ public class SpringClassAnnotator implements Annotator {
   private static final DomElementListCellRenderer DOM_RENDERER = new DomElementListCellRenderer(UNKNOWN);
 
   @Nullable
-  private static SpringBean getSpringBean(final PsiElement element) {
-    final DomElement domElement = DomUtil.getDomElement(element);
+  private static SpringBean getSpringBean(PsiElement element) {
+    DomElement domElement = DomUtil.getDomElement(element);
     return domElement == null ? null : domElement.getParentOfType(SpringBean.class, false);
   }
 
   private static final PsiElementListCellRenderer BEAN_RENDERER = new DefaultPsiElementCellRenderer() {
 
     @Override
-    public String getElementText(final PsiElement element) {
+    public String getElementText(PsiElement element) {
       if (element instanceof XmlTag) {
         return DOM_RENDERER.getElementText((XmlTag)element);
       }
       else if (element instanceof PsiAnnotation) {
-        final PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
-        final CommonSpringBean springBean =
+        PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
+        CommonSpringBean springBean =
           member == null ? null : JamService.getJamService(element.getProject()).getJamElement(JamPsiMemberSpringBean.class, member);
         if (springBean != null) {
-          final String beanName = springBean.getBeanName();
+          String beanName = springBean.getBeanName();
           return beanName == null ? UNKNOWN : beanName;
         }
       }
@@ -77,12 +77,12 @@ public class SpringClassAnnotator implements Annotator {
     }
 
     @Override
-    public String getContainerText(final PsiElement element, final String name) {
+    public String getContainerText(PsiElement element, String name) {
       if (element instanceof XmlTag) {
         return DOM_RENDERER.getContainerText((XmlTag)element, name);
       }
       else if (element instanceof PsiAnnotation) {
-        final PsiClass psiClass = PsiTreeUtil.getParentOfType(element, PsiClass.class);
+        PsiClass psiClass = PsiTreeUtil.getParentOfType(element, PsiClass.class);
         if (psiClass != null && psiClass.getName() != null) {
           return psiClass.getName();
         }
@@ -92,13 +92,13 @@ public class SpringClassAnnotator implements Annotator {
 
     @Nullable
     @Override
-    protected Image getIcon(final PsiElement element) {
+    protected Image getIcon(PsiElement element) {
       if (element instanceof XmlTag) {
         return DOM_RENDERER.getIcon(element);
       }
       else if (element instanceof PsiAnnotation) {
-        final PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
-        final CommonSpringBean springBean =
+        PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
+        CommonSpringBean springBean =
           member == null ? null : JamService.getJamService(element.getProject()).getJamElement(JamPsiMemberSpringBean.class, member);
         if (springBean != null) {
           return consulo.spring.impl.SpringIcons.SpringJavaBean;
@@ -111,19 +111,19 @@ public class SpringClassAnnotator implements Annotator {
   private static final Function<SpringBaseBeanPointer, Collection<? extends PsiElement>> BEAN_POINTER_CONVERTOR = new Function<>() {
     @Override
     @Nonnull
-    public Collection<? extends PsiElement> apply(final SpringBaseBeanPointer pointer) {
+    public Collection<? extends PsiElement> apply(SpringBaseBeanPointer pointer) {
       return Collections.singleton(pointer.getPsiElement());
     }
   };
 
   @Override
   @RequiredReadAction
-  public void annotate(final PsiElement psiElement, final AnnotationHolder holder) {
+  public void annotate(PsiElement psiElement, AnnotationHolder holder) {
     if (psiElement instanceof PsiIdentifier) {
-      final PsiElement parent = psiElement.getParent();
+      PsiElement parent = psiElement.getParent();
       if (parent instanceof PsiClass) {
         final PsiClass psiClass = (PsiClass)parent;
-        final SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+        SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
         if (info.isMapped()) {
           addSpringBeanGutterIcon(holder,
                                   psiClass.getNameIdentifier(),
@@ -131,7 +131,7 @@ public class SpringClassAnnotator implements Annotator {
                                     @Override
                                     @Nonnull
                                     protected Collection<? extends SpringBaseBeanPointer> compute() {
-                                      final SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+                                      SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
                                       return info.getMappedBeans();
                                     }
                                   });
@@ -143,10 +143,10 @@ public class SpringClassAnnotator implements Annotator {
       else if (parent instanceof PsiField) {
         PsiField field = (PsiField)parent;
         if (SpringAutowireUtil.isAutowiredByAnnotation(field)) {
-          final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(field);
-          final SpringModel model = SpringManager.getInstance(field.getProject()).getCombinedModel(module);
+          consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(field);
+          SpringModel model = SpringManager.getInstance(field.getProject()).getCombinedModel(module);
           if (model != null) {
-            final boolean required = SpringAutowireUtil.isRequired(field);
+            boolean required = SpringAutowireUtil.isRequired(field);
             processVariable(field, holder, model, psiElement, required, field.getType());
           }
         }
@@ -155,23 +155,23 @@ public class SpringClassAnnotator implements Annotator {
   }
 
   @RequiredReadAction
-  private static void annotateMethod(final PsiMethod method, final AnnotationHolder holder) {
+  private static void annotateMethod(PsiMethod method, AnnotationHolder holder) {
     boolean autowired = false;
     if (PropertyUtil.isSimplePropertySetter(method)) {
       PsiClass psiClass = method.getContainingClass();
       if (psiClass != null) {
-        final SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
-        final String propertyName = PropertyUtil.getPropertyNameBySetter(method);
-        final Collection<SpringPropertyDefinition> list = info.getMappedProperties(propertyName);
+        SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(psiClass);
+        String propertyName = PropertyUtil.getPropertyNameBySetter(method);
+        Collection<SpringPropertyDefinition> list = info.getMappedProperties(propertyName);
         if (list.size() > 0) {
           addPropertiesGutterIcon(holder, method);
         }
-        final List<SpringBaseBeanPointer> pointers = info.getMappedBeans();
+        List<SpringBaseBeanPointer> pointers = info.getMappedBeans();
         for (SpringBaseBeanPointer pointer : pointers) {
           if (pointer instanceof DomSpringBeanPointer domPointer) {
-            final DomSpringBean springBean = domPointer.getSpringBean();
+            DomSpringBean springBean = domPointer.getSpringBean();
             if (springBean instanceof SpringBean) {
-              final Autowire autowire = ((SpringBean)springBean).getBeanAutowire();
+              Autowire autowire = ((SpringBean)springBean).getBeanAutowire();
               if (autowire.isAutowired()) {
                 autowired = true;
                 break;
@@ -180,10 +180,10 @@ public class SpringClassAnnotator implements Annotator {
           }
         }
         if (autowired) {
-          final Module module = method.getModule();
-          final SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
+          Module module = method.getModule();
+          SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
           if (model != null) {
-            final PsiType type = PropertyUtil.getPropertyType(method);
+            PsiType type = PropertyUtil.getPropertyType(method);
             if (type != null) {
               processVariable(method, holder, model, method.getNameIdentifier(), false, type);
             }
@@ -193,7 +193,7 @@ public class SpringClassAnnotator implements Annotator {
     }
     else if (AnnotationUtil.isAnnotated(method, SpringAnnotationsConstants.SPRING_BEAN_ANNOTATION, 0)) {
       Module module = method.getModule();
-      final SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
+      SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
 
       if (model != null) {
         SpringBeanPointer bean = model.findBean(method.getName());
@@ -214,7 +214,7 @@ public class SpringClassAnnotator implements Annotator {
   }
 
   @RequiredReadAction
-  private static void processAnnotatedMethod(final PsiMethod method, final AnnotationHolder holder) {
+  private static void processAnnotatedMethod(PsiMethod method, AnnotationHolder holder) {
     boolean isAutowired = SpringAutowireUtil.isAutowiredByAnnotation(method);
 
     // implicit autowiring: single constructor of a Spring bean doesn't need @Autowired
@@ -230,10 +230,10 @@ public class SpringClassAnnotator implements Annotator {
     }
 
     if (isAutowired) {
-      final Module module = method.getModule();
-      final SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
+      Module module = method.getModule();
+      SpringModel model = SpringManager.getInstance(method.getProject()).getCombinedModel(module);
       if (model != null) {
-        final boolean required = SpringAutowireUtil.isRequired(method);
+        boolean required = SpringAutowireUtil.isRequired(method);
         for (PsiVariable variable : method.getParameterList().getParameters()) {
           processVariable(variable, holder, model, variable, required, variable.getType());
         }
@@ -241,10 +241,10 @@ public class SpringClassAnnotator implements Annotator {
     }
   }
 
-  private static void processVariable(final PsiModifierListOwner variable, final AnnotationHolder holder,
-                                      @Nonnull final SpringModel model,
-                                      final PsiElement element, final boolean required, @Nonnull final PsiType type) {
-    final Collection<SpringBaseBeanPointer> list =
+  private static void processVariable(PsiModifierListOwner variable, AnnotationHolder holder,
+                                      @Nonnull SpringModel model,
+                                      PsiElement element, boolean required, @Nonnull PsiType type) {
+    Collection<SpringBaseBeanPointer> list =
       SpringJavaAutowiringInspection.checkAutowiredPsiMember(variable, type, null, model, required);
     if (list != null && !list.isEmpty()) {
       NavigationGutterIconBuilder.create(SpringImplIconGroup.gutterShowautowireddependencies(), BEAN_POINTER_CONVERTOR).
@@ -255,7 +255,7 @@ public class SpringClassAnnotator implements Annotator {
     }
   }
 
-  private static void addPropertiesGutterIcon(final AnnotationHolder holder,
+  private static void addPropertiesGutterIcon(AnnotationHolder holder,
                                               final PsiMethod psiMethod) {
 
 
@@ -264,32 +264,32 @@ public class SpringClassAnnotator implements Annotator {
                                  @Override
                                  @Nonnull
                                  protected Collection<? extends DomElement> compute() {
-                                   final String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
-                                   final SpringJavaClassInfo info =
+                                   String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
+                                   SpringJavaClassInfo info =
                                      SpringJavaClassInfo.getSpringJavaClassInfo((PsiClass)psiMethod.getParent());
                                    return info.getMappedProperties(propertyName);
                                  }
                                }).setPopupTitle(SpringBundle.message("spring.bean.property.navigate.choose.class.title")).
                                setCellRenderer(new DefaultPsiElementCellRenderer() {
                                  @Override
-                                 public String getElementText(final PsiElement element) {
-                                   final SpringBean springBean = getSpringBean(element);
+                                 public String getElementText(PsiElement element) {
+                                   SpringBean springBean = getSpringBean(element);
                                    assert springBean != null;
-                                   final String elementName = springBean.getBeanName();
+                                   String elementName = springBean.getBeanName();
                                    assert elementName != null;
                                    return elementName;
                                  }
 
                                  @Nullable
                                  @Override
-                                 protected Image getIcon(final PsiElement element) {
-                                   final SpringBean springBean = getSpringBean(element);
+                                 protected Image getIcon(PsiElement element) {
+                                   SpringBean springBean = getSpringBean(element);
                                    assert springBean != null;
                                    return consulo.spring.impl.SpringIcons.SpringBean;
                                  }
 
                                  @Override
-                                 public String getContainerText(final PsiElement element, final String name) {
+                                 public String getContainerText(PsiElement element, String name) {
                                    return DomElementListCellRenderer.getContainerText(element);
                                  }
                                }).
@@ -297,9 +297,9 @@ public class SpringClassAnnotator implements Annotator {
                                install(holder, psiMethod.getNameIdentifier());
   }
 
-  private static void addSpringBeanGutterIcon(final AnnotationHolder holder,
-                                              final PsiIdentifier psiIdentifier,
-                                              final NotNullLazyValue<Collection<? extends SpringBaseBeanPointer>> targets) {
+  private static void addSpringBeanGutterIcon(AnnotationHolder holder,
+                                              PsiIdentifier psiIdentifier,
+                                              NotNullLazyValue<Collection<? extends SpringBaseBeanPointer>> targets) {
 
     String tooltip = SpringBundle.message("spring.bean.class.tooltip.navigate.declaration");
     Collection<? extends SpringBaseBeanPointer> resolvedTargets = targets.getValue();

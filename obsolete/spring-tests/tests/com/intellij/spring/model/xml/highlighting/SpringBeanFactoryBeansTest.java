@@ -25,7 +25,7 @@ public class SpringBeanFactoryBeansTest extends SpringHighlightingTestCase {
     PsiTestUtil.addLibrary(myModuleTestFixture.getModule(), "hb3", PathManager.getHomePath() + "/lib/", "hibernate3.jar");
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     addSpringJar(moduleBuilder);
   }
@@ -46,11 +46,11 @@ public class SpringBeanFactoryBeansTest extends SpringHighlightingTestCase {
     SpringFactoryBeansManager.getInstance().registerFactory("FooBeanFactory", new ObjectTypeResolver() {
 
       @NotNull
-      public Set<String> getObjectType(@NotNull final CommonSpringBean bean) {
+      public Set<String> getObjectType(@NotNull CommonSpringBean bean) {
         return Collections.singleton("FooBean2");
       }
 
-      public boolean accept(@NotNull final String factoryClassName) {
+      public boolean accept(@NotNull String factoryClassName) {
         return factoryClassName.equals("FooBeanFactory");
       }
     });

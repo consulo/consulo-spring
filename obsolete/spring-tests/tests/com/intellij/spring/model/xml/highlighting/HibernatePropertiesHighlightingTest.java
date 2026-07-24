@@ -20,7 +20,7 @@ public class HibernatePropertiesHighlightingTest extends SpringHighlightingTestC
     PsiTestUtil.addLibrary(myModuleTestFixture.getModule(), "hb3", PathManager.getHomePath() + "/lib/", "hibernate3.jar");
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     addSpringJar(moduleBuilder);
   }
@@ -39,11 +39,11 @@ public class HibernatePropertiesHighlightingTest extends SpringHighlightingTestC
   }
 
   public void testPropertiesNames() throws Throwable {
-    final SpringBean springBean = getBeanFromFile("hibernate-properties-resolving.xml", "sessionFactory");
-    final SpringPropertyDefinition propertyByName = SpringUtils.findPropertyByName(springBean, "hibernateProperties");
+    SpringBean springBean = getBeanFromFile("hibernate-properties-resolving.xml", "sessionFactory");
+    SpringPropertyDefinition propertyByName = SpringUtils.findPropertyByName(springBean, "hibernateProperties");
     assertNotNull(propertyByName);
 
-    final Prop prop = ((SpringProperty)propertyByName).getProps().getProps().get(0);
+    Prop prop = ((SpringProperty)propertyByName).getProps().getProps().get(0);
 
     XmlAttributeValue xmlAttributeValue = prop.getKey().getXmlAttributeValue();
     assert xmlAttributeValue != null;

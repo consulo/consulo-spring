@@ -17,7 +17,7 @@ import java.util.Collections;
  */
 public class AopReferenceHolder extends AopElementBase implements AopReferenceTarget{
 
-  public AopReferenceHolder(@Nonnull final ASTNode node) {
+  public AopReferenceHolder(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -30,29 +30,29 @@ public class AopReferenceHolder extends AopElementBase implements AopReferenceTa
     return "AopReferenceHolder";
   }
 
-  public PointcutMatchDegree accepts(@Nonnull final PsiType psiType) {
-    final AopTypeExpression typeExpression = getTypeExpression();
+  public PointcutMatchDegree accepts(@Nonnull PsiType psiType) {
+    AopTypeExpression typeExpression = getTypeExpression();
     return typeExpression != null ? AopPsiTypePattern.accepts(typeExpression, psiType) : PointcutMatchDegree.FALSE;
   }
 
   @Nullable
   public String getTypePattern() {
-    final AopTypeExpression expression = getTypeExpression();
+    AopTypeExpression expression = getTypeExpression();
     if (expression == null) return null;
 
     return expression.getTypePattern();
   }
 
   public final Collection<AopPsiTypePattern> getPatterns() {
-    final AopTypeExpression expression = getTypeExpression();
+    AopTypeExpression expression = getTypeExpression();
     return expression == null ? Collections.<AopPsiTypePattern>emptyList() : expression.getPatterns();
   }
 
   @Nullable
   public PsiClass findClass() {
-    final AopTypeExpression expression = getTypeExpression();
+    AopTypeExpression expression = getTypeExpression();
     if (expression instanceof AopReferenceExpression) {
-      final PsiElement psiElement = ((AopReferenceExpression)expression).resolve();
+      PsiElement psiElement = ((AopReferenceExpression)expression).resolve();
       if (psiElement instanceof PsiClass) {
         return (PsiClass)psiElement;
       }
@@ -61,22 +61,22 @@ public class AopReferenceHolder extends AopElementBase implements AopReferenceTa
   }
 
   public boolean isAssignableFrom(PsiType type) {
-    final AopTypeExpression expression = getTypeExpression();
+    AopTypeExpression expression = getTypeExpression();
     return expression != null && isAssignable(expression, type);
   }
 
   private static boolean isAssignable(@Nonnull AopTypeExpression expression, PsiType type) {
     if (type instanceof PsiArrayType) {
-      final PsiArrayType arrayType = (PsiArrayType)type;
+      PsiArrayType arrayType = (PsiArrayType)type;
       if (expression instanceof AopArrayExpression) {
-        final AopArrayExpression arrayExpression = (AopArrayExpression)expression;
+        AopArrayExpression arrayExpression = (AopArrayExpression)expression;
         return arrayExpression.isVarargs() == arrayType instanceof PsiEllipsisType && isAssignable(arrayExpression.getTypeReference(), arrayType.getComponentType());
       }
       return false;
     }
     PsiType exprType;
     if (expression instanceof AopReferenceExpression) {
-      final PsiElement superClass = ((AopReferenceExpression)expression).resolve();
+      PsiElement superClass = ((AopReferenceExpression)expression).resolve();
       if (!(superClass instanceof PsiClass)) return false;
 
       exprType = JavaPsiFacade.getInstance(expression.getProject()).getElementFactory().createType((PsiClass)superClass);
@@ -93,9 +93,9 @@ public class AopReferenceHolder extends AopElementBase implements AopReferenceTa
 
   @Nonnull
   public String getQualifiedName() {
-    final PsiClass psiClass = findClass();
+    PsiClass psiClass = findClass();
     if (psiClass != null) {
-      final String qname = psiClass.getQualifiedName();
+      String qname = psiClass.getQualifiedName();
       if (qname != null) {
         return qname;
       }
@@ -103,7 +103,7 @@ public class AopReferenceHolder extends AopElementBase implements AopReferenceTa
     return getText().trim();
   }
 
-  public PointcutMatchDegree canBeInstance(final PsiClass psiClass, final boolean allowPatterns) {
+  public PointcutMatchDegree canBeInstance(PsiClass psiClass, boolean allowPatterns) {
     return PsiTargetExpression.canBeInstanceOf(psiClass, allowPatterns, getTypeExpression());
   }
 

@@ -49,7 +49,7 @@ public class SpringConfigTest extends HeavySpringTestCase {
       }
 
       @Nullable
-      public Library findLibrary(@NotNull final String name) {
+      public Library findLibrary(@NotNull String name) {
         return null;
       }
 
@@ -106,11 +106,11 @@ public class SpringConfigTest extends HeavySpringTestCase {
         return null;
       }
 
-      public Library createProjectLibrary(final String name, final VirtualFile[] roots, final VirtualFile[] sources) {
+      public Library createProjectLibrary(String name, VirtualFile[] roots, VirtualFile[] sources) {
         throw new UnsupportedOperationException("'createProjectLibrary' not implemented in " + getClass().getName());
       }
 
-      public VirtualFile[] getLibraryFiles(final Library library, final OrderRootType rootType) {
+      public VirtualFile[] getLibraryFiles(Library library, OrderRootType rootType) {
         return VirtualFile.EMPTY_ARRAY;
       }
 
@@ -119,11 +119,11 @@ public class SpringConfigTest extends HeavySpringTestCase {
         return "";
       }
 
-      public <T> T getUserData(final Key<T> key) {
+      public <T> T getUserData(Key<T> key) {
         return null;
       }
 
-      public <T> void putUserData(final Key<T> key, final T value) {
+      public <T> void putUserData(Key<T> key, T value) {
       }
     };
   }
@@ -133,29 +133,29 @@ public class SpringConfigTest extends HeavySpringTestCase {
   }
 
   public void testConfigSearcher() {
-    final SpringConfigsSearcher configsSearcher = new SpringConfigsSearcher(createContext(null));
+    SpringConfigsSearcher configsSearcher = new SpringConfigsSearcher(createContext(null));
     configsSearcher.search();
-    final MultiMap<Module,PsiFile> map = configsSearcher.getFilesByModules();
+    MultiMap<Module,PsiFile> map = configsSearcher.getFilesByModules();
     assertEquals(1, map.size());
-    final Module module = myFixture.getModule();
-    final Collection<PsiFile> psiFiles = map.get(module);
+    Module module = myFixture.getModule();
+    Collection<PsiFile> psiFiles = map.get(module);
     assertEquals(2, psiFiles.size());
-    final MultiMap<VirtualFile, PsiFile> jars = configsSearcher.getJars();
+    MultiMap<VirtualFile, PsiFile> jars = configsSearcher.getJars();
     assertEquals(1, jars.size());
-    final Collection<? extends PsiFile> jarFiles = jars.values();
+    Collection<? extends PsiFile> jarFiles = jars.values();
     assertEquals(1, jarFiles.size());
   }
 
   public void testSpringConfiguration() {
-    final SpringFacet facet = new WriteAction<SpringFacet>() {
-      protected void run(final Result<SpringFacet> result) {
+    SpringFacet facet = new WriteAction<SpringFacet>() {
+      protected void run(Result<SpringFacet> result) {
         result.setResult(
             FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, SpringFacetType.INSTANCE.getDefaultFacetName(), null));
       }
     }.execute().getResultObject();
-    final SpringFacetConfiguration configuration = facet.getConfiguration();
-    final FacetErrorPanel errorPanel = new FacetErrorPanel();
-    final FacetEditorTab[] tabs = configuration.createEditorTabs(createContext(facet), errorPanel.getValidatorsManager());
+    SpringFacetConfiguration configuration = facet.getConfiguration();
+    FacetErrorPanel errorPanel = new FacetErrorPanel();
+    FacetEditorTab[] tabs = configuration.createEditorTabs(createContext(facet), errorPanel.getValidatorsManager());
     assertEquals(2, tabs.length);
     SpringConfigurationTab configurationTab = (SpringConfigurationTab)tabs[0];
     UIUtil.pump();

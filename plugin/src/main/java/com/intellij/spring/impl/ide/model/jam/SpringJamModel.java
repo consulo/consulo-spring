@@ -32,13 +32,13 @@ public class SpringJamModel {
   }
 
   @Inject
-  public SpringJamModel(@Nonnull final Module module) {
+  public SpringJamModel(@Nonnull Module module) {
     myModule = module;
   }
 
   public List<SpringJamElement> getConfigurations() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
     List<SpringJamElement> configurations = new ArrayList<>();
 
     configurations.addAll(service.getJamClassElements(JavaSpringConfigurationElement.META,
@@ -53,7 +53,7 @@ public class SpringJamModel {
 
   @Nonnull
   public List<? extends SpringStereotypeElement> getAllStereotypeComponents(@Nonnull PsiClass psiMember) {
-    final JamService service = JamService.getJamService(myModule.getProject());
+    JamService service = JamService.getJamService(myModule.getProject());
 
     return service
       .getAnnotatedMembersList(psiMember, true, true, false, true, SpringComponent.META, SpringController.META, SpringService.META,
@@ -76,8 +76,8 @@ public class SpringJamModel {
   @Nonnull
   public List<? extends CustomSpringComponent> getCustomStereotypeComponents() {
     List<CustomSpringComponent> customSpringComponents = new ArrayList<>();
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     for (String anno : JamAnnotationTypeUtil.getUserDefinedCustomComponentAnnotations(myModule)) {
       customSpringComponents.addAll(service.getJamClassElements(SpringSemContributor.CUSTOM_COMPONENT_JAM_KEY, anno, scope));
@@ -88,16 +88,16 @@ public class SpringJamModel {
 
   @Nonnull
   public List<? extends SpringComponent> getComponents() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     return service.getJamClassElements(SpringComponent.META, SpringAnnotationsConstants.COMPONENT_ANNOTATION, scope);
   }
 
   @Nonnull
   public List<? extends SpringController> getControllers() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     return service.getJamClassElements(SpringController.META, SpringAnnotationsConstants.CONTROLLER_ANNOTATION, scope);
   }
@@ -105,8 +105,8 @@ public class SpringJamModel {
 
   @Nonnull
   public List<? extends SpringRepository> getRepositories() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     return service.getJamClassElements(SpringRepository.META, SpringAnnotationsConstants.REPOSITORY_ANNOTATION, scope);
   }
@@ -114,16 +114,16 @@ public class SpringJamModel {
 
   @Nonnull
   public List<? extends SpringService> getServices() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     return service.getJamClassElements(SpringService.META, SpringAnnotationsConstants.SERVICE_ANNOTATION, scope);
   }
 
   @Nonnull
   public List<? extends SpringComponentScan> getComponentScans() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
     return service.getJamClassElements(SpringComponentScan.META, SpringAnnotationsConstants.COMPONENT_SCAN_ANNOTATION, scope);
   }

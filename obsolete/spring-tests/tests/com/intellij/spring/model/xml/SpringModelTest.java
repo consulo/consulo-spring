@@ -33,18 +33,18 @@ public class SpringModelTest extends LightSpringTestCase {
   }
 
   public void testSimpleId() {
-    final SpringBean springBean = findBeanById("simpleId");
+    SpringBean springBean = findBeanById("simpleId");
     assertNotNull(springBean);
 
-    final Set<String> list = SpringUtils.getAllBeanNames(springBean);
+    Set<String> list = SpringUtils.getAllBeanNames(springBean);
     assertEquals(list.size(), 1);
     assertEquals(list.iterator().next(), "simpleId");
   }
 
   public void testSimpleName() {
-    final SpringBean springBean = findBeanByName("simpleName");
+    SpringBean springBean = findBeanByName("simpleName");
 
-    final Set<String> list = SpringUtils.getAllBeanNames(springBean);
+    Set<String> list = SpringUtils.getAllBeanNames(springBean);
     assertEquals(list.size(), 1);
     assertEquals(list.iterator().next(), "simpleName");
   }
@@ -61,7 +61,7 @@ public class SpringModelTest extends LightSpringTestCase {
                 Arrays.asList("test_alias", "aliasName_1", "aliasName_2", "aliasName_3"));
   }
 
-  private void assertNames(final Collection<String> facts, final Collection<String> required) {
+  private void assertNames(Collection<String> facts, Collection<String> required) {
     assertEquals(facts.toString(), required.size(), facts.size());
 
     for (String s : facts) {
@@ -69,11 +69,11 @@ public class SpringModelTest extends LightSpringTestCase {
     }
   }
 
-  private SpringBean findBeanByName(final String beanName) {
+  private SpringBean findBeanByName(String beanName) {
     SpringBean beanByName = null;
 
     for (SpringBean bean : myBeans.getBeans()) {
-      final String currentBeanName = bean.getName().getStringValue();
+      String currentBeanName = bean.getName().getStringValue();
 
       if (currentBeanName != null && currentBeanName.contains(beanName)) {
         beanByName = bean;
@@ -85,7 +85,7 @@ public class SpringModelTest extends LightSpringTestCase {
     return beanByName;
   }
 
-  private SpringBean findBeanById(@NotNull final String beanId) {
+  private SpringBean findBeanById(@NotNull String beanId) {
     return findBean(myBeans, beanId);
   }
 
@@ -94,18 +94,18 @@ public class SpringModelTest extends LightSpringTestCase {
   }
 
   public void testGraphModel() throws Exception {
-    final DomFileElement<Beans> fileElement = getFileElement("generated_spring_bean.xml", Beans.class, myProject);
-    final SpringBeanDependenciesDataModel model = new SpringBeanDependenciesDataModel(fileElement.getFile(),
+    DomFileElement<Beans> fileElement = getFileElement("generated_spring_bean.xml", Beans.class, myProject);
+    SpringBeanDependenciesDataModel model = new SpringBeanDependenciesDataModel(fileElement.getFile(),
                                                                                       SpringBeanDependenciesDiagramContext.DEFAULT);
 //    ProfilingUtil.forceCPUTracing();
 
-    final long start = System.currentTimeMillis();
+    long start = System.currentTimeMillis();
     model.updateDataModel();
-    final long doneFor = System.currentTimeMillis() - start;
+    long doneFor = System.currentTimeMillis() - start;
     System.out.println("Model built in " + doneFor + "ms");
 
-    final Collection<SpringBaseBeanPointer> nodes = model.getNodes();
-    final Collection<SpringBeanDependencyInfo> edges = model.getEdges();
+    Collection<SpringBaseBeanPointer> nodes = model.getNodes();
+    Collection<SpringBeanDependencyInfo> edges = model.getEdges();
     assertEquals(99, nodes.size());
     assertEquals(243, edges.size());
 //    ProfilingUtil.forceStopCPUTracing(name);

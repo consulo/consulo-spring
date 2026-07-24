@@ -22,21 +22,21 @@ import java.util.List;
  * @author peter
  */
 public class PointcutExpressionConverter extends Converter<PsiPointcutExpression> {
-  public PsiPointcutExpression fromString(@Nullable @NonNls String s, final ConvertContext context) {
-    final XmlAttributeValue attributeValue = ((GenericAttributeValue)context.getInvocationElement()).getXmlAttributeValue();
+  public PsiPointcutExpression fromString(@Nullable @NonNls String s, ConvertContext context) {
+    XmlAttributeValue attributeValue = ((GenericAttributeValue)context.getInvocationElement()).getXmlAttributeValue();
     if (attributeValue == null) return null;
 
-    final List<Pair<PsiElement,TextRange>> list = InjectedLanguageManager.getInstance(context.getProject()).getInjectedPsiFiles(attributeValue);
+    List<Pair<PsiElement,TextRange>> list = InjectedLanguageManager.getInstance(context.getProject()).getInjectedPsiFiles(attributeValue);
     if (list == null || list.isEmpty()) return null;
 
     return ((AopPointcutExpressionFile)list.get(0).first).getPointcutExpression();
   }
 
-  public String getErrorMessage(@Nullable final String s, final ConvertContext context) {
+  public String getErrorMessage(@Nullable String s, ConvertContext context) {
     return null;
   }
 
-  public String toString(@Nullable PsiPointcutExpression psiPointcutExpression, final ConvertContext context) {
+  public String toString(@Nullable PsiPointcutExpression psiPointcutExpression, ConvertContext context) {
     throw new UnsupportedOperationException("Method toString is not yet implemented in " + getClass().getName());
   }
 }

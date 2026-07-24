@@ -36,7 +36,7 @@ public abstract class AdvisorImpl extends DomSpringBeanImpl implements Advisor {
   @Nullable
   @Override
   public PsiPointcutExpression getPointcutExpression() {
-    final AopPointcut aopPointcut = getPointcutRef().getValue();
+    AopPointcut aopPointcut = getPointcutRef().getValue();
     return aopPointcut != null ? aopPointcut.getExpression().getValue() : getPointcut().getValue();
   }
 
@@ -53,8 +53,8 @@ public abstract class AdvisorImpl extends DomSpringBeanImpl implements Advisor {
   }
 
   @Override
-  public PointcutMatchDegree accepts(final PsiMethod method) {
-    final PsiPointcutExpression expression = getPointcutExpression();
+  public PointcutMatchDegree accepts(PsiMethod method) {
+    PsiPointcutExpression expression = getPointcutExpression();
     return expression != null ? expression.acceptsSubject(new PointcutContext(), method) : PointcutMatchDegree.FALSE;
   }
 
@@ -71,7 +71,7 @@ public abstract class AdvisorImpl extends DomSpringBeanImpl implements Advisor {
   @Nullable
   @Override
   public PsiClass getPsiClass() {
-    final SpringBeanPointer pointer = getAdviceRef().getValue();
+    SpringBeanPointer pointer = getAdviceRef().getValue();
     return pointer == null ? null : pointer.getBeanClass();
   }
 }

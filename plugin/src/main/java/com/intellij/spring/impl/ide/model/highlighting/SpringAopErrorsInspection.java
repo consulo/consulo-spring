@@ -48,35 +48,35 @@ public class SpringAopErrorsInspection extends BasicDomElementsInspection<Beans,
         super(Beans.class);
     }
 
-    protected void checkDomElement(final DomElement element, final DomElementAnnotationHolder holder, final DomHighlightingHelper helper) {
-        final XmlTag tag = element.getXmlTag();
+    protected void checkDomElement(DomElement element, DomElementAnnotationHolder holder, DomHighlightingHelper helper) {
+        XmlTag tag = element.getXmlTag();
         if (element instanceof BasicAdvice && tag != null) {
-            final BasicAdvice advice = (BasicAdvice) element;
+            BasicAdvice advice = (BasicAdvice) element;
             if (advice.getPointcut().getXmlAttribute() == null && advice.getPointcutRef().getXmlAttribute() == null) {
                 createPointcutProblem(element, holder);
             }
         }
         else if (element instanceof Advisor && tag != null) {
-            final Advisor advisor = (Advisor) element;
+            Advisor advisor = (Advisor) element;
             if (advisor.getPointcut().getXmlAttribute() == null && advisor.getPointcutRef().getXmlAttribute() == null) {
                 createPointcutProblem(element, holder);
             }
         }
     }
 
-    public ProblemDescriptor[] checkFile(@Nonnull final PsiFile file, @Nonnull final InspectionManager manager, final boolean isOnTheFly) {
+    public ProblemDescriptor[] checkFile(@Nonnull PsiFile file, @Nonnull final InspectionManager manager, boolean isOnTheFly) {
         if (file instanceof AopPointcutExpressionFile) {
             final List<ProblemDescriptor> result = new SmartList<ProblemDescriptor>();
-            final PsiPointcutExpression expression = ((AopPointcutExpressionFile) file).getPointcutExpression();
+            PsiPointcutExpression expression = ((AopPointcutExpressionFile) file).getPointcutExpression();
             if (expression != null) {
                 expression.accept(new PsiRecursiveElementVisitor() {
                     @Override
-                    public void visitElement(final PsiElement element) {
+                    public void visitElement(PsiElement element) {
                         if (!(element instanceof PsiPointcutExpression)) {
                             return;
                         }
                         super.visitElement(element);
-                        final PsiElement firstChild = element.getFirstChild();
+                        PsiElement firstChild = element.getFirstChild();
                         if (element instanceof PsiPointcutReferenceExpression || element instanceof AopNotExpression ||
                             element instanceof AopBinaryExpression || element instanceof AopParenthesizedExpression) {
                             return;
@@ -85,7 +85,7 @@ public class SpringAopErrorsInspection extends BasicDomElementsInspection<Beans,
                             return;
                         }
 
-                        @NonNls final String text = firstChild.getText();
+                        @NonNls String text = firstChild.getText();
                         if (StringUtil.isEmptyOrSpaces(text)) {
                             return;
                         }
@@ -107,7 +107,7 @@ public class SpringAopErrorsInspection extends BasicDomElementsInspection<Beans,
         return super.checkFile(file, manager, isOnTheFly);
     }
 
-    private static void createPointcutProblem(final DomElement element, final DomElementAnnotationHolder holder) {
+    private static void createPointcutProblem(DomElement element, DomElementAnnotationHolder holder) {
         holder.createProblem(element, HighlightSeverity.ERROR, SpringBundle.message("error.pointcut.or.pointcut.ref.should.be.defined"),
             new DefineAttributeQuickFix("pointcut"), new DefineAttributeQuickFix("pointcut-ref")
         );

@@ -23,18 +23,18 @@ public abstract class AbstarctSpringConfigActionGroup extends DefaultActionGroup
     setPopup(true);
   }
 
-  public void update(final AnActionEvent event) {
+  public void update(AnActionEvent event) {
     Presentation presentation = event.getPresentation();
 
     Project project = event.getData(Project.KEY);
-    final Editor editor = event.getData(PlatformDataKeys.EDITOR);
+    Editor editor = event.getData(PlatformDataKeys.EDITOR);
     if (project == null || editor == null) {
       presentation.setVisible(false);
       return;
     }
 
     PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-    final boolean enabled =
+    boolean enabled =
       file instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile)file) && isInsideRootTag(editor, (XmlFile)file);
 
     presentation.setEnabled(enabled);
@@ -45,7 +45,7 @@ public abstract class AbstarctSpringConfigActionGroup extends DefaultActionGroup
     }
   }
 
-  private static boolean isInsideRootTag(final Editor editor, final XmlFile xmlFile) {
+  private static boolean isInsideRootTag(Editor editor, XmlFile xmlFile) {
     XmlDocument document = xmlFile.getDocument();
     if (document != null) {
       XmlTag tag = document.getRootTag();

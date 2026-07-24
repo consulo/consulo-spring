@@ -22,29 +22,29 @@ public class MoveSelectionModeAction extends AbstractGraphToggleAction {
     super(null);
   }
 
-  public MoveSelectionModeAction(final GraphBuilder<WebflowNode, WebflowEdge> builder) {
+  public MoveSelectionModeAction(GraphBuilder<WebflowNode, WebflowEdge> builder) {
     super(builder.getGraph(), WebflowIcons.WEBFLOW_VIEW_STATE); // todo icon
 
     myBuilder = builder;
   }
 
   @Nullable
-   protected GraphBuilder getBuilder(final AnActionEvent e) {
+   protected GraphBuilder getBuilder(AnActionEvent e) {
     return myBuilder == null ? super.getBuilder(e) : myBuilder;
   }
 
-  public void update(final AnActionEvent e) {
+  public void update(AnActionEvent e) {
     super.update(e);
-    final GraphBuilder builder = getBuilder(e);
+    GraphBuilder builder = getBuilder(e);
 
     e.getPresentation().setVisible(builder != null && builder.getGraphPresentationModel() instanceof BasicGraphPresentationModel);
   }
 
-  protected boolean isSelected(Graph2D graph, final Project project, final AnActionEvent event) {
-    final GraphBuilder builder = getBuilder(event);
+  protected boolean isSelected(Graph2D graph, Project project, AnActionEvent event) {
+    GraphBuilder builder = getBuilder(event);
 
     if (builder != null) {
-      final GraphPresentationModel graphPresentationModel = builder.getGraphPresentationModel();
+      GraphPresentationModel graphPresentationModel = builder.getGraphPresentationModel();
       if (graphPresentationModel instanceof WebflowPresentationModel) {
         return ((WebflowPresentationModel)graphPresentationModel).isMoveSelectionMode();
       }
@@ -52,11 +52,11 @@ public class MoveSelectionModeAction extends AbstractGraphToggleAction {
     return false;
   }
 
-  protected void setSelected(Graph2D graph, boolean state, final Project project, final AnActionEvent e) {
-    final GraphBuilder builder = getBuilder(e);
+  protected void setSelected(Graph2D graph, boolean state, Project project, AnActionEvent e) {
+    GraphBuilder builder = getBuilder(e);
 
     if (builder != null) {
-      final GraphPresentationModel graphPresentationModel = builder.getGraphPresentationModel();
+      GraphPresentationModel graphPresentationModel = builder.getGraphPresentationModel();
       if (graphPresentationModel instanceof WebflowPresentationModel) {
         ((WebflowPresentationModel)graphPresentationModel).setMoveSelectionMode(state);
         
@@ -65,7 +65,7 @@ public class MoveSelectionModeAction extends AbstractGraphToggleAction {
     }
   }
 
-  protected String getText(final @NotNull Graph2D graph) {
+  protected String getText(@NotNull Graph2D graph) {
     return WebflowBundle.message("action.move.selection.mode");
   }
 }

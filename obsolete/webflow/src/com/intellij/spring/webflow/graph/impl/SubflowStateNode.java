@@ -31,7 +31,7 @@ public class SubflowStateNode extends WebflowBasicNode<SubflowState> {
 
   public List<WebflowNamedAction> getAllNodeActions() {
     List<WebflowNamedAction> actions = new ArrayList<WebflowNamedAction>();
-    final SubflowState state = getIdentifyingElement();
+    SubflowState state = getIdentifyingElement();
     if (state.isValid()) {
       WebflowUtil.collectActons(state.getEntryActions(), actions);
       WebflowUtil.collectActons(state.getExitActions(), actions);

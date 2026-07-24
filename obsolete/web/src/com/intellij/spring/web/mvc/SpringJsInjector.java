@@ -40,16 +40,16 @@ public class SpringJsInjector implements MultiHostInjector {
   private static final NamespaceFilter NAMESPACE_FILTER = new NamespaceFilter(SpringWebConstants.MVC_FORM_TLD);
 
   public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement host) {
-    final FileType fileType = host.getContainingFile().getFileType();
+    FileType fileType = host.getContainingFile().getFileType();
     if (fileType != StdFileTypes.JSP &&
         fileType != StdFileTypes.JSPX) {
       return;
     }
 
     if (host instanceof XmlAttributeValue) {
-      final PsiElement tag = host.getParent().getParent();
+      PsiElement tag = host.getParent().getParent();
       if (NAMESPACE_FILTER.isAcceptable(tag, null)) {
-        @NonNls final String name = ((XmlAttribute) host.getParent()).getName();
+        @NonNls String name = ((XmlAttribute) host.getParent()).getName();
         if (name.startsWith("on")) {
           JSLanguageInjector.injectJSIntoAttributeValue(registrar, (XmlAttributeValue)host, false);
         }

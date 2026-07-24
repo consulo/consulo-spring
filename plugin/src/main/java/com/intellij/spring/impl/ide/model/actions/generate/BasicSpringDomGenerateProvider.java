@@ -15,17 +15,17 @@ import consulo.xml.util.xml.actions.generate.AbstractDomGenerateProvider;
  */
 public abstract class BasicSpringDomGenerateProvider<T extends DomElement> extends AbstractDomGenerateProvider<T> {
 
-  protected BasicSpringDomGenerateProvider(final String description, final Class<T> tClass) {
+  protected BasicSpringDomGenerateProvider(String description, Class<T> tClass) {
     super(description, tClass);
   }
 
-  protected BasicSpringDomGenerateProvider(final String description, final Class<T> tClass, final String mappingId) {
+  protected BasicSpringDomGenerateProvider(String description, Class<T> tClass, String mappingId) {
     super(description, tClass, mappingId);
   }
 
   @Override
-  protected DomElement getParentDomElement(final Project project, final Editor editor, final PsiFile file) {
-    final SpringModel springModel = SpringManager.getInstance(project).getLocalSpringModel((XmlFile)file);
+  protected DomElement getParentDomElement(Project project, Editor editor, PsiFile file) {
+    SpringModel springModel = SpringManager.getInstance(project).getLocalSpringModel((XmlFile)file);
     if(springModel instanceof DomSpringModel) {
       return ((DomSpringModel) springModel).getDomModel().getMergedModel();
     }

@@ -23,8 +23,8 @@ import consulo.language.psi.PsiElement;
 @ExtensionImpl
 public class SpringFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
   @Override
-  public boolean canFindUsages(final PsiElement psiElement) {
-    final BeanProperty property = SpringPropertiesUtil.getBeanProperty(psiElement);
+  public boolean canFindUsages(PsiElement psiElement) {
+    BeanProperty property = SpringPropertiesUtil.getBeanProperty(psiElement);
     if (property != null) return true;
 
     if (psiElement instanceof PsiMethod && SpringJamUtils.isBean((PsiMethod)psiElement)) return true;
@@ -33,13 +33,13 @@ public class SpringFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
   }
 
   @Override
-  public FindUsagesHandler createFindUsagesHandler(final PsiElement element, final boolean forHighlightUsages) {
-    final BeanProperty property = SpringPropertiesUtil.getBeanProperty(element);
+  public FindUsagesHandler createFindUsagesHandler(PsiElement element, boolean forHighlightUsages) {
+    BeanProperty property = SpringPropertiesUtil.getBeanProperty(element);
     if (property != null) {
       return new BeanPropertyFindUsagesHandler(property);
     }
 
-    final DomSpringBean bean = SpringBeanUtil.getTargetSpringBean(element);
+    DomSpringBean bean = SpringBeanUtil.getTargetSpringBean(element);
     if (bean != null) {
       return new SpringJavaBeanReferencesFindUsagesHandler(bean);
     }

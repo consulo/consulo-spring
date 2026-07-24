@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class SpringOsgiElementsInconsistencyInspection extends SpringOsgiBaseInspection {
 
   @Override
-  protected void checkOsgiService(final Service service, final Beans beans, final DomElementAnnotationHolder holder, final SpringModel springModel) {
+  protected void checkOsgiService(Service service, Beans beans, DomElementAnnotationHolder holder, SpringModel springModel) {
     super.checkOsgiService(service, beans, holder, springModel);
 
     if (service.getInterface().getXmlAttribute() != null && DomUtil.hasXml(service.getInterfaces())) {
@@ -37,7 +37,7 @@ public class SpringOsgiElementsInconsistencyInspection extends SpringOsgiBaseIns
   }
 
   @Override
-  protected void checkOsgiReference(BaseOsgiReference reference, final Beans beans, final DomElementAnnotationHolder holder, final SpringModel springModel) {
+  protected void checkOsgiReference(BaseOsgiReference reference, Beans beans, DomElementAnnotationHolder holder, SpringModel springModel) {
     super.checkOsgiReference(reference, beans, holder, springModel);
 
     if (reference.getInterface().getXmlAttribute() != null && DomUtil.hasXml(reference.getInterfaces())) {

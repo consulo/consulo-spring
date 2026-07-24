@@ -10,7 +10,7 @@ import com.intellij.java.language.psi.PsiModifier;
 //@see org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod
 public class SpringBeanInitMethodConverter extends SpringBeanMethodConverter {
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return !method.hasModifierProperty(PsiModifier.ABSTRACT);
   }
 }

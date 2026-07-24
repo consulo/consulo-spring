@@ -23,7 +23,7 @@ public interface IntroductionManipulator {
   @Nullable
   AopIntroduction getIntroduction();
 
-  void defineDefaultImpl(final Project project, final ProblemDescriptor descriptor) throws IncorrectOperationException;
+  void defineDefaultImpl(Project project, ProblemDescriptor descriptor) throws IncorrectOperationException;
 
   @NonNls
   String getDefaultImplAttributeName();  

@@ -32,19 +32,19 @@ import jakarta.annotation.Nonnull;
 @ExtensionImpl
 public class SpringBeanInstantiationInspection extends SpringBeanInspectionBase {
     protected void checkBean(
-        final SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel,
+        SpringBean springBean,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel,
         Object state
     ) {
-        final PsiClass psiClass = springBean.getClazz().getValue();
+        PsiClass psiClass = springBean.getClazz().getValue();
         if (psiClass != null && !springBean.isAbstract()) {
             if (psiClass.isInterface()) {
                 return;
             }
-            final boolean factory = DomUtil.hasXml(springBean.getFactoryMethod());
-            final boolean lookup = springBean.getLookupMethods().size() > 0;
+            boolean factory = DomUtil.hasXml(springBean.getFactoryMethod());
+            boolean lookup = springBean.getLookupMethods().size() > 0;
             if ((psiClass.hasModifierProperty(PsiModifier.ABSTRACT) && !factory && !lookup && !isJavaConfiBean(springBean))) {
                 holder.createProblem(
                     springBean.getClazz(),
@@ -56,12 +56,12 @@ public class SpringBeanInstantiationInspection extends SpringBeanInspectionBase 
         }
     }
 
-    private static boolean isJavaConfiBean(final SpringBean springBean) {
-        final XmlElement xmlElement = springBean.getXmlElement();
-        final PsiClass beanClass = springBean.getBeanClass();
+    private static boolean isJavaConfiBean(SpringBean springBean) {
+        XmlElement xmlElement = springBean.getXmlElement();
+        PsiClass beanClass = springBean.getBeanClass();
 
         if (xmlElement != null && beanClass != null) {
-            final Module module = ModuleUtilCore.findModuleForPsiElement(xmlElement);
+            Module module = ModuleUtilCore.findModuleForPsiElement(xmlElement);
             if (module != null) {
                 for (SpringJamElement javaConfiguration : SpringJamModel.getModel(module).getConfigurations()) {
                     if (beanClass.equals(javaConfiguration.getPsiClass())) {
@@ -86,11 +86,11 @@ public class SpringBeanInstantiationInspection extends SpringBeanInspectionBase 
     }
 
     private static class MarkAbstractFix extends AddDomElementQuickFix<GenericAttributeValue<Boolean>> {
-        public MarkAbstractFix(final GenericAttributeValue<Boolean> value) {
+        public MarkAbstractFix(GenericAttributeValue<Boolean> value) {
             super(value);
         }
 
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             if (CodeInsightUtilCore.getInstance().preparePsiElementForWrite(descriptor.getPsiElement())) {
                 myElement.setValue(Boolean.TRUE);
             }

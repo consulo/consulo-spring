@@ -27,24 +27,24 @@ public class AllAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   private GlobalSearchScope myScope;
 
   @TestOnly
-  public AllAdvisedElementsSearcher(final PsiManager manager) {
+  public AllAdvisedElementsSearcher(PsiManager manager) {
     this(manager, GlobalSearchScope.allScope(manager.getProject()));
 
   }
 
-  public AllAdvisedElementsSearcher(final PsiManager manager, final GlobalSearchScope scope) {
+  public AllAdvisedElementsSearcher(PsiManager manager, GlobalSearchScope scope) {
     super(manager);
     myScope = scope;
   }
 
   @Override
   public boolean test(Predicate<PsiClass> processor) {
-    final PsiJavaPackage psiPackage = JavaPsiFacade.getInstance(getManager().getProject()).findPackage("");
+    PsiJavaPackage psiPackage = JavaPsiFacade.getInstance(getManager().getProject()).findPackage("");
     return psiPackage == null || processPackage(processor, psiPackage, new ArrayList<>());
   }
 
   @Override
-  public boolean isAcceptable(final PsiClass psiClass) {
+  public boolean isAcceptable(PsiClass psiClass) {
     return true;
   }
 
@@ -63,7 +63,7 @@ public class AllAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     )) {
       return false;
     }
-    for (final PsiJavaPackage aPackage : psiPackage.getSubPackages(myScope)) {
+    for (PsiJavaPackage aPackage : psiPackage.getSubPackages(myScope)) {
       if (!processPackage(processor, aPackage, new ArrayList<>(visited))) return false;
     }
     return true;

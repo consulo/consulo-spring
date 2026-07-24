@@ -25,7 +25,7 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
   @Nonnull
   private final PointcutContainer myContainer;
 
-  public JavaArgNamesManipulator(@Nonnull final PointcutContainer advice) {
+  public JavaArgNamesManipulator(@Nonnull PointcutContainer advice) {
     myContainer = advice;
   }
 
@@ -36,7 +36,7 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
 
   @Nonnull
   public PsiElement getArgNamesProblemElement() {
-    final PsiAnnotationMemberValue value = myContainer.getArgNames().getPsiElement();
+    PsiAnnotationMemberValue value = myContainer.getArgNames().getPsiElement();
     return value == null ? getCommonProblemElement() : value;
   }
 
@@ -66,8 +66,8 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
   public PsiReference getReturningReference() {
     if (!(myContainer instanceof AopAfterReturningAdviceImpl)) return null;
 
-    final JamStringAttributeElement<PsiParameter> returning = ((AopAfterReturningAdviceImpl)myContainer).getReturning();
-    final PsiReference[] references = returning.getConverter().createReferences(returning);
+    JamStringAttributeElement<PsiParameter> returning = ((AopAfterReturningAdviceImpl)myContainer).getReturning();
+    PsiReference[] references = returning.getConverter().createReferences(returning);
     return references.length == 0 ? null : references[0];
   }
 
@@ -75,8 +75,8 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
   public PsiReference getThrowingReference() {
     if (!(myContainer instanceof AopAfterThrowingAdviceImpl)) return null;
 
-    final JamStringAttributeElement<PsiParameter> throwing = ((AopAfterThrowingAdviceImpl)myContainer).getThrowing();
-    final PsiReference[] references = throwing.getConverter().createReferences(throwing);
+    JamStringAttributeElement<PsiParameter> throwing = ((AopAfterThrowingAdviceImpl)myContainer).getThrowing();
+    PsiReference[] references = throwing.getConverter().createReferences(throwing);
     return references.length == 0 ? null : references[0];
 
   }
@@ -85,7 +85,7 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
     return myContainer instanceof AopAdvice ? ((AopAdvice)myContainer).getAdviceType() : null;
   }
 
-  public void setArgNames(@Nullable final String argNames) throws IncorrectOperationException
+  public void setArgNames(@Nullable String argNames) throws IncorrectOperationException
   {
     myContainer.getArgNames().setStringValue(argNames);
   }

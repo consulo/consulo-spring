@@ -15,7 +15,7 @@ import jakarta.annotation.Nonnull;
 public class SpringBeanClassMember extends MemberChooserObjectBase implements ClassMember {
   private final SpringBeanPointer mySpringBean;
 
-  public SpringBeanClassMember(final SpringBeanPointer springBean) {
+  public SpringBeanClassMember(SpringBeanPointer springBean) {
     super(SpringUtils.getPresentationBeanName(springBean), springBean.getBeanIcon());
     mySpringBean = springBean;
   }
@@ -30,7 +30,7 @@ public class SpringBeanClassMember extends MemberChooserObjectBase implements Cl
 
   private static class SpringFileMemberChooserObjectBase extends PsiElementMemberChooserObject {
 
-    public SpringFileMemberChooserObjectBase(@Nonnull final PsiFile psiFile) {
+    public SpringFileMemberChooserObjectBase(@Nonnull PsiFile psiFile) {
       super(psiFile, psiFile.getName(), psiFile instanceof XmlFile ? SpringIcons.CONFIG_FILE : SpringIcons.JAVA_CONFIG_FILE);
     }
 

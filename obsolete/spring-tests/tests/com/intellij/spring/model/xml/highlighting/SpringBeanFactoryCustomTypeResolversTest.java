@@ -22,41 +22,41 @@ public class SpringBeanFactoryCustomTypeResolversTest extends SpringHighlighting
     super.setUp();
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     addSpringJar(moduleBuilder);
   }
 
-  public void assertFactoryProduces(@NotNull final SpringBean factoryBean, @NotNull final String... productClassNames) {
-    final PsiClass factoryBeanClass = factoryBean.getBeanClass();
+  public void assertFactoryProduces(@NotNull SpringBean factoryBean, @NotNull String... productClassNames) {
+    PsiClass factoryBeanClass = factoryBean.getBeanClass();
     assertNotNull(factoryBeanClass);
     assertTrue(SpringFactoryBeansManager.isBeanFactory(factoryBeanClass));
-    final PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(factoryBean);
+    PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(factoryBean);
     assertSameElements(ContainerUtil.map(classes, new NullableFunction<PsiClass, String>() {
-      public String fun(final PsiClass psiClass) {
+      public String fun(PsiClass psiClass) {
         return psiClass.getQualifiedName();
       }
     }), productClassNames);
   }
 
-  public void assertFactoryProduces(@NotNull final Beans beans, @NotNull final String id, @NotNull final String... productClassNames) {
-    final SpringBean bean = findBeanById(beans, id);
+  public void assertFactoryProduces(@NotNull Beans beans, @NotNull String id, @NotNull String... productClassNames) {
+    SpringBean bean = findBeanById(beans, id);
     assertFactoryProduces(bean, productClassNames);
   }
 
   public void testBeanReferenceFactoryBean() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
     assertFactoryProduces(beans, "beanReference", "TargetBean");
   }
 
   public void testScopedProxyFactoryBean() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
     assertFactoryProduces(beans, "scopedProxy", "TargetBeanImplementingInterface");
     assertFactoryProduces(beans, "scopedProxyUsingInterface", "TargetInterfaceOne");
   }
 
   public void testProxyFactoryBean() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
     assertFactoryProduces(beans, "proxyFromRef", "TargetInterfaceOne");
     assertFactoryProduces(beans, "proxyFromRefTwoInterfaces", "TargetInterfaceOne", "TargetInterfaceTwo");
     assertFactoryProduces(beans, "proxyFromName", "TargetInterfaceOne");
@@ -67,7 +67,7 @@ public class SpringBeanFactoryCustomTypeResolversTest extends SpringHighlighting
   }
 
   public void testTransactionProxyFactoryBean() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
     assertFactoryProduces(beans, "txProxyNoInterfaces", "TargetBean");
     assertFactoryProduces(beans, "txProxyNestedTarget", "TargetBean");
     assertFactoryProduces(beans, "txProxyAllInterfaces", "TargetInterfaceOne", "TargetInterfaceTwo");
@@ -77,15 +77,15 @@ public class SpringBeanFactoryCustomTypeResolversTest extends SpringHighlighting
 
   // IDEA-13844
   public void testDoubleProxy() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
     assertFactoryProduces(beans, "doubleProxy", "TargetInterfaceOne");
   }
 
   public void testCircularFactoryBeans() throws Throwable {
-    final Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
-    final SpringBean factoryBean = findBeanById(beans, "circularOne");
+    Beans beans = getBeans("spring-factory-beans-custom-resolvers.xml");
+    SpringBean factoryBean = findBeanById(beans, "circularOne");
     assertNotNull(factoryBean);
-    final PsiClass factoryBeanClass = factoryBean.getBeanClass();
+    PsiClass factoryBeanClass = factoryBean.getBeanClass();
     assertNotNull(factoryBeanClass);
     assertTrue(SpringFactoryBeansManager.isBeanFactory(factoryBeanClass));
     assertEmpty(SpringUtils.getEffectiveBeanTypes(factoryBean));

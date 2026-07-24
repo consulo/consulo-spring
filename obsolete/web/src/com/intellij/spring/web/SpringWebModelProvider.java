@@ -44,24 +44,24 @@ public class SpringWebModelProvider implements SpringModelProvider {
 
   @NotNull
   public List<SpringFileSet> getFilesets(@NotNull SpringFacet springFacet) {
-    final Collection<WebFacet> facets = WebFacet.getInstances(springFacet.getModule());
+    Collection<WebFacet> facets = WebFacet.getInstances(springFacet.getModule());
     List<SpringFileSet> result = new ArrayList<SpringFileSet>(facets.size());
-    for (final WebFacet facet : facets) {
-      final List<ServletFileSet> servletSets = getServletSets(facet, springFacet.getConfiguration());
+    for (WebFacet facet : facets) {
+      List<ServletFileSet> servletSets = getServletSets(facet, springFacet.getConfiguration());
       if (servletSets == null) {
         continue;
       }
-      final WebApp app = facet.getRoot();
-      final VirtualFile webinfFile = getWebInf(facet);
+      WebApp app = facet.getRoot();
+      VirtualFile webinfFile = getWebInf(facet);
       assert webinfFile != null;
       assert app != null;
-      final ParamValue param = DomUtil.findByName(app.getContextParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
+      ParamValue param = DomUtil.findByName(app.getContextParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
       SpringFileSet appContext = null;
-      final String fsname = SpringWebBundle.message("mvc.application.context.autodetected");
+      String fsname = SpringWebBundle.message("mvc.application.context.autodetected");
       if (param != null) {
         appContext = createFileSet(webinfFile.getParent(), param, fsname, APPLICATION_CONTEXT_FILESET, springFacet.getConfiguration(), null);
       } else {
-        final VirtualFile file = webinfFile.findChild(SpringWebConstants.APPLICATION_CONTEXT_XML);
+        VirtualFile file = webinfFile.findChild(SpringWebConstants.APPLICATION_CONTEXT_XML);
         if (file != null) {
           appContext = createFileSet(APPLICATION_CONTEXT_FILESET, fsname, springFacet.getConfiguration(), null);
           appContext.addFile(file);
@@ -79,39 +79,39 @@ public class SpringWebModelProvider implements SpringModelProvider {
   }
 
   @Nullable
-  private static VirtualFile getWebInf(final WebFacet facet) {
-    final WebDirectoryElement webinf = WebUtil.getWebUtil().findWebDirectoryElement(SpringWebConstants.WEB_INF, facet);
+  private static VirtualFile getWebInf(WebFacet facet) {
+    WebDirectoryElement webinf = WebUtil.getWebUtil().findWebDirectoryElement(SpringWebConstants.WEB_INF, facet);
     return webinf == null ? null : webinf.getVirtualFile();
   }
 
   @Nullable
-  public static List<ServletFileSet> getServletSets(final WebFacet facet, @NotNull final SpringFacetConfiguration configuration) {
+  public static List<ServletFileSet> getServletSets(WebFacet facet, @NotNull SpringFacetConfiguration configuration) {
 
-    final WebApp app = facet.getRoot();
+    WebApp app = facet.getRoot();
     if (app == null) {
       return null;
     }
-    final Module module = facet.getModule();
-    final GlobalSearchScope scope = module.getModuleWithDependenciesAndLibrariesScope(false);
-    final PsiClass dispatchClass = JavaPsiFacade.getInstance(module.getProject()).findClass(SpringWebConstants.DISPATCHER_SERVLET_CLASS, scope);
+    Module module = facet.getModule();
+    GlobalSearchScope scope = module.getModuleWithDependenciesAndLibrariesScope(false);
+    PsiClass dispatchClass = JavaPsiFacade.getInstance(module.getProject()).findClass(SpringWebConstants.DISPATCHER_SERVLET_CLASS, scope);
     if (dispatchClass == null) {
       return null;
     }
-    final List<ServletFileSet> result = new ArrayList<ServletFileSet>();
-    final VirtualFile webInf = getWebInf(facet);
+    List<ServletFileSet> result = new ArrayList<ServletFileSet>();
+    VirtualFile webInf = getWebInf(facet);
     if (webInf == null) {
       return null;
     }
-    final VirtualFile root = webInf.getParent();
-    for (final Servlet servlet: app.getServlets()) {
-      final PsiClass servletClass = servlet.getServletClass().getValue();
-      final String servletName = servlet.getServletName().getValue();
+    VirtualFile root = webInf.getParent();
+    for (Servlet servlet: app.getServlets()) {
+      PsiClass servletClass = servlet.getServletClass().getValue();
+      String servletName = servlet.getServletName().getValue();
       if (servletClass != null && servletName != null && dispatchClass.equals(servletClass)) {
 
-        final ParamValue servlParam = DomUtil.findByName(servlet.getInitParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
-        final ServletFileSet springFileSet;
-        final String id = WEB + servletName + SERVLET_CONTEXT_POSTFIX;
-        final String name = SpringWebBundle.message("mvc.servlet.context.autodetected", servletName);
+        ParamValue servlParam = DomUtil.findByName(servlet.getInitParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
+        ServletFileSet springFileSet;
+        String id = WEB + servletName + SERVLET_CONTEXT_POSTFIX;
+        String name = SpringWebBundle.message("mvc.servlet.context.autodetected", servletName);
         if (servlParam != null) {
           springFileSet = createFileSet(root, servlParam, id, name, configuration, servlet);
         } else {
@@ -126,24 +126,24 @@ public class SpringWebModelProvider implements SpringModelProvider {
   }
 
   @NotNull
-  private static ServletFileSet createFileSet(final VirtualFile root,
-                                             final ParamValue param,
-                                             final String name, final String id,
-                                             @NotNull final SpringFacetConfiguration configuration,
-                                             @Nullable Servlet servlet) {
-    final ServletFileSet fileSet = createFileSet(id, name, configuration, servlet);
-    final XmlElement tag = param.getParamValue().getXmlElement();
+  private static ServletFileSet createFileSet(VirtualFile root,
+                                              ParamValue param,
+                                              String name, String id,
+                                              @NotNull SpringFacetConfiguration configuration,
+                                              @Nullable Servlet servlet) {
+    ServletFileSet fileSet = createFileSet(id, name, configuration, servlet);
+    XmlElement tag = param.getParamValue().getXmlElement();
     if (tag != null) {
-      final PsiReference[] references = tag.getReferences();
+      PsiReference[] references = tag.getReferences();
       for (PsiReference reference : references) {
         if (reference instanceof FileReference) {
           if (((FileReference)reference).isLast()) {
-            final ResolveResult[] results = ((FileReference)reference).multiResolve(false);
+            ResolveResult[] results = ((FileReference)reference).multiResolve(false);
             boolean resolved = false;
             for (ResolveResult resolveResult : results) {
-              final PsiElement element = resolveResult.getElement();
+              PsiElement element = resolveResult.getElement();
               if (element instanceof PsiFileSystemItem && !((PsiFileSystemItem)element).isDirectory()) {
-                final VirtualFile virtualFile = ((PsiFileSystemItem)element).getVirtualFile();
+                VirtualFile virtualFile = ((PsiFileSystemItem)element).getVirtualFile();
                 if (virtualFile != null) {
                   fileSet.addFile(virtualFile);
                   resolved = true;

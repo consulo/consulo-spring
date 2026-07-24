@@ -14,11 +14,11 @@ import org.jetbrains.annotations.Nullable;
 // where ServiceType can be any type compatible with the exported service interface of the service
 public class RegistrationListenerMethodConverter extends BasicListenerMethodConverter {
 
-  protected boolean checkParameterList(final PsiMethod method, final ConvertContext context) {
-    final Project project = method.getProject();
-    final PsiParameter[] parameters = method.getParameterList().getParameters();
+  protected boolean checkParameterList(PsiMethod method, ConvertContext context) {
+    Project project = method.getProject();
+    PsiParameter[] parameters = method.getParameterList().getParameters();
     if (parameters.length == 2) {
-      final PsiType type2 = parameters[1].getType();
+      PsiType type2 = parameters[1].getType();
 
       return checkServiceTypeParameter(context, parameters[0].getType()) &&
              (checkType(type2, CommonClassNames.JAVA_UTIL_MAP, project) ||
@@ -28,11 +28,11 @@ public class RegistrationListenerMethodConverter extends BasicListenerMethodConv
     return false;
   }
 
-  private static boolean checkServiceTypeParameter(final ConvertContext context, final PsiType type) {
-    final Service service = context.getInvocationElement().getParentOfType(Service.class, false);
+  private static boolean checkServiceTypeParameter(ConvertContext context, PsiType type) {
+    Service service = context.getInvocationElement().getParentOfType(Service.class, false);
 
     if (service != null && type != null) {
-      final PsiClass beanClass = getServiceBeanClass(service);
+      PsiClass beanClass = getServiceBeanClass(service);
       if (beanClass != null) {
         return type.isAssignableFrom(JavaPsiFacade.getInstance(context.getModule().getProject()).getElementFactory().createType(beanClass));
       }
@@ -42,8 +42,8 @@ public class RegistrationListenerMethodConverter extends BasicListenerMethodConv
   }
 
   @Nullable
-  private static PsiClass getServiceBeanClass(final Service service) {
-    final SpringBeanPointer value = service.getRef().getValue();
+  private static PsiClass getServiceBeanClass(Service service) {
+    SpringBeanPointer value = service.getRef().getValue();
     if (value != null) {
       return value.getBeanClass();
     }

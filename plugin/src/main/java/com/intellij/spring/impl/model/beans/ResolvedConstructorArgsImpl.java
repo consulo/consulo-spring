@@ -29,9 +29,9 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
    * @see org.springframework.beans.factory.support.AutowireUtils#sortConstructors(java.lang.reflect.Constructor[])
    */
   private static final Comparator<PsiMethod> CTOR_COMPARATOR = new Comparator<PsiMethod>() {
-    public int compare(final PsiMethod o1, final PsiMethod o2) {
-      final boolean p1 = o1.hasModifierProperty(PsiModifier.PUBLIC);
-      final boolean p2 = o2.hasModifierProperty(PsiModifier.PUBLIC);
+    public int compare(PsiMethod o1, PsiMethod o2) {
+      boolean p1 = o1.hasModifierProperty(PsiModifier.PUBLIC);
+      boolean p2 = o2.hasModifierProperty(PsiModifier.PUBLIC);
       if (p1 != p2) {
         return (p1 ? -1 : 1);
       }
@@ -40,9 +40,9 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
   };
 
   private static final Comparator<ConstructorArg> ARG_COMPARATOR = new Comparator<ConstructorArg>() {
-    public int compare(final ConstructorArg o1, final ConstructorArg o2) {
-      final boolean hasValue1 = DomUtil.hasXml(o1.getValueElement());
-      final boolean hasValue2 = DomUtil.hasXml(o2.getValueElement());
+    public int compare(ConstructorArg o1, ConstructorArg o2) {
+      boolean hasValue1 = DomUtil.hasXml(o1.getValueElement());
+      boolean hasValue2 = DomUtil.hasXml(o2.getValueElement());
       return hasValue1 ? (hasValue2 ? 0 : 1) : (hasValue2 ? -1 : 0);
     }
   };
@@ -83,7 +83,7 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     return myResolvedArgs.get(method);
   }
 
-  public Map<PsiParameter, Collection<SpringBaseBeanPointer>> getAutowiredParams(@Nonnull final PsiMethod method) {
+  public Map<PsiParameter, Collection<SpringBaseBeanPointer>> getAutowiredParams(@Nonnull PsiMethod method) {
     return myAutowiredParams.get(method);
   }
 
@@ -94,8 +94,8 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
    */
   private boolean resolve(SpringBean bean, SpringModel springModel) {
 
-    final List<PsiMethod> methods;
-    final String factoryMethod = bean.getFactoryMethod().getStringValue();
+    List<PsiMethod> methods;
+    String factoryMethod = bean.getFactoryMethod().getStringValue();
     if (factoryMethod != null) {
       methods = SpringBeanFactoryMethodConverter.getFactoryMethodCandidates(bean, factoryMethod);
       if (methods.size() == 0) {
@@ -103,9 +103,9 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
       }
     }
     else {
-      final PsiClass beanClass = bean.getBeanClass();
+      PsiClass beanClass = bean.getBeanClass();
       if (beanClass != null) {
-        final PsiMethod[] constructors = beanClass.getConstructors();
+        PsiMethod[] constructors = beanClass.getConstructors();
         if (constructors.length == 0) { // ctor by default
           return bean.getAllConstructorArgs().size() == 0;
         }
@@ -119,30 +119,30 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     // there is at least one candidate here
     myCheckedMethods = new ArrayList<PsiMethod>(methods.size());
 
-    final Set<ConstructorArg> args = bean.getAllConstructorArgs();
-    final boolean constructorAutowire = SpringAutowireUtil.isConstructorAutowire(bean);
-    final ConstructorArgumentValues values = new ConstructorArgumentValues();
-    final int minNrOfArgs = values.init(args);
+    Set<ConstructorArg> args = bean.getAllConstructorArgs();
+    boolean constructorAutowire = SpringAutowireUtil.isConstructorAutowire(bean);
+    ConstructorArgumentValues values = new ConstructorArgumentValues();
+    int minNrOfArgs = values.init(args);
 
     Collections.sort(methods, CTOR_COMPARATOR);
-    for (final PsiMethod method : methods) {
-      final PsiParameter[] params = method.getParameterList().getParameters();
+    for (PsiMethod method : methods) {
+      PsiParameter[] params = method.getParameterList().getParameters();
       if (myResolvedMethod != null && params.length < myResolvedMethod.getParameterList().getParametersCount()) {
         return true;
       }
-      final HashMap<ConstructorArg, PsiParameter> resolvedArgs = new HashMap<ConstructorArg, PsiParameter>(params.length);
+      HashMap<ConstructorArg, PsiParameter> resolvedArgs = new HashMap<ConstructorArg, PsiParameter>(params.length);
       myResolvedArgs.put(method, resolvedArgs);
-      final HashMap<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = new HashMap<PsiParameter, Collection<SpringBaseBeanPointer>>();
+      HashMap<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = new HashMap<PsiParameter, Collection<SpringBaseBeanPointer>>();
       myAutowiredParams.put(method, autowiredParams);
       Set<ConstructorArg> usedArgs = new HashSet<ConstructorArg>(args.size());
       int autowired = 0;
       for (int i = 0; i < params.length; i++) {
-        final PsiParameter param = params[i];
-        final PsiType paramType = param.getType();
+        PsiParameter param = params[i];
+        PsiType paramType = param.getType();
         ConstructorArg arg = values.resolve(i, paramType, usedArgs);
 
         if (arg == null && constructorAutowire) {
-          final Collection<SpringBaseBeanPointer> beans = SpringAutowireUtil.autowireByType(springModel, paramType);
+          Collection<SpringBaseBeanPointer> beans = SpringAutowireUtil.autowireByType(springModel, paramType);
           if (beans.size() == 1) {
             autowired++;
           }
@@ -166,13 +166,13 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     Map<Integer, ConstructorArg> indexedArgs;
     List<ConstructorArg> genericArgs;
 
-    private int init(final Set<ConstructorArg> args) {
+    private int init(Set<ConstructorArg> args) {
       indexedArgs = new HashMap<Integer, ConstructorArg>(args.size());
       genericArgs = new ArrayList<ConstructorArg>(args.size());
 
       int minNrOfArgs = args.size();
       for (ConstructorArg arg : args) {
-        final Integer index = arg.getIndex().getValue();
+        Integer index = arg.getIndex().getValue();
         if (index != null) {
           indexedArgs.put(index, arg);
           minNrOfArgs = Math.max(minNrOfArgs, index.intValue());
@@ -186,7 +186,7 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     }
 
     @Nullable
-    private ConstructorArg resolve(final int index, final PsiType paramType, Set<ConstructorArg> usedArgs) {
+    private ConstructorArg resolve(int index, PsiType paramType, Set<ConstructorArg> usedArgs) {
       ConstructorArg arg = resolveIndexed(index, paramType);
       if (arg == null) {
         return resolveGeneric(paramType, usedArgs);
@@ -197,13 +197,13 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     }
 
     @Nullable
-    private ConstructorArg resolveGeneric(@Nullable final PsiType requiredType, Set<ConstructorArg> usedArgs) {
+    private ConstructorArg resolveGeneric(@Nullable PsiType requiredType, Set<ConstructorArg> usedArgs) {
 
-      for (final ConstructorArg arg : genericArgs) {
+      for (ConstructorArg arg : genericArgs) {
         if (usedArgs.contains(arg)) {
           continue;
         }
-        final PsiType type = arg.getType().getValue();
+        PsiType type = arg.getType().getValue();
         if (requiredType == null) {
           if (type == null) {
             return arg;
@@ -226,10 +226,10 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     }
 
     @Nullable
-    private ConstructorArg resolveIndexed(final int index, final PsiType paramType) {
-      final ConstructorArg arg = indexedArgs.get(index);
+    private ConstructorArg resolveIndexed(int index, PsiType paramType) {
+      ConstructorArg arg = indexedArgs.get(index);
       if (arg != null) {
-        final PsiType type = arg.getType().getValue();
+        PsiType type = arg.getType().getValue();
         if (type == null || type.isAssignableFrom(paramType)) {
           return arg;
         }

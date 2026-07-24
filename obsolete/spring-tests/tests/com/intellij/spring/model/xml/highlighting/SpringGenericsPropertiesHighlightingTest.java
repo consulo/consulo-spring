@@ -6,7 +6,7 @@ import com.intellij.codeInsight.completion.CompletionType;
 import org.jetbrains.annotations.NonNls;
 
 public class SpringGenericsPropertiesHighlightingTest extends SpringHighlightingTestCase<JavaModuleFixtureBuilder> {
-   protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+   protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
   }

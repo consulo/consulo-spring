@@ -30,10 +30,10 @@ public class WebflowNodeRenderer extends AbstractColoredNodeCellRenderer {
     myBuilder = builder;
   }
 
-  public void tuneNode(final NodeRealizer realizer, final JPanel wrapper) {
+  public void tuneNode(NodeRealizer realizer, JPanel wrapper) {
     wrapper.removeAll();
-    final Node node = realizer.getNode();
-    final WebflowNode webflowNode = myBuilder.getNodeObject(node);
+    Node node = realizer.getNode();
+    WebflowNode webflowNode = myBuilder.getNodeObject(node);
     if (webflowNode != null) {
       JLabel nameLabel = new JLabel(webflowNode.getName(), getIcon(webflowNode), JLabel.HORIZONTAL);
 
@@ -48,25 +48,25 @@ public class WebflowNodeRenderer extends AbstractColoredNodeCellRenderer {
       nameLabel.setForeground(Color.BLACK);
       wrapper.add(namePanel, BorderLayout.NORTH);
 
-      final JPanel actionsPanel = new JPanel(new GridBagLayout());
+      JPanel actionsPanel = new JPanel(new GridBagLayout());
       actionsPanel.setBorder(IdeBorderFactory.createEmptyBorder(2, 5, 2, 5));
       actionsPanel.setBackground(myBackgroundColor);
 
-      final List<WebflowNamedAction> nodeActions = webflowNode.getAllNodeActions();
+      List<WebflowNamedAction> nodeActions = webflowNode.getAllNodeActions();
 
       if (!nodeActions.isEmpty()) {
         for (WebflowNamedAction namedAction : nodeActions) {
-          final String beanName = namedAction.getBean().getStringValue();
-          final String methodName = namedAction.getMethod().getStringValue();
+          String beanName = namedAction.getBean().getStringValue();
+          String methodName = namedAction.getMethod().getStringValue();
 
           String actionName =
               StringUtil.isEmptyOrSpaces(beanName) ? "" : beanName + (StringUtil.isEmptyOrSpaces(methodName) ? "" : "." + methodName);
 
           if (!StringUtil.isEmptyOrSpaces(actionName)) {
-            final JLabel propertyNameLabel = new JLabel(actionName, WebflowIcons.WEBFLOW_ACTION, JLabel.HORIZONTAL);
+            JLabel propertyNameLabel = new JLabel(actionName, WebflowIcons.WEBFLOW_ACTION, JLabel.HORIZONTAL);
 
 
-            final JLabel descriptionLabel = new JLabel("");
+            JLabel descriptionLabel = new JLabel("");
             propertyNameLabel.setHorizontalAlignment(SwingConstants.LEFT);
             descriptionLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
@@ -91,7 +91,7 @@ public class WebflowNodeRenderer extends AbstractColoredNodeCellRenderer {
     }
   }
 
-  private static Icon getIcon(final WebflowNode webflowNode) {
+  private static Icon getIcon(WebflowNode webflowNode) {
     return WebflowUtil.isStartState(webflowNode) ? WebflowIcons.WEBFLOW_START_STATE :webflowNode.getIcon();
   }
 

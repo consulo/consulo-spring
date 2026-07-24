@@ -9,7 +9,7 @@ import com.intellij.util.xml.highlighting.DomElementAnnotationHolder;
 
 public abstract class SpringSecurityBaseInspection extends SpringBeanInspectionBase {
 
-  protected SpringModelVisitor createVisitor(final DomElementAnnotationHolder holder, final Beans beans, final SpringModel model) {
+  protected SpringModelVisitor createVisitor(DomElementAnnotationHolder holder, Beans beans, SpringModel model) {
     return new SpringModelVisitor() {
 
       protected boolean visitBean(CommonSpringBean bean) {

@@ -17,7 +17,7 @@ import java.util.Set;
  * @author peter
  */
 public class AopGenericTypeExpression extends AopElementBase implements AopTypeExpression{
-  public AopGenericTypeExpression(@Nonnull final ASTNode node) {
+  public AopGenericTypeExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -37,20 +37,20 @@ public class AopGenericTypeExpression extends AopElementBase implements AopTypeE
 
   @Nonnull
   public Collection<AopPsiTypePattern> getPatterns() {
-    final Collection<AopPsiTypePattern> erasurePatterns = getRawTypeReference().getPatterns();
-    final PsiElement[] parameters = getTypeParameterList().getParameters();
-    final AopPsiTypePattern[][] parameterPatterns = new AopPsiTypePattern[parameters.length][];
+    Collection<AopPsiTypePattern> erasurePatterns = getRawTypeReference().getPatterns();
+    PsiElement[] parameters = getTypeParameterList().getParameters();
+    AopPsiTypePattern[][] parameterPatterns = new AopPsiTypePattern[parameters.length][];
     for (int i = 0; i < parameters.length; i++) {
-      final AopTypeExpression expression = ((AopReferenceHolder)parameters[i]).getTypeExpression();
+      AopTypeExpression expression = ((AopReferenceHolder)parameters[i]).getTypeExpression();
       if (expression == null) return Collections.emptyList();
-      final Collection<AopPsiTypePattern> patterns = expression.getPatterns();
+      Collection<AopPsiTypePattern> patterns = expression.getPatterns();
       parameterPatterns[i] = patterns.toArray(new AopPsiTypePattern[patterns.size()]);
     }
-    final Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
-    for (final AopPsiTypePattern erasurePattern : erasurePatterns) {
-      final int[] indices = new int[parameterPatterns.length];
+    Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
+    for (AopPsiTypePattern erasurePattern : erasurePatterns) {
+      int[] indices = new int[parameterPatterns.length];
       while (true) {
-        final AopPsiTypePattern[] paramVariant = new AopPsiTypePattern[parameterPatterns.length];
+        AopPsiTypePattern[] paramVariant = new AopPsiTypePattern[parameterPatterns.length];
         for (int i = 0; i < paramVariant.length; i++) {
           paramVariant[i] = parameterPatterns[i][indices[i]];
         }

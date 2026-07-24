@@ -53,8 +53,8 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     @Nonnull
     @Override
     protected Boolean compute() {
-      for (final SpringModel model : myModels) {
-        for (final DomFileElement<Beans> root : model.getRoots()) {
+      for (SpringModel model : myModels) {
+        for (DomFileElement<Beans> root : model.getRoots()) {
           CachedValue<Boolean> value = root.getUserData(CGLIB_PROXYING);
           if (value == null) {
             root.putUserData(
@@ -72,20 +72,20 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   };
   private static final Key<CachedValue<Boolean>> INHERITANCE_CACHE_KEY = Key.create("INHERITANCE_CACHE");
 
-  public SpringAdvisedElementsSearcher(@Nonnull final PsiManager manager, final List<SpringModel> models) {
+  public SpringAdvisedElementsSearcher(@Nonnull PsiManager manager, List<SpringModel> models) {
     super(manager);
     myModels = models;
   }
 
   private static boolean isCglib(DomFileElement<Beans> root) {
-    final DomElement element = root.getRootElement();
-    for (final AopConfig config : DomUtil.getDefinedChildrenOfType(element, AopConfig.class)) {
+    DomElement element = root.getRootElement();
+    for (AopConfig config : DomUtil.getDefinedChildrenOfType(element, AopConfig.class)) {
       if (Boolean.TRUE.equals(config.getProxyTargetClass().getValue())) {
         return true;
       }
     }
 
-    for (final CommonSpringBean springBean : SpringUtils.getChildBeans(element, false)) {
+    for (CommonSpringBean springBean : SpringUtils.getChildBeans(element, false)) {
       if (springBean instanceof AnnotationDriven && Boolean.TRUE.equals(((AnnotationDriven)springBean).getProxyTargetClass().getValue()) ||
           springBean instanceof AspectjAutoproxy && Boolean.TRUE.equals(((AspectjAutoproxy)springBean).getProxyTargetClass().getValue())) {
         return true;
@@ -95,42 +95,42 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   }
 
   @Override
-  public boolean isAcceptable(final PsiClass psiClass) {
+  public boolean isAcceptable(PsiClass psiClass) {
     return _isAcceptable(psiClass) && isSpringBeanClass(psiClass);
   }
 
   protected boolean isSpringBeanClass(PsiClass psiClass) {
-    for (final SpringModel model : myModels) {
+    for (SpringModel model : myModels) {
       if (!model.findBeansByPsiClassWithInheritance(psiClass).isEmpty()) return true;
     }
     return false;
   }
 
-  private static boolean _isAcceptable(final PsiClass psiClass) {
+  private static boolean _isAcceptable(PsiClass psiClass) {
     if (psiClass == null || psiClass.isInterface() || psiClass.isFinal()) return false;
 
     if (isAopClass(psiClass)) return false;
 
-    final PsiModifierList modifierList = psiClass.getModifierList();
+    PsiModifierList modifierList = psiClass.getModifierList();
     if ((modifierList != null && modifierList.findAnnotation(AopConstants.ASPECT_ANNO) != null)) return false;
     return true;
   }
 
   @Override
   public boolean test(Predicate<PsiClass> processor) {
-    final MyBeanVisitor visitor = new MyBeanVisitor(processor);
-    final Set<SpringModel> visited = new HashSet<>();
-    for (final SpringModel model : myModels) {
+    MyBeanVisitor visitor = new MyBeanVisitor(processor);
+    Set<SpringModel> visited = new HashSet<>();
+    for (SpringModel model : myModels) {
       ProgressManager.getInstance().checkCanceled();
       if (!visited.add(model)) continue;
 
-      final Collection<? extends SpringBaseBeanPointer> beans =
+      Collection<? extends SpringBaseBeanPointer> beans =
         Application.get().runReadAction((Supplier<Collection<? extends SpringBaseBeanPointer>>) () -> model.getAllCommonBeans(true));
 
-      for (final SpringBaseBeanPointer pointer : beans) {
+      for (SpringBaseBeanPointer pointer : beans) {
         ProgressManager.getInstance().checkCanceled();
 
-        final boolean[] stop = new boolean[]{false};
+        boolean[] stop = new boolean[]{false};
         Application.get().runReadAction(() -> {
           if (!pointer.isValid()) {
             return;
@@ -160,17 +160,17 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     }
 
     @Override
-    protected boolean visitBean(final CommonSpringBean bean) {
+    protected boolean visitBean(CommonSpringBean bean) {
       ProgressManager.getInstance().checkCanceled();
       return processBeanClass(bean.getBeanClass()) && super.visitBean(bean);
     }
 
-    final boolean processBeanClass(@Nullable final PsiClass beanClass) {
+    final boolean processBeanClass(@Nullable PsiClass beanClass) {
       return !_isAcceptable(beanClass) || InheritanceUtil.processSupers(beanClass, true, myProcessor);
     }
   }
 
-  private static boolean isAopClass(@Nonnull final PsiClass psiClass) {
+  private static boolean isAopClass(@Nonnull PsiClass psiClass) {
     CachedValue<Boolean> value = psiClass.getUserData(INHERITANCE_CACHE_KEY);
     if (value == null) {
       value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(() -> {
@@ -187,14 +187,14 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     return value.getValue();
   }
 
-  private static boolean hasInterfaces(@Nonnull final PsiClass psiClass, @Nonnull Set<PsiClass> visited) {
+  private static boolean hasInterfaces(@Nonnull PsiClass psiClass, @Nonnull Set<PsiClass> visited) {
     if (psiClass.getInterfaces().length > 0) return true;
-    final PsiClass superClass = psiClass.getSuperClass();
+    PsiClass superClass = psiClass.getSuperClass();
     return superClass != null && visited.add(superClass) && hasInterfaces(superClass, visited);
   }
 
   @Override
-  public boolean acceptsBoundMethod(@Nonnull final PsiMethod method) {
+  public boolean acceptsBoundMethod(@Nonnull PsiMethod method) {
     return super.acceptsBoundMethod(method)
       && !method.isStatic()
       && !method.isFinal()
@@ -204,7 +204,7 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
   @Override
   public boolean acceptsBoundMethodHeavy(@Nonnull PsiMethod method) {
     if (isJdkProxyType()) {
-      final PsiClass psiClass = method.getContainingClass();
+      PsiClass psiClass = method.getContainingClass();
       if (psiClass == null || hasInterfaces(psiClass, new HashSet<>()) && !isFromInterface(method, psiClass)) return false;
     }
     return super.acceptsBoundMethodHeavy(method);
@@ -214,9 +214,9 @@ public class SpringAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     return !myCglibProxyType.getValue();
   }
 
-  private static boolean isFromInterface(final PsiMethod method, final PsiClass psiClass) {
+  private static boolean isFromInterface(PsiMethod method, PsiClass psiClass) {
     return !new MethodSuperSearcher().execute(new SuperMethodsSearch.SearchParameters(method, psiClass, true, false), signature -> {
-      final PsiClass aClass = signature.getMethod().getContainingClass();
+      PsiClass aClass = signature.getMethod().getContainingClass();
       return aClass == null || !aClass.isInterface();
     });
   }

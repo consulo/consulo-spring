@@ -22,14 +22,14 @@ public abstract class SpringPointcutImpl implements SpringPointcut {
   }
 
   public int getParameterCount() {
-    final PsiPointcutExpression expression = getExpression().getValue();
+    PsiPointcutExpression expression = getExpression().getValue();
     if (expression == null) return -1;
 
     final Set<String> paramNames = new HashSet<String>();
     expression.acceptChildren(new PsiRecursiveElementVisitor() {
-      @Override public void visitElement(final PsiElement element) {
+      @Override public void visitElement(PsiElement element) {
         if (element instanceof AopReferenceExpression) {
-          final PsiElement psiElement = ((AopReferenceExpression)element).resolve();
+          PsiElement psiElement = ((AopReferenceExpression)element).resolve();
           if (psiElement instanceof PsiParameter) {
             paramNames.add(((PsiParameter)psiElement).getName());
           }

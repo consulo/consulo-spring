@@ -24,18 +24,18 @@ import java.util.regex.Pattern;
 public class PatternFileReferenceSet extends FileReferenceSet
 {
 
-  public PatternFileReferenceSet(final String str, final PsiElement element, final int offset) {
+  public PatternFileReferenceSet(String str, PsiElement element, int offset) {
     super(str, element, offset, null, true);
   }
 
-  public FileReference createFileReference(final TextRange range, final int index, final String text) {
+  public FileReference createFileReference(TextRange range, int index, String text) {
     if (!isAntPattern(text)) return super.createFileReference(range, index, text);
 
     return new PatternFileReference(this, range, index, text);
   }
 
   // @see org.springframework.util.AntPathMatcher#isPattern
-  static boolean isAntPattern(final String str) {
+  static boolean isAntPattern(String str) {
     return (str.indexOf('*') != -1 || str.indexOf('?') != -1);
   }
 
@@ -48,23 +48,23 @@ public class PatternFileReferenceSet extends FileReferenceSet
   */
   public static class PatternFileReference extends FileReference
   {
-    public PatternFileReference(final FileReferenceSet referenceSet, final TextRange range, final int index, final String text) {
+    public PatternFileReference(FileReferenceSet referenceSet, TextRange range, int index, String text) {
       super(referenceSet, range, index, text);
     }
 
-    protected void innerResolveInContext(@Nonnull final String text,
-										 @Nonnull final PsiFileSystemItem context,
-										 final Collection<ResolveResult> result, final boolean caseSensitive) {
+    protected void innerResolveInContext(@Nonnull String text,
+										 @Nonnull PsiFileSystemItem context,
+										 Collection<ResolveResult> result, boolean caseSensitive) {
 
 
       if (text.equals("**")) {
         addDirectoryResolves(context, result);
       }
       else {
-        final String patternText = FileUtil.convertAntToRegexp(text);
-        final Pattern pattern = Pattern.compile(patternText);
+        String patternText = FileUtil.convertAntToRegexp(text);
+        Pattern pattern = Pattern.compile(patternText);
 
-        final PsiElement[] psiElements = context.getChildren();
+        PsiElement[] psiElements = context.getChildren();
         for (PsiElement psiElement : psiElements) {
           if (psiElement instanceof PsiFileSystemItem) {
             if (pattern.matcher(((PsiFileSystemItem)psiElement).getName()).matches()) {
@@ -75,7 +75,7 @@ public class PatternFileReferenceSet extends FileReferenceSet
       }
     }
 
-    private static void addDirectoryResolves(final PsiElement context, final Collection<ResolveResult> result) {
+    private static void addDirectoryResolves(PsiElement context, Collection<ResolveResult> result) {
       if (context instanceof PsiFileSystemItem && ((PsiFileSystemItem)context).isDirectory()) {
         result.add(new PsiElementResolveResult(context));
         for (PsiElement psiElement : context.getChildren()) {

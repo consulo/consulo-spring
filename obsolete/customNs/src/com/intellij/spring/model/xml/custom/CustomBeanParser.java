@@ -17,8 +17,8 @@ public class CustomBeanParser {
   public static void main(String[] args) {
     Logger.getLogger("").setLevel(Level.FINE);
     Logger.getLogger("").addHandler(new Handler() {
-      public void publish(final LogRecord record) {
-        final Throwable throwable = record.getThrown();
+      public void publish(LogRecord record) {
+        Throwable throwable = record.getThrown();
         if (throwable != null) {
           printException(throwable);
         }
@@ -57,16 +57,16 @@ public class CustomBeanParser {
     }
   }
 
-  static void printException(final Throwable e) {
+  static void printException(Throwable e) {
     System.out.print("exception\n");
-    final StringWriter writer = new StringWriter();
+    StringWriter writer = new StringWriter();
     e.printStackTrace(new PrintWriter(writer));
     System.out.print(encode(writer.toString()) + "\n\n");
     System.out.flush();
   }
 
   // cannot use StringUtil here since this class has to be runnable under jad1.3, while StringUtil evidently can't
-  static String decode(final String s1) {
+  static String decode(String s1) {
     StringBuilder buffer = new StringBuilder();
     int length = s1.length();
     boolean escaped = false;
@@ -143,7 +143,7 @@ public class CustomBeanParser {
   }
 
   // cannot use StringUtil here since this class has to be runnable under jad1.3, while StringUtil evidently can't
-  static String encode(final String s1) {
+  static String encode(String s1) {
     StringBuilder buffer = new StringBuilder();
     for (int idx = 0; idx < s1.length(); idx++) {
       char ch = s1.charAt(idx);

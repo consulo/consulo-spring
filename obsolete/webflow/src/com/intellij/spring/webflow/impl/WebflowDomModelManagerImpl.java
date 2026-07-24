@@ -20,21 +20,21 @@ public class WebflowDomModelManagerImpl extends WebflowDomModelManager {
  private final WebflowModelFactory myModelFactory;
   private final DomManager myDomManager;
 
-  public WebflowDomModelManagerImpl(final Project project, DomManager domManager) {
+  public WebflowDomModelManagerImpl(Project project, DomManager domManager) {
     myDomManager = domManager;
     myModelFactory = new WebflowModelFactory(project);
   }
 
-  public boolean isWebflow(@NotNull final XmlFile file) {
+  public boolean isWebflow(@NotNull XmlFile file) {
     return myDomManager.getFileElement(file, Flow.class) != null;
   }
 
   @Nullable
-  public WebflowModel getWebflowModel(@NotNull final XmlFile file) {
+  public WebflowModel getWebflowModel(@NotNull XmlFile file) {
     return myModelFactory.getModelByConfigFile(file);
   }
 
-  public List<WebflowModel> getAllModels(@NotNull final Module module) {
+  public List<WebflowModel> getAllModels(@NotNull Module module) {
     return myModelFactory.getAllModels(module);
   }
 }

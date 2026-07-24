@@ -18,7 +18,7 @@ public class PsiClassTypePattern extends AopPsiTypePattern {
   private final Pattern myPattern;
   private final String myRegex;
 
-  public PsiClassTypePattern(final String pattern) {
+  public PsiClassTypePattern(String pattern) {
     assert !"*".equals(pattern);
     myText = pattern;
     myRegex = "*".equals(pattern) ? ".*" : pattern.
@@ -43,7 +43,7 @@ public class PsiClassTypePattern extends AopPsiTypePattern {
   }
 
   @Override
-  public boolean accepts(@Nonnull final String qualifiedName) {
+  public boolean accepts(@Nonnull String qualifiedName) {
     return myPattern.matcher(qualifiedName).matches();
   }
 
@@ -54,8 +54,8 @@ public class PsiClassTypePattern extends AopPsiTypePattern {
 
     int i = 0;
     while (true) {
-      final String prefix = myText.substring(0, i);
-      final PsiJavaPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(prefix);
+      String prefix = myText.substring(0, i);
+      PsiJavaPackage psiPackage = JavaPsiFacade.getInstance(manager.getProject()).findPackage(prefix);
       if (psiPackage == null) return true;
 
       int i1 = myText.indexOf('.', i + 1);
@@ -73,10 +73,10 @@ public class PsiClassTypePattern extends AopPsiTypePattern {
   @Override
   public boolean accepts(@Nonnull PsiType type) {
     if (type instanceof PsiClassType) {
-      final PsiClassType classType = (PsiClassType)type;
-      final PsiClass psiClass = classType.resolve();
+      PsiClassType classType = (PsiClassType)type;
+      PsiClass psiClass = classType.resolve();
       if (psiClass != null) {
-        final String qName = psiClass.getQualifiedName();
+        String qName = psiClass.getQualifiedName();
         if (qName != null && accepts(qName)) {
           return true;
         }

@@ -45,7 +45,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
         if (aClass == null) {
             return null;
         }
-        final Module module = aClass.getModule();
+        Module module = aClass.getModule();
         if (module == null) {
             return null;
         }
@@ -67,7 +67,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
                 if (SpringAutowireUtil.isAutowiredByAnnotation(method)) {
                     SpringModel springModel = getModelForBean(method.getContainingClass());
                     if (springModel != null) {
-                        final boolean required = SpringAutowireUtil.isRequired(method);
+                        boolean required = SpringAutowireUtil.isRequired(method);
                         checkAutowiredMethod(method, holder, springModel, required);
                     }
                 }
@@ -79,7 +79,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
                 if (SpringAutowireUtil.isAutowiredByAnnotation(field)) {
                     SpringModel springModel = getModelForBean(field.getContainingClass());
                     if (springModel != null) {
-                        final boolean required = SpringAutowireUtil.isRequired(field);
+                        boolean required = SpringAutowireUtil.isRequired(field);
                         checkAutowiredPsiMember(field, field.getType(), holder, springModel, required);
                     }
                 }
@@ -88,14 +88,14 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
     }
 
     private static void checkAutowiredMethod(
-        final PsiMethod psiMethod,
-        @Nullable final ProblemsHolder holder,
-        final SpringModel springModel,
-        final boolean required
+        PsiMethod psiMethod,
+        @Nullable ProblemsHolder holder,
+        SpringModel springModel,
+        boolean required
     ) {
-        final PsiAnnotation resourceAnnotation = SpringAutowireUtil.getResourceAnnotation(psiMethod);
+        PsiAnnotation resourceAnnotation = SpringAutowireUtil.getResourceAnnotation(psiMethod);
         if (resourceAnnotation != null) {
-            final PsiType type = PropertyUtil.getPropertyType(psiMethod);
+            PsiType type = PropertyUtil.getPropertyType(psiMethod);
             if (type != null) {
                 checkAutowiredPsiMember(psiMethod, type, holder, springModel, required);
             }
@@ -109,23 +109,23 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
 
     @Nullable
     public static Collection<SpringBaseBeanPointer> checkAutowiredPsiMember(
-        final PsiModifierListOwner modifierListOwner,
-        @Nonnull final PsiType psiType,
-        @Nullable final ProblemsHolder holder,
-        @Nonnull final SpringModel springModel,
-        final boolean required
+        PsiModifierListOwner modifierListOwner,
+        @Nonnull PsiType psiType,
+        @Nullable ProblemsHolder holder,
+        @Nonnull SpringModel springModel,
+        boolean required
     ) {
 
         PsiType beanType = psiType instanceof PsiArrayType
             ? ((PsiArrayType) psiType).getComponentType()
             : PsiUtil.extractIterableTypeParameter(psiType, true);
-        final boolean isIterable = beanType != null;
+        boolean isIterable = beanType != null;
         if (beanType == null) {
             beanType = psiType;
         }
-        final PsiAnnotation resourceAnnotation = SpringAutowireUtil.getResourceAnnotation(modifierListOwner);
+        PsiAnnotation resourceAnnotation = SpringAutowireUtil.getResourceAnnotation(modifierListOwner);
         if (resourceAnnotation != null && modifierListOwner instanceof PsiMember) {
-            final PsiAnnotationMemberValue attributeValue = resourceAnnotation.findDeclaredAttributeValue("name");
+            PsiAnnotationMemberValue attributeValue = resourceAnnotation.findDeclaredAttributeValue("name");
             if (attributeValue != null) {
                 return checkByNameAutowiring(attributeValue, beanType, holder, springModel);
             }
@@ -137,7 +137,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
                 name = ((PsiField) modifierListOwner).getName();
             }
             if (name != null) {
-                final SpringBeanPointer bean = springModel.findBean(name);
+                SpringBeanPointer bean = springModel.findBean(name);
                 if (bean != null) {
                     return Collections.singleton(bean.getBasePointer());
                 }
@@ -151,7 +151,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
                 required
             );
         }
-        final PsiAnnotation qualifiedAnnotation = SpringAutowireUtil.getQualifiedAnnotation(modifierListOwner);
+        PsiAnnotation qualifiedAnnotation = SpringAutowireUtil.getQualifiedAnnotation(modifierListOwner);
 
         if (qualifiedAnnotation == null) {
             return checkByTypeAutowire(
@@ -170,10 +170,10 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
 
     @Nullable
     private static Collection<SpringBaseBeanPointer> checkByNameAutowiring(
-        final PsiAnnotationMemberValue annotationMemberValue,
-        final PsiType psiType,
-        @Nullable final ProblemsHolder holder,
-        @Nonnull final SpringModel model
+        PsiAnnotationMemberValue annotationMemberValue,
+        PsiType psiType,
+        @Nullable ProblemsHolder holder,
+        @Nonnull SpringModel model
     ) {
         SpringBeanReference ref = null;
         for (PsiReference reference : annotationMemberValue.getReferences()) {
@@ -182,11 +182,11 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
             }
         }
         if (ref != null) {
-            final SpringBeanPointer bean = model.findBean(ref.getValue());
+            SpringBeanPointer bean = model.findBean(ref.getValue());
             if (bean != null) {
-                final PsiClass beanClass = bean.getBeanClass();
+                PsiClass beanClass = bean.getBeanClass();
                 if (psiType instanceof PsiClassType) {
-                    final PsiClass psiClass = ((PsiClassType) psiType).resolve();
+                    PsiClass psiClass = ((PsiClassType) psiType).resolve();
                     if (psiClass != null && InheritanceUtil.isInheritorOrSelf(beanClass, psiClass, true)) {
                         return Collections.singleton(bean.getBasePointer());
                     }
@@ -210,16 +210,16 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
 
     @Nullable
     private static List<SpringBaseBeanPointer> checkQualifiedAutowiring(
-        final PsiType type,
-        final PsiAnnotation qualifiedAnnotation,
-        @Nullable final ProblemsHolder holder,
-        @Nonnull final SpringModel springModel
+        PsiType type,
+        PsiAnnotation qualifiedAnnotation,
+        @Nullable ProblemsHolder holder,
+        @Nonnull SpringModel springModel
     ) {
 
-        final PsiAnnotationMemberValue attributeValue = qualifiedAnnotation.findDeclaredAttributeValue("value");
+        PsiAnnotationMemberValue attributeValue = qualifiedAnnotation.findDeclaredAttributeValue("value");
         PsiReference qreference = null;
-        final String name = attributeValue == null ? null : AnnotationModelUtil.getStringValue(qualifiedAnnotation, "value", "").getValue();
-        final PsiReference[] references;
+        String name = attributeValue == null ? null : AnnotationModelUtil.getStringValue(qualifiedAnnotation, "value", "").getValue();
+        PsiReference[] references;
         if (attributeValue != null) {
             references = attributeValue.getReferences();
             for (PsiReference reference : references) {
@@ -239,17 +239,17 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
             }
         }
         if (type instanceof PsiClassType) {
-            final PsiClass aClass = ((PsiClassType) type).resolve();
+            PsiClass aClass = ((PsiClassType) type).resolve();
             if (aClass != null) {
                 List<SpringBaseBeanPointer> candidates = SpringAutowireUtil.getQualifiedBeans(qualifiedAnnotation, springModel);
                 if (name != null) {
-                    final SpringBeanPointer pointer = springModel.findBean(name);
+                    SpringBeanPointer pointer = springModel.findBean(name);
                     if (pointer != null) {
                         candidates = new ArrayList<SpringBaseBeanPointer>(candidates);
                         candidates.add(pointer.getBasePointer());
                     }
                 }
-                final List<SpringBaseBeanPointer> beanPointers = SpringAutowireUtil.excludeAutowireCandidatesForCommonBeans(candidates);
+                List<SpringBaseBeanPointer> beanPointers = SpringAutowireUtil.excludeAutowireCandidatesForCommonBeans(candidates);
 
                 if (beanPointers.size() == 0) {
                     if (holder != null) {
@@ -262,7 +262,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
                             );
                         }
                         else {
-                            final String qualifiedName = qualifiedAnnotation.getQualifiedName();
+                            String qualifiedName = qualifiedAnnotation.getQualifiedName();
                             assert qualifiedName != null;
                             reportProblem(
                                 holder,
@@ -302,9 +302,9 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
     }
 
     private static void reportProblem(
-        @Nonnull final ProblemsHolder holder,
-        final PsiReference qreference,
-        @Nonnull final PsiAnnotationMemberValue attributeValue,
+        @Nonnull ProblemsHolder holder,
+        PsiReference qreference,
+        @Nonnull PsiAnnotationMemberValue attributeValue,
         @Nonnull LocalizeValue text
     ) {
         if (qreference == null) {
@@ -319,14 +319,14 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
 
     @Nullable
     private static Collection<SpringBaseBeanPointer> checkByTypeAutowire(
-        final PsiElement psiElement,
-        @Nonnull final PsiType type,
-        @Nullable final ProblemsHolder holder,
-        @Nonnull final SpringModel springModel,
-        final boolean iterable, final boolean required
+        PsiElement psiElement,
+        @Nonnull PsiType type,
+        @Nullable ProblemsHolder holder,
+        @Nonnull SpringModel springModel,
+        boolean iterable, boolean required
     ) {
 
-        final Collection<SpringBaseBeanPointer> beanPointers = SpringAutowireUtil.autowireByType(springModel, type);
+        Collection<SpringBaseBeanPointer> beanPointers = SpringAutowireUtil.autowireByType(springModel, type);
 
         if (beanPointers.isEmpty() && required) {
             if (holder != null && !SpringAutowireUtil.isAutowiredByDefault(type)) {
@@ -338,7 +338,7 @@ public class SpringJavaAutowiringInspection extends BaseJavaLocalInspectionTool<
         }
         else if (beanPointers.size() > 1 && !iterable) {
             if (holder != null) {
-                final List<String> beanNames = new ArrayList<String>();
+                List<String> beanNames = new ArrayList<String>();
                 for (SpringBaseBeanPointer bean : beanPointers) {
                     String beanName = bean.getName();
                     if (StringUtil.isEmptyOrSpaces(beanName)) {

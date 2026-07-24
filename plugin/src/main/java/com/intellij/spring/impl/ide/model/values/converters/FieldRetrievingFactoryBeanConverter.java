@@ -45,28 +45,28 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
     return createReferences(genericDomValue, element);
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue, final PsiElement element) {
-    final String stringValue = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue, PsiElement element) {
+    String stringValue = genericDomValue.getStringValue();
     if (stringValue == null) {
       return PsiReference.EMPTY_ARRAY;
     }
 
     List<PsiReference> collectedReferences = new ArrayList<PsiReference>();
 
-    final JavaClassReferenceProvider provider = new JavaClassReferenceProvider();
+    JavaClassReferenceProvider provider = new JavaClassReferenceProvider();
     provider.setSoft(mySoft);
-    final PsiReference[] javaClassReferences = provider.getReferencesByElement(element);
+    PsiReference[] javaClassReferences = provider.getReferencesByElement(element);
 
     PsiClass psiClass = null;
     for (PsiReference reference : javaClassReferences) {
-      final PsiElement psiElement = reference.resolve();
+      PsiElement psiElement = reference.resolve();
       if (psiElement == null) break;
 
 
@@ -85,11 +85,11 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
 
   private PsiReference createFieldReference(final PsiClass psiClass,
                                             final PsiElement element,
-                                            final String stringValue,
+                                            String stringValue,
                                             final GenericDomValue<String> genericDomValue) {
-    final String className = psiClass.getName();
+    String className = psiClass.getName();
     assert className != null;
-    final int i = stringValue.indexOf(className) + className.length();
+    int i = stringValue.indexOf(className) + className.length();
     final String fieldName = stringValue.substring(i + 1).trim();
 
     final TextRange textRange = fieldName.length() == 0
@@ -99,7 +99,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
     return new PsiReferenceBase<PsiElement>(element, textRange, mySoft) {
       public PsiElement resolve() {
         if (fieldName.length() != 0) {
-          final PsiField[] psiFields = psiClass.getFields();
+          PsiField[] psiFields = psiClass.getFields();
           for (PsiField psiField : psiFields) {
             if (psiField.hasModifierProperty(PsiModifier.PUBLIC) &&
               psiField.hasModifierProperty(PsiModifier.STATIC) &&
@@ -112,9 +112,9 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
       }
 
       @Override
-      public PsiElement bindToElement(@Nonnull final PsiElement element) throws IncorrectOperationException {
+      public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
         if (element instanceof PsiField) {
-          final PsiField field = (PsiField)element;
+          PsiField field = (PsiField)element;
           genericDomValue.setStringValue(field.getContainingClass().getQualifiedName() + "." + field.getName());
         }
         return getElement();
@@ -122,7 +122,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
 
       public Object[] getVariants() {
         List<String> staticFields = new ArrayList<String>();
-        final PsiField[] psiFields = psiClass.getFields();
+        PsiField[] psiFields = psiClass.getFields();
         for (PsiField psiField : psiFields) {
           if (psiField.hasModifierProperty(PsiModifier.PUBLIC) &&
             psiField.hasModifierProperty(PsiModifier.STATIC) &&
@@ -135,11 +135,11 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
     };
   }
 
-  public String fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  public String fromString(@Nullable @NonNls String s, ConvertContext context) {
     return s;
   }
 
-  public String toString(@Nullable String s, final ConvertContext context) {
+  public String toString(@Nullable String s, ConvertContext context) {
     return s;
   }
 
@@ -152,7 +152,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
 
   public static class FactoryClassAndPropertyCondition implements Condition<Pair<PsiType, GenericDomValue>> {
     public boolean value(Pair<PsiType, GenericDomValue> pair) {
-      final GenericDomValue element = pair.getSecond();
+      GenericDomValue element = pair.getSecond();
       return checkbeanClass(element) && checkPropertyName(element);
     }
   }
@@ -162,30 +162,30 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
   }
 
   private static boolean checkPropertyName(DomElement element) {
-    final SpringProperty springProperty = element.getParentOfType(SpringProperty.class, false);
+    SpringProperty springProperty = element.getParentOfType(SpringProperty.class, false);
     return springProperty != null && STATIC_FIELD_PROPERTY_NAME.equals(springProperty.getName().getStringValue());
   }
 
   public static boolean isFieldRetrivingFactoryBean(@Nullable CommonSpringBean springBean) {
     if (springBean == null) return false;
 
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
 
     return beanClass != null && FIELD_RETRIVING_FACTORY_BEAN_CLASS.equals(beanClass.getQualifiedName());
   }
 
-  public static boolean isResolved(final Project project, String field) {
-    final PsiManager psiManager = PsiManager.getInstance(project);
+  public static boolean isResolved(Project project, String field) {
+    PsiManager psiManager = PsiManager.getInstance(project);
 
-    final int index = field.lastIndexOf(".");
+    int index = field.lastIndexOf(".");
     if (index <= 0) return false;
 
-    final String className = field.substring(0, index);
-    final String fieldName = field.substring(index + 1);
+    String className = field.substring(0, index);
+    String fieldName = field.substring(index + 1);
 
     if (StringUtil.isEmpty(fieldName) || StringUtil.isEmpty(className)) return false;
 
-    final PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(className, GlobalSearchScope.allScope(project));
+    PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(className, GlobalSearchScope.allScope(project));
     if (psiClass != null) {
       for (PsiField psiField : psiClass.getFields()) {
         if (psiField.hasModifierProperty(PsiModifier.STATIC) && fieldName.equals(psiField.getName())) {

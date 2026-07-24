@@ -46,21 +46,21 @@ public class ResourceResolverUtils {
   @NonNls private static final String HTTP_PREFIX = "http:";
 
   public static final Condition<PsiFileSystemItem> FILE_FILTER = new Condition<PsiFileSystemItem>() {
-    public boolean value(final PsiFileSystemItem item) {
+    public boolean value(PsiFileSystemItem item) {
       return item instanceof PsiFile;
     }
   };
   public static final Condition<PsiFileSystemItem> DIRECTORY_FILTER = new Condition<PsiFileSystemItem>() {
-    public boolean value(final PsiFileSystemItem item) {
+    public boolean value(PsiFileSystemItem item) {
       return item instanceof PsiDirectory;
     }
   };
 
   private static final FilePathReferenceProvider ourFilePathReferenceProvider = new FilePathReferenceProvider() {
-    protected FileReference createFileReference(final FileReferenceSet referenceSet,
-												final TextRange range,
-												final int index,
-												final String text) {
+    protected FileReference createFileReference(FileReferenceSet referenceSet,
+                                                TextRange range,
+                                                int index,
+                                                String text) {
       if (!PatternFileReferenceSet.isAntPattern(text)) return new FileReference(referenceSet, range, index, text);
 
       return new PatternFileReferenceSet.PatternFileReference(referenceSet, range, index, text);
@@ -70,28 +70,28 @@ public class ResourceResolverUtils {
   private ResourceResolverUtils() {
   }
 
-  public static boolean processSpringValues(final SpringProperty property, final PairProcessor<GenericDomValue, String> processor) {
+  public static boolean processSpringValues(SpringProperty property, PairProcessor<GenericDomValue, String> processor) {
     {
-      final GenericAttributeValue<String> valueAttr = property.getValueAttr();
-      final XmlAttribute valueAttrElement = valueAttr.getXmlAttribute();
-      final String valueAttrString = valueAttr.getStringValue();
+      GenericAttributeValue<String> valueAttr = property.getValueAttr();
+      XmlAttribute valueAttrElement = valueAttr.getXmlAttribute();
+      String valueAttrString = valueAttr.getStringValue();
       if (valueAttrElement != null && valueAttrString != null && !processor.process(valueAttr, valueAttrString)) {
         return false;
       }
     }
     {
-      final SpringValue value = property.getValue();
-      final XmlTag valueElement = value.getXmlTag();
-      final String valueString = value.getStringValue();
+      SpringValue value = property.getValue();
+      XmlTag valueElement = value.getXmlTag();
+      String valueString = value.getStringValue();
       if (valueElement != null && valueString != null && !processor.process(value, valueString)) {
         return false;
       }
     }
     {
-      final ListOrSet listOrSet = property.getList();
+      ListOrSet listOrSet = property.getList();
       for (SpringValue springValue : listOrSet.getValues()) {
-        final XmlTag element = springValue.getXmlTag();
-        final String string = springValue.getStringValue();
+        XmlTag element = springValue.getXmlTag();
+        String string = springValue.getStringValue();
         if (element != null && string != null && !processor.process(springValue, string)) {
           return false;
         }
@@ -100,10 +100,10 @@ public class ResourceResolverUtils {
     return true;
   }
 
-  public static <V extends PsiFileSystemItem, T extends Collection<V>> T getResourceItems(final @Nonnull SpringProperty property, final T result, final Condition<PsiFileSystemItem> filter) {
+  public static <V extends PsiFileSystemItem, T extends Collection<V>> T getResourceItems(@Nonnull SpringProperty property, final T result, final Condition<PsiFileSystemItem> filter) {
     processSpringValues(property, new PairProcessor<GenericDomValue, String>() {
-      public boolean process(final GenericDomValue domValue, final String s) {
-        final Object value = domValue.getValue();
+      public boolean process(GenericDomValue domValue, String s) {
+        Object value = domValue.getValue();
         if (value instanceof Collection) {
           for (Object o : (Collection)value) {
             if (o instanceof PsiFileSystemItem && filter.value((PsiFileSystemItem)o)) {
@@ -117,20 +117,20 @@ public class ResourceResolverUtils {
     return result;
   }
 
-  public static <V extends PsiFileSystemItem, T extends Collection<V>> T addResourceFilesFrom(final @Nonnull PsiElement element, final @Nonnull String s,
-                                                                                              final T result, final Condition<PsiFileSystemItem> filter) {
-    final PsiReference[] references = getReferences(element, s, false, false);
+  public static <V extends PsiFileSystemItem, T extends Collection<V>> T addResourceFilesFrom(@Nonnull PsiElement element, @Nonnull String s,
+                                                                                              T result, Condition<PsiFileSystemItem> filter) {
+    PsiReference[] references = getReferences(element, s, false, false);
     return addResourceItems(result, references, filter);
   }
 
-  public static <V, T extends Collection<V>> T addResourceFilesFrom(final @Nonnull PsiElement element, final @Nonnull String s, final String delimiter,
-																	final T result, final Condition<PsiFileSystemItem> filter) {
+  public static <V, T extends Collection<V>> T addResourceFilesFrom(final @Nonnull PsiElement element, @Nonnull String s, String delimiter,
+																	T result, Condition<PsiFileSystemItem> filter) {
     final ArrayList<PsiReference> references = new ArrayList<PsiReference>();
     final int startInElement = ElementManipulators.getOffsetInElement(element);
 
     processSeparatedString(s, delimiter, new PairProcessor<String, Integer>() {
-      public boolean process(final String s, final Integer offset) {
-        final PsiReference[] psiReferences = getReferences(element, s, false, false, offset.intValue() + startInElement, true);
+      public boolean process(String s, Integer offset) {
+        PsiReference[] psiReferences = getReferences(element, s, false, false, offset.intValue() + startInElement, true);
         references.addAll(Arrays.asList(psiReferences));
         return true;
       }
@@ -139,31 +139,31 @@ public class ResourceResolverUtils {
     return addResourceItems(result, references.toArray(new PsiReference[references.size()]) , filter);
   }
 
-  public static <V extends PsiFileSystemItem, T extends Collection<V>> T addResourceFilesFrom(final @Nonnull GenericDomValue element, final @Nonnull String s,
-																												   final T result,
-																												   final Condition<PsiFileSystemItem> filter) {
-    final Converter converter = WrappingConverter.getDeepestConverter(element.getConverter(), element);
+  public static <V extends PsiFileSystemItem, T extends Collection<V>> T addResourceFilesFrom(@Nonnull GenericDomValue element, @Nonnull String s,
+                                                                                              T result,
+                                                                                              Condition<PsiFileSystemItem> filter) {
+    Converter converter = WrappingConverter.getDeepestConverter(element.getConverter(), element);
     if (converter instanceof CustomReferenceConverter) {
-      final PsiReference[] references = ((CustomReferenceConverter)converter).createReferences(element, element.getXmlElement(),
+      PsiReference[] references = ((CustomReferenceConverter)converter).createReferences(element, element.getXmlElement(),
                                                                                                new ConvertContextImpl(element));
       return addResourceItems(result, references, filter);
     }
     return result;
   }
 
-  private static <V, T extends Collection<V>> T addResourceItems(final T result, final PsiReference[] references, final Condition<PsiFileSystemItem> filter) {
+  private static <V, T extends Collection<V>> T addResourceItems(T result, PsiReference[] references, Condition<PsiFileSystemItem> filter) {
     for (PsiReference reference : references) {
       if (reference instanceof PsiPolyVariantReference) {
-        final ResolveResult[] resolveResults = ((PsiPolyVariantReference)reference).multiResolve(false);
+        ResolveResult[] resolveResults = ((PsiPolyVariantReference)reference).multiResolve(false);
         for (ResolveResult resolveResult : resolveResults) {
-          final PsiElement psiElement = resolveResult.getElement();
+          PsiElement psiElement = resolveResult.getElement();
           if (psiElement instanceof PsiFileSystemItem && filter.value((PsiFileSystemItem)psiElement)) {
             result.add((V)psiElement);
           }
         }
       }
       else {
-        final PsiElement psiElement = reference.resolve();
+        PsiElement psiElement = reference.resolve();
         if (psiElement instanceof PsiFileSystemItem && filter.value((PsiFileSystemItem)psiElement)) {
           result.add((V)psiElement);
         }
@@ -172,33 +172,33 @@ public class ResourceResolverUtils {
     return result;
   }
 
-  public static PsiReference[] getReferences(final @Nonnull PsiElement element,
-																  final @Nullable String s,
-																  final boolean fromRoot,
-																  final boolean fromCurrent) {
-    final int offset = ElementManipulators.getOffsetInElement(element);
+  public static PsiReference[] getReferences(@Nonnull PsiElement element,
+                                             @Nullable String s,
+                                             boolean fromRoot,
+                                             boolean fromCurrent) {
+    int offset = ElementManipulators.getOffsetInElement(element);
     return getReferences(element, s, fromRoot, fromCurrent, offset);
   }
 
-  public static PsiReference[] getReferences(final @Nonnull PsiElement element,
-																  final @Nullable String s,
-																  final boolean fromRoot,
-																  final boolean fromCurrent,
-																  final int offset) {
+  public static PsiReference[] getReferences(@Nonnull PsiElement element,
+                                             @Nullable String s,
+                                             boolean fromRoot,
+                                             boolean fromCurrent,
+                                             int offset) {
 
     return getReferences(element, s, fromRoot, fromCurrent, offset, true);
   }
 
   public static PsiReference[] getReferences(final @Nonnull PsiElement element,
 																  final @Nullable String s,
-																  final boolean fromRoot,
-																  final boolean fromCurrent,
+																  boolean fromRoot,
+																  boolean fromCurrent,
 																  final int offset,
 																  final boolean soft) {
 
     if (s == null || StringUtil.isEmptyOrSpaces(s) || s.startsWith(HTTP_PREFIX)) return PsiReference.EMPTY_ARRAY;
 
-    final FileReferenceSet set;
+    FileReferenceSet set;
     if (s.startsWith(CLASSPATH_PREFIX)) {
       return getClassPathReferences(element, s.substring(CLASSPATH_PREFIX.length()), CLASSPATH_PREFIX.length() + offset, soft);
     } else if (s.startsWith(CLASSPATH_PREFIX_ASTERISK)) {
@@ -237,14 +237,14 @@ public class ResourceResolverUtils {
     return set.getAllReferences();
   }
 
-  public static PsiReference[] getClassPathReferences(final PsiElement element, final String s, final int offset, final boolean soft) {
+  public static PsiReference[] getClassPathReferences(PsiElement element, String s, int offset, boolean soft) {
     return ourFilePathReferenceProvider.getReferencesByElement(element, s, offset, soft);
   }
 
-  public static boolean processSeparatedString(final String str, final String delimiter, final PairProcessor<String, Integer> processor) {
+  public static boolean processSeparatedString(String str, String delimiter, PairProcessor<String, Integer> processor) {
     if (str == null || StringUtil.isEmptyOrSpaces(str)) return true;
 
-    final StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
+    StringTokenizer tokenizer = new StringTokenizer(str, delimiter);
     while (tokenizer.hasMoreElements()) {
       @NonNls String s = tokenizer.nextElement().trim();
       if (s.length() == 0) continue;
@@ -255,8 +255,8 @@ public class ResourceResolverUtils {
   }
 
   @Nullable
-  public static String getResourceFileReferenceString(final PsiFile resourceFile) {
-    final VirtualFile virtualFile = resourceFile == null ? null : resourceFile.getVirtualFile();
+  public static String getResourceFileReferenceString(PsiFile resourceFile) {
+    VirtualFile virtualFile = resourceFile == null ? null : resourceFile.getVirtualFile();
     if (virtualFile == null) return null;
 
     Module moduleForFile = ModuleUtilCore.findModuleForFile(resourceFile);
@@ -274,8 +274,8 @@ public class ResourceResolverUtils {
       }
     }
 
-    final ProjectFileIndex index = ProjectRootManager.getInstance(resourceFile.getProject()).getFileIndex();
-    final VirtualFile contentRoot = index.getContentRootForFile(virtualFile);
+    ProjectFileIndex index = ProjectRootManager.getInstance(resourceFile.getProject()).getFileIndex();
+    VirtualFile contentRoot = index.getContentRootForFile(virtualFile);
     if (contentRoot != null) {
       return FILE_PREFIX + VirtualFileUtil.getRelativePath(virtualFile, contentRoot, '/');
     }

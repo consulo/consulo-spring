@@ -32,8 +32,8 @@ import java.util.Set;
 @ExtensionImpl
 public class UtilSchemaInspection extends InjectionValueTypeInspection {
     @Override
-    public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, Object state) {
-        final Beans beans = domFileElement.getRootElement();
+    public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder, Object state) {
+        Beans beans = domFileElement.getRootElement();
 
         for (UtilSet springSet : DomUtil.getDefinedChildrenOfType(beans, UtilSet.class)) {
             checkSetBean(springSet, holder);
@@ -48,28 +48,28 @@ public class UtilSchemaInspection extends InjectionValueTypeInspection {
         }
     }
 
-    private void checkElementsHolder(final ListOrSet springSet, final DomElementAnnotationHolder holder) {
+    private void checkElementsHolder(ListOrSet springSet, DomElementAnnotationHolder holder) {
         checkSpringPropertyCollection(springSet, holder);
     }
 
-    private static void checkMapBean(final UtilMap map, final DomElementAnnotationHolder holder) {
+    private static void checkMapBean(UtilMap map, DomElementAnnotationHolder holder) {
         checkProperClass(map.getMapClass(), Map.class, holder);
     }
 
-    private static void checkListBean(final UtilList list, final DomElementAnnotationHolder holder) {
+    private static void checkListBean(UtilList list, DomElementAnnotationHolder holder) {
         checkProperClass(list.getListClass(), List.class, holder);
     }
 
-    private static void checkSetBean(final UtilSet set, final DomElementAnnotationHolder holder) {
+    private static void checkSetBean(UtilSet set, DomElementAnnotationHolder holder) {
         checkProperClass(set.getSetClass(), Set.class, holder);
     }
 
     private static void checkProperClass(
-        final GenericAttributeValue<PsiClass> attrClass,
-        final Class aClass,
-        final DomElementAnnotationHolder holder
+        GenericAttributeValue<PsiClass> attrClass,
+        Class aClass,
+        DomElementAnnotationHolder holder
     ) {
-        final PsiClass psiClass = attrClass.getValue();
+        PsiClass psiClass = attrClass.getValue();
         if (psiClass != null) {
             if (!isAssignable(psiClass, aClass)) {
                 LocalizeValue s = SpringLocalize.utilRequredClassMessage(aClass.getName());
@@ -78,10 +78,10 @@ public class UtilSchemaInspection extends InjectionValueTypeInspection {
         }
     }
 
-    private static boolean isAssignable(final PsiClass psiClass, final Class fromClass) {
-        final Project project = psiClass.getProject();
-        final PsiType fromType = SpringConverterUtil.findType(fromClass, project);
-        final PsiClassType classType = JavaPsiFacade.getInstance(project).getElementFactory().createType(psiClass);
+    private static boolean isAssignable(PsiClass psiClass, Class fromClass) {
+        Project project = psiClass.getProject();
+        PsiType fromType = SpringConverterUtil.findType(fromClass, project);
+        PsiClassType classType = JavaPsiFacade.getInstance(project).getElementFactory().createType(psiClass);
 
         return fromType != null && fromType.isAssignableFrom(classType);
     }

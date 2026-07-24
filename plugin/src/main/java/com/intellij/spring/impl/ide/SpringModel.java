@@ -56,7 +56,7 @@ public interface SpringModel {
   Collection<SpringBaseBeanPointer> getAllDomBeans(boolean withDepenedencies);
 
   @Nonnull
-  Set<String> getAllBeanNames(@Nonnull final String beanName);
+  Set<String> getAllBeanNames(@Nonnull String beanName);
 
   boolean isNameDuplicated(@Nonnull String beanName);
 
@@ -93,7 +93,7 @@ public interface SpringModel {
   Collection<SpringBaseBeanPointer> getOwnBeans();
 
   @Nonnull
-  List<SpringBaseBeanPointer> findQualifiedBeans(final @Nonnull SpringQualifier qualifier);
+  List<SpringBaseBeanPointer> findQualifiedBeans(@Nonnull SpringQualifier qualifier);
 
   @Nonnull
   Collection<XmlTag> getCustomBeanCandidates(String id);

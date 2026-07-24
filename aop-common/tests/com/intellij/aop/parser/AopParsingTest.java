@@ -503,14 +503,14 @@ public class AopParsingTest extends LightCodeInsightFixtureTestCase {
     doTest("execution(* Foo.get(..))");
   }
 
-  private void doTest(@NonNls final String code) {
-    final AopPointcutExpressionFile psiFile = parsePointcutExpression(code);
-    final String tree = DebugUtil.psiTreeToString(psiFile, true);
-    final String path = PathManager.getHomePath() + "/svnPlugins/aop-common/tests/com/intellij/aop/parser/data/" + getTestName(true) + ".txt";
+  private void doTest(@NonNls String code) {
+    AopPointcutExpressionFile psiFile = parsePointcutExpression(code);
+    String tree = DebugUtil.psiTreeToString(psiFile, true);
+    String path = PathManager.getHomePath() + "/svnPlugins/aop-common/tests/com/intellij/aop/parser/data/" + getTestName(true) + ".txt";
     assertSameLinesWithFile(path, tree);
   }
 
-  public AopPointcutExpressionFile parsePointcutExpression(final String code) {
+  public AopPointcutExpressionFile parsePointcutExpression(String code) {
     return (AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, code);
   }
 

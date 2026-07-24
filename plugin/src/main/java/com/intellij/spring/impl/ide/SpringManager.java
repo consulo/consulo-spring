@@ -76,7 +76,7 @@ public abstract class SpringManager {
    */
   @Nonnull
   @RequiredReadAction
-  public abstract List<SpringFileSet> getProvidedModels(final @Nonnull SpringModuleExtension extension);
+  public abstract List<SpringFileSet> getProvidedModels(@Nonnull SpringModuleExtension extension);
 
   /**
    * Returns all configured and provided file sets.
@@ -86,7 +86,7 @@ public abstract class SpringManager {
    * @see #getProvidedModels(SpringModuleExtension)
    */
   @Nonnull
-  public abstract Set<SpringFileSet> getAllSets(final @Nonnull SpringModuleExtension extension);
+  public abstract Set<SpringFileSet> getAllSets(@Nonnull SpringModuleExtension extension);
 
   public abstract GenericDomValueConvertersRegistry getValueProvidersRegistry();
 

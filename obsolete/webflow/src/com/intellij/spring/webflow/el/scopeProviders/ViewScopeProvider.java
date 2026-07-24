@@ -32,7 +32,7 @@ public class ViewScopeProvider implements WebflowScopeProvider {
 
   private final Module myModule;
 
-  public ViewScopeProvider(final Module module) {
+  public ViewScopeProvider(Module module) {
     myModule = module;
   }
 
@@ -40,14 +40,14 @@ public class ViewScopeProvider implements WebflowScopeProvider {
     return WebflowScope.VIEW;
   }
 
-  public boolean accept(@Nullable final DomElement domElement) {
+  public boolean accept(@Nullable DomElement domElement) {
     return getScopes(domElement).size() > 0;
   }
 
   @NotNull
-  public Set<DomElement> getScopes(@Nullable final DomElement domElement) {
+  public Set<DomElement> getScopes(@Nullable DomElement domElement) {
     if(domElement != null) {
-      final ViewState state = domElement.getParentOfType(ViewState.class, false);
+      ViewState state = domElement.getParentOfType(ViewState.class, false);
       if (state != null) {
         return Collections.<DomElement>singleton(state);
       }
@@ -56,11 +56,11 @@ public class ViewScopeProvider implements WebflowScopeProvider {
   }
 
   @Nullable
-  public PsiElement getOrCreateScopeVariable(final XmlFile psiFile, final String varName, final PsiElement host) {
+  public PsiElement getOrCreateScopeVariable(XmlFile psiFile, String varName, PsiElement host) {
     final ViewState state = getViewState(host);
 
     if (state != null && state.isValid()) {
-      final XmlTag tag = state.getXmlTag();
+      XmlTag tag = state.getXmlTag();
       if (tag != null) {
         CachedValue<Map<String, PsiElement>> cachedValue = tag.getUserData(VIEW_SCOPE_VARIABLES_KEY);
         if (cachedValue == null) {
@@ -75,7 +75,7 @@ public class ViewScopeProvider implements WebflowScopeProvider {
           tag.putUserData(VIEW_SCOPE_VARIABLES_KEY, cachedValue);
         }
 
-        final Map<String, PsiElement> map = cachedValue.getValue();
+        Map<String, PsiElement> map = cachedValue.getValue();
 
         assert map != null;
 
@@ -87,8 +87,8 @@ public class ViewScopeProvider implements WebflowScopeProvider {
 
 
   @Nullable
-  private static ViewState getViewState(final PsiElement host) {
-    final DomElement domElement = DomUtil.getDomElement(host);
+  private static ViewState getViewState(PsiElement host) {
+    DomElement domElement = DomUtil.getDomElement(host);
     if (domElement != null) {
       return domElement.getParentOfType(ViewState.class, false);
     }
@@ -98,8 +98,8 @@ public class ViewScopeProvider implements WebflowScopeProvider {
   private static Map<String, PsiElement> collectViewScopeVariables(final ViewState viewState) {
     Map<String, PsiElement> map = new HashMap<String, PsiElement>();
 
-    final List<Evaluate> evaluates = new ArrayList<Evaluate>();
-    final List<Set> sets = new ArrayList<Set>();
+    List<Evaluate> evaluates = new ArrayList<Evaluate>();
+    List<Set> sets = new ArrayList<Set>();
 
     collectEvaluates(viewState, evaluates);
     collectSets(viewState, sets);
@@ -133,14 +133,14 @@ public class ViewScopeProvider implements WebflowScopeProvider {
     return map;
   }
 
-  private static void collectSets(final ViewState viewState, final List<Set> sets) {
+  private static void collectSets(ViewState viewState, List<Set> sets) {
       addSets(sets, viewState.getOnEntry());
       addSets(sets, viewState.getOnRender());
       addSets(sets, viewState.getOnExit());
   }
 
 
-  private static void collectEvaluates(final ViewState viewState, final List<Evaluate> evaluates) {
+  private static void collectEvaluates(ViewState viewState, List<Evaluate> evaluates) {
     addEvaluates(evaluates, viewState.getOnEntry());
     addEvaluates(evaluates, viewState.getOnRender());
     addEvaluates(evaluates, viewState.getOnExit());
@@ -149,11 +149,11 @@ public class ViewScopeProvider implements WebflowScopeProvider {
     }
   }
 
-  private static void addEvaluates(final List<Evaluate> evaluates, final EvaluatesOwner evaluatesOwner) {
+  private static void addEvaluates(List<Evaluate> evaluates, EvaluatesOwner evaluatesOwner) {
     evaluates.addAll(evaluatesOwner.getEvaluates());
   }
 
-  private static void addSets(final List<Set> sets, final SetsOwner evaluatesOwner) {
+  private static void addSets(List<Set> sets, SetsOwner evaluatesOwner) {
     sets.addAll(evaluatesOwner.getSets());
   }
 

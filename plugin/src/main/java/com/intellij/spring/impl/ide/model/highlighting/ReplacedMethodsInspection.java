@@ -26,9 +26,9 @@ import jakarta.annotation.Nonnull;
 public class ReplacedMethodsInspection extends SpringBeanInspectionBase {
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel, Object state
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel, Object state
     ) {
         for (ReplacedMethod replacedMethod : springBean.getReplacedMethods()) {
             checkReplacedMethod(springBean, replacedMethod, holder);
@@ -36,18 +36,18 @@ public class ReplacedMethodsInspection extends SpringBeanInspectionBase {
     }
 
     private static void checkReplacedMethod(
-        final SpringBean springBean,
-        final ReplacedMethod replacedMethod,
-        final DomElementAnnotationHolder holder
+        SpringBean springBean,
+        ReplacedMethod replacedMethod,
+        DomElementAnnotationHolder holder
     ) {
 
-        final SpringBeanPointer beanPointer = replacedMethod.getReplacer().getValue();
+        SpringBeanPointer beanPointer = replacedMethod.getReplacer().getValue();
         if (beanPointer != null) {
-            final PsiClass beanClass = beanPointer.getBeanClass();
+            PsiClass beanClass = beanPointer.getBeanClass();
 
             if (beanClass != null) {
-                final Project project = springBean.getManager().getProject();
-                final PsiClass replacerClass = JavaPsiFacade.getInstance(project)
+                Project project = springBean.getManager().getProject();
+                PsiClass replacerClass = JavaPsiFacade.getInstance(project)
                     .findClass(
                         ReplacedMethodBeanConverter.METHOD_REPLACER_CLASS,
                         GlobalSearchScope.allScope(project)

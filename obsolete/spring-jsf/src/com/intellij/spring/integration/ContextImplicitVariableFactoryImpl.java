@@ -15,12 +15,12 @@ public class ContextImplicitVariableFactoryImpl extends ContextImplicitVariableF
 
   private final PsiFile myDummyFile;
 
-  public ContextImplicitVariableFactoryImpl(final Project project) {
+  public ContextImplicitVariableFactoryImpl(Project project) {
     myDummyFile = PsiFileFactory.getInstance(project).createFileFromText("DummyContextImplicitVariableFactory.java", "");
   }
 
   @NotNull
-  public ContextImplicitVariable createContextVariable(@NotNull final String contextName, @NotNull final Factory<List<JspImplicitVariable>> factory) {
+  public ContextImplicitVariable createContextVariable(@NotNull String contextName, @NotNull Factory<List<JspImplicitVariable>> factory) {
     return new ContextImplicitVariable(contextName, new FakePsiElement() {
       public PsiElement getParent() {
         return myDummyFile;

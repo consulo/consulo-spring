@@ -47,10 +47,10 @@ public class WebflowELInjector implements MultiHostInjector {
 
   private static void initPatterns() {
     for (Pair<String, String> pair : expressionTypeAttributes) {
-      final String attrNames = pair.second;
-      final StringPattern namePattern = string().oneOf(attrNames);
+      String attrNames = pair.second;
+      StringPattern namePattern = string().oneOf(attrNames);
 
-      final String tagName = pair.first;
+      String tagName = pair.first;
 
       myPatterns.add(
         xmlAttributeValue().withLocalName(namePattern).withSuperParent(
@@ -63,10 +63,10 @@ public class WebflowELInjector implements MultiHostInjector {
     myWebflowDomModelManager = WebflowDomModelManager.getInstance(project);
   }
 
-  public void getLanguagesToInject(@NotNull final MultiHostRegistrar registrar, @NotNull final PsiElement host) {
+  public void getLanguagesToInject(@NotNull MultiHostRegistrar registrar, @NotNull PsiElement host) {
     if (!(host instanceof XmlAttributeValue)) return;
 
-    final XmlAttributeValue originalElement = (XmlAttributeValue)PsiUtil.getOriginalElement(host, XmlAttributeValue.class);
+    XmlAttributeValue originalElement = (XmlAttributeValue)PsiUtil.getOriginalElement(host, XmlAttributeValue.class);
 
     if (originalElement == null) return;
     if (originalElement.getText().length() < 2) return; // IDEADEV-29268
@@ -85,12 +85,12 @@ public class WebflowELInjector implements MultiHostInjector {
     }
   }
 
-  private boolean isWebflowFile(final PsiFile file) {
+  private boolean isWebflowFile(PsiFile file) {
     return file instanceof XmlFile && myWebflowDomModelManager.isWebflow((XmlFile)file);
   }
 
-  private static TextRange getTextRange(final PsiElement host) {
-    final int length = ((XmlAttributeValue)host).getValue().length();
+  private static TextRange getTextRange(PsiElement host) {
+    int length = ((XmlAttributeValue)host).getValue().length();
 
     return TextRange.from(1, length);
   }
@@ -100,7 +100,7 @@ public class WebflowELInjector implements MultiHostInjector {
     return Arrays.asList(XmlAttributeValue.class);
   }
 
-  private static boolean acceptExpressionXmlAttributeValue(final XmlAttributeValue value) {
+  private static boolean acceptExpressionXmlAttributeValue(XmlAttributeValue value) {
     for (XmlAttributeValuePattern myPattern : myPatterns) {
       if (myPattern.accepts(value)) return true;
     }

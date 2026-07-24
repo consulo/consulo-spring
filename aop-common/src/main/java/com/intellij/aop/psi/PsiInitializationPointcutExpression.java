@@ -15,13 +15,13 @@ import jakarta.annotation.Nonnull;
 public class PsiInitializationPointcutExpression extends MethodPatternPointcut{
   private final boolean myPre;
 
-  public PsiInitializationPointcutExpression(@Nonnull final ASTNode node, boolean isPre) {
+  public PsiInitializationPointcutExpression(@Nonnull ASTNode node, boolean isPre) {
     super(node);
     myPre = isPre;
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PointcutMatchDegree.FALSE;
   }
 

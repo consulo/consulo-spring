@@ -36,9 +36,9 @@ import java.util.*;
 public class SpringRequiredAnnotationInspection extends BaseJavaLocalInspectionTool<Object> {
     @Override
     public ProblemDescriptor[] checkMethod(
-        @Nonnull final PsiMethod method,
-        @Nonnull final InspectionManager manager,
-        final boolean isOnTheFly,
+        @Nonnull PsiMethod method,
+        @Nonnull InspectionManager manager,
+        boolean isOnTheFly,
         Object state
     ) {
 
@@ -48,17 +48,17 @@ public class SpringRequiredAnnotationInspection extends BaseJavaLocalInspectionT
                 return null;
             }
 
-            final SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(containingClass);
+            SpringJavaClassInfo info = SpringJavaClassInfo.getSpringJavaClassInfo(containingClass);
             if (info.isMapped()) {
                 if (method.getModifierList().findAnnotation(SpringAnnotationsConstants.REQUIRED_ANNOTATION) != null) {
                     final String property = PropertyUtil.getPropertyNameBySetter(method);
-                    final Collection<SpringPropertyDefinition> mappedProperties = info.getMappedProperties(property);
+                    Collection<SpringPropertyDefinition> mappedProperties = info.getMappedProperties(property);
                     if (mappedProperties.isEmpty()) {
-                        final List<SpringBaseBeanPointer> list = info.getMappedBeans();
+                        List<SpringBaseBeanPointer> list = info.getMappedBeans();
                         final List<SpringBean> beans = new ArrayList<>(list.size());
                         for (SpringBaseBeanPointer pointer : list) {
                             if (pointer instanceof DomSpringBeanPointer domPointer) {
-                                final DomSpringBean springBean = domPointer.getSpringBean();
+                                DomSpringBean springBean = domPointer.getSpringBean();
                                 if (springBean instanceof SpringBean && !((SpringBean) springBean).isAbstract()) {
                                     beans.add((SpringBean) springBean);
                                 }
@@ -68,7 +68,7 @@ public class SpringRequiredAnnotationInspection extends BaseJavaLocalInspectionT
                             return null;
                         }
 
-                        final LocalQuickFix fix = new LocalQuickFix() {
+                        LocalQuickFix fix = new LocalQuickFix() {
                             @Nonnull
                             @Override
                             public LocalizeValue getName() {
@@ -76,10 +76,10 @@ public class SpringRequiredAnnotationInspection extends BaseJavaLocalInspectionT
                             }
 
                             @Override
-                            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
-                                final Set<VirtualFile> files = new HashSet<>();
+                            public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
+                                Set<VirtualFile> files = new HashSet<>();
                                 for (SpringBean bean : beans) {
-                                    final PsiFile psiFile = bean.getContainingFile();
+                                    PsiFile psiFile = bean.getContainingFile();
                                     if (psiFile != null) {
                                         files.add(psiFile.getVirtualFile());
                                     }
@@ -91,9 +91,9 @@ public class SpringRequiredAnnotationInspection extends BaseJavaLocalInspectionT
                                 }
                             }
                         };
-                        final PsiIdentifier psiIdentifier = method.getNameIdentifier();
+                        PsiIdentifier psiIdentifier = method.getNameIdentifier();
                         assert psiIdentifier != null;
-                        final ProblemDescriptor descriptor = manager
+                        ProblemDescriptor descriptor = manager
                             .createProblemDescriptor(psiIdentifier, SpringBundle.message("required.property.not.mapped", property), fix,
                                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING
                             );

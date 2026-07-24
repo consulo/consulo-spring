@@ -68,14 +68,14 @@ public class AopLexer extends DelegateLexer implements AopElementTypes {
     }
 
     if (AOP_IDENTIFIER == tokenType) {
-      @NonNls final String text = getTokenText();
-      final AopElementType primType = PRIMITIVE_TYPES.get(text);
+      @NonNls String text = getTokenText();
+      AopElementType primType = PRIMITIVE_TYPES.get(text);
       if (primType != null) return primType;
 
       if (_AopLexer.PATH_ELEMENT != getState()) {
-        final AopElementType pointcutType = AopPointcutTypes.getPointcutTokens().get(text);
+        AopElementType pointcutType = AopPointcutTypes.getPointcutTokens().get(text);
         if (pointcutType != null) {
-          final LexerPosition position = getDelegate().getCurrentPosition();
+          LexerPosition position = getDelegate().getCurrentPosition();
           try {
             advance();
             while (WHITE_SPACE == super.getTokenType()) advance();
@@ -102,7 +102,7 @@ public class AopLexer extends DelegateLexer implements AopElementTypes {
         }
       }
 
-      final AopElementType logType = LOGICAL_OP_TYPES.get(text);
+      AopElementType logType = LOGICAL_OP_TYPES.get(text);
       if (logType != null) {
         return logType;
       }

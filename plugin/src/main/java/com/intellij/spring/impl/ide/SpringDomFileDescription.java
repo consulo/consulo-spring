@@ -36,14 +36,14 @@ public class SpringDomFileDescription extends DomFileDescription<Beans> {
   static {
     // TODO dirty hack - need extension for it
     AopPointcutTypes.registerPointcut(new PointcutDescriptor("bean") {
-      public void parseToken(final PrattBuilder builder) {
+      public void parseToken(PrattBuilder builder) {
         if (builder.assertToken(AOP_LEFT_PAR, AopBundle.message("error.0.expected", "("))) {
           parsePatternPart(builder);
           builder.assertToken(AOP_RIGHT_PAR, AopBundle.message("error.0.expected", ")"));
         }
       }
 
-      public PsiPointcutExpression createPsi(final ASTNode node) {
+      public PsiPointcutExpression createPsi(ASTNode node) {
         return new PsiBeanPointcutExpression(node);
       }
     });

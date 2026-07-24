@@ -35,9 +35,9 @@ public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvid
     ((DomTemplateRunnerImpl)DomTemplateRunner.getInstance(file.getProject())).runTemplate(springBean,editor, getTemplate(springBean));
   }
 
-  protected Template getTemplate(final SpringBean springBean) {
-    final TemplateManager manager = TemplateManager.getInstance(springBean.getManager().getProject());
-    final Template template = manager.createTemplate("", "");
+  protected Template getTemplate(SpringBean springBean) {
+    TemplateManager manager = TemplateManager.getInstance(springBean.getManager().getProject());
+    Template template = manager.createTemplate("", "");
     template.setToReformat(true);
 
     Expression completeExpression = new MacroCallNode(MacroFactory.createMacro("complete"));
@@ -65,7 +65,7 @@ public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvid
 
   abstract protected String getClassName();
 
-  private static Expression getTargetMethodExpression(final SpringBean springBean) {
+  private static Expression getTargetMethodExpression(SpringBean springBean) {
     final SpringBean copy = springBean.createStableCopy();
     return new Expression() {
       public Result calculateResult(ExpressionContext context) {
@@ -77,7 +77,7 @@ public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvid
       }
 
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
-        final PsiClass psiClass = getTargetObjectPsiClass(copy);
+        PsiClass psiClass = getTargetObjectPsiClass(copy);
         if(psiClass == null) return LookupItem.EMPTY_ARRAY;
 
         LinkedHashSet<LookupElement> items = new LinkedHashSet<LookupElement>();
@@ -93,12 +93,12 @@ public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvid
   }
 
   @Nullable
-  private static PsiClass getTargetObjectPsiClass(final SpringBean springBean) {
-    final SpringPropertyDefinition property = SpringUtils.findPropertyByName(springBean, "targetObject");
+  private static PsiClass getTargetObjectPsiClass(SpringBean springBean) {
+    SpringPropertyDefinition property = SpringUtils.findPropertyByName(springBean, "targetObject");
     if (property != null) {
-      final GenericDomValue<SpringBeanPointer> element = property.getRefElement();
+      GenericDomValue<SpringBeanPointer> element = property.getRefElement();
       if (element != null) {
-        final SpringBeanPointer beanPointer = element.getValue();
+        SpringBeanPointer beanPointer = element.getValue();
         if(beanPointer != null) {
           return beanPointer.getBeanClass();
         }

@@ -16,11 +16,11 @@ import java.util.List;
 public class WebflowVarBeanConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @NotNull
-  public Collection<SpringBeanPointer> getVariants(final ConvertContext context) {
-    final List<SpringBeanPointer> filtered = new ArrayList<SpringBeanPointer>();
+  public Collection<SpringBeanPointer> getVariants(ConvertContext context) {
+    List<SpringBeanPointer> filtered = new ArrayList<SpringBeanPointer>();
 
     for (SpringBeanPointer pointer : super.getVariants(context)) {
-      final CommonSpringBean bean = pointer.getSpringBean();
+      CommonSpringBean bean = pointer.getSpringBean();
       if (bean.isValid() && WebflowUtil.isNonSingletonPrototype(bean)) {
         filtered.add(pointer);
       }
@@ -29,7 +29,7 @@ public class WebflowVarBeanConverter extends WebflowBeanResolveConverterForDefin
     return filtered;
   }
 
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return null;
   }
 }

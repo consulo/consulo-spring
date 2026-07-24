@@ -26,18 +26,18 @@ public class ChooseTemplatesForm implements Disposable
     myTableViewPanel.setLayout(new GridLayout(templates.size(), 1));
     myTemplateInfos = templates;
 
-    for (final TemplateInfo template : myTemplateInfos) {
-      final JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    for (TemplateInfo template : myTemplateInfos) {
+      JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-      final JCheckBox checkBox = new JCheckBox(template.getName().get());
+      JCheckBox checkBox = new JCheckBox(template.getName().get());
       checkBox.setSelected(template.isAccepted());
       checkBox.addActionListener(e -> template.setAccepted(checkBox.isSelected()));
 
       checkBoxPanel.add(checkBox);
       if (template.getApiLink() != null || template.getReferenceLink() != null) {
-        final JLabel comp = new JLabel("(");
-        final int width = comp.getFontMetrics(comp.getFont()).stringWidth("(");
-        final int height = comp.getFontMetrics(comp.getFont()).getHeight();
+        JLabel comp = new JLabel("(");
+        int width = comp.getFontMetrics(comp.getFont()).stringWidth("(");
+        int height = comp.getFontMetrics(comp.getFont()).getHeight();
         comp.setPreferredSize(new Dimension(width, height));
 
         checkBoxPanel.add(comp);
@@ -52,7 +52,7 @@ public class ChooseTemplatesForm implements Disposable
         checkBoxPanel.add(new JLabel(")"));
       }
 
-      final JPanel comboPanelWrapper = new JPanel(new BorderLayout());
+      JPanel comboPanelWrapper = new JPanel(new BorderLayout());
       comboPanelWrapper.add(checkBoxPanel, BorderLayout.WEST);
 
       myTableViewPanel.add(comboPanelWrapper);
@@ -65,10 +65,10 @@ public class ChooseTemplatesForm implements Disposable
     }
   }
 
-  private static JComponent getApiLink(final TemplateInfo template) {
+  private static JComponent getApiLink(TemplateInfo template) {
     if (template.getApiLink() == null) return new JLabel();
 
-    final HyperlinkLabel hyperlinkLabel = new HyperlinkLabel(JAVADOC);
+    HyperlinkLabel hyperlinkLabel = new HyperlinkLabel(JAVADOC);
 
     reduceHyperlinkFontSize(hyperlinkLabel);
 
@@ -76,15 +76,15 @@ public class ChooseTemplatesForm implements Disposable
     return hyperlinkLabel;
   }
 
-  private static void reduceHyperlinkFontSize(final HyperlinkLabel hyperlinkLabel) {
-    final Font font = hyperlinkLabel.getFont();
+  private static void reduceHyperlinkFontSize(HyperlinkLabel hyperlinkLabel) {
+    Font font = hyperlinkLabel.getFont();
     hyperlinkLabel.setFont(font.deriveFont((float)(font.getSize() - 1)));
   }
 
-  private static JComponent getReferenceLink(final TemplateInfo template) {
+  private static JComponent getReferenceLink(TemplateInfo template) {
     if (template.getReferenceLink() == null) return new JLabel();
 
-    final HyperlinkLabel hyperlinkLabel = new HyperlinkLabel(DETAILS);
+    HyperlinkLabel hyperlinkLabel = new HyperlinkLabel(DETAILS);
 
     reduceHyperlinkFontSize(hyperlinkLabel);
 
@@ -104,7 +104,7 @@ public class ChooseTemplatesForm implements Disposable
     return myChoosePanel;
   }
 
-  public void setLibrariesExist(final boolean valid) {
+  public void setLibrariesExist(boolean valid) {
   }
 
   public LibrariesValidationComponent getLibrariesValidationComponent() {

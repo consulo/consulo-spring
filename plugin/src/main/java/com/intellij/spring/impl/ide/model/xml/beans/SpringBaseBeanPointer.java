@@ -32,7 +32,7 @@ public abstract class SpringBaseBeanPointer extends SpringBeanPointer{
     }
   };
 
-  protected SpringBaseBeanPointer(@Nullable final String name) {
+  protected SpringBaseBeanPointer(@Nullable String name) {
     myName = name;
   }
 
@@ -58,11 +58,11 @@ public abstract class SpringBaseBeanPointer extends SpringBeanPointer{
     return this;
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof SpringBaseBeanPointer)) return false;
 
-    final SpringBaseBeanPointer that = (SpringBaseBeanPointer)o;
+    SpringBaseBeanPointer that = (SpringBaseBeanPointer)o;
     return Comparing.equal(getPsiElement(), that.getPsiElement());
   }
 

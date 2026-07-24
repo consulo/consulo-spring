@@ -47,7 +47,7 @@ public class SpringJamQualifier extends CommonModelElement.PsiBase implements Ja
 
   @Nonnull
   public PsiClass getType() {
-    final String annoQualifiedName = myAnno.getQualifiedName();
+    String annoQualifiedName = myAnno.getQualifiedName();
 
     return annoQualifiedName == null ? null : JavaPsiFacade.getInstance(myProject).findClass(annoQualifiedName, GlobalSearchScope.allScope(myProject));
   }
@@ -62,8 +62,8 @@ public class SpringJamQualifier extends CommonModelElement.PsiBase implements Ja
 
   @Nonnull
   public List<? extends QualifierAttribute> getQualifierAttributes() {
-    final PsiNameValuePair[] attributes = myAnno.getParameterList().getAttributes();
-    final ArrayList<QualifierAttribute> list = new ArrayList<QualifierAttribute>();
+    PsiNameValuePair[] attributes = myAnno.getParameterList().getAttributes();
+    ArrayList<QualifierAttribute> list = new ArrayList<QualifierAttribute>();
     for (final PsiNameValuePair pair : attributes) {
       final String name = pair.getName();
       if (name == null || name.equals("value")) {

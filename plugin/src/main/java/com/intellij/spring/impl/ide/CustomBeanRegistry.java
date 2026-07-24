@@ -95,10 +95,10 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   public MyBean getState() {
-    final MyBean bean = new MyBean();
+    MyBean bean = new MyBean();
     bean.map = new HashMap<String, List<CustomBeanInfo>>();
-    for (final String s : myText2Infos.keySet()) {
-      final List<CustomBeanInfo> infos = myText2Infos.get(s);
+    for (String s : myText2Infos.keySet()) {
+      List<CustomBeanInfo> infos = myText2Infos.get(s);
       if (infos != null && !infos.isEmpty()) {
         bean.map.put(s, infos);
       }
@@ -107,7 +107,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     return bean;
   }
 
-  public void loadState(final MyBean state) {
+  public void loadState(MyBean state) {
     if (state.version == CURRENT_VERSION) {
       myText2Infos = state.map;
       myPolicies = state.policies;
@@ -116,7 +116,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
 
   public ParseResult parseBeans(Collection<XmlTag> tags) {
     ParseResult result = ParseResult.EMPTY_PARSE_RESULT;
-    for (final XmlTag tag : tags) {
+    for (XmlTag tag : tags) {
       if (tag.isValid()) {
         result = result.merge(parseBean(tag));
       }
@@ -125,12 +125,12 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   public ParseResult parseBean(XmlTag tag) {
-    final String text = getIdealBeanText(tag);
+    String text = getIdealBeanText(tag);
     try {
-      final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(tag);
+      consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(tag);
       if (module == null) return ParseResult.EMPTY_PARSE_RESULT;
 
-      final ParseResult result = getCustomBeans(createTag(text, tag.getProject()), module);
+      ParseResult result = getCustomBeans(createTag(text, tag.getProject()), module);
       myText2Infos.put(text, result.beans == null ? Collections.<CustomBeanInfo>emptyList() : result.beans);
       return result;
     }
@@ -144,10 +144,10 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   @Nullable
-  public List<CustomBeanInfo> getParseResult(final XmlTag tag) {
-    final CustomBeanInfo policy = myPolicies.get(new MyQName(tag.getNamespace(), tag.getLocalName()));
+  public List<CustomBeanInfo> getParseResult(XmlTag tag) {
+    CustomBeanInfo policy = myPolicies.get(new MyQName(tag.getNamespace(), tag.getLocalName()));
     if (policy != null) {
-      final CustomBeanInfo info = new CustomBeanInfo(policy);
+      CustomBeanInfo info = new CustomBeanInfo(policy);
       info.beanName = tag.getAttributeValue(policy.idAttribute);
       return Arrays.asList(info);
     }
@@ -156,19 +156,19 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   @Nonnull
-  public static String getIdealBeanText(final XmlTag tag) {
-    final Set<String> usedNamespaces = collectReferencedNamespaces(tag);
+  public static String getIdealBeanText(XmlTag tag) {
+    Set<String> usedNamespaces = collectReferencedNamespaces(tag);
 
     String text = tag.getText();
 
     try {
-      final XmlTag copy = createTag(text, tag.getProject());
+      XmlTag copy = createTag(text, tag.getProject());
       XmlTag parent = tag;
       while (parent != null) {
-        for (final XmlAttribute attribute : parent.getAttributes()) {
+        for (XmlAttribute attribute : parent.getAttributes()) {
           if (attribute.isNamespaceDeclaration()) {
-            final String prefix = "xmlns".equals(attribute.getName()) ? "" : attribute.getLocalName();
-            final String ns = copy.getNamespaceByPrefix(prefix);
+            String prefix = "xmlns".equals(attribute.getName()) ? "" : attribute.getLocalName();
+            String ns = copy.getNamespaceByPrefix(prefix);
             if (StringUtil.isEmpty(ns) && usedNamespaces.contains(attribute.getDisplayValue())) {
               copy.add(attribute);
             }
@@ -178,7 +178,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
       }
 
       text = copy.getText();
-      final Document document;
+      Document document;
       try {
         document = JDOMUtil.loadDocument(text);
       }
@@ -196,39 +196,39 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     }
   }
 
-  private static Set<String> collectReferencedNamespaces(final XmlTag tag) {
+  private static Set<String> collectReferencedNamespaces(XmlTag tag) {
     final Set<String> usedNamespaces = new HashSet<String>();
     tag.accept(new XmlElementVisitor() {
       @Override
-      public final void visitXmlTag(final XmlTag tag) {
+      public final void visitXmlTag(XmlTag tag) {
         usedNamespaces.add(tag.getNamespace());
-        for (final XmlAttribute attribute : tag.getAttributes()) {
+        for (XmlAttribute attribute : tag.getAttributes()) {
           visitXmlAttribute(attribute);
         }
-        for (final XmlTag xmlTag : tag.getSubTags()) {
+        for (XmlTag xmlTag : tag.getSubTags()) {
           visitXmlTag(xmlTag);
         }
       }
 
       @Override
-      public final void visitXmlAttribute(final XmlAttribute attribute) {
+      public final void visitXmlAttribute(XmlAttribute attribute) {
         usedNamespaces.add(attribute.getNamespace());
       }
     });
     return usedNamespaces;
   }
 
-  private static XmlTag createTag(final String text, final Project project) throws IncorrectOperationException {
+  private static XmlTag createTag(String text, Project project) throws IncorrectOperationException {
     return XmlElementFactory.getInstance(project).createTagFromText(text);
   }
 
   @Nonnull
-  public static XmlTag getActualSourceTag(final CustomBeanInfo info, XmlTag tag) {
-    final List<Integer> path = info.path;
+  public static XmlTag getActualSourceTag(CustomBeanInfo info, XmlTag tag) {
+    List<Integer> path = info.path;
     for (Integer index : path) {
-      final XmlTag parent = tag;
-      final XmlTag[] subTags = parent.getSubTags();
-      final int i = index.intValue();
+      XmlTag parent = tag;
+      XmlTag[] subTags = parent.getSubTags();
+      int i = index.intValue();
       tag = subTags[i];
       if (tag == null) {
         LOG.error("parent: " + parent.getText() + "\nindex: " + i + "\nsubTags: " + Arrays.toString(subTags));
@@ -237,7 +237,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     return tag;
   }
 
-  public void addBeanPolicy(@Nonnull final String namespace, @Nonnull final String localName, CustomBeanInfo info) {
+  public void addBeanPolicy(@Nonnull String namespace, @Nonnull String localName, CustomBeanInfo info) {
     assert info.beanName == null;
     assert info.idAttribute != null;
     myPolicies.put(new MyQName(namespace, localName), info);
@@ -257,17 +257,17 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     public MyQName() {
     }
 
-    public MyQName(final String namespace, final String localName) {
+    public MyQName(String namespace, String localName) {
       this.namespace = namespace;
       this.localName = localName;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
       if (this == o) return true;
       if (!(o instanceof MyQName)) return false;
 
-      final MyQName myQName = (MyQName)o;
+      MyQName myQName = (MyQName)o;
 
       if (!localName.equals(myQName.localName)) return false;
       if (!namespace.equals(myQName.namespace)) return false;
@@ -283,8 +283,8 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     }
   }
 
-  private static void computeUrls(consulo.module.Module module, final PathsList list) {
-    final File springPluginClassesLocation = new File(ClassPathUtil.getJarPathForClass(CustomBeanWrapperImpl.class));
+  private static void computeUrls(consulo.module.Module module, PathsList list) {
+    File springPluginClassesLocation = new File(ClassPathUtil.getJarPathForClass(CustomBeanWrapperImpl.class));
     if (springPluginClassesLocation.isFile()) {//build
       File customNsLocation = new File(springPluginClassesLocation.getParent(), "customNs");
       list.add(new File(customNsLocation, "customNs.jar").getAbsolutePath());
@@ -299,21 +299,21 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   @Nonnull
-  private static ParseResult getCustomBeans(@Nonnull XmlTag tag, @Nonnull final consulo.module.Module module) {
-    final Map<String, String> handlersToRun = findHandlersToRun(module, tag);
-    final String namespace = tag.getNamespace();
+  private static ParseResult getCustomBeans(@Nonnull XmlTag tag, @Nonnull consulo.module.Module module) {
+    Map<String, String> handlersToRun = findHandlersToRun(module, tag);
+    String namespace = tag.getNamespace();
     if (!handlersToRun.containsKey(namespace)) {
       return new ParseResult(SpringBundle.message("parse.no.namespace.handler", namespace));
     }
 
-    final OwnJavaParameters javaParameters = new OwnJavaParameters();
+    OwnJavaParameters javaParameters = new OwnJavaParameters();
     javaParameters.setJdk(ModuleUtilCore.getSdk(module, JavaModuleExtension.class));
     javaParameters.setMainClass("com.intellij.spring.model.xml.custom.CustomBeanParser");
     if (isDebug()) {
       javaParameters.getVMParametersList().addParametersString("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5239");
     }
     computeUrls(module, javaParameters.getClassPath());
-    final GeneralCommandLine cmd;
+    GeneralCommandLine cmd;
     try {
       cmd = javaParameters.toCommandLine();
     }
@@ -328,7 +328,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
       @NonNls PrintWriter writer = new PrintWriter(handler.getProcessInput());
       handler.startNotify();
 
-      final int timeout = Math.max(getTimeout(), tag.getTextLength() * 150);
+      int timeout = Math.max(getTimeout(), tag.getTextLength() * 150);
       writer.println(timeout);
 
       ParseResult result = invokeParser(writer, handler, tag, timeout);
@@ -340,10 +340,10 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
         catch (IncorrectOperationException e) {
           LOG.error(e);
         }
-        final ParseResult result1 = invokeParser(writer, handler, tag, timeout);
-        final List<CustomBeanInfo> list = result1.getBeans();
+        ParseResult result1 = invokeParser(writer, handler, tag, timeout);
+        List<CustomBeanInfo> list = result1.getBeans();
         if (list != null) {
-          for (final CustomBeanInfo info : list) {
+          for (CustomBeanInfo info : list) {
             if (FAKE_ID.equals(info.beanName) && info.path.isEmpty()) {
               info.beanName = null;
               info.idAttribute = "id";
@@ -370,8 +370,8 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   @Nonnull
-  private static ParseResult invokeParser(@NonNls final PrintWriter writer, final ProcessHandler handler, final XmlTag tag,
-                                          final int timeout) {
+  private static ParseResult invokeParser(@NonNls PrintWriter writer, final ProcessHandler handler, XmlTag tag,
+                                          int timeout) {
     final Ref<ParseResult> result = Ref.create(null);
     final Semaphore semaphore = new Semaphore();
     semaphore.down();
@@ -382,7 +382,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
       StringBuilder sb = new StringBuilder();
 
       @Override
-      public void onTextAvailable(final ProcessEvent event, final Key outputType) {
+      public void onTextAvailable(ProcessEvent event, Key outputType) {
         try {
           if (outputType != ProcessOutputTypes.STDOUT) {
             other.append(event.getText());
@@ -390,7 +390,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
           }
 
           sb.append(event.getText().replaceAll("\\r\\n", "\n").replaceAll("\\r", "\n"));
-          final int i = sb.indexOf("\n\n");
+          int i = sb.indexOf("\n\n");
           if (i < 0) return;
 
           @NonNls String input = sb.substring(0, i);
@@ -404,7 +404,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
             return;
           }
 
-          @NonNls final String first = lines[k];
+          @NonNls String first = lines[k];
           if ("exception".equals(first)) {
             assert lines.length == k + 2;
             setResult(new ParseResult(StringUtil.unescapeStringCharacters(lines[k + 1]), true));
@@ -428,8 +428,8 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
               assert "info".equals(nextLine);
               CustomBeanInfo info = new CustomBeanInfo();
               while (!"info_end".equals(lines[j])) {
-                @NonNls final String prop = lines[j++];
-                @NonNls final String propValue = StringUtil.unescapeStringCharacters(lines[j++]);
+                @NonNls String prop = lines[j++];
+                @NonNls String propValue = StringUtil.unescapeStringCharacters(lines[j++]);
                 if ("beanName".equals(prop)) {
                   info.beanName = propValue;
                 }
@@ -448,7 +448,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
                 else {
                   assert "path".equals(prop) : prop;
                   assert propValue.startsWith("x"); //otherwise string may be empty
-                  final String separated = propValue.substring(1);
+                  String separated = propValue.substring(1);
                   info.path = StringUtil.isEmpty(separated)
                     ? Collections.<Integer>emptyList()
                     : ContainerUtil.map(separated.split(";"), s -> Integer.parseInt(s));
@@ -465,19 +465,19 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
         }
       }
 
-      private void setResult(final ParseResult value) {
+      private void setResult(ParseResult value) {
         result.set(value);
         handler.removeProcessListener(this);
         semaphore.up();
       }
 
       @Override
-      public void processTerminated(final ProcessEvent event) {
+      public void processTerminated(ProcessEvent event) {
         if (other.length() == 0 || sb.length() == 0) {
           setResult(new ParseResult(SpringBundle.message("process.unexpectedly.terminated", "")));
           return;
         }
-        @NonNls final String output = ":\n\nSTDOUT:\n" + sb + "\n\nOTHER:\n" + other;
+        @NonNls String output = ":\n\nSTDOUT:\n" + sb + "\n\nOTHER:\n" + other;
         setResult(new ParseResult(SpringBundle.message("process.unexpectedly.terminated", output)));
       }
     });
@@ -486,9 +486,9 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     writer.println(StringUtil.escapeStringCharacters(tag.getText()));
     writer.flush();
 
-    final boolean inTime = semaphore.waitFor(timeout);
+    boolean inTime = semaphore.waitFor(timeout);
 
-    final ParseResult parseResult = result.get();
+    ParseResult parseResult = result.get();
     if (parseResult == null) {
       if (inTime) {
         return new ParseResult(other.toString(), true);
@@ -502,8 +502,8 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   private static void guessIdAttributeNames(@NonNls PrintWriter writer,
                                             ProcessHandler reader,
                                             XmlTag tag,
-                                            final List<CustomBeanInfo> list,
-                                            final int timeout)
+                                            List<CustomBeanInfo> list,
+                                            int timeout)
     throws IncorrectOperationException {
     String[] fakeNames = new String[list.size()];
     String[] idAttrs = new String[list.size()];
@@ -512,10 +512,10 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
       CustomBeanInfo info = list.get(i);
       if (info.idAttribute != null) continue;
 
-      final XmlTag sourceTag = getActualSourceTag(info, tag);
+      XmlTag sourceTag = getActualSourceTag(info, tag);
       final String id = info.beanName;
-      final XmlAttribute idAttr = id == null ? null : ContainerUtil.find(sourceTag.getAttributes(), new Condition<XmlAttribute>() {
-        public boolean value(final XmlAttribute xmlAttribute) {
+      XmlAttribute idAttr = id == null ? null : ContainerUtil.find(sourceTag.getAttributes(), new Condition<XmlAttribute>() {
+        public boolean value(XmlAttribute xmlAttribute) {
           return !xmlAttribute.isNamespaceDeclaration() && id.equals(xmlAttribute.getDisplayValue());
         }
       });
@@ -541,15 +541,15 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     }
   }
 
-  private static Map<String, String> findHandlersToRun(@Nonnull final Module module, @Nonnull final XmlTag tag) {
+  private static Map<String, String> findHandlersToRun(@Nonnull Module module, @Nonnull XmlTag tag) {
     if (SpringConstants.INSIDER_NAMESPACES.contains(tag.getNamespace())) return Collections.emptyMap();
 
-    final Map<String, String> handlers = SpringSchemaProvider.getHandlers(module);
+    Map<String, String> handlers = SpringSchemaProvider.getHandlers(module);
     if (handlers.isEmpty()) return Collections.emptyMap();
 
-    final Set<String> referencedNamespaces = collectReferencedNamespaces(tag);
+    Set<String> referencedNamespaces = collectReferencedNamespaces(tag);
 
-    final HashMap<String, String> handlersToRun = new HashMap<String, String>(referencedNamespaces.size());
+    HashMap<String, String> handlersToRun = new HashMap<String, String>(referencedNamespaces.size());
     for (String namespace : handlers.keySet()) {
       if (referencedNamespaces.contains(namespace)) {
         handlersToRun.put(namespace, handlers.get(namespace));
@@ -585,11 +585,11 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
       this(getStackTrace(t), true);
     }
 
-    private ParseResult(final String errorMessage) {
+    private ParseResult(String errorMessage) {
       this(errorMessage, false);
     }
 
-    private ParseResult(final String errorMessage, boolean isStackTrace) {
+    private ParseResult(String errorMessage, boolean isStackTrace) {
       if (!isStackTrace) {
         this.errorMessage = errorMessage;
       }
@@ -629,7 +629,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
     }
 
     public ParseResult merge(ParseResult with) {
-      final ParseResult result = new ParseResult((List<CustomBeanInfo>)null, hasInfrastructures || with.hasInfrastructures);
+      ParseResult result = new ParseResult((List<CustomBeanInfo>)null, hasInfrastructures || with.hasInfrastructures);
       result.stackTrace = stackTrace == null ? with.stackTrace : stackTrace;
       result.errorMessage = errorMessage == null ? with.errorMessage : errorMessage;
       result.beans = beans == null ? with.beans : with.beans == null ? beans : ContainerUtil.concat(beans, with.beans);

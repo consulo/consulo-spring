@@ -34,7 +34,7 @@ public class WebflowScopeProviderManager {
 
   public List<WebflowScopeProvider> getAvailableProviders(@Nullable final DomElement domElement) {
     return ContainerUtil.mapNotNull(myProviders, new Function<WebflowScopeProvider, WebflowScopeProvider>() {
-      public WebflowScopeProvider fun(final WebflowScopeProvider webflowScopeProvider) {
+      public WebflowScopeProvider fun(WebflowScopeProvider webflowScopeProvider) {
         return webflowScopeProvider.getScopes(domElement).size() > 0 ? webflowScopeProvider : null;
       }
     });
@@ -45,7 +45,7 @@ public class WebflowScopeProviderManager {
   }
 
   @Nullable
-  public WebflowScopeProvider getProvider(final WebflowScope scope) {
+  public WebflowScopeProvider getProvider(WebflowScope scope) {
     for (WebflowScopeProvider provider : myProviders) {
       if (provider.getScope().equals(scope)) return provider;
     }
@@ -53,14 +53,14 @@ public class WebflowScopeProviderManager {
   }
 
   @Nullable
-  public WebflowScopeProvider getProvider(final String scopeName) {
+  public WebflowScopeProvider getProvider(String scopeName) {
     for (WebflowScopeProvider provider : myProviders) {
       if (provider.getScope().getName().equals(scopeName)) return provider;
     }
     return null;
   }
 
-  public void registerScopeProvider(final WebflowScopeProvider provider) {
+  public void registerScopeProvider(WebflowScopeProvider provider) {
     myProviders.add(provider);
   }
 }

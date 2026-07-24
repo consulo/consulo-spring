@@ -21,7 +21,7 @@ public abstract class AbstractProxiedTypeResolver extends AbstractTypeResolver {
 
   // @see org.springframework.util.ClassUtils#getAllInterfacesForClass(Class clazz)
   @Nonnull
-  protected static Set<PsiClass> getAllInterfaces(@Nonnull final PsiClassType classType) {
+  protected static Set<PsiClass> getAllInterfaces(@Nonnull PsiClassType classType) {
 
     PsiClass psiClass = classType.resolve();
     if (psiClass != null) {
@@ -30,7 +30,7 @@ public abstract class AbstractProxiedTypeResolver extends AbstractTypeResolver {
         return Collections.singleton(psiClass);
       }
 
-      final Set<PsiClass> interfaces = new HashSet<PsiClass>();
+      Set<PsiClass> interfaces = new HashSet<PsiClass>();
       while (psiClass != null) {
         interfaces.addAll(Arrays.asList(psiClass.getInterfaces()));
         psiClass = psiClass.getSuperClass();
@@ -41,16 +41,16 @@ public abstract class AbstractProxiedTypeResolver extends AbstractTypeResolver {
   }
 
   @Nonnull
-  protected static Set<String> getAllInterfaceNames(@Nonnull final PsiClassType type) {
-    final Set<PsiClass> interfaces = getAllInterfaces(type);
-    final Set<String> names = new HashSet<String>(interfaces.size());
+  protected static Set<String> getAllInterfaceNames(@Nonnull PsiClassType type) {
+    Set<PsiClass> interfaces = getAllInterfaces(type);
+    Set<String> names = new HashSet<String>(interfaces.size());
     for (PsiClass anInterface : interfaces) {
       names.add(anInterface.getQualifiedName());
     }
     return names;
   }
 
-  protected static boolean isCglibExplicitlyEnabled(@Nonnull final SpringBean context) {
+  protected static boolean isCglibExplicitlyEnabled(@Nonnull SpringBean context) {
     return isBooleanProperySetAndTrue(context, PROXY_CLASS_FLAG_PROPERTY_NAME) ||
         isBooleanProperySetAndTrue(context, OPTIMIZE_PROPERTY_NAME);
   }

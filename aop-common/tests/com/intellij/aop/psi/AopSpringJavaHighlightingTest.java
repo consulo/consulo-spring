@@ -52,7 +52,7 @@ public class AopSpringJavaHighlightingTest extends JavaCodeInsightFixtureTestCas
     doTest(getTestName(true) + ".java", tools);
   }
 
-  private void doTest(final String path, final LocalInspectionTool... tools) throws Throwable {
+  private void doTest(String path, LocalInspectionTool... tools) throws Throwable {
     myFixture.enableInspections(tools);
     myFixture.copyFileToProject(path);
     myFixture.testHighlighting(true, false, false, path);
@@ -65,16 +65,16 @@ public class AopSpringJavaHighlightingTest extends JavaCodeInsightFixtureTestCas
       }
     }.execute();
 
-    final SpringFacetConfiguration configuration = SpringFacet.getInstance(myModule).getConfiguration();
-    final SpringFileSet fileSet = new SpringFileSet("zz", "dd", configuration);
+    SpringFacetConfiguration configuration = SpringFacet.getInstance(myModule).getConfiguration();
+    SpringFileSet fileSet = new SpringFileSet("zz", "dd", configuration);
     configuration.getFileSets().add(fileSet);
     fileSet.addFile(myFixture.copyFileToProject("addAspectJAutoproxy.xml"));
 
     doTest(new MissingAspectjAutoproxyInspection());
   }
 
-  private Beans getFileElement(final String text) {
-    final XmlFile file = (XmlFile)PsiFileFactory.getInstance(getProject()).createFileFromText("a.xml", text);
+  private Beans getFileElement(String text) {
+    XmlFile file = (XmlFile)PsiFileFactory.getInstance(getProject()).createFileFromText("a.xml", text);
     return DomManager.getDomManager(getProject()).getFileElement(file, Beans.class).getRootElement();
   }
 
@@ -88,7 +88,7 @@ public class AopSpringJavaHighlightingTest extends JavaCodeInsightFixtureTestCas
 
     IdeaTestUtil.registerExtension(Extensions.getRootArea(), AopProvider.EXTENSION_POINT_NAME, new SpringAopProvider() {
       @Nonnull
-      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
         return new SpringAdvisedElementsSearcher(aClass.getManager(), Collections.singletonList(SpringUtils.getSpringModel(bean)));
       }
     }, myTestRootDisposable);
@@ -105,7 +105,7 @@ public class AopSpringJavaHighlightingTest extends JavaCodeInsightFixtureTestCas
 
     IdeaTestUtil.registerExtension(Extensions.getRootArea(), AopProvider.EXTENSION_POINT_NAME, new SpringAopProvider() {
       @Nullable
-      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
         return new SpringAdvisedElementsSearcher(aClass.getManager(), Collections.singletonList(SpringUtils.getSpringModel(bean)));
       }
     }, myTestRootDisposable);

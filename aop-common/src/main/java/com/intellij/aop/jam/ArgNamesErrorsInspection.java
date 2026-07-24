@@ -40,16 +40,16 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
     }
 
     protected void checkAnnotation(
-        final PsiParameter[] parameters, final ProblemsHolder holder,
-        final ArgNamesManipulator manipulator, final PsiMethod method
+        PsiParameter[] parameters, ProblemsHolder holder,
+        ArgNamesManipulator manipulator, PsiMethod method
     ) {
-        final String names = manipulator.getArgNames();
+        String names = manipulator.getArgNames();
         if (names != null) {
-            final String[] strings = names.trim().split(",");
+            String[] strings = names.trim().split(",");
             for (int i = 0; i < strings.length; i++) {
                 strings[i] = strings[i].trim();
             }
-            final List<String> actualNames = getGeneralArgumentNames(parameters);
+            List<String> actualNames = getGeneralArgumentNames(parameters);
             if (!actualNames.equals(Arrays.asList(strings))) {
                 holder.newProblem(AopLocalize.errorArgnamesShouldMatch(manipulator.getArgNamesAttributeName()))
                     .range(manipulator.getArgNamesProblemElement())
@@ -69,23 +69,23 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
                 return;
             }
         }
-        final PsiReference returningReference = manipulator.getReturningReference();
+        PsiReference returningReference = manipulator.getReturningReference();
         if (returningReference != null) {
             if (method != null && returningReference.resolve() == null) {
                 addAnnoReferenceProblem(holder, returningReference);
                 return;
             }
         }
-        final PsiReference throwingReference = manipulator.getThrowingReference();
+        PsiReference throwingReference = manipulator.getThrowingReference();
         if (throwingReference != null) {
-            final PsiElement psiElement = throwingReference.resolve();
+            PsiElement psiElement = throwingReference.resolve();
             if (method != null && psiElement == null) {
                 addAnnoReferenceProblem(holder, throwingReference);
                 return;
             }
             else if (psiElement instanceof PsiParameter) {
-                final PsiManager psiManager = psiElement.getManager();
-                final PsiClass throwableClass = JavaPsiFacade.getInstance(psiManager.getProject())
+                PsiManager psiManager = psiElement.getManager();
+                PsiClass throwableClass = JavaPsiFacade.getInstance(psiManager.getProject())
                     .findClass(CommonClassNames.JAVA_LANG_THROWABLE, GlobalSearchScope.allScope(psiElement.getProject()));
                 if (throwableClass != null &&
                     !JavaPsiFacade.getInstance(psiManager.getProject())
@@ -100,10 +100,10 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
             }
         }
 
-        for (final PsiParameter parameter : parameters) {
+        for (PsiParameter parameter : parameters) {
             if (!LocalAopModel.isJoinPointParamer(parameter)) {
                 boolean hasRef = !ReferencesSearch.search(parameter).forEach(new Processor<PsiReference>() {
-                    public boolean process(final PsiReference reference) {
+                    public boolean process(PsiReference reference) {
                         return !(reference.getElement().getContainingFile() instanceof AopPointcutExpressionFile);
                     }
                 });
@@ -117,23 +117,23 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
     }
 
     @RequiredReadAction
-    private static void addAnnoReferenceProblem(final ProblemsHolder holder, final PsiReference returningReference) {
-        final PsiElement element = returningReference.getElement();
+    private static void addAnnoReferenceProblem(ProblemsHolder holder, PsiReference returningReference) {
+        PsiElement element = returningReference.getElement();
         TextRange range = returningReference.getRangeInElement();
-        final boolean emptyRange = range.isEmpty();
+        boolean emptyRange = range.isEmpty();
         if (emptyRange) {
             range = TextRange.from(range.getStartOffset(), 1);
         }
         LocalizeValue message = ProblemsHolder.unresolvedReferenceMessage(returningReference);
-        final ProblemHighlightType highlightType = emptyRange || !(element instanceof PsiLiteralExpression || element instanceof XmlElement)
+        ProblemHighlightType highlightType = emptyRange || !(element instanceof PsiLiteralExpression || element instanceof XmlElement)
             ? ProblemHighlightType.GENERIC_ERROR_OR_WARNING : ProblemHighlightType.LIKE_UNKNOWN_SYMBOL;
         holder.registerProblem(InspectionManager.getInstance(element.getProject()).createProblemDescriptor(element, range, message.get(),
             highlightType
         ));
     }
 
-    public static List<String> getGeneralArgumentNames(final PsiParameter[] parameters) {
-        final List<String> actualNames = new ArrayList<String>();
+    public static List<String> getGeneralArgumentNames(PsiParameter[] parameters) {
+        List<String> actualNames = new ArrayList<String>();
         for (PsiParameter parameter : parameters) {
             actualNames.add(parameter.getName());
         }

@@ -17,14 +17,14 @@ import java.util.Collection;
 */
 public class ParentRefConverter extends SpringBeanResolveConverter.PropertyBean {
 
-  public SpringBeanPointer fromString(final @Nullable String s, final ConvertContext context) {
+  public SpringBeanPointer fromString(@Nullable String s, ConvertContext context) {
     if (s == null) return null;
-    final SpringModel model = getSpringModel(context);
+    SpringModel model = getSpringModel(context);
     return model == null ? null : model.findParentBean(s);
   }
 
   @Nonnull
-  public Collection<SpringBeanPointer> getVariants(final ConvertContext context) {
+  public Collection<SpringBeanPointer> getVariants(ConvertContext context) {
     return getVariants(context, true);
   }
 }

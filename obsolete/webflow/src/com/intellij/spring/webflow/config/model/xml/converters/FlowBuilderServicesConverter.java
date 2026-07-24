@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class FlowBuilderServicesConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
    @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
    return new String[]{  WebflowConstants.FLOW_BUILDER_SERVICES_CLASS_NAME};
   }
 }

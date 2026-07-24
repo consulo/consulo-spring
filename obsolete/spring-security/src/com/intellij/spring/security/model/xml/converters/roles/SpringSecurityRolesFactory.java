@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class SpringSecurityRolesFactory implements Disposable {
 
-  public static SpringSecurityRolesFactory getInstance(final Module module) {
+  public static SpringSecurityRolesFactory getInstance(Module module) {
       return ModuleServiceManager.getService(module, SpringSecurityRolesFactory.class);
   }
 
@@ -23,12 +23,12 @@ public class SpringSecurityRolesFactory implements Disposable {
 
   private final PsiFile myDummyFile;
 
-  public SpringSecurityRolesFactory(final Module module) {
+  public SpringSecurityRolesFactory(Module module) {
     myDummyFile = PsiFileFactory.getInstance(module.getProject()).createFileFromText("dummy_security_roles.java", "");
   }
 
   @NotNull
-  public SpringSecurityRole getOrCreateRole(final String roleName, @NotNull PsiFile containingFile) {
+  public SpringSecurityRole getOrCreateRole(String roleName, @NotNull PsiFile containingFile) {
     if (myContributers.containsKey(containingFile) && myContributers.get(containingFile) != containingFile.getModificationStamp()) {
       myRoles.clear();
       myContributers.clear();

@@ -21,7 +21,7 @@ public abstract class SpringAspectImpl implements SpringAspect {
 
   @Nullable
   public PsiClass getPsiClass() {
-    final SpringBeanPointer pointer = getRef().getValue();
+    SpringBeanPointer pointer = getRef().getValue();
     return pointer != null ? pointer.getBeanClass() : null;
   }
 

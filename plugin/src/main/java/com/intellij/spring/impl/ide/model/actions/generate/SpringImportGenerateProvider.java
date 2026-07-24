@@ -11,8 +11,8 @@ public class SpringImportGenerateProvider extends BasicSpringDomGenerateProvider
     super(SpringBundle.message("spring.import"), SpringImport.class);
   }
 
-  public SpringImport generate(@Nullable final DomElement parent, final Editor editor) {
-    final SpringImport springImport = super.generate(parent, editor);
+  public SpringImport generate(@Nullable DomElement parent, Editor editor) {
+    SpringImport springImport = super.generate(parent, editor);
 
     if (springImport != null) {
       springImport.getResource().ensureXmlElementExists();
@@ -21,7 +21,7 @@ public class SpringImportGenerateProvider extends BasicSpringDomGenerateProvider
     return springImport;
   }
 
-  protected DomElement getElementToNavigate(final SpringImport springImport) {
+  protected DomElement getElementToNavigate(SpringImport springImport) {
     return springImport.getResource();
   }
 }

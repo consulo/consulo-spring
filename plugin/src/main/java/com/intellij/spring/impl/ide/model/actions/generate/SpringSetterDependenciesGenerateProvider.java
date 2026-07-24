@@ -23,14 +23,14 @@ public class SpringSetterDependenciesGenerateProvider extends AbstractDomGenerat
     super(SpringBundle.message("spring.generate.setter.dependencies"), SpringProperty.class);
   }
 
-  protected DomElement getParentDomElement(final Project project, final Editor editor, final PsiFile file) {
+  protected DomElement getParentDomElement(Project project, Editor editor, PsiFile file) {
     return SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
   }
 
-  public SpringProperty generate(@Nullable final DomElement parent, final Editor editor) {
+  public SpringProperty generate(@Nullable DomElement parent, Editor editor) {
 
     if (!(parent instanceof SpringBean)) return null;
-    final List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list =
+    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list =
       GenerateSpringBeanDependenciesUtil.generateDependenciesFor((SpringBean)parent, true);
 
     SpringGenerateTemplatesHolder merged = new SpringGenerateTemplatesHolder(editor.getProject() );
@@ -42,10 +42,10 @@ public class SpringSetterDependenciesGenerateProvider extends AbstractDomGenerat
     return list.size() > 0 ? (SpringProperty)list.get(0).getFirst() : null;
   }
 
-  protected void doNavigate(final DomElementNavigationProvider navigateProvider, final DomElement element) {
+  protected void doNavigate(DomElementNavigationProvider navigateProvider, DomElement element) {
   }
 
-  public boolean isAvailableForElement(@Nonnull final DomElement contextElement) {
+  public boolean isAvailableForElement(@Nonnull DomElement contextElement) {
     return contextElement instanceof SpringBean && GenerateSpringBeanDependenciesUtil.acceptBean((SpringBean)contextElement, true);
   }
 }

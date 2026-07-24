@@ -56,23 +56,23 @@ public class MissingAspectjAutoproxyInspection extends AOPLocalInspectionTool {
         return true;
     }
 
-    public ProblemDescriptor[] checkFile(@Nonnull final PsiFile file, @Nonnull final InspectionManager manager, final boolean isOnTheFly) {
+    public ProblemDescriptor[] checkFile(@Nonnull PsiFile file, @Nonnull InspectionManager manager, boolean isOnTheFly) {
         if (file instanceof PsiJavaFile) {
-            final Module module = ModuleUtilCore.findModuleForPsiElement(file);
+            Module module = ModuleUtilCore.findModuleForPsiElement(file);
             if (module == null || SpringUtils.isSpring25(module)) {
                 return null;
             }
 
-            for (final PsiClass aClass : ((PsiJavaFile) file).getClasses()) {
-                final PsiModifierList modifierList = aClass.getModifierList();
+            for (PsiClass aClass : ((PsiJavaFile) file).getClasses()) {
+                PsiModifierList modifierList = aClass.getModifierList();
                 if (modifierList != null) {
-                    final PsiAnnotation annotation = modifierList.findAnnotation(AopConstants.ASPECT_ANNO);
+                    PsiAnnotation annotation = modifierList.findAnnotation(AopConstants.ASPECT_ANNO);
                     if (annotation != null) {
-                        final AopAdvisedElementsSearcher searcher = mySpringAopProvider.getValue().getAdvisedElementsSearcher(aClass);
+                        AopAdvisedElementsSearcher searcher = mySpringAopProvider.getValue().getAdvisedElementsSearcher(aClass);
                         if (searcher instanceof SpringAdvisedElementsSearcher) {
-                            final List<SpringModel> models = ((SpringAdvisedElementsSearcher) searcher).getSpringModels();
+                            List<SpringModel> models = ((SpringAdvisedElementsSearcher) searcher).getSpringModels();
                             if (!models.isEmpty() && !isAspectJSupportEnabled(models)) {
-                                final LocalQuickFix[] fixes = models.isEmpty()
+                                LocalQuickFix[] fixes = models.isEmpty()
                                     ? LocalQuickFix.EMPTY_ARRAY
                                     : new LocalQuickFix[]{new EnableAspectJQuickFix(models.get(0))};
                                 return new ProblemDescriptor[]{
@@ -105,10 +105,10 @@ public class MissingAspectjAutoproxyInspection extends AOPLocalInspectionTool {
     }
 
     public static boolean isAspectJSupportEnabled(List<SpringModel> models) {
-        for (final SpringModel model : models) {
-            for (final DomFileElement<Beans> fileElement : model.getRoots()) {
-                for (final CommonSpringBean springBean : SpringUtils.getChildBeans(fileElement.getRootElement(), false)) {
-                    final PsiClass beanClass = springBean.getBeanClass();
+        for (SpringModel model : models) {
+            for (DomFileElement<Beans> fileElement : model.getRoots()) {
+                for (CommonSpringBean springBean : SpringUtils.getChildBeans(fileElement.getRootElement(), false)) {
+                    PsiClass beanClass = springBean.getBeanClass();
                     if (beanClass != null && SpringConstants.ASPECTJ_AUTOPROXY_BEAN_CLASS.equals(beanClass.getQualifiedName())) {
                         return true;
                     }

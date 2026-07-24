@@ -67,7 +67,7 @@ public class AopCompletionData extends CompletionContributor implements AopEleme
       CompletionType.BASIC,
       modifier(not(string().oneOf(modifiers))),
       (parameters, context, result) -> {
-        for (final String modifier : modifiers) {
+        for (String modifier : modifiers) {
           result.addElement(keyword(modifier));
         }
       }
@@ -158,7 +158,7 @@ public class AopCompletionData extends CompletionContributor implements AopEleme
     return LookupElementBuilder.create(s).setInsertHandler(ParenthesesInsertHandler.WITH_PARAMETERS).setBold();
   }
 
-  private static ElementPattern<PsiElement> modifier(final ElementPattern allowedModifiers) {
+  private static ElementPattern<PsiElement> modifier(ElementPattern allowedModifiers) {
     return psiElement().withSuperParent(2, psiElement(AopReferenceHolder.class).withParent(
       psiElement(PsiExecutionExpression.class))).afterLeafSkipping(
       or(
@@ -171,10 +171,10 @@ public class AopCompletionData extends CompletionContributor implements AopEleme
   }
 
   @RequiredReadAction
-  private static String findPrefix(final PsiElement insertedElement, final int offsetInFile, String oldPrefix) {
-    final ProcessingContext matchingContext = new ProcessingContext();
+  private static String findPrefix(PsiElement insertedElement, int offsetInFile, String oldPrefix) {
+    ProcessingContext matchingContext = new ProcessingContext();
     if (POINTCUT_REFERENCE_PATTERN.accepts(insertedElement, matchingContext)) {
-      final PsiElement psiElement = matchingContext.get(POINTCUT_REFERENCE_KEY);
+      PsiElement psiElement = matchingContext.get(POINTCUT_REFERENCE_KEY);
       return psiElement.getText().substring(0, offsetInFile - psiElement.getTextRange().getStartOffset());
     }
 

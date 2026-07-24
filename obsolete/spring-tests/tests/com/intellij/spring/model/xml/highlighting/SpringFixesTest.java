@@ -22,8 +22,8 @@ public class SpringFixesTest extends SpringHighlightingTestCase<JavaModuleFixtur
   }
 
   public void testMethodReplacerFix() throws Throwable {
-    final List<IntentionAction> list = myFixture.getAvailableIntentions("methodReplacerFix.xml", "MethodReplacerBean.java");
-    final IntentionAction action = CodeInsightTestUtil
+    List<IntentionAction> list = myFixture.getAvailableIntentions("methodReplacerFix.xml", "MethodReplacerBean.java");
+    IntentionAction action = CodeInsightTestUtil
       .findIntentionByText(list, "Make 'MethodReplacerBean' implement 'org.springframework.beans.factory.support.MethodReplacer'");
     assertNotNull(action);
     myFixture.launchAction(action);
@@ -34,7 +34,7 @@ public class SpringFixesTest extends SpringHighlightingTestCase<JavaModuleFixtur
     myFixture.testRename("innerBeanClassRename.xml", "innerBeanClassRename_after.xml", "NewName", "InnerBean.java");
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     if (getName().equals("testMethodReplacerFix")) {
       addSpringJar(moduleBuilder);

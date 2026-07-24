@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class InterfacesImpl implements Interfaces {
   @NotNull
   public List<? extends PsiType> getRequiredTypes() {
-    final Project project = getManager().getProject();
+    Project project = getManager().getProject();
 
     return Collections.singletonList(PsiType.getJavaLangClass(PsiManager.getInstance(project), GlobalSearchScope.allScope(project)));
   }

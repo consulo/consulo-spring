@@ -17,10 +17,10 @@ public abstract class WebflowDomModelManager {
     return ServiceManager.getService(project, WebflowDomModelManager.class);
   }
 
-  public abstract boolean isWebflow(@NotNull final XmlFile file) ;
+  public abstract boolean isWebflow(@NotNull XmlFile file) ;
 
   @Nullable
-  public abstract WebflowModel getWebflowModel(@NotNull final XmlFile file);
+  public abstract WebflowModel getWebflowModel(@NotNull XmlFile file);
 
    public abstract List<WebflowModel> getAllModels(@NotNull Module module);
 }

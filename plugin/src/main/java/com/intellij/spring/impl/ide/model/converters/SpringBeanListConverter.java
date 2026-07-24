@@ -53,12 +53,12 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
 
     @Override
     @Nullable
-    protected SpringBeanPointer convertString(final @Nullable String s, final ConvertContext context) {
+    protected SpringBeanPointer convertString(@Nullable String s, ConvertContext context) {
         if (s == null) {
             return null;
         }
 
-        final SpringModel model = SpringConverterUtil.getSpringModel(context);
+        SpringModel model = SpringConverterUtil.getSpringModel(context);
         if (model == null) {
             return null;
         }
@@ -68,13 +68,13 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
 
     @Override
     @Nullable
-    protected String toString(@Nullable final SpringBeanPointer springBeanPointer) {
+    protected String toString(@Nullable SpringBeanPointer springBeanPointer) {
         return springBeanPointer == null ? null : springBeanPointer.getName();
     }
 
     @Override
     @Nullable
-    protected PsiElement resolveReference(final SpringBeanPointer springBeanPointer, final ConvertContext context) {
+    protected PsiElement resolveReference(SpringBeanPointer springBeanPointer, ConvertContext context) {
         return springBeanPointer == null ? null : springBeanPointer.getPsiElement();
     }
 
@@ -85,23 +85,23 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
     }
 
     @Override
-    protected Object[] getReferenceVariants(final ConvertContext context, GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
-        final SpringModel model = SpringConverterUtil.getSpringModel(context);
+    protected Object[] getReferenceVariants(ConvertContext context, GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
+        SpringModel model = SpringConverterUtil.getSpringModel(context);
         if (model == null) {
             return EMPTY_ARRAY;
         }
 
         List<SpringBeanPointer> variants = new ArrayList<SpringBeanPointer>();
 
-        final DomSpringBean currentBean = SpringConverterUtil.getCurrentBean(context);
+        DomSpringBean currentBean = SpringConverterUtil.getCurrentBean(context);
 
-        final Collection<? extends SpringBeanPointer> allBeans = getVariantBeans(model);
+        Collection<? extends SpringBeanPointer> allBeans = getVariantBeans(model);
         for (SpringBeanPointer pointer : allBeans) {
             if (pointer.isReferenceTo(currentBean)) {
                 continue;
             }
 
-            final String beanName = pointer.getName();
+            String beanName = pointer.getName();
             if (beanName != null) {
                 for (String string : model.getAllBeanNames(beanName)) {
                     if (StringUtil.isNotEmpty(string)) {
@@ -111,10 +111,10 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
             }
         }
 
-        final List<SpringBeanPointer> list = genericDomValue.getValue();
+        List<SpringBeanPointer> list = genericDomValue.getValue();
         if (list != null) {
             for (Iterator<SpringBeanPointer> i = variants.iterator(); i.hasNext(); ) {
-                final CommonSpringBean variant = i.next().getSpringBean();
+                CommonSpringBean variant = i.next().getSpringBean();
                 for (SpringBeanPointer existing : list) {
                     if (existing.isReferenceTo(variant)) {
                         i.remove();
@@ -125,11 +125,11 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
         }
 
         List<LookupElement> result = new ArrayList<LookupElement>();
-        for (final SpringBeanPointer pointer : variants) {
-            final String beanName = pointer.getName();
+        for (SpringBeanPointer pointer : variants) {
+            String beanName = pointer.getName();
             if (beanName != null) {
-                final LookupElementBuilder element = LookupElementBuilder.create(pointer, beanName).withIcon(pointer.getBeanIcon());
-                final PsiClass psiClass = pointer.getBeanClass();
+                LookupElementBuilder element = LookupElementBuilder.create(pointer, beanName).withIcon(pointer.getBeanIcon());
+                PsiClass psiClass = pointer.getBeanClass();
                 if (psiClass != null) {
                     element.withTypeText(psiClass.getName());
                 }
@@ -147,8 +147,8 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
     @Override
     @Nonnull
     protected PsiReference createPsiReference(
-        final PsiElement element, final int start, final int end, final ConvertContext context,
-        final GenericDomValue<List<SpringBeanPointer>> genericDomValue, final boolean delimitersOnly
+        PsiElement element, int start, int end, ConvertContext context,
+        GenericDomValue<List<SpringBeanPointer>> genericDomValue, boolean delimitersOnly
     ) {
 
         return new MyFixableReference(element, new TextRange(start, end), context, genericDomValue, delimitersOnly);
@@ -157,11 +157,11 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
     protected class MyFixableReference extends MyPsiReference implements LocalQuickFixProvider {
 
         public MyFixableReference(
-            final PsiElement element,
-            final TextRange range,
-            final ConvertContext context,
-            final GenericDomValue<List<SpringBeanPointer>> genericDomValue,
-            final boolean delimitersOnly
+            PsiElement element,
+            TextRange range,
+            ConvertContext context,
+            GenericDomValue<List<SpringBeanPointer>> genericDomValue,
+            boolean delimitersOnly
         ) {
             super(element, range, context, genericDomValue, delimitersOnly);
         }
@@ -169,14 +169,14 @@ public class SpringBeanListConverter extends DelimitedListConverter<SpringBeanPo
         private final CreateElementQuickFixProvider<List<SpringBeanPointer>> myQuickFixProvider =
             new CreateElementQuickFixProvider<List<SpringBeanPointer>>() {
                 @Override
-                protected String getElementName(@Nonnull final GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
+                protected String getElementName(@Nonnull GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
                     return getValue().trim();
                 }
 
                 @Override
-                protected void apply(final String elementName, final GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
+                protected void apply(String elementName, GenericDomValue<List<SpringBeanPointer>> genericDomValue) {
                     Beans beans = genericDomValue.getParentOfType(Beans.class, false);
-                    final SpringBean springBean = beans.addBean();
+                    SpringBean springBean = beans.addBean();
                     springBean.setName(elementName);
                 }
 

@@ -29,7 +29,7 @@ import java.util.List;
 
 public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     if (getName().equals("testInclude") ||
         getName().equals("testReplacedMethod") ||
@@ -52,8 +52,8 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   public void testInclude() throws Throwable {
     myFixture.testHighlighting("import/includeHighlightingTest.xml");
 
-    final XmlFile xmlFile = (XmlFile)myFixture.getFile();
-    final SpringModel model = SpringManager.getInstance(myProject).getSpringModelByFile(xmlFile);
+    XmlFile xmlFile = (XmlFile)myFixture.getFile();
+    SpringModel model = SpringManager.getInstance(myProject).getSpringModelByFile(xmlFile);
     assert model != null;
     assertEquals(4, model.getConfigFiles().size());
   }
@@ -67,13 +67,13 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   }
 
   public void testDependsOnVariants() throws Throwable {
-    final SpringBean springBean = getBeanFromFile("spring-beans-depends-on-variants.xml", "test5");
+    SpringBean springBean = getBeanFromFile("spring-beans-depends-on-variants.xml", "test5");
 
-    final XmlAttributeValue xmlAttributeValue = springBean.getDependsOn().getXmlAttributeValue();
+    XmlAttributeValue xmlAttributeValue = springBean.getDependsOn().getXmlAttributeValue();
     assert xmlAttributeValue != null;
-    final PsiReference[] references = xmlAttributeValue.getReferences();
+    PsiReference[] references = xmlAttributeValue.getReferences();
 
-    final Object[] variants = references[0].getVariants();
+    Object[] variants = references[0].getVariants();
     assertEquals(3, variants.length);
   }
 
@@ -98,7 +98,7 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   public void testLookupMethod() throws Throwable {
     myFixture.testHighlighting("spring-beans-lookup-method.xml");
 
-    final SpringBean springBean = getBeanFromFile("spring-beans-lookup-method.xml", "lookupTest");
+    SpringBean springBean = getBeanFromFile("spring-beans-lookup-method.xml", "lookupTest");
     LookupMethod lookup = springBean.getLookupMethods().get(0);
     assertNotNull(lookup);
 
@@ -130,7 +130,7 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   public void testReplacedMethod() throws Throwable {
     myFixture.testHighlighting("spring-beans-replaced-method.xml");
 
-    final SpringBean springBean = getBeanFromFile("spring-beans-replaced-method.xml", "testReplacer");
+    SpringBean springBean = getBeanFromFile("spring-beans-replaced-method.xml", "testReplacer");
     ReplacedMethod replaced = springBean.getReplacedMethods().get(0);
     assertNotNull(replaced);
 
@@ -143,7 +143,7 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
 
   //todo[serega] add some assertions
   public void testDestroyAndInitMethod() throws Throwable {
-    final SpringBean springBean = getBeanFromFile("spring-bean-destroy-and-init-method.xml", "foo");
+    SpringBean springBean = getBeanFromFile("spring-bean-destroy-and-init-method.xml", "foo");
 
     XmlAttributeValue xmlAttributeValue = springBean.getDestroyMethod().getXmlAttributeValue();
     assert xmlAttributeValue != null;
@@ -155,19 +155,19 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   }
 
   public void testSpringBeansParentVariants() throws Throwable {
-    final DomFileElement<Beans> fileElement = getFileElement("spring-beans-parent.xml", Beans.class, myProject);
+    DomFileElement<Beans> fileElement = getFileElement("spring-beans-parent.xml", Beans.class, myProject);
 
-    final String beanId = "test";
+    String beanId = "test";
 
-    final SpringBean springBean = findBeanById(fileElement.getRootElement(), beanId);
+    SpringBean springBean = findBeanById(fileElement.getRootElement(), beanId);
     assertNotNull("Cannot find bean = " + beanId  , springBean);
 
-    final XmlAttributeValue xmlAttributeValue = springBean.getParentBean().getXmlAttributeValue();
+    XmlAttributeValue xmlAttributeValue = springBean.getParentBean().getXmlAttributeValue();
     assertNotNull(xmlAttributeValue);
 
-    final PsiReference[] references = xmlAttributeValue.getReferences();
+    PsiReference[] references = xmlAttributeValue.getReferences();
 
-    final Object[] variants = references[0].getVariants();
+    Object[] variants = references[0].getVariants();
     assertEquals(10, variants.length);
   }
 
@@ -217,7 +217,7 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   }
 
   public void testCreateBeanQuickFix() throws Throwable {
-    final Collection<IntentionAction> actions = myFixture.getAvailableIntentions("createBeanQuickFix.xml");
+    Collection<IntentionAction> actions = myFixture.getAvailableIntentions("createBeanQuickFix.xml");
     for (IntentionAction action : actions) {
       if (action.getText().startsWith("Create new")) {
         myFixture.launchAction(action);
@@ -228,7 +228,7 @@ public class SpringBeansHighlightingTest extends SpringHighlightingTestCase {
   }
 
   public void testCompiledProperty() throws Throwable {
-    final List<IntentionAction> list = myFixture.getAvailableIntentions("compiledProperty.xml");
+    List<IntentionAction> list = myFixture.getAvailableIntentions("compiledProperty.xml");
     for (IntentionAction intentionAction : list) {
       if (intentionAction.getFamilyName().equals(SpringBundle.message("model.bean.quickfix.family"))) {
         assertTrue(false);

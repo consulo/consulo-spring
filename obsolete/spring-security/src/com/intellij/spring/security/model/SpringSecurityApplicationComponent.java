@@ -37,7 +37,7 @@ public class SpringSecurityApplicationComponent implements ApplicationComponent,
   }
 
   private static void registerDomFileDescriptionComponents() {
-    final SpringDomFileDescription springDomFileDescription = SpringDomFileDescription.getInstance();
+    SpringDomFileDescription springDomFileDescription = SpringDomFileDescription.getInstance();
 
     springDomFileDescription.registerNamespacePolicy(SpringSecurityConstants.SECURITY_NAMESPACE_KEY, SpringSecurityConstants.SECURITY_NAMESPACE);
 

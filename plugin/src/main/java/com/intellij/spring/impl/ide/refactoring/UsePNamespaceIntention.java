@@ -35,21 +35,21 @@ public class UsePNamespaceIntention implements IntentionAction {
         return SpringLocalize.usePNamespace();
     }
 
-    public boolean isAvailable(@Nonnull final Project project, final Editor editor, final PsiFile file) {
+    public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
         if (!(file instanceof XmlFile)) {
             return false;
         }
 
-        final SpringProperty property = DomUtil.getContextElement(editor, SpringProperty.class);
+        SpringProperty property = DomUtil.getContextElement(editor, SpringProperty.class);
         return property != null &&
             property.getParent() instanceof SpringBean &&
             property.getName().getStringValue() != null &&
             (DomUtil.hasXml(property.getValueElement()) || DomUtil.hasXml(property.getRefElement()));
     }
 
-    public void invoke(@Nonnull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
+    public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         if (SpringUpdateSchemaIntention.requestSchemaUpdate((XmlFile) file)) {
-            final SpringProperty property = DomUtil.getContextElement(editor, SpringProperty.class);
+            SpringProperty property = DomUtil.getContextElement(editor, SpringProperty.class);
             assert property != null;
             if (property.getXmlTag().getNamespaceByPrefix("p").equals(XmlUtil.EMPTY_URI)) {
                 XmlNamespaceHelper.getHelper((XmlFile) file).insertNamespaceDeclaration(
@@ -60,22 +60,22 @@ public class UsePNamespaceIntention implements IntentionAction {
                     null
                 );
             }
-            final SpringBean bean = (SpringBean) property.getParent();
+            SpringBean bean = (SpringBean) property.getParent();
             assert bean != null;
-            final String name = property.getName().getStringValue();
-            final String value = property.getValueElement().getStringValue();
-            final XmlTag tag = bean.getXmlTag();
+            String name = property.getName().getStringValue();
+            String value = property.getValueElement().getStringValue();
+            XmlTag tag = bean.getXmlTag();
             if (value != null) {
                 property.undefine();
-                final XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("p:" + name, value);
+                XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("p:" + name, value);
                 tag.add(attribute);
                 tag.collapseIfEmpty();
                 return;
             }
-            final String ref = property.getRefElement().getStringValue();
+            String ref = property.getRefElement().getStringValue();
             if (ref != null) {
                 property.undefine();
-                final XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("p:" + name + "-ref", ref);
+                XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("p:" + name + "-ref", ref);
                 tag.add(attribute);
                 tag.collapseIfEmpty();
             }

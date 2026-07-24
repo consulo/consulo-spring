@@ -33,7 +33,7 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
   private final AopAdviceType myType;
   protected final JamAnnotationMeta myAnnoMeta;
 
-  public AopAdviceImpl(final AopAdviceType type, JamAnnotationMeta annoMeta) {
+  public AopAdviceImpl(AopAdviceType type, JamAnnotationMeta annoMeta) {
     myAnnoMeta = annoMeta;
     myType = type;
   }
@@ -51,7 +51,7 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
   @Nullable
   @Override
   public PsiPointcutExpression getPointcutExpression() {
-    final PsiAnnotationMemberValue param = getAnnoParam();
+    PsiAnnotationMemberValue param = getAnnoParam();
     return AopPointcutImpl.getPsiPointcutExpression(param);
   }
 
@@ -63,13 +63,13 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
 
   @Override
   public AopAdvisedElementsSearcher getSearcher() {
-    final PsiPointcutExpression expression = getPointcutExpression();
+    PsiPointcutExpression expression = getPointcutExpression();
     return expression == null ? null : expression.getContainingFile().getAopModel().getAdvisedElementsSearcher();
   }
 
   @Override
-  public PointcutMatchDegree accepts(final PsiMethod method) {
-    final PsiPointcutExpression expression = getPointcutExpression();
+  public PointcutMatchDegree accepts(PsiMethod method) {
+    PsiPointcutExpression expression = getPointcutExpression();
     return expression == null ? PointcutMatchDegree.FALSE : expression.acceptsSubject(new PointcutContext(expression), method);
   }
 
@@ -94,10 +94,10 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
   }
 
   @Nullable
-  public static PsiParameter findParameter(@Nullable final PsiMethod method, @Nonnull final String parameterName) {
+  public static PsiParameter findParameter(@Nullable PsiMethod method, @Nonnull String parameterName) {
     if (method != null) {
-      final PsiParameter[] parameters = method.getParameterList().getParameters();
-      for (final PsiParameter parameter : parameters) {
+      PsiParameter[] parameters = method.getParameterList().getParameters();
+      for (PsiParameter parameter : parameters) {
         if (parameterName.equals(parameter.getName())) return parameter;
       }
     }

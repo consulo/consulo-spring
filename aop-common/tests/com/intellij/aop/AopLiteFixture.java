@@ -31,7 +31,7 @@ public abstract class AopLiteFixture extends LiteFixture {
     LanguageAnnotators.INSTANCE.addExplicitExtension(AopPointcutExpressionLanguage.getInstance(), new AopAnnotator());
   }
 
-  public static void addAopAnnotations(final JavaCodeInsightTestFixture fixture) throws IOException {
+  public static void addAopAnnotations(JavaCodeInsightTestFixture fixture) throws IOException {
     fixture.addClass("package org.aspectj.lang.annotation; public @interface Pointcut {" +
                                         "java.lang.String value();" +
                                         "java.lang.String argNames() default \"\";" +

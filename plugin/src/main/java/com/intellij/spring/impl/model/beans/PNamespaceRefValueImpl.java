@@ -27,7 +27,7 @@ public abstract class PNamespaceRefValueImpl implements PNamespaceRefValue {
   @Nonnull
   @NonNls
   public String getPropertyName() {
-    final String name = getXmlElementName();
+    String name = getXmlElementName();
     return name.substring(0, name.length() - "-ref".length());
   }
 

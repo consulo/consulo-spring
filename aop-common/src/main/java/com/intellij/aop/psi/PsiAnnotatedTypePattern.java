@@ -16,7 +16,7 @@ import java.util.Set;
 public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
   private final AopPsiTypePattern myAnnotationPattern;
 
-  public PsiAnnotatedTypePattern(final AopPsiTypePattern annotationPattern) {
+  public PsiAnnotatedTypePattern(AopPsiTypePattern annotationPattern) {
     myAnnotationPattern = annotationPattern;
   }
 
@@ -24,41 +24,41 @@ public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
     return myAnnotationPattern;
   }
 
-  public boolean accepts(@Nonnull final PsiType type) {
+  public boolean accepts(@Nonnull PsiType type) {
     if (type instanceof PsiClassType) {
-      final PsiClass psiClass = ((PsiClassType)type).resolve();
+      PsiClass psiClass = ((PsiClassType)type).resolve();
       if (psiClass != null && acceptsAnnotationPattern(psiClass, myAnnotationPattern, false)) return true;
     }
     return false;
   }
 
-  public static boolean acceptsAnnotationPattern(@Nonnull final PsiModifierListOwner owner, final AopPsiTypePattern annoPattern, boolean shoulBeInherited) {
+  public static boolean acceptsAnnotationPattern(@Nonnull PsiModifierListOwner owner, AopPsiTypePattern annoPattern, boolean shoulBeInherited) {
     return acceptsAnnotationPattern(owner, annoPattern, shoulBeInherited, new HashSet<PsiModifierListOwner>());
   }
 
-  private static boolean acceptsAnnotationPattern(final PsiModifierListOwner owner, final AopPsiTypePattern annoPattern,
-                                                  final boolean shoulBeInherited,
-                                                  final Set<PsiModifierListOwner> visited) {
+  private static boolean acceptsAnnotationPattern(PsiModifierListOwner owner, AopPsiTypePattern annoPattern,
+                                                  boolean shoulBeInherited,
+                                                  Set<PsiModifierListOwner> visited) {
     visited.add(owner);
     if (annoPattern instanceof NotPattern) {
       return !acceptsAnnotationPattern(owner, ((NotPattern)annoPattern).getInnerPattern(), shoulBeInherited);
     }
 
-    final PsiModifierList modifierList = owner.getModifierList();
+    PsiModifierList modifierList = owner.getModifierList();
     if (modifierList != null) {
-      for (final PsiAnnotation annotation : modifierList.getAnnotations()) {
-        final PsiJavaCodeReferenceElement element = annotation.getNameReferenceElement();
+      for (PsiAnnotation annotation : modifierList.getAnnotations()) {
+        PsiJavaCodeReferenceElement element = annotation.getNameReferenceElement();
         if (element != null) {
-          final PsiElement psiElement = element.resolve();
+          PsiElement psiElement = element.resolve();
           if (psiElement instanceof PsiClass) {
-            final PsiClass annoClass = (PsiClass)psiElement;
+            PsiClass annoClass = (PsiClass)psiElement;
             if (annoPattern.accepts(JavaPsiFacade.getInstance(psiElement.getProject()).getElementFactory().createType(annoClass))) {
-              final PsiModifierList list = annoClass.getModifierList();
+              PsiModifierList list = annoClass.getModifierList();
               return !shoulBeInherited || list != null && list.findAnnotation(CommonClassNames.JAVA_LANG_ANNOTATION_INHERITED) != null;
             }
           }
         }
-        final String qualifiedName = annotation.getQualifiedName();
+        String qualifiedName = annotation.getQualifiedName();
         if (qualifiedName != null && annoPattern.accepts(qualifiedName)) {
           return true;
         }
@@ -73,7 +73,7 @@ public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
   }
 
   @Nonnull
-  public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
+  public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     return PointcutMatchDegree.valueOf(accepts(type));
   }
 }

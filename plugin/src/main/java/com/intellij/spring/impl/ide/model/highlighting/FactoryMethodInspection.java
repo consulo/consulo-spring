@@ -36,18 +36,18 @@ public class FactoryMethodInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel model,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel model,
         Object state
     ) {
-        final PsiMethod factoryMethod = springBean.getFactoryMethod().getValue();
+        PsiMethod factoryMethod = springBean.getFactoryMethod().getValue();
         if (factoryMethod != null) {
             if (!SpringBeanFactoryMethodConverter.isPublic(factoryMethod)) {
                 holder.createProblem(springBean.getFactoryMethod(), SpringLocalize.methodMustBePublic(factoryMethod.getName()).get());
             }
-            final boolean isStatic = SpringBeanFactoryMethodConverter.isStatic(factoryMethod);
-            final SpringBeanPointer factoryBean = springBean.getFactoryBean().getValue();
+            boolean isStatic = SpringBeanFactoryMethodConverter.isStatic(factoryMethod);
+            SpringBeanPointer factoryBean = springBean.getFactoryBean().getValue();
             if (!isStatic && factoryBean == null) {
                 holder.createProblem(springBean.getFactoryMethod(), SpringLocalize.methodMustBeStatic(factoryMethod.getName()).get());
             }

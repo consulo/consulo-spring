@@ -34,15 +34,15 @@ import java.util.Set;
 
 public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter {
     @Nullable
-    protected PsiClass getPsiClass(final ConvertContext context) {
-        final SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
+    protected PsiClass getPsiClass(ConvertContext context) {
+        SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
         return getFactoryClass(springBean);
     }
 
     protected MethodAccepter getMethodAccepter(ConvertContext context, final boolean forCompletion) {
-        final SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
+        SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
         assert springBean != null;
-        final SpringModel model = SpringUtils.getSpringModel(springBean);
+        SpringModel model = SpringUtils.getSpringModel(springBean);
         final boolean fromFactoryBean = springBean.getFactoryBean().getValue() != null;
         final boolean autowire = SpringAutowireUtil.isConstructorAutowire(springBean);
         final Set<ConstructorArg> args = springBean.getAllConstructorArgs();
@@ -53,7 +53,7 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
                     return false;
                 }
 
-                final String containingClass = psiMethod.getContainingClass().getQualifiedName();
+                String containingClass = psiMethod.getContainingClass().getQualifiedName();
                 return (!forCompletion || containingClass == null || !containingClass.equals(CommonClassNames.JAVA_LANG_OBJECT)) &&
                     isValidFactoryMethod(psiMethod, fromFactoryBean) &&
                     (forCompletion || SpringConstructorArgResolveUtil.acceptMethodByAutowire(
@@ -67,10 +67,10 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
 
     // gets methods matching the method name
     @Nonnull
-    public static List<PsiMethod> getFactoryMethodCandidates(@Nonnull final SpringBean springBean, @Nonnull final String methodName) {
-        final PsiClass factoryClass = getFactoryClass(springBean);
+    public static List<PsiMethod> getFactoryMethodCandidates(@Nonnull SpringBean springBean, @Nonnull String methodName) {
+        PsiClass factoryClass = getFactoryClass(springBean);
         if (factoryClass != null) {
-            final PsiMethod[] methods;
+            PsiMethod[] methods;
             if (factoryClass.isEnum()) {
                 MethodResolveProcessor processor = new MethodResolveProcessor(methodName);
                 factoryClass.processDeclarations(processor, ResolveState.initial(), null, factoryClass);
@@ -80,8 +80,8 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
                 methods = factoryClass.findMethodsByName(methodName, true);
             }
             if (methods.length > 0) {
-                final ArrayList<PsiMethod> result = new ArrayList<PsiMethod>(methods.length);
-                final boolean fromFactoryBean = springBean.getFactoryBean().getValue() != null;
+                ArrayList<PsiMethod> result = new ArrayList<PsiMethod>(methods.length);
+                boolean fromFactoryBean = springBean.getFactoryBean().getValue() != null;
                 for (PsiMethod method : methods) {
                     if (isValidFactoryMethod(method, fromFactoryBean)) {
                         result.add(method);
@@ -93,48 +93,48 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
         return Collections.emptyList();
     }
 
-    public static boolean isValidFactoryMethod(final PsiMethod psiMethod, final boolean fromFactoryBean) {
+    public static boolean isValidFactoryMethod(PsiMethod psiMethod, boolean fromFactoryBean) {
         if (psiMethod.isConstructor() || psiMethod.getReturnType() == null) {
             return false;
         }
 
-        final boolean isStatic = isStatic(psiMethod);
+        boolean isStatic = isStatic(psiMethod);
         return isPublic(psiMethod) &&
             (fromFactoryBean && !isStatic || !fromFactoryBean && isStatic) &&
             isProperReturnType(psiMethod);
     }
 
     @Nullable
-    public static PsiClass getFactoryClass(final SpringBean springBean) {
-        final SpringBeanPointer factoryBeanPointer = springBean.getFactoryBean().getValue();
+    public static PsiClass getFactoryClass(SpringBean springBean) {
+        SpringBeanPointer factoryBeanPointer = springBean.getFactoryBean().getValue();
         if (factoryBeanPointer == null) {
             return springBean.getBeanClass(false);
         }
         else {
-            final CommonSpringBean factoryBean = factoryBeanPointer.getSpringBean();
+            CommonSpringBean factoryBean = factoryBeanPointer.getSpringBean();
             return factoryBean.equals(springBean) ? null : factoryBean.getBeanClass(false);
         }
     }
 
-    public static boolean isPublic(final PsiMethod psiMethod) {
+    public static boolean isPublic(PsiMethod psiMethod) {
         return psiMethod.hasModifierProperty(PsiModifier.PUBLIC);
     }
 
-    public static boolean isStatic(final PsiMethod psiMethod) {
+    public static boolean isStatic(PsiMethod psiMethod) {
         return psiMethod.hasModifierProperty(PsiModifier.STATIC);
     }
 
-    public static boolean isProperReturnType(final PsiMethod psiMethod) {
-        final PsiType returnType = psiMethod.getReturnType();
+    public static boolean isProperReturnType(PsiMethod psiMethod) {
+        PsiType returnType = psiMethod.getReturnType();
         return returnType instanceof PsiClassType;
     }
 
-    public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
+    public LocalQuickFix[] getQuickFixes(ConvertContext context) {
         List<LocalQuickFix> fixes = new ArrayList<LocalQuickFix>();
-        final SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
-        final GenericDomValue element = (GenericDomValue) context.getInvocationElement();
+        SpringBean springBean = (SpringBean) SpringConverterUtil.getCurrentBean(context);
+        GenericDomValue element = (GenericDomValue) context.getInvocationElement();
 
-        final String elementName = element.getStringValue();
+        String elementName = element.getStringValue();
         if (elementName != null && elementName.length() > 0) {
             PsiClass psiClass = getFactoryMethodClass(springBean);
             if (psiClass != null) {
@@ -148,8 +148,8 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
     }
 
     @Nullable
-    private static PsiClass getFactoryMethodClass(final SpringBean springBean) {
-        final SpringBeanPointer factoryBeanPointer = springBean.getFactoryBean().getValue();
+    private static PsiClass getFactoryMethodClass(SpringBean springBean) {
+        SpringBeanPointer factoryBeanPointer = springBean.getFactoryBean().getValue();
 
         return factoryBeanPointer != null ? factoryBeanPointer.getSpringBean().getBeanClass(false) : springBean.getBeanClass(false);
     }
@@ -165,14 +165,14 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
                 return SpringLocalize.modelCreateFactoryMethodQuickfixMessage(getSignature(springBean, elementName));
             }
 
-            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+            public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                 try {
                     assert beanClass != null;
-                    final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
+                    PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
 
-                    final String signature = getSignature(springBean, elementName) + "{ return null; }";
+                    String signature = getSignature(springBean, elementName) + "{ return null; }";
 
-                    final PsiMethod method = elementFactory.createMethodFromText(signature, null);
+                    PsiMethod method = elementFactory.createMethodFromText(signature, null);
 
                     beanClass.add(method);
                 }
@@ -184,11 +184,11 @@ public class SpringBeanFactoryMethodConverter extends SpringBeanMethodConverter 
     }
 
     @NonNls
-    private static String getSignature(@Nonnull final SpringBean springBean, @Nonnull final String elementName) {
+    private static String getSignature(@Nonnull SpringBean springBean, @Nonnull String elementName) {
         boolean isStatic = springBean.getFactoryBean().getValue() == null;
 
         String params = SpringConstructorArgResolveUtil.suggestParamsForConstructorArgsAsString(springBean);
-        final PsiClass psiClass = springBean.getBeanClass();
+        PsiClass psiClass = springBean.getBeanClass();
         String returnType = psiClass == null ? "java.lang.String" : psiClass.getQualifiedName();
 
         StringBuilder signature = new StringBuilder();

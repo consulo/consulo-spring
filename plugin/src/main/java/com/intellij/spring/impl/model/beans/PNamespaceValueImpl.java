@@ -31,12 +31,12 @@ public abstract class PNamespaceValueImpl implements PNamespaceValue {
   }
 
   @Nonnull
-  static List<PsiType> getPropertyType(final DomElement value, @Nonnull @NonNls final String name) {
-    final SpringBean bean = (SpringBean)value.getParent();
+  static List<PsiType> getPropertyType(DomElement value, @Nonnull @NonNls String name) {
+    SpringBean bean = (SpringBean)value.getParent();
     assert bean != null;
-    final PsiClass beanClass = bean.getBeanClass();
+    PsiClass beanClass = bean.getBeanClass();
     if (beanClass != null) {
-      final List<PsiMethod> methods = PropertyUtil.getSetters(beanClass, name);
+      List<PsiMethod> methods = PropertyUtil.getSetters(beanClass, name);
       return ContainerUtil.map2List(methods, psiMethod -> PropertyUtil.getPropertyType(psiMethod));
     }
     return Collections.emptyList();

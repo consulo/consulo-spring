@@ -7,12 +7,12 @@ import jakarta.annotation.Nullable;
 
 public class SpringBeanGenerateProvider extends BasicSpringDomGenerateProvider<SpringBean> {
 
-  public SpringBeanGenerateProvider(final String description, @NonNls String template) {
+  public SpringBeanGenerateProvider(String description, @NonNls String template) {
     super(description, SpringBean.class, template);
   }
 
   @Nullable
-  protected DomElement getElementToNavigate(final SpringBean springBean) {
+  protected DomElement getElementToNavigate(SpringBean springBean) {
     return null;
   }
 }

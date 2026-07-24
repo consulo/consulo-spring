@@ -35,23 +35,23 @@ public class SpringImplicitUsageProvider implements ImplicitUsageProvider {
                                                   AopConstants.AFTER_THROWING_ANNO);
 
   @Override
-  public boolean isImplicitUsage(final PsiElement element) {
+  public boolean isImplicitUsage(PsiElement element) {
     return isImplicitWrite(element) || isBeanConstructor(element);
   }
 
   @Override
-  public boolean isImplicitWrite(final PsiElement element) {
+  public boolean isImplicitWrite(PsiElement element) {
     return element instanceof PsiModifierListOwner &&
       AnnotationUtil.isAnnotated((PsiModifierListOwner)element, WUSED_SYMBOL_ANNOTATIONS, 0);
   }
 
-  private static boolean isBeanConstructor(final PsiElement element) {
+  private static boolean isBeanConstructor(PsiElement element) {
     if (element instanceof PsiMethod && ((PsiMethod)element).isConstructor()) {
-      final PsiClass containingClass = ((PsiMethod)element).getContainingClass();
+      PsiClass containingClass = ((PsiMethod)element).getContainingClass();
       if (containingClass == null) {
         return false;
       }
-      final SpringModel springModel = SpringUtils.getModelByPsiElement(element);
+      SpringModel springModel = SpringUtils.getModelByPsiElement(element);
       return springModel != null && !springModel.findBeansByPsiClass(containingClass).isEmpty();
     }
     return false;

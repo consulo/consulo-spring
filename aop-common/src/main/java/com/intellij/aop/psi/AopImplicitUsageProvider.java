@@ -16,9 +16,9 @@ import consulo.language.psi.util.PsiTreeUtil;
  */
 @ExtensionImpl
 public class AopImplicitUsageProvider implements ImplicitUsageProvider {
-  public boolean isImplicitUsage(final PsiElement element) {
+  public boolean isImplicitUsage(PsiElement element) {
     if (element instanceof PsiParameter) {
-      final PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+      PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
       if (method != null && method.getModifierList().findAnnotation(AopConstants.POINTCUT_ANNO) != null) {
         return true;
       }
@@ -26,11 +26,11 @@ public class AopImplicitUsageProvider implements ImplicitUsageProvider {
     return false;
   }
 
-  public boolean isImplicitRead(final PsiElement element) {
+  public boolean isImplicitRead(PsiElement element) {
     return false;
   }
 
-  public boolean isImplicitWrite(final PsiElement element) {
+  public boolean isImplicitWrite(PsiElement element) {
     return false;
   }
 }

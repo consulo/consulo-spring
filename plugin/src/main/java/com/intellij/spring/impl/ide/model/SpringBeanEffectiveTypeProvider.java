@@ -17,12 +17,12 @@ public abstract class SpringBeanEffectiveTypeProvider {
   public static final ExtensionPointName<SpringBeanEffectiveTypeProvider> EP_NAME =
     ExtensionPointName.create(SpringBeanEffectiveTypeProvider.class);
 
-  public abstract void processEffectiveTypes(@Nonnull final CommonSpringBean bean, Collection<PsiClass> result);
+  public abstract void processEffectiveTypes(@Nonnull CommonSpringBean bean, Collection<PsiClass> result);
 
-  public boolean createCustomProblem(@Nonnull final CommonSpringBean bean,
+  public boolean createCustomProblem(@Nonnull CommonSpringBean bean,
                                      @Nonnull PsiType expectedType,
-                                     final DomElementAnnotationHolder holder,
-                                     final DomElement element) {
+                                     DomElementAnnotationHolder holder,
+                                     DomElement element) {
     return false;
   }
 

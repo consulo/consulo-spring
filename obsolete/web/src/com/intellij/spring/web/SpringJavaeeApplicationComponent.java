@@ -32,21 +32,21 @@ public class SpringJavaeeApplicationComponent implements ApplicationComponent {
   public void initComponent() {
     addCustomActions();
     ElementPresentationManager.registerNameProvider(new NullableFunction<Object, String>() {
-      public String fun(final Object o) {
+      public String fun(Object o) {
         return o instanceof SpringMVCRequestMapping ? ((SpringMVCRequestMapping)o).getName() : null;
       }
     });
 
     RenameInputValidatorRegistry.getInstance().registerInputValidator(PsiJavaPatterns.psiAnnotation().qName(SpringMVCRequestMapping.REQUEST_MAPPING), new RenameInputValidator() {
-      public boolean isInputValid(final String newName, final PsiElement element, final ProcessingContext context) {
+      public boolean isInputValid(String newName, PsiElement element, ProcessingContext context) {
         return true;
       }
     });
   }
 
   private static void addCustomActions() {
-    final DefaultActionGroup group = (DefaultActionGroup)ActionManager.getInstance().getAction("Spring.Template.Beans.ActionGroup");
-    final AnAction[] actions = group.getChildren(null);
+    DefaultActionGroup group = (DefaultActionGroup)ActionManager.getInstance().getAction("Spring.Template.Beans.ActionGroup");
+    AnAction[] actions = group.getChildren(null);
     for (AnAction action : actions) {
       if (action instanceof GenerateDataAccessPatternsGroup) {
         try {
@@ -56,7 +56,7 @@ public class SpringJavaeeApplicationComponent implements ApplicationComponent {
         break;
       }
     }
-    final DefaultActionGroup patternsGroup = (DefaultActionGroup)ActionManager.getInstance().getAction("Spring.Patterns.ActionGroup");
+    DefaultActionGroup patternsGroup = (DefaultActionGroup)ActionManager.getInstance().getAction("Spring.Patterns.ActionGroup");
     if (patternsGroup != null) {
       patternsGroup.addSeparator();
       patternsGroup.add(new JpaPatternAction());

@@ -43,35 +43,35 @@ public class SpringIntroduceBeanIntention implements IntentionAction {
         return SpringLocalize.introduceBeanIntention();
     }
 
-    public boolean isAvailable(@Nonnull final Project project, final Editor editor, final PsiFile file) {
+    public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
         if (!(file instanceof XmlFile) || !SpringManager.getInstance(project).isSpringBeans((XmlFile) file)) {
             return false;
         }
 
-        final SpringBean springBean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
+        SpringBean springBean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
         return springBean != null && springBean.getParent() instanceof SpringValueHolder;
     }
 
-    public void invoke(@Nonnull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
-        final SpringBean springBean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
+    public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+        SpringBean springBean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
         moveToTheTopLevel(project, editor, springBean);
     }
 
-    public static void moveToTheTopLevel(final Project project, final Editor editor, final SpringBean springBean) {
+    public static void moveToTheTopLevel(Project project, Editor editor, SpringBean springBean) {
         if (springBean == null) {
             return;
         }
-        final SpringBean topLevelBean = SpringUtils.getTopLevelBean(springBean);
+        SpringBean topLevelBean = SpringUtils.getTopLevelBean(springBean);
 
-        final SpringBean newBean = DomUtil.addElementAfter(topLevelBean);
+        SpringBean newBean = DomUtil.addElementAfter(topLevelBean);
         newBean.copyFrom(springBean);
 
-        final String id = newBean.getId().getValue();
+        String id = newBean.getId().getValue();
         if (id == null) {
             try {
-                final XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("id", "");
-                final XmlTag tag = newBean.getXmlTag();
-                final XmlAttribute[] attributes = tag.getAttributes();
+                XmlAttribute attribute = XmlElementFactory.getInstance(project).createXmlAttribute("id", "");
+                XmlTag tag = newBean.getXmlTag();
+                XmlAttribute[] attributes = tag.getAttributes();
                 if (attributes.length > 0) {
                     tag.addBefore(attribute, attributes[0]);
                 }
@@ -84,50 +84,50 @@ public class SpringIntroduceBeanIntention implements IntentionAction {
             }
         }
 
-        final SpringValueHolder holder = (SpringValueHolder) springBean.getParent();
+        SpringValueHolder holder = (SpringValueHolder) springBean.getParent();
         assert holder != null;
         holder.getRefAttr().setStringValue(id == null ? "" : id);
 
         springBean.undefine();
 
-        final XmlTag tag = holder.getXmlTag();
+        XmlTag tag = holder.getXmlTag();
         tag.collapseIfEmpty();
 
         if (id != null) {
             return;
         }
 
-        final SpringBean topLevelBeanCopy = topLevelBean.createStableCopy();
-        final SpringBean newBeanCopy = newBean.createStableCopy();
-        final SpringValueHolder holderCopy = holder.createStableCopy();
+        SpringBean topLevelBeanCopy = topLevelBean.createStableCopy();
+        SpringBean newBeanCopy = newBean.createStableCopy();
+        SpringValueHolder holderCopy = holder.createStableCopy();
 
-        final Document document = editor.getDocument();
+        Document document = editor.getDocument();
         PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document);
 
-        final int start = topLevelBeanCopy.getXmlTag().getTextOffset();
-        final int end = newBeanCopy.getXmlTag().getTextRange().getEndOffset();
+        int start = topLevelBeanCopy.getXmlTag().getTextOffset();
+        int end = newBeanCopy.getXmlTag().getTextRange().getEndOffset();
 
-        final TemplateManager templateManager = TemplateManager.getInstance(project);
-        final Template template = templateManager.createTemplate("", "");
+        TemplateManager templateManager = TemplateManager.getInstance(project);
+        Template template = templateManager.createTemplate("", "");
         template.setToReformat(true);
 
-        final String text = document.getText();
-        final int refOffset = holderCopy.getRefAttr().getXmlAttributeValue().getTextOffset();
-        final int idOffset = newBeanCopy.getId().getXmlAttributeValue().getTextOffset();
+        String text = document.getText();
+        int refOffset = holderCopy.getRefAttr().getXmlAttributeValue().getTextOffset();
+        int idOffset = newBeanCopy.getId().getXmlAttributeValue().getTextOffset();
 
         template.addTextSegment(text.substring(start, refOffset));
 
         final String[] names = SpringUtils.suggestBeanNames(newBean);
-        final Expression node = new Expression() {
-            public Result calculateResult(final ExpressionContext context) {
+        Expression node = new Expression() {
+            public Result calculateResult(ExpressionContext context) {
                 return null;
             }
 
-            public Result calculateQuickResult(final ExpressionContext context) {
+            public Result calculateQuickResult(ExpressionContext context) {
                 return null;
             }
 
-            public LookupElement[] calculateLookupItems(final ExpressionContext context) {
+            public LookupElement[] calculateLookupItems(ExpressionContext context) {
                 return ContainerUtil.map2Array(names, LookupElement.class, (Function<String, LookupElement>) LookupElementBuilder::create);
             }
         };

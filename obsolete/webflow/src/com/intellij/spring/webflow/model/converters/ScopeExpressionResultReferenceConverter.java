@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 public class ScopeExpressionResultReferenceConverter implements CustomReferenceConverter {
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
-    final ScopeReferenceSet referenceSet = new ScopeReferenceSet(element, genericDomValue);
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
+    ScopeReferenceSet referenceSet = new ScopeReferenceSet(element, genericDomValue);
 
     return referenceSet.getPsiReferences();
   }
@@ -22,13 +22,13 @@ public class ScopeExpressionResultReferenceConverter implements CustomReferenceC
   private static class ScopeReferenceSet extends ReferenceSetBase {
     private final GenericDomValue myDomValue;
 
-    public ScopeReferenceSet(final PsiElement element, final GenericDomValue genericDomValue) {
+    public ScopeReferenceSet(PsiElement element, GenericDomValue genericDomValue) {
       super(element, 0);
       myDomValue = genericDomValue;
     }
 
     @NotNull
-    protected PsiReference createReference(final TextRange range, final int index) {
+    protected PsiReference createReference(TextRange range, int index) {
       switch (index) {
         case 0:
            return new WebflowScopeReference(getElement(), range, myDomValue);
@@ -40,7 +40,7 @@ public class ScopeExpressionResultReferenceConverter implements CustomReferenceC
     }
 
     private class UnresolvableReference extends PsiReferenceBase<PsiElement> {
-      public UnresolvableReference(final TextRange range) {
+      public UnresolvableReference(TextRange range) {
         super(ScopeReferenceSet.this.getElement(), range, false);
       }
 

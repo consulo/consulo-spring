@@ -39,7 +39,7 @@ public abstract class SpringStereotypeElement extends JamPsiClassSpringBean {
 
   @Override
   public String getBeanName() {
-    final String definedName = getAnnotationDefinedBeanName();
+    String definedName = getAnnotationDefinedBeanName();
 
     if (!StringUtil.isEmptyOrSpaces(definedName)) return definedName;
 
@@ -52,16 +52,16 @@ public abstract class SpringStereotypeElement extends JamPsiClassSpringBean {
 
   @Nullable
   public SpringJamQualifier getQualifier() {
-    final Module module = getModule();
+    Module module = getModule();
     if (module == null) {
       return null;
     }
 
-    final List<PsiClass> annotationTypeClasses = JamAnnotationTypeUtil.getQualifierAnnotationTypesWithChildren(module);
+    List<PsiClass> annotationTypeClasses = JamAnnotationTypeUtil.getQualifierAnnotationTypesWithChildren(module);
 
     for (PsiClass annotationTypeClass : annotationTypeClasses) {
       if (JamAnnotationTypeUtil.isAcceptedFor(annotationTypeClass, ElementType.TYPE)) {
-        final PsiAnnotation annotation = AnnotationUtil.findAnnotation(getPsiElement(), annotationTypeClass.getQualifiedName());
+        PsiAnnotation annotation = AnnotationUtil.findAnnotation(getPsiElement(), annotationTypeClass.getQualifiedName());
         if(annotation != null) {
            return new SpringJamQualifier(annotation, getPsiElement(), this);
         }
@@ -77,7 +77,7 @@ public abstract class SpringStereotypeElement extends JamPsiClassSpringBean {
 
   @Override
   public String toString() {
-    final String beanName = getBeanName();
+    String beanName = getBeanName();
     return beanName == null ? "" : beanName;
   }
 }

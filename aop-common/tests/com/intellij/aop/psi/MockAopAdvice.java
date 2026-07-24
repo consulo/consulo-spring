@@ -25,7 +25,7 @@ public class MockAopAdvice extends MockDomElement implements AopAdvice {
   private final PsiPointcutExpression myPointcutExpression;
   private final XmlTag myXmlTag;
 
-  public MockAopAdvice(final PsiPointcutExpression pointcutExpression) throws IncorrectOperationException {
+  public MockAopAdvice(PsiPointcutExpression pointcutExpression) throws IncorrectOperationException {
     myPointcutExpression = pointcutExpression;
     myXmlTag = XmlElementFactory.getInstance(pointcutExpression.getProject()).createTagFromText("<a/>");
   }
@@ -40,7 +40,7 @@ public class MockAopAdvice extends MockDomElement implements AopAdvice {
     throw new UnsupportedOperationException("Method getAdviceType is not yet implemented in " + getClass().getName());
   }
 
-  public PointcutMatchDegree accepts(final PsiMethod method) {
+  public PointcutMatchDegree accepts(PsiMethod method) {
     PsiPointcutExpression expression = getPointcutExpression();
     return expression != null ? expression.acceptsSubject(new PointcutContext(expression), method) : PointcutMatchDegree.FALSE;
   }

@@ -26,15 +26,15 @@ class MethodParameterConverter extends JamConverter<PsiParameter> {
 
   @Override
   public PsiParameter fromString(@Nullable String name, JamStringAttributeElement<PsiParameter> context) {
-    final PsiAnnotation annotation = context.getParentAnnotationElement().getPsiElement();
-    final PsiMethod method = (PsiMethod)annotation.getParent().getParent();
+    PsiAnnotation annotation = context.getParentAnnotationElement().getPsiElement();
+    PsiMethod method = (PsiMethod)annotation.getParent().getParent();
     return name != null ? AopAdviceImpl.findParameter(method, name) : null;
   }
 
   @Nonnull
   @Override
   public PsiReference[] createReferences(JamStringAttributeElement<PsiParameter> context) {
-    final PsiLiteral expression = context.getPsiLiteral();
+    PsiLiteral expression = context.getPsiLiteral();
     if (expression == null) return PsiReference.EMPTY_ARRAY;
 
     return new PsiReference[]{new AopAnnoParameterReference(expression)};

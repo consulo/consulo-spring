@@ -31,7 +31,7 @@ public class RemoteRepositoryInfo {
   private final String myPresentableName;
   private final String[] myMirrors;
 
-  public RemoteRepositoryInfo(@Nonnull @NonNls String id, final @Nonnull @Nls String presentableName, final @Nonnull @NonNls String[] mirrors) {
+  public RemoteRepositoryInfo(@Nonnull @NonNls String id, @Nonnull @Nls String presentableName, @Nonnull @NonNls String[] mirrors) {
     myId = id;
     LOG.assertTrue(mirrors.length > 0);
     myPresentableName = presentableName;
@@ -54,11 +54,11 @@ public class RemoteRepositoryInfo {
     return myMirrors[0];
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final RemoteRepositoryInfo that = (RemoteRepositoryInfo)o;
+    RemoteRepositoryInfo that = (RemoteRepositoryInfo)o;
     return myId.equals(that.myId);
 
   }

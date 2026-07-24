@@ -30,9 +30,9 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
 
     protected void checkAopMethod(
         final PsiMethod pointcutMethod,
-        final LocalAopModel model,
-        final ProblemsHolder holder,
-        final AopPointcutExpressionFile aopFile
+        LocalAopModel model,
+        ProblemsHolder holder,
+        AopPointcutExpressionFile aopFile
     ) {
         if (model.getArgNamesManipulator().getAdviceType() != AopAdviceType.AROUND) {
             return;
@@ -44,13 +44,13 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
             holder.newProblem(AopLocalize.aroundAdviceShouldReturnSomething())
                 .range(model.getArgNamesManipulator().getCommonProblemElement())
                 .withFix(new LocalQuickFix() {
-                    public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+                    public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                         if (!pointcutMethod.isValid()) {
                             return;
                         }
 
                         try {
-                            final PsiClassType object =
+                            PsiClassType object =
                                 PsiType.getJavaLangObject(pointcutMethod.getManager(), pointcutMethod.getResolveScope());
                             pointcutMethod.getReturnTypeElement().replace(factory.createTypeElement(object));
                         }
@@ -69,7 +69,7 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
             return;
         }
 
-        final PsiParameter[] parameters = pointcutMethod.getParameterList().getParameters();
+        PsiParameter[] parameters = pointcutMethod.getParameterList().getParameters();
         if (parameters.length == 0 || !parameters[0].getType().equalsToText(AopConstants.PROCEEDING_JOIN_POINT)) {
             holder.newProblem(AopLocalize.aroundAdviceCallCannotProceed())
                 .range(model.getArgNamesManipulator().getCommonProblemElement())
@@ -79,17 +79,17 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
                         return AopLocalize.addPjpParameter();
                     }
 
-                    public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+                    public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                         if (!pointcutMethod.isValid()) {
                             return;
                         }
 
                         try {
-                            final PsiParameter newParameter = factory.createParameter(
+                            PsiParameter newParameter = factory.createParameter(
                                 "pjp",
                                 factory.createTypeFromText(AopConstants.PROCEEDING_JOIN_POINT, pointcutMethod)
                             );
-                            final PsiParameterList list = pointcutMethod.getParameterList();
+                            PsiParameterList list = pointcutMethod.getParameterList();
                             if (list.getParametersCount() == 0) {
                                 list.add(newParameter);
                             }

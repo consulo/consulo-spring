@@ -29,16 +29,16 @@ public class CreateSpringConfigAction extends CreateFileAction {
         SpringIcons.CONFIG_FILE);
   }
 
-  protected boolean isAvailable(final DataContext dataContext) {
+  protected boolean isAvailable(DataContext dataContext) {
     if (!super.isAvailable(dataContext)) {
       return false;
     }
-    final consulo.module.Module module = dataContext.getData(LangDataKeys.MODULE);
+    consulo.module.Module module = dataContext.getData(LangDataKeys.MODULE);
     return module != null && JavaPsiFacade.getInstance(module.getProject()).findPackage("org.springframework") != null;
   }
 
   @Nonnull
-  protected PsiElement[] invokeDialog(final Project project, PsiDirectory directory) {
+  protected PsiElement[] invokeDialog(Project project, PsiDirectory directory) {
     MyInputValidator validator = new MyInputValidator(project, directory);
     Messages.showInputDialog(project, IdeBundle.message("prompt.enter.new.file.name"),
         IdeBundle.message("title.new.file"), Messages.getQuestionIcon(), null, validator);
@@ -46,11 +46,11 @@ public class CreateSpringConfigAction extends CreateFileAction {
   }
 
   @Nonnull
-  protected PsiElement[] create(final String newName, final PsiDirectory directory) throws Exception {
-    final Module module = ModuleUtilCore.findModuleForPsiElement(directory);
-    final FileTemplate template = null;///SpringFrameworkSupportProvider.chooseTemplate(module);
-    @NonNls final String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
-    final PsiElement psiElement = FileTemplateUtil.createFromTemplate(template, fileName, (Map<String, Object>) null, directory);
+  protected PsiElement[] create(String newName, PsiDirectory directory) throws Exception {
+    Module module = ModuleUtilCore.findModuleForPsiElement(directory);
+    FileTemplate template = null;///SpringFrameworkSupportProvider.chooseTemplate(module);
+    @NonNls String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
+    PsiElement psiElement = FileTemplateUtil.createFromTemplate(template, fileName, (Map<String, Object>) null, directory);
     return new PsiElement[]{psiElement};
   }
 }

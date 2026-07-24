@@ -43,7 +43,7 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
                           "testConstructorDependenciesAutowire").contains(getName());
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     for (String springJarTestName : springJarTestNames) {
       if (springJarTestName.equals(getName())) {
@@ -61,12 +61,12 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
 
   protected void doGenerationTest(String file, String expected) throws Throwable {
     myFixture.configureByFile(file);
-    final GenerateSpringBeanBodyAction action = new GenerateSpringBeanBodyAction(new SpringPropertiesGenerateProvider());
+    GenerateSpringBeanBodyAction action = new GenerateSpringBeanBodyAction(new SpringPropertiesGenerateProvider());
     assertTrue(action.isValidForFile(myProject, myFixture.getEditor(), myFixture.getFile()));
 
-    final int offset = myFixture.getEditor().getCaretModel().getOffset();
-    final PsiElement element = myFixture.getFile().findElementAt(offset);
-    final XmlTag tag = PsiTreeUtil.getParentOfType(element, XmlTag.class);
+    int offset = myFixture.getEditor().getCaretModel().getOffset();
+    PsiElement element = myFixture.getFile().findElementAt(offset);
+    XmlTag tag = PsiTreeUtil.getParentOfType(element, XmlTag.class);
     final SpringBean springBean = (SpringBean)DomManager.getDomManager(myProject).getDomElement(tag);
 
     final Collection<PsiMethod> psiMethods = SpringPropertiesGenerateProvider.getNonInjectedPropertySetters(springBean);
@@ -97,13 +97,13 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   }
 
   public void testFactoryBeanSetterDependencies() throws IOException {
-    final Beans beans = getBeans("primitive-properties.xml");
+    Beans beans = getBeans("primitive-properties.xml");
 
-    final SpringBean transactionManager = findBean(beans, "transactionManager");
-    final CommonSpringBean sessionFactory = findBean(beans, "sessionFactory");
+    SpringBean transactionManager = findBean(beans, "transactionManager");
+    CommonSpringBean sessionFactory = findBean(beans, "sessionFactory");
 
     assertNull(SpringUtils.findPropertyByName(transactionManager, "sessionFactory", true));
-    final List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = generateDependencies(transactionManager, Collections.singletonList(sessionFactory), true);
+    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = generateDependencies(transactionManager, Collections.singletonList(sessionFactory), true);
     SpringProperty springProperty = (SpringProperty)list.get(0).getFirst();
 
     assertEquals(springProperty.getName().getStringValue(), "sessionFactory");
@@ -111,16 +111,16 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   }
 
   public void testFactoryBeanConstructorDependencies() throws IOException {
-    final Beans beans = getBeans("primitive-properties.xml");
+    Beans beans = getBeans("primitive-properties.xml");
 
-    final SpringBean transactionManager = findBean(beans, "transactionManager");
-    final CommonSpringBean sessionFactory = findBean(beans, "sessionFactory");
+    SpringBean transactionManager = findBean(beans, "transactionManager");
+    CommonSpringBean sessionFactory = findBean(beans, "sessionFactory");
     List<SpringBeanClassMember> candidates = GenerateSpringBeanDependenciesUtil.getCandidates(transactionManager, false);
     assertEquals(candidates.size(), 1);
     assertEquals(candidates.get(0).getSpringBean().getSpringBean(), sessionFactory);
 
     assertEquals(SpringUtils.getConstructorArgs(transactionManager).size(), 0);
-    final List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = generateDependencies(transactionManager, Collections.singletonList(sessionFactory), false);
+    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = generateDependencies(transactionManager, Collections.singletonList(sessionFactory), false);
     assertEquals(SpringUtils.getConstructorArgs(transactionManager).size(), 1);
     ConstructorArg arg = (ConstructorArg)list.get(0).getFirst();
 
@@ -128,7 +128,7 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   }
 
   public void testFactoryBeanConstructorDependenciesForPsiClass() throws IOException {
-    final String tmClassName = "org.springframework.orm.hibernate3.HibernateTransactionManager";
+    String tmClassName = "org.springframework.orm.hibernate3.HibernateTransactionManager";
     SpringModel springModel = SpringManager.getInstance(myProject).getLocalSpringModel(getXmlFile("session-factory-spring-config.xml"));
 
     assertNotNull(springModel);
@@ -140,7 +140,7 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
 
     List<SpringBeanClassMember> candidates = GenerateSpringBeanDependenciesUtil.getCandidates(springModel, transactionManagerClass, false);
     assertEquals(candidates.size(), 1);
-    final CommonSpringBean springBean = springModel.getMergedModel().getBeans().get(0);
+    CommonSpringBean springBean = springModel.getMergedModel().getBeans().get(0);
     createBeanAndGenerateDependencies(transactionManagerClass, Collections.singletonList(springBean), false);
 
     springModel = SpringManager.getInstance(myProject).getLocalSpringModel(getXmlFile("session-factory-spring-config.xml"));
@@ -153,9 +153,9 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
 
   public void testSetterDependencies() throws Throwable {
     myFixture.configureByFiles("setter-dependencies.xml", "Foo.java", "Foo2.java", "Foo3.java", "Foo4.java");
-    final Beans beans = getBeans("setter-dependencies.xml");
-    final CommonSpringBean foo = findBean(beans, "foo");
-    final SpringBean foo2_has_foo_setter = findBean(beans, "foo2");
+    Beans beans = getBeans("setter-dependencies.xml");
+    CommonSpringBean foo = findBean(beans, "foo");
+    SpringBean foo2_has_foo_setter = findBean(beans, "foo2");
     assertNull(SpringUtils.findPropertyByName(foo2_has_foo_setter, "foo", true));
 
     assertNotNull(findPropertySetter(foo2_has_foo_setter, "foo"));
@@ -167,7 +167,7 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
     assertEquals(springProperty.getName().getStringValue(), "foo");
     assertEquals(springProperty.getRefAttr().getStringValue(), "foo");
 
-    final SpringBean foo3_has_no_foo_setter = findBean(beans, "foo3");
+    SpringBean foo3_has_no_foo_setter = findBean(beans, "foo3");
     assertNull(SpringUtils.findPropertyByName(foo3_has_no_foo_setter, "foo", true));
 
     assertNull(findPropertySetter(foo3_has_no_foo_setter, "foo"));
@@ -183,7 +183,7 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
     assertTrue(PropertyUtil.isSimplePropertySetter(propertySetter));
     assertTrue(propertySetter.getParameterList().getParameters()[0].getType().getCanonicalText().equals("Foo"));
 
-    final SpringBean foo4_has_foo_setter_with_wrong_type = findBean(beans, "foo4");
+    SpringBean foo4_has_foo_setter_with_wrong_type = findBean(beans, "foo4");
     propertySetter = findPropertySetter(foo4_has_foo_setter_with_wrong_type, "foo");
     assertNotNull(propertySetter);
     assertTrue(propertySetter.getParameterList().getParameters()[0].getType().getCanonicalText().equals("java.lang.String"));
@@ -213,10 +213,10 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
     myFixture.configureByFiles("constructor-dependencies.xml", "Foo.java", "Foo2.java", "Foo3.java",
                                "Foo4.java", "Foo5.java", "FooEmptyConstructor.java",
                                "FooSimpleConstructor.java");
-    final Beans beans = getBeans("constructor-dependencies.xml");
-    final CommonSpringBean foo = findBean(beans, "foo");
+    Beans beans = getBeans("constructor-dependencies.xml");
+    CommonSpringBean foo = findBean(beans, "foo");
 
-    final SpringBean foo_empty_constructor = findBean(beans, "fooEmptyConstructor");
+    SpringBean foo_empty_constructor = findBean(beans, "fooEmptyConstructor");
     assertEquals(0, foo_empty_constructor.getBeanClass().getConstructors().length);
 
     List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = generateDependencies(foo_empty_constructor, Collections.singletonList(foo), false);
@@ -230,10 +230,10 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   public void testConstructorDependenciesSimple() throws Throwable {
     myFixture.configureByFiles("Foo.java", "Foo2.java", "Foo3.java", "Foo4.java", "Foo5.java",
                                "FooEmptyConstructor.java", "FooSimpleConstructor.java");
-    final Beans beans = getBeans("constructor-dependencies.xml");
-    final CommonSpringBean foo = findBean(beans, "foo");
+    Beans beans = getBeans("constructor-dependencies.xml");
+    CommonSpringBean foo = findBean(beans, "foo");
 
-    final SpringBean foo_simple_constructor = findBean(beans, "fooSimpleConstructor");
+    SpringBean foo_simple_constructor = findBean(beans, "fooSimpleConstructor");
     List<ConstructorArg> constructorArgs = foo_simple_constructor.getConstructorArgs();
     assertEquals(constructorArgs.size(), 1);
     assertEquals(constructorArgs.get(0).getRefAttr().getStringValue(), "foo2");
@@ -266,10 +266,10 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   public void testConstructorDependenciesSimple2() throws Throwable {
     myFixture.configureByFiles("Foo.java", "Foo2.java", "Foo3.java", "Foo4.java", "Foo5.java",
                                "FooEmptyConstructor.java", "FooSimpleConstructor.java");
-    final Beans beans = getBeans("constructor-dependencies.xml");
-    final CommonSpringBean foo = findBean(beans, "foo");
+    Beans beans = getBeans("constructor-dependencies.xml");
+    CommonSpringBean foo = findBean(beans, "foo");
 
-    final SpringBean foo_simple_constructor = findBean(beans, "fooSimpleConstructor2");
+    SpringBean foo_simple_constructor = findBean(beans, "fooSimpleConstructor2");
     List<ConstructorArg> args = foo_simple_constructor.getConstructorArgs();
     assertEquals(args.size(), 1);
     assertEquals(args.get(0).getRefAttr().getStringValue(), "foo3");
@@ -304,11 +304,11 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
   public void testConstructorDependenciesAutowire() throws Throwable {
     myFixture.configureByFiles("constructor-dependencies.xml", "Foo.java", "Foo2.java", "Foo3.java", "Foo4.java",
                                "Foo5.java", "FooEmptyConstructor.java", "FooAutowiredConstructor.java");
-    final Beans beans = getBeans("constructor-dependencies.xml");
-    final CommonSpringBean foo5 = findBean(beans, "foo5");
+    Beans beans = getBeans("constructor-dependencies.xml");
+    CommonSpringBean foo5 = findBean(beans, "foo5");
 
     // 2 args are definde (1,3) and 2 are autowired (2,4)
-    final SpringBean foo_autowired_constructor = findBean(beans, "fooAutowiredConstructor");
+    SpringBean foo_autowired_constructor = findBean(beans, "fooAutowiredConstructor");
     assertEquals(foo_autowired_constructor.getConstructorArgs().size(), 2);
 
     PsiMethod[] psiMethods = foo_autowired_constructor.getBeanClass().getConstructors();
@@ -336,9 +336,9 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
                                                      final boolean isSetterDependencies) {
     final List<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>> list = new ArrayList<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>>();
     new WriteCommandAction(source.getManager().getProject()) {
-      protected void run(final Result result) throws Throwable {
+      protected void run(Result result) throws Throwable {
         list.add(GenerateSpringBeanDependenciesUtil.generateDependencies(source, ContainerUtil.map(targets, new Function<CommonSpringBean, SpringBeanPointer>() {
-          public SpringBeanPointer fun(final CommonSpringBean bean) {
+          public SpringBeanPointer fun(CommonSpringBean bean) {
             return SpringBeanPointer.createSpringBeanPointer(bean);
           }
         }), isSetterDependencies));
@@ -353,9 +353,9 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
                                                                   final boolean isSetterDependencies) {
     final List<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>> list = new ArrayList<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>>();
     new WriteCommandAction(source.getProject()) {
-      protected void run(final Result result) throws Throwable {
+      protected void run(Result result) throws Throwable {
         list.add(GenerateSpringBeanDependenciesUtil.createBeanAndGenerateDependencies(source, isSetterDependencies, ContainerUtil.map(targets, new Function<CommonSpringBean, SpringBeanPointer>() {
-          public SpringBeanPointer fun(final CommonSpringBean bean) {
+          public SpringBeanPointer fun(CommonSpringBean bean) {
             return SpringBeanPointer.createSpringBeanPointer(bean);
           }
         })));
@@ -367,15 +367,15 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
 
 
   public void testCompiledClassesDependencies() throws IOException {
-    final Beans beans = getBeans("compiled-classes-dependencies.xml");
+    Beans beans = getBeans("compiled-classes-dependencies.xml");
 
     assertFalse(GenerateSpringBeanDependenciesUtil.acceptBean(findBean(beans, "sessionFactory"), true));
     assertEquals(GenerateSpringBeanDependenciesUtil.getCandidates(findBean(beans, "transactionManager"), true).size(), 1);
     assertEquals(GenerateSpringBeanDependenciesUtil.getCandidates(findBean(beans, "foo"), true).size(), 2);
   }
 
-  private PsiMethod findPropertySetter(final SpringBean bean, final String propertyName) {
-    final PsiClass beanClass = bean.getBeanClass();
+  private PsiMethod findPropertySetter(SpringBean bean, String propertyName) {
+    PsiClass beanClass = bean.getBeanClass();
     assertNotNull(beanClass);
     for (PsiMethod psiMethod : beanClass.getAllMethods()) {
       if (PropertyUtil.isSimplePropertySetter(psiMethod) && propertyName.equals(PropertyUtil.getPropertyNameBySetter(psiMethod))) {
@@ -385,8 +385,8 @@ public class GenerateSpringModelElementsTest extends SpringHighlightingTestCase 
     return null;
   }
 
-  private PsiMethod findPropertySetter(final SpringBean bean, final String propertyName, final String className) {
-    final PsiClass beanClass = bean.getBeanClass();
+  private PsiMethod findPropertySetter(SpringBean bean, String propertyName, String className) {
+    PsiClass beanClass = bean.getBeanClass();
     assertNotNull(beanClass);
     for (PsiMethod psiMethod : beanClass.getAllMethods()) {
       if (PropertyUtil.isSimplePropertySetter(psiMethod) && propertyName.equals(PropertyUtil.getPropertyNameBySetter(psiMethod)) &&

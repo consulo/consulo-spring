@@ -61,7 +61,7 @@ public class SpringOsgiListenerInspection extends SpringOsgiBaseInspection {
   private void checkMethodSignature(GenericAttributeValue<PsiMethod> method, DomElementAnnotationHolder holder) {
     PsiMethod psiMethod = method.getValue();
     if (psiMethod != null) {
-      final PsiType returnType = psiMethod.getReturnType();
+      PsiType returnType = psiMethod.getReturnType();
       if (!PsiType.VOID.equals(returnType)) {
         holder.createProblem(method, SpringOsgiBundle.message("model.inspection.listener.common.method.return.type"));
       }

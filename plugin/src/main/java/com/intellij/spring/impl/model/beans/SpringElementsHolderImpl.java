@@ -32,13 +32,13 @@ public abstract class SpringElementsHolderImpl implements SpringElementsHolder {
   public PsiType[] getTypesByValue() {
     //todo: this method can return PsiType[] if value type is FactoryBean which produces multiple product types 
     Project project = getManager().getProject();
-    final PsiManager psiManager = PsiManager.getInstance(project);
-    final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+    PsiManager psiManager = PsiManager.getInstance(project);
+    GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
     PsiClass psiClass = null;
 
     if (DomUtil.hasXml(getValue())) {
-      final PsiType type = getValue().getType().getValue();
+      PsiType type = getValue().getType().getValue();
       if (type != null) {
         return new PsiType[]{type};
       }
@@ -47,31 +47,31 @@ public abstract class SpringElementsHolderImpl implements SpringElementsHolder {
       }
     }
     else if (DomUtil.hasXml(getBean())) {
-      final PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(getBean());
+      PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(getBean());
       if (classes.length > 0) {
         psiClass = classes[0];
       }
     }
     else if (DomUtil.hasXml(getRef())) {
-      final SpringRef springRef = getRef();
+      SpringRef springRef = getRef();
 
-      final SpringBeanPointer beanPointer = springRef.getBean().getValue();
+      SpringBeanPointer beanPointer = springRef.getBean().getValue();
       if (beanPointer != null) {
-        final PsiClass[] classes = beanPointer.getEffectiveBeanType();
+        PsiClass[] classes = beanPointer.getEffectiveBeanType();
         if (classes.length > 0) {
           psiClass = classes[0];
         }
       }
       else {
-        final SpringBeanPointer localPointer = springRef.getLocal().getValue();
+        SpringBeanPointer localPointer = springRef.getLocal().getValue();
         if (localPointer != null) {
-          final PsiClass[] classes = localPointer.getEffectiveBeanType();
+          PsiClass[] classes = localPointer.getEffectiveBeanType();
           if (classes.length > 0) {
             psiClass = classes[0];
           }
         }
         else {
-          final SpringBeanPointer parentPointer = springRef.getParentAttr().getValue();
+          SpringBeanPointer parentPointer = springRef.getParentAttr().getValue();
           if (parentPointer != null) {
             psiClass = parentPointer.getBeanClass();
           }

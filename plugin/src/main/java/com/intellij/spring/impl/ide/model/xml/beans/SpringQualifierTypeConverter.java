@@ -12,9 +12,9 @@ import consulo.xml.dom.ConvertContext;
  */
 public class SpringQualifierTypeConverter extends PsiClassConverter {
 
-  public PsiClass fromString(final String s, final ConvertContext context) {
+  public PsiClass fromString(String s, ConvertContext context) {
     if (s == null) {
-      final Project project = context.getPsiManager().getProject();
+      Project project = context.getPsiManager().getProject();
       return JavaPsiFacade.getInstance(project).findClass("org.springframework.beans.factory.annotation.Qualifier",
                                                           GlobalSearchScope.allScope(project));
     }

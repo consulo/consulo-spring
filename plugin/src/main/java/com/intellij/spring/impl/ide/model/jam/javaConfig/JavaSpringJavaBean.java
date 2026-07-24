@@ -107,7 +107,7 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
       if (method != null) {
         PsiType type = method.getReturnType();
         if (type instanceof PsiClassType) {
-          final PsiClass psiClass = ((PsiClassType)type).resolve();
+          PsiClass psiClass = ((PsiClassType)type).resolve();
           for (PsiMethod psiMethod : psiClass.getAllMethods()) {
             if (!psiMethod.isConstructor() && psiMethod.getParameterList().getParametersCount() == 0) {
               methods.add(psiMethod);

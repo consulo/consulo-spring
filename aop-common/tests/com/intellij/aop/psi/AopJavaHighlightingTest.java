@@ -35,7 +35,7 @@ public class AopJavaHighlightingTest extends JavaCodeInsightFixtureTestCase {
     }.execute();
 
     myFixture.enableInspections(tools);
-    final String path = getTestName(true) + ".java";
+    String path = getTestName(true) + ".java";
     myFixture.copyFileToProject(path);
     myFixture.testHighlighting(true, false, false, path);
   }

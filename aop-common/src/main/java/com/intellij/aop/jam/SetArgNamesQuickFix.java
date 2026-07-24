@@ -27,21 +27,21 @@ public class SetArgNamesQuickFix implements LocalQuickFix {
     private final ArgNamesManipulator myManipulator;
     private final PsiMethod myMethod;
 
-    public SetArgNamesQuickFix(@Nonnull LocalizeValue name, final boolean set, final ArgNamesManipulator manipulator, final PsiMethod method) {
+    public SetArgNamesQuickFix(@Nonnull LocalizeValue name, boolean set, ArgNamesManipulator manipulator, PsiMethod method) {
         myName = name;
         mySet = set;
         myManipulator = manipulator;
         myMethod = method;
     }
 
-    public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+    public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
         try {
             CheckUtil.checkWritable(descriptor.getPsiElement());
             if (mySet) {
-                final PsiMethod method = myMethod;
+                PsiMethod method = myMethod;
                 StringBuilder result = new StringBuilder();
                 for (PsiParameter parameter : method.getParameterList().getParameters()) {
-                    final String name = parameter.getName();
+                    String name = parameter.getName();
                     if (result.length() > 0) {
                         result.append(",");
                     }

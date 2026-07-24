@@ -22,7 +22,7 @@ public class AliasNameConverter implements CustomReferenceConverter<String> {
   @Override
   public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
                                          final PsiElement element,
-                                         final ConvertContext context) {
+                                         ConvertContext context) {
     return new PsiReference[]{new PsiReferenceBase<>(element) {
       @Override
       public PsiElement resolve() {
@@ -36,10 +36,10 @@ public class AliasNameConverter implements CustomReferenceConverter<String> {
 
       @Override
       public Object[] getVariants() {
-        final Alias alias = genericDomValue.getParentOfType(Alias.class, false);
+        Alias alias = genericDomValue.getParentOfType(Alias.class, false);
 
         if (alias != null) {
-          final SpringBeanPointer beanPointer = alias.getAliasedBean().getValue();
+          SpringBeanPointer beanPointer = alias.getAliasedBean().getValue();
           if (beanPointer != null) {
             return SpringUtils.suggestBeanNames(beanPointer.getSpringBean());
           }

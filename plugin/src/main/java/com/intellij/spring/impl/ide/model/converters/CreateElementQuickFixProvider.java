@@ -16,13 +16,13 @@ import jakarta.annotation.Nullable;
  * @author Dmitry Avdeev
  */
 public abstract class CreateElementQuickFixProvider<T> {
-    public LocalQuickFix[] getQuickFixes(final GenericDomValue<T> value) {
-        final LocalQuickFix fix = getQuickFix(value);
+    public LocalQuickFix[] getQuickFixes(GenericDomValue<T> value) {
+        LocalQuickFix fix = getQuickFix(value);
         return fix == null ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[]{fix};
     }
 
     @Nullable
-    public LocalQuickFix getQuickFix(final GenericDomValue<T> value) {
+    public LocalQuickFix getQuickFix(GenericDomValue<T> value) {
         final String elementName = getElementName(value);
         if (!isAvailable(elementName, value)) {
             return null;
@@ -35,7 +35,7 @@ public abstract class CreateElementQuickFixProvider<T> {
                 return getFixName(elementName);
             }
 
-            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+            public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                 apply(elementName, copy);
             }
         };
@@ -51,7 +51,7 @@ public abstract class CreateElementQuickFixProvider<T> {
     protected abstract LocalizeValue getFixName(String elementName);
 
     @Nullable
-    protected String getElementName(@Nonnull final GenericDomValue<T> value) {
+    protected String getElementName(@Nonnull GenericDomValue<T> value) {
         return value.getStringValue();
     }
 }

@@ -27,25 +27,25 @@ public class SpringConstructorArgResolveUtil {
   private SpringConstructorArgResolveUtil() {
   }
 
-  public static List<PsiMethod> findMatchingMethods(final SpringBean springBean) {
-    final SpringModel model = SpringUtils.getSpringModel(springBean);
+  public static List<PsiMethod> findMatchingMethods(SpringBean springBean) {
+    SpringModel model = SpringUtils.getSpringModel(springBean);
     return findMatchingMethods(springBean, model);
   }
 
-  private static List<PsiMethod> findMatchingMethods(final SpringBean springBean,
-                                            final SpringModel springModel) {
+  private static List<PsiMethod> findMatchingMethods(SpringBean springBean,
+                                                     SpringModel springModel) {
 
-    final List<PsiMethod> methods = SpringBeanUtil.getInstantiationMethods(springBean);
+    List<PsiMethod> methods = SpringBeanUtil.getInstantiationMethods(springBean);
     if (methods.size() == 0) {
       return methods;
     }
-    final Set<ConstructorArg> args = springBean.getAllConstructorArgs();
-    final boolean constructorAutowire = SpringAutowireUtil.isConstructorAutowire(springBean);
+    Set<ConstructorArg> args = springBean.getAllConstructorArgs();
+    boolean constructorAutowire = SpringAutowireUtil.isConstructorAutowire(springBean);
     Map<Integer, ConstructorArg> indexedArgs = getIndexedConstructorArgs(args);
 
     List<PsiMethod> accepted = new ArrayList<PsiMethod>(methods.size());
     for (PsiMethod method : methods) {
-      final PsiParameter[] parameters = method.getParameterList().getParameters();
+      PsiParameter[] parameters = method.getParameterList().getParameters();
       if (acceptMethodByAutowire(constructorAutowire, args, parameters) &&
           acceptMethodByParameterTypes(indexedArgs, constructorAutowire, springModel, args, parameters)) {
 
@@ -56,9 +56,9 @@ public class SpringConstructorArgResolveUtil {
     return accepted;
   }
 
-  public static boolean acceptMethodByAutowire(final boolean constructorAutowire,
-                                     final Set<ConstructorArg> args,
-                                     final PsiParameter[] parameters) {
+  public static boolean acceptMethodByAutowire(boolean constructorAutowire,
+                                               Set<ConstructorArg> args,
+                                               PsiParameter[] parameters) {
 
     if ((!constructorAutowire && parameters.length != args.size()) || (constructorAutowire && parameters.length < args.size())) {
       return false;
@@ -67,11 +67,11 @@ public class SpringConstructorArgResolveUtil {
     return true;
   }
 
-  private static boolean acceptMethodByParameterTypes(final Map<Integer, ConstructorArg> indexedArgs,
-                                                      final boolean constructorAutowire,
-                                                      final SpringModel springModel,
-                                                      final Set<ConstructorArg> args,
-                                                      final PsiParameter[] parameters) {
+  private static boolean acceptMethodByParameterTypes(Map<Integer, ConstructorArg> indexedArgs,
+                                                      boolean constructorAutowire,
+                                                      SpringModel springModel,
+                                                      Set<ConstructorArg> args,
+                                                      PsiParameter[] parameters) {
     for (int i = 0; i < parameters.length; i++) {
       PsiParameter parameter = parameters[i];
       if (!acceptParameter(parameter, args, indexedArgs, i)) {
@@ -84,14 +84,14 @@ public class SpringConstructorArgResolveUtil {
     return true;
   }
 
-  public static boolean acceptParameter(final PsiParameter parameter,
-                                        final Collection<ConstructorArg> list,
-                                        final Map<Integer, ConstructorArg> indexedArgs,
-                                        final int i) {
-    final PsiType psiType = parameter.getType();
+  public static boolean acceptParameter(PsiParameter parameter,
+                                        Collection<ConstructorArg> list,
+                                        Map<Integer, ConstructorArg> indexedArgs,
+                                        int i) {
+    PsiType psiType = parameter.getType();
 
     if (indexedArgs.get(i) != null) {
-      final ConstructorArg arg = indexedArgs.get(i);
+      ConstructorArg arg = indexedArgs.get(i);
 
       return hasProperArgumentType(psiType, arg);
     }
@@ -105,8 +105,8 @@ public class SpringConstructorArgResolveUtil {
     return false;
   }
 
-  private static boolean hasProperArgumentType(final PsiType requiredType, final ConstructorArg arg) {
-    final PsiType constructorArgType = SpringBeanUtil.getRequiredType(arg);
+  private static boolean hasProperArgumentType(PsiType requiredType, ConstructorArg arg) {
+    PsiType constructorArgType = SpringBeanUtil.getRequiredType(arg);
     if (constructorArgType != null) {
       return constructorArgType.isAssignableFrom(requiredType);
     } else {
@@ -125,11 +125,11 @@ public class SpringConstructorArgResolveUtil {
   }
 
   // todo move it to SpringBean
-  public static Map<Integer, ConstructorArg> getIndexedConstructorArgs(final Collection<ConstructorArg> list) {
+  public static Map<Integer, ConstructorArg> getIndexedConstructorArgs(Collection<ConstructorArg> list) {
     Map<Integer, ConstructorArg> indexed = new HashMap<Integer, ConstructorArg>();
 
     for (ConstructorArg constructorArg : list) {
-      final Integer value = constructorArg.getIndex().getValue();
+      Integer value = constructorArg.getIndex().getValue();
       if (value != null) {
         indexed.put(value, constructorArg);
       }
@@ -138,10 +138,10 @@ public class SpringConstructorArgResolveUtil {
   }
 
   @Nullable
-  public static PsiMethod getSpringBeanConstructor(final SpringBean springBean, final SpringModel springModel) {
+  public static PsiMethod getSpringBeanConstructor(SpringBean springBean, SpringModel springModel) {
     if (isInstantiatedByFactory(springBean)) return null;
 
-    final List<PsiMethod> psiMethods =
+    List<PsiMethod> psiMethods =
       SpringConstructorArgResolveUtil.findMatchingMethods(springBean, springModel);
 
     PsiMethod resolvedConstructor = null;
@@ -154,14 +154,14 @@ public class SpringConstructorArgResolveUtil {
     return resolvedConstructor;
   }
 
-  public static boolean isInstantiatedByFactory(final SpringBean springBean) {
+  public static boolean isInstantiatedByFactory(SpringBean springBean) {
     return springBean.getFactoryMethod().getXmlAttribute() != null;
   }
 
-  public static boolean hasEmptyConstructor(final SpringBean springBean) {
-    final PsiClass beanClass = springBean.getBeanClass(false);
+  public static boolean hasEmptyConstructor(SpringBean springBean) {
+    PsiClass beanClass = springBean.getBeanClass(false);
     if (beanClass != null) {
-      final PsiMethod[] constructors = beanClass.getConstructors();
+      PsiMethod[] constructors = beanClass.getConstructors();
 
       if (constructors.length == 0) return true;
 
@@ -172,7 +172,7 @@ public class SpringConstructorArgResolveUtil {
     return false;
   }
 
-  public static String suggestParamsForConstructorArgsAsString(final SpringBean springBean) {
+  public static String suggestParamsForConstructorArgsAsString(SpringBean springBean) {
     List<String> params = new ArrayList<String>();
     for (PsiParameter psiParameter : SpringConstructorArgResolveUtil.suggestParamsForConstructorArgs(springBean)) {
       params.add(psiParameter.getText());
@@ -181,22 +181,22 @@ public class SpringConstructorArgResolveUtil {
     return StringUtil.join(params, ",");
   }
 
-  public static List<PsiParameter> suggestParamsForConstructorArgs(final SpringBean springBean) {
+  public static List<PsiParameter> suggestParamsForConstructorArgs(SpringBean springBean) {
     List<PsiParameter> methodParameters = new ArrayList<PsiParameter>();
 
-    final Project project = springBean.getManager().getProject();
-    final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
+    Project project = springBean.getManager().getProject();
+    PsiElementFactory elementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
 
-    final PsiClass aClass = JavaPsiFacade.getInstance(project).findClass("java.lang.String", GlobalSearchScope.allScope(project));
+    PsiClass aClass = JavaPsiFacade.getInstance(project).findClass("java.lang.String", GlobalSearchScope.allScope(project));
     assert aClass != null;
-    final PsiClassType defaultParamType = elementFactory.createType(aClass);
+    PsiClassType defaultParamType = elementFactory.createType(aClass);
 
     JavaCodeStyleManager codeStyleManager = JavaCodeStyleManager.getInstance(project);
 
     List<String> existedNames = new ArrayList<String>();
-    final List<ConstructorArg> constructorArgs = SpringUtils.getConstructorArgs(springBean);
+    List<ConstructorArg> constructorArgs = SpringUtils.getConstructorArgs(springBean);
 
-    final ConstructorArg[] sortedArgs = sortConstructorArgsByIndex(constructorArgs);
+    ConstructorArg[] sortedArgs = sortConstructorArgsByIndex(constructorArgs);
 
     for (ConstructorArg arg : sortedArgs) {
       if (arg == null) continue; // if indexes param od different constructor-args are eqaul 
@@ -231,10 +231,10 @@ public class SpringConstructorArgResolveUtil {
     return methodParameters;
   }
 
-  private static ConstructorArg[] sortConstructorArgsByIndex(final List<ConstructorArg> constructorArgs) {
+  private static ConstructorArg[] sortConstructorArgsByIndex(List<ConstructorArg> constructorArgs) {
     ConstructorArg[] args = new ConstructorArg[constructorArgs.size()];
 
-    final Map<Integer, ConstructorArg> indexedConstructorArgs = SpringConstructorArgResolveUtil.getIndexedConstructorArgs(constructorArgs);
+    Map<Integer, ConstructorArg> indexedConstructorArgs = SpringConstructorArgResolveUtil.getIndexedConstructorArgs(constructorArgs);
 
     if (indexedConstructorArgs.size() == 0) {
       return constructorArgs.toArray(new ConstructorArg[constructorArgs.size()]);
@@ -242,9 +242,9 @@ public class SpringConstructorArgResolveUtil {
 
     List<ConstructorArg> indexed = new ArrayList<ConstructorArg>();
     for (Integer index : indexedConstructorArgs.keySet()) {
-      final int i = index.intValue();
+      int i = index.intValue();
       if (i >= 0 && i < args.length) {
-        final ConstructorArg arg = indexedConstructorArgs.get(index);
+        ConstructorArg arg = indexedConstructorArgs.get(index);
         args[i] = arg;
         indexed.add(arg);
       }

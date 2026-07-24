@@ -50,23 +50,23 @@ public class ConfigFileChooser extends DialogWrapper {
 
     final List<DomFileElement<Beans>> list =
       DomService.getInstance().getFileElements(Beans.class, project, GlobalSearchScope.allScope(project));
-    final consulo.module.Module[] modules = ModuleManager.getInstance(project).getModules();
+    consulo.module.Module[] modules = ModuleManager.getInstance(project).getModules();
     final List<SpringModel> springModels = new ArrayList<SpringModel>();
     for (Module module : modules) {
       springModels.addAll(SpringManager.getInstance(project).getAllModels(module));
     }
-    final SimpleTreeStructure structure = new SimpleTreeStructure() {
+    SimpleTreeStructure structure = new SimpleTreeStructure() {
       public Object getRootElement() {
         return new SimpleNode() {
           public SimpleNode[] getChildren() {
-            final ArrayList<XmlFile> files = new ArrayList<XmlFile>(list.size());
+            ArrayList<XmlFile> files = new ArrayList<XmlFile>(list.size());
             for (DomFileElement<Beans> element : list) {
               files.add(element.getFile());
             }
             if (fileToIgnore instanceof XmlFile) {
               files.remove(fileToIgnore);
             }
-            final List<SimpleNode> nodes = new ArrayList<SimpleNode>();
+            List<SimpleNode> nodes = new ArrayList<SimpleNode>();
             for (SpringModel springModel : springModels) {
               nodes.add(new FileSetNode(springModel));
               for (XmlFile file : springModel.getConfigFiles()) {
@@ -74,7 +74,7 @@ public class ConfigFileChooser extends DialogWrapper {
               }
             }
             for (XmlFile file : files) {
-              final VirtualFile vFile = file.getVirtualFile();
+              VirtualFile vFile = file.getVirtualFile();
               if (vFile != null && (vFile.getPath()
                                          .indexOf(StandardFileSystems.JAR_SEPARATOR) < 0 || ArchiveVfsUtil.getVirtualFileForArchive(vFile) == null)) {
                 nodes.add(new ConfigFileNode(file));
@@ -90,7 +90,7 @@ public class ConfigFileChooser extends DialogWrapper {
       }
     };
     myTree.setRootVisible(false);
-    final SimpleTreeBuilder builder = new SimpleTreeBuilder(myTree, (DefaultTreeModel)myTree.getModel(), structure, null);
+    SimpleTreeBuilder builder = new SimpleTreeBuilder(myTree, (DefaultTreeModel)myTree.getModel(), structure, null);
     builder.initRoot();
 
     init();
@@ -99,7 +99,7 @@ public class ConfigFileChooser extends DialogWrapper {
 
 
     myTree.addMouseListener(new MouseAdapter() {
-      public void mouseClicked(final MouseEvent e) {
+      public void mouseClicked(MouseEvent e) {
         if (e.getClickCount() == 2 && getSelectedFile() != null) {
           doOKAction();
         }
@@ -111,7 +111,7 @@ public class ConfigFileChooser extends DialogWrapper {
 
   @Nullable
   public XmlFile getSelectedFile() {
-    final SimpleNode simpleNode = myTree.getSelectedNode();
+    SimpleNode simpleNode = myTree.getSelectedNode();
     return simpleNode instanceof ConfigFileNode ? ((ConfigFileNode)simpleNode).myFile : null;
   }
 
@@ -137,7 +137,7 @@ public class ConfigFileChooser extends DialogWrapper {
     private FileSetNode(SpringModel model) {
       myModel = model;
       if (model.getFileSet() != null) {
-        final SpringFileSet springFileSet = model.getFileSet();
+        SpringFileSet springFileSet = model.getFileSet();
         setPlainText(springFileSet.getName());
         setIcon(springFileSet.getIcon());
       }
@@ -152,7 +152,7 @@ public class ConfigFileChooser extends DialogWrapper {
     }
 
     public SimpleNode[] getChildren() {
-      final Set<XmlFile> files = myModel.getConfigFiles();
+      Set<XmlFile> files = myModel.getConfigFiles();
       return ContainerUtil.map2Array(files, SimpleNode.class, xmlFile -> new ConfigFileNode(xmlFile));
     }
   }
@@ -164,7 +164,7 @@ public class ConfigFileChooser extends DialogWrapper {
       myFile = file;
       setIcon(IconDescriptorUpdaters.getIcon(file, 0));
       addColoredFragment(myFile.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-      final VirtualFile virtualFile = myFile.getVirtualFile();
+      VirtualFile virtualFile = myFile.getVirtualFile();
       assert virtualFile != null;
       addColoredFragment(" (" + virtualFile.getPath() + ")", SimpleTextAttributes.GRAYED_ATTRIBUTES);
     }

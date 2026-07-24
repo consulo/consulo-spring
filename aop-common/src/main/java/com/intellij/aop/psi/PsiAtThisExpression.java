@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 public class PsiAtThisExpression extends PsiTypedPointcutExpression implements PsiAtPointcutDesignator{
 
-  public PsiAtThisExpression(@Nonnull final ASTNode node) {
+  public PsiAtThisExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -25,7 +25,7 @@ public class PsiAtThisExpression extends PsiTypedPointcutExpression implements P
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PsiAtArgsExpression.canHaveAnnotation(member.getContainingClass(), getTypeReference(), context, PointcutMatchDegree.FALSE, PointcutMatchDegree.FALSE);
   }
 

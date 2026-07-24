@@ -33,18 +33,18 @@ public final class AopPointcutExpressionFile extends PsiFileBase {
     super(fileView, AopPointcutExpressionLanguage.getInstance());
   }
 
-  public boolean processDeclarations(@Nonnull final PsiScopeProcessor processor,
-                                     @Nonnull final ResolveState state,
-                                     final PsiElement lastParent,
-                                     @Nonnull final PsiElement place) {
-    final PsiMethod method = getAopModel().getPointcutMethod();
+  public boolean processDeclarations(@Nonnull PsiScopeProcessor processor,
+                                     @Nonnull ResolveState state,
+                                     PsiElement lastParent,
+                                     @Nonnull PsiElement place) {
+    PsiMethod method = getAopModel().getPointcutMethod();
     if (method != null) {
-      for (final PsiParameter parameter : method.getParameterList().getParameters()) {
+      for (PsiParameter parameter : method.getParameterList().getParameters()) {
         if (!processor.execute(parameter, state)) return false;
       }
     }
 
-    final PsiElement element = getContext();
+    PsiElement element = getContext();
     if (element instanceof XmlElement) {
       JavaPsiFacade facade = JavaPsiFacade.getInstance(getProject());
       PsiJavaPackage aPackage = facade.findPackage("");
@@ -77,22 +77,22 @@ public final class AopPointcutExpressionFile extends PsiFileBase {
 
   @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
   protected PsiFileImpl clone() {
-    final PsiFileImpl file = super.clone();
+    PsiFileImpl file = super.clone();
     file.putUserData(LOCAL_AOP_MODEL, getUserData(LOCAL_AOP_MODEL));
     return file;
   }
 
   @Nonnull
   public LocalAopModel getAopModel() {
-    final LocalAopModel data = getUserData(LOCAL_AOP_MODEL);
+    LocalAopModel data = getUserData(LOCAL_AOP_MODEL);
     if (data != null) return data;
 
-    final PsiElement element = getContext() == null ? this : getContext();
+    PsiElement element = getContext() == null ? this : getContext();
     return element.getUserData(LOCAL_AOP_MODEL);
   }
 
   @TestOnly
-  public void setAopModel(final LocalAopModel model) {
+  public void setAopModel(LocalAopModel model) {
     putUserData(LOCAL_AOP_MODEL, model);
   }
 }

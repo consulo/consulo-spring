@@ -5,7 +5,7 @@ import com.intellij.spring.model.converters.SpringBeanResolveConverterForDefinit
 import com.intellij.util.xml.ConvertContext;
 
 public class SpringBeanComparatorConverter  extends SpringBeanResolveConverterForDefiniteClasses {
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[] {CommonClassNames.JAVA_UTIL_COMPARATOR};
   }
 }

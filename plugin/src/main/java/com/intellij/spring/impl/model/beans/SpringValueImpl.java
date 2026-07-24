@@ -14,7 +14,7 @@ public abstract class SpringValueImpl implements SpringValue {
 
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final PsiType type = getType().getValue();
+    PsiType type = getType().getValue();
     return type == null ? Collections.<PsiType>emptyList() : Collections.singletonList(type);
   }
 }

@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 public class AndPsiTypePattern extends AopPsiTypePattern {
   private final AopPsiTypePattern[] myPatterns;
 
-  public AndPsiTypePattern(final AopPsiTypePattern... patterns) {
+  public AndPsiTypePattern(AopPsiTypePattern... patterns) {
     myPatterns = patterns;
   }
 
@@ -29,8 +29,8 @@ public class AndPsiTypePattern extends AopPsiTypePattern {
   }
 
   @Override
-  public boolean accepts(@Nonnull final PsiType type) {
-    for (final AopPsiTypePattern typePattern : myPatterns) {
+  public boolean accepts(@Nonnull PsiType type) {
+    for (AopPsiTypePattern typePattern : myPatterns) {
       if (!typePattern.accepts(type)) return false;
     }
     return true;
@@ -51,7 +51,7 @@ public class AndPsiTypePattern extends AopPsiTypePattern {
         return true;
       });
     }
-    for (final PsiJavaPackage psiPackage : set.get()) {
+    for (PsiJavaPackage psiPackage : set.get()) {
       if (!processor.test(psiPackage)) return false;
     }
     return true;

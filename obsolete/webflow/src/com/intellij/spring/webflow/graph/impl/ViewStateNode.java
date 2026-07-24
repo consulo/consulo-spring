@@ -31,7 +31,7 @@ public class ViewStateNode extends WebflowBasicNode<ViewState> {
 
   public List<WebflowNamedAction> getAllNodeActions() {
     List<WebflowNamedAction> actions = new ArrayList<WebflowNamedAction>();
-    final ViewState state = getIdentifyingElement();
+    ViewState state = getIdentifyingElement();
     if (state.isValid()) {
       WebflowUtil.collectActons(state.getEntryActions(), actions);
       WebflowUtil.collectActons(state.getExitActions(), actions);

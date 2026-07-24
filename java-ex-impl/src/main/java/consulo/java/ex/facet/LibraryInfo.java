@@ -33,9 +33,9 @@ public class LibraryInfo {
   @Nullable private String myMd5;
   private @NonNls final String[] myRequiredClasses;
 
-  public LibraryInfo(final @NonNls String name,
-                     final @Nullable @NonNls String downloadingUrl,
-                     final @Nullable String presentableUrl, final @Nullable String md5, final @NonNls String... requiredClasses) {
+  public LibraryInfo(@NonNls String name,
+                     @Nullable @NonNls String downloadingUrl,
+                     @Nullable String presentableUrl, @Nullable String md5, @NonNls String... requiredClasses) {
     myName = name;
     myMd5 = md5;
     myRequiredClasses = requiredClasses;
@@ -50,7 +50,7 @@ public class LibraryInfo {
     }
   }
 
-  public LibraryInfo(final @NonNls String name, final @Nullable LibraryDownloadInfo downloadInfo, String... requiredClasses) {
+  public LibraryInfo(@NonNls String name, @Nullable LibraryDownloadInfo downloadInfo, String... requiredClasses) {
     myName = name;
     myRequiredClasses = requiredClasses;
     myDownloadInfo = downloadInfo;
@@ -71,11 +71,11 @@ public class LibraryInfo {
     return myDownloadInfo;
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final LibraryInfo that = (LibraryInfo)o;
+    LibraryInfo that = (LibraryInfo)o;
 
     if (myDownloadInfo != null ? !myDownloadInfo.equals(that.myDownloadInfo) : that.myDownloadInfo != null) return false;
     if (!myName.equals(that.myName)) return false;

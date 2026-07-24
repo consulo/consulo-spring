@@ -14,7 +14,7 @@ import java.util.Collection;
  * @author peter
  */
 public class AopSubtypeExpression extends AopElementBase implements AopReferenceQualifier {
-  public AopSubtypeExpression(@Nonnull final ASTNode node) {
+  public AopSubtypeExpression(@Nonnull ASTNode node) {
     super(node);
   }
 

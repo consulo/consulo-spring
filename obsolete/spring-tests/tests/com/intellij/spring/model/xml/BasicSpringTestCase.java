@@ -31,14 +31,14 @@ public abstract class BasicSpringTestCase extends UsefulTestCase {
     final Ref<VirtualFile> result = new Ref<VirtualFile>(null);
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
       public void run() {
-        final VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
         result.set(file);
       }
     });
     return result.get();
   }
 
-   protected SpringBean findBean(final Beans beans, final String beanId) {
+   protected SpringBean findBean(Beans beans, String beanId) {
       SpringBean springBean = null;
 
       for (SpringBean bean : beans.getBeans()) {

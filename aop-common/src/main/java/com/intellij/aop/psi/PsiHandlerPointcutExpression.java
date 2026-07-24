@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 public class PsiHandlerPointcutExpression extends PsiTypedPointcutExpression {
 
-  public PsiHandlerPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiHandlerPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -25,7 +25,7 @@ public class PsiHandlerPointcutExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PointcutMatchDegree.FALSE;
   }
 

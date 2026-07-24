@@ -88,9 +88,9 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testJavaClassReferences() throws Throwable {
-    final AopReferenceExpression expression = parseMethodReference("nonjava.nonlang.*").getReferenceExpression();
-    final AopReferenceExpression javaLang = expression.getQualifier();
-    final AopReferenceExpression java = javaLang.getQualifier();
+    AopReferenceExpression expression = parseMethodReference("nonjava.nonlang.*").getReferenceExpression();
+    AopReferenceExpression javaLang = expression.getQualifier();
+    AopReferenceExpression java = javaLang.getQualifier();
     assertEquals("nonjava", java.getCanonicalText());
     assertEquals(TextRange.from(0, 7), java.getRangeInElement());
     assertEquals(JavaPsiFacade.getInstance(getProject()).findPackage("nonjava"), java.resolve());
@@ -103,11 +103,11 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(TextRange.from(16, 1), expression.getRangeInElement());
     assertNull(expression.resolve());
     assertUnorderedCollection(expression.multiResolve(false), new Consumer<ResolveResult>() {
-      public void consume(final ResolveResult resolveResult) {
+      public void consume(ResolveResult resolveResult) {
         assertEquals(getJavaFacade().findClass("nonjava.nonlang.NonObject"), resolveResult.getElement());
       }
     }, new Consumer<ResolveResult>() {
-      public void consume(final ResolveResult resolveResult) {
+      public void consume(ResolveResult resolveResult) {
         assertEquals(getJavaFacade().findClass("nonjava.nonlang.NonString"), resolveResult.getElement());
       }
     });
@@ -121,7 +121,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     AopMemberReferenceExpression expression = parseMethodReference("java.lang.Object");
     LiteFixture.setContext(expression.getContainingFile(), createXmlFile("<xml/>"));
     expression.getContainingFile().setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));
@@ -130,7 +130,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     expression = parseMethodReference("Object");
     LiteFixture.setContext(expression.getContainingFile(), createXmlFile("<xml/>"));
     expression.getContainingFile().setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));
@@ -141,22 +141,22 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     return createLightFile(StdFileTypes.XML, s);
   }
 
-  private AopMemberReferenceExpression parseMethodReference(final String refText) {
-    final AopMemberReferenceExpression reference =
+  private AopMemberReferenceExpression parseMethodReference(String refText) {
+    AopMemberReferenceExpression reference =
       assertInstanceOf(parse("execution(* " + refText + "())"), PsiExecutionExpression.class).getMethodReference();
     LiteFixture.setContext(reference.getContainingFile(), getJavaFacade().findClass("Object239"));
     reference.getContainingFile().setAopModel(new LocalAopModel(new AllAdvisedElementsSearcher(getPsiManager())));
     return reference;
   }
 
-  private AopReferenceExpression parsePointcutReference(final String refText) {
-    final AopReferenceExpression reference =
+  private AopReferenceExpression parsePointcutReference(String refText) {
+    AopReferenceExpression reference =
       assertInstanceOf(parse(refText + "()"), PsiPointcutReferenceExpression.class).getReferenceExpression();
 
-    final AopPointcutExpressionFile psiFile = reference.getContainingFile();
+    AopPointcutExpressionFile psiFile = reference.getContainingFile();
     LiteFixture.setContext(psiFile, getJavaFacade().findClass("Object239"));
     psiFile.setAopModel(new MockAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }) {
@@ -170,7 +170,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
 
   public void testPointcutReferences() throws Throwable {
     assertNull(parsePointcutReference("nonExistentPointcut").resolve());
-    final AopReferenceExpression referenceExpression = parsePointcutReference("foo");
+    AopReferenceExpression referenceExpression = parsePointcutReference("foo");
     assertResolves(referenceExpression);
     assertResolves(parsePointcutReference("Foo"));
     assertNull(parsePointcutReference("String239").resolve());
@@ -203,14 +203,14 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testParameter() throws Throwable {
-    final AopParameterList parameterList = ((PsiArgsExpression)parse("args(argName, nonArgName)")).getParameterList();
-    final PsiElement[] parameters = parameterList.getParameters();
-    final PsiMethod method =
+    AopParameterList parameterList = ((PsiArgsExpression)parse("args(argName, nonArgName)")).getParameterList();
+    PsiElement[] parameters = parameterList.getParameters();
+    PsiMethod method =
       parseClass("class A {" + "@" + AopConstants.POINTCUT_ANNO + "(\"\") void foo(" + AopConstants.PROCEEDING_JOIN_POINT + " nonArgName, int argName) }").getMethods()[0];
-    final PsiFile file = parameterList.getContainingFile();
+    PsiFile file = parameterList.getContainingFile();
     LiteFixture.setContext(file, method.getModifierList().getAnnotations()[0].findAttributeValue("value"));
     ((AopPointcutExpressionFile)file).setAopModel(new LocalAopModel(null, method, new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented in " + getClass().getName());
       }
     }));
@@ -243,7 +243,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
           }
 
           @NonNls
-          public String getName(final PsiElement context) {
+          public String getName(PsiElement context) {
             return "fubar.xxx";
           }
 
@@ -252,7 +252,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
             throw new UnsupportedOperationException("Method getName is not yet implemented in " + getClass().getName());
           }
 
-          public void init(final PsiElement element) {
+          public void init(PsiElement element) {
             throw new UnsupportedOperationException("Method init is not yet implemented in " + getClass().getName());
           }
 
@@ -264,13 +264,13 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     }, "fubar.xxx");
   }
 
-  private void assertBinds(final PsiElement bindTo, final String expectedText) throws IncorrectOperationException {
+  private void assertBinds(PsiElement bindTo, String expectedText) throws IncorrectOperationException {
     assertBinds("a.b.c.d", bindTo, expectedText);
   }
 
-  private void assertBinds(final String refText, final PsiElement bindTo, final String expectedText) throws IncorrectOperationException
+  private void assertBinds(String refText, PsiElement bindTo, String expectedText) throws IncorrectOperationException
   {
-    final AopMemberReferenceExpression reference =
+    AopMemberReferenceExpression reference =
       assertInstanceOf(parse("execution(* " + refText + "())"), PsiExecutionExpression.class).getMethodReference();
     LiteFixture.setContext(reference.getContainingFile(), getJavaFacade().findClass("abc.Def"));
     reference.getContainingFile().setAopModel(new LocalAopModel(new AllAdvisedElementsSearcher(getPsiManager())));
@@ -279,8 +279,8 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(expectedText, reference.getText());
   }
 
-  private static PsiElement assertResolves(final AopReferenceExpression referenceExpression) {
-    final PsiElement element = referenceExpression.resolve();
+  private static PsiElement assertResolves(AopReferenceExpression referenceExpression) {
+    PsiElement element = referenceExpression.resolve();
     assertNotNull(element);
     assertTrue(referenceExpression.isReferenceTo(element));
     return element;
@@ -303,10 +303,10 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testMethodResolve() throws Throwable {
-    final String prefix = "nonjava.nonlang.NonObject.";
-    final String methodName = "to*";
-    final AopMemberReferenceExpression expression = parseMethodReference(prefix + methodName);
-    final PsiClass psiClass = assertInstanceOf(expression.getReferenceExpression().getQualifier().resolve(), PsiClass.class);
+    String prefix = "nonjava.nonlang.NonObject.";
+    String methodName = "to*";
+    AopMemberReferenceExpression expression = parseMethodReference(prefix + methodName);
+    PsiClass psiClass = assertInstanceOf(expression.getReferenceExpression().getQualifier().resolve(), PsiClass.class);
 
     final AopReferenceExpression namePattern = expression.getReferenceExpression();
     assertEquals(prefix + methodName, namePattern.getCanonicalText());
@@ -318,8 +318,8 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     assertUnorderedCollection(namePattern.multiResolve(true), ContainerUtil.map2Array(methods, Consumer.class, new Function<PsiMethod, Consumer>() {
       public Consumer fun(final PsiMethod method) {
         return new Consumer<ResolveResult>() {
-          public void consume(final ResolveResult resolveResult) {
-            final PsiElement element = resolveResult.getElement();
+          public void consume(ResolveResult resolveResult) {
+            PsiElement element = resolveResult.getElement();
             assertNotNull(element);
             assertEquals(element, method);
             assertTrue(namePattern.isReferenceTo(element));
@@ -328,36 +328,36 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
       }
     }));
     assertSameElements(psiClass.getAllMethods(), ContainerUtil.map2Array(namePattern.getVariants(), new Function<LookupElement, Object>() {
-      public Object fun(final LookupElement item) {
+      public Object fun(LookupElement item) {
         return item.getObject();
       }
     }));
   }
 
   public void testMethodConflicts() throws Throwable {
-    final AopMemberReferenceExpression expression = parseMethodReference("somePointcut");
-    final PsiClass innerClass = getJavaFacade().findClass("Object239").getInnerClasses()[0];
+    AopMemberReferenceExpression expression = parseMethodReference("somePointcut");
+    PsiClass innerClass = getJavaFacade().findClass("Object239").getInnerClasses()[0];
     LiteFixture.setContext(expression.getContainingFile(), innerClass);
     expression.getContainingFile().setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));
-    final PsiElement element = expression.getReferenceExpression().resolve();
+    PsiElement element = expression.getReferenceExpression().resolve();
     assertEquals(innerClass, assertInstanceOf(element, PsiMethod.class).getContainingClass());
   }
 
   public void testInheritedMethod() throws Throwable {
-    final AopMemberReferenceExpression expression = parseMethodReference("foobar.String239.intfMethod");
-    final PsiElement element = expression.getReferenceExpression().resolve();
+    AopMemberReferenceExpression expression = parseMethodReference("foobar.String239.intfMethod");
+    PsiElement element = expression.getReferenceExpression().resolve();
     assertEquals(getJavaFacade().findClass("foobar.String239"), assertInstanceOf(element, PsiMethod.class).getContainingClass());
   }
 
   public void testPackageResolvesToMethod() throws Throwable {
-    final AopMemberReferenceExpression expression = parseMethodReference("foobar.String239.intfMethod");
+    AopMemberReferenceExpression expression = parseMethodReference("foobar.String239.intfMethod");
     LiteFixture.setContext(expression.getContainingFile(), parseClass("class A { void foobar() {}}"));
     expression.getContainingFile().setAopModel(new LocalAopModel(new AllAdvisedElementsSearcher(getPsiManager())));
-    final PsiElement element = expression.getReferenceExpression().resolve();
+    PsiElement element = expression.getReferenceExpression().resolve();
     assertEquals(getJavaFacade().findClass("foobar.String239"), assertInstanceOf(element, PsiMethod.class).getContainingClass());
   }
 
@@ -393,15 +393,15 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testPrimitiveTypeReferences() throws Throwable {
-    for (final String name : AopLexer.PRIMITIVE_TYPES.keySet()) {
+    for (String name : AopLexer.PRIMITIVE_TYPES.keySet()) {
       assertNoReferences(name);
       assertNoReferences(name + "[]");
       assertNoReferences(name + "[][]");
     }
   }
 
-  private void assertNoReferences(final String text) {
-    final AopReferenceHolder aopReferenceHolder = parseTypeReference(text);
+  private void assertNoReferences(String text) {
+    AopReferenceHolder aopReferenceHolder = parseTypeReference(text);
     assertEmpty(aopReferenceHolder.getReferences());
     PsiElement child = aopReferenceHolder;
     while ((child = child.getFirstChild()) != null) {
@@ -409,16 +409,16 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     }
   }
 
-  private void assertTypeReference(final String refText, final String candidate, final boolean suits) {
+  private void assertTypeReference(String refText, String candidate, boolean suits) {
     assertEquals(PointcutMatchDegree.valueOf(suits), parseTypeReference(refText).accepts(new MockPsiClassType(candidate)));
   }
 
-  private AopReferenceHolder parseTypeReference(final String refText) {
-    final AopPointcutExpressionFile file =
+  private AopReferenceHolder parseTypeReference(String refText) {
+    AopPointcutExpressionFile file =
       (AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, "args(" + refText + ")");
     LiteFixture.setContext(file, createXmlFile("<a/>"));
     file.setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));
@@ -429,7 +429,7 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
     return PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", fileType, s);
   }
 
-  private PsiPointcutExpression parse(@NonNls final String code) {
+  private PsiPointcutExpression parse(@NonNls String code) {
     return ((AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, code)).getPointcutExpression();
   }
 

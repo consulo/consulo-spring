@@ -33,10 +33,10 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     super(Flow.class);
   }
 
-  public void checkFileElement(final DomFileElement<Flow> flowDomFileElement, final DomElementAnnotationHolder holder) {
+  public void checkFileElement(DomFileElement<Flow> flowDomFileElement, DomElementAnnotationHolder holder) {
     super.checkFileElement(flowDomFileElement, holder);
 
-    final Flow flow = flowDomFileElement.getRootElement();
+    Flow flow = flowDomFileElement.getRootElement();
 
     if (!flow.isValid()) return;
 
@@ -58,7 +58,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     checkExceptionHandlerBeanClass(flow, holder);
   }
 
-  private static void checkTransitions(final TransitionOwner owner, final DomElementAnnotationHolder holder) {
+  private static void checkTransitions(TransitionOwner owner, DomElementAnnotationHolder holder) {
     for (Transition transition : owner.getTransitions()) {
       if (DomUtil.hasXml(transition.getOn()) && DomUtil.hasXml(transition.getOnException())) {
         holder.createProblem(transition, WebflowBundle.message("transition.on.and.onexception.inconsistency"));
@@ -66,10 +66,10 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     }
   }
 
-  private static void checkFlowVar(final Var var, final DomElementAnnotationHolder holder) {
-    final SpringBeanPointer pointer = var.getBean().getValue();
+  private static void checkFlowVar(Var var, DomElementAnnotationHolder holder) {
+    SpringBeanPointer pointer = var.getBean().getValue();
     if (pointer != null) {
-      final CommonSpringBean bean = pointer.getSpringBean();
+      CommonSpringBean bean = pointer.getSpringBean();
       if (bean.isValid() && !WebflowUtil.isNonSingletonPrototype(bean)) {
         holder.createProblem(var.getBean(), WebflowBundle.message("var.bean.must.be.non.singleton.prototype"));
       }
@@ -81,7 +81,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
 
   }
 
-  private static void checkAction(final WebflowNamedAction action, final DomElementAnnotationHolder holder) {
+  private static void checkAction(WebflowNamedAction action, DomElementAnnotationHolder holder) {
     if (action instanceof Action) {
       checkActionBeanClass(action.getBean(), holder);
       checkActionMethodSignature(action.getMethod(), holder);
@@ -90,17 +90,17 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     checkActionMethodIsPublic(action.getMethod(), holder);
   }
 
-  private static void checkMultiActionInconsistency(final Action action, final DomElementAnnotationHolder holder) {
+  private static void checkMultiActionInconsistency(Action action, DomElementAnnotationHolder holder) {
     if (isMultiActionBean(action.getBean())) {
-      final PsiMethod method = action.getMethod().getValue();
+      PsiMethod method = action.getMethod().getValue();
       if (method == null) {
-        final ActionState actionState = action.getParentOfType(ActionState.class, false);
+        ActionState actionState = action.getParentOfType(ActionState.class, false);
         if (actionState != null) {
-          final String defaultMethodName = actionState.getId().getValue();
+          String defaultMethodName = actionState.getId().getValue();
           if (defaultMethodName != null) {
-            final PsiClass beanClass = WebflowUtil.getBeanClass(action.getBean());
+            PsiClass beanClass = WebflowUtil.getBeanClass(action.getBean());
 
-            final PsiMethod actionMethod = findMultiActionMethod(beanClass, defaultMethodName);
+            PsiMethod actionMethod = findMultiActionMethod(beanClass, defaultMethodName);
             if (actionMethod == null) {
               holder.createProblem(action, HighlightSeverity.ERROR, WebflowBundle.message("multi.action.bean.method.not.specified"),
                                    getMultiActionBeanMethodQuickFixes(action, beanClass));
@@ -111,7 +111,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     }
   }
 
-  private static LocalQuickFix[] getMultiActionBeanMethodQuickFixes(final Action action, final PsiClass beanClass) {
+  private static LocalQuickFix[] getMultiActionBeanMethodQuickFixes(final Action action, PsiClass beanClass) {
     LocalQuickFix addMethodAttrQuickFix = new LocalQuickFix() {
       @NotNull
       public String getName() {
@@ -123,13 +123,13 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
         return WebflowBundle.message("webflow.model.bean.quickfix.family");
       }
 
-      public void applyFix(@NotNull final Project project, @NotNull final ProblemDescriptor descriptor) {
+      public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
         action.getMethod().ensureXmlElementExists();
 
-        final XmlElement xmlElement = action.getXmlElement();
-        final XmlAttributeValue attributeValue = action.getMethod().getXmlAttributeValue();
+        XmlElement xmlElement = action.getXmlElement();
+        XmlAttributeValue attributeValue = action.getMethod().getXmlAttributeValue();
         if (xmlElement != null && attributeValue != null) {
-          final VirtualFile file = xmlElement.getContainingFile().getVirtualFile();
+          VirtualFile file = xmlElement.getContainingFile().getVirtualFile();
           if (file != null) {
             new OpenFileDescriptor(project, file, attributeValue.getTextRange().getStartOffset() + 1).navigate(true);
           }
@@ -141,7 +141,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
   }
 
   @Nullable
-  private static PsiMethod findMultiActionMethod(final PsiClass beanClass, final String methodName) {
+  private static PsiMethod findMultiActionMethod(PsiClass beanClass, String methodName) {
     if (beanClass != null) {
       for (PsiMethod method : beanClass.getAllMethods()) {
         // public Event ${methodName}(RequestContext context) throws Exception;
@@ -158,24 +158,24 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     return null;
   }
 
-  private static boolean isMultiActionBean(@Nullable final GenericAttributeValue<SpringBeanPointer> value) {
+  private static boolean isMultiActionBean(@Nullable GenericAttributeValue<SpringBeanPointer> value) {
     return WebflowUtil.isBeanOfSpecificType(value, WebflowConstants.MULTI_ACTION_BEAN_CLASSNAME);
   }
 
-  private static void checkActionBeanClass(final GenericAttributeValue<SpringBeanPointer> bean, final DomElementAnnotationHolder holder) {
+  private static void checkActionBeanClass(GenericAttributeValue<SpringBeanPointer> bean, DomElementAnnotationHolder holder) {
     WebflowUtil.checkBeanOfSpecificType(bean, WebflowConstants.ACTION_BEAN_CLASSNAME, holder);
   }
 
-  private static void checkActionMethodSignature(final GenericAttributeValue<PsiMethod> methodValue,
-                                                 final DomElementAnnotationHolder holder) {
-    final PsiMethod method = methodValue.getValue();
+  private static void checkActionMethodSignature(GenericAttributeValue<PsiMethod> methodValue,
+                                                 DomElementAnnotationHolder holder) {
+    PsiMethod method = methodValue.getValue();
     if (method != null) {
       if (method.getParameterList().getParameters().length != 1 ||
           !isAssignable(WebflowConstants.ACTION_BEAN_METHOD_PARAMETER_CLASSNAME, method.getParameterList().getParameters()[0].getType(),
                         method.getProject())) {
         holder.createProblem(methodValue, WebflowBundle.message("action.bean.method.parameter.type"));
       }
-      final PsiType type = method.getReturnType();
+      PsiType type = method.getReturnType();
       if (type == null || !isAssignable(WebflowConstants.ACTION_BEAN_METHOD_RETURN_TYPE_CLASSNAME, type, method.getProject())) {
         holder.createProblem(methodValue, WebflowBundle.message("action.bean.method.return.type"));
 
@@ -183,18 +183,18 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     }
   }
 
-  private static boolean isAssignable(final String className, final PsiType type, final Project project) {
+  private static boolean isAssignable(String className, PsiType type, Project project) {
     if (type == null) return false;
     if (type.getCanonicalText().equals(className)) return true;
 
-    final PsiClass psiClass = WebflowUtil.getClassByQualifiedName(className, project);
+    PsiClass psiClass = WebflowUtil.getClassByQualifiedName(className, project);
 
     return psiClass != null && type.isAssignableFrom(JavaPsiFacade.getInstance(project).getElementFactory().createType(psiClass));
   }
 
-  private static void checkActionMethodIsPublic(final GenericAttributeValue<PsiMethod> methodValue,
-                                                final DomElementAnnotationHolder holder) {
-    final PsiMethod method = methodValue.getValue();
+  private static void checkActionMethodIsPublic(GenericAttributeValue<PsiMethod> methodValue,
+                                                DomElementAnnotationHolder holder) {
+    PsiMethod method = methodValue.getValue();
     if (method != null) {
       if (!method.hasModifierProperty(PsiModifier.PUBLIC)) {
         holder.createProblem(methodValue, WebflowBundle.message("action.bean.method.must.be.public"));
@@ -207,7 +207,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
 
 
   @NotNull
-  private static List<WebflowNamedAction> getAllActions(final Flow flow) {
+  private static List<WebflowNamedAction> getAllActions(Flow flow) {
     List<WebflowNamedAction> actions = new ArrayList<WebflowNamedAction>();
     if (flow.isValid()) {
       for (ActionState state : flow.getActionStates()) {
@@ -243,7 +243,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
   }
 
   @NotNull
-  private static List<TransitionOwner> getAllTransitionOwner(final Flow flow) {
+  private static List<TransitionOwner> getAllTransitionOwner(Flow flow) {
     List<TransitionOwner> owners = new ArrayList<TransitionOwner>();
     if (flow.isValid()) {
       owners.addAll(flow.getActionStates());
@@ -263,7 +263,7 @@ public class WebflowModelInspection extends BasicDomElementsInspection<Flow> {
     return actions;
   }
 
-  private static void checkExceptionHandlerBeanClass(final Flow flow, final DomElementAnnotationHolder holder) {
+  private static void checkExceptionHandlerBeanClass(Flow flow, DomElementAnnotationHolder holder) {
 
     for (ExceptionHandler exceptionHandler : flow.getExceptionHandlers()) {
       WebflowUtil.checkBeanOfSpecificType(exceptionHandler.getBean(), WebflowConstants.FLOW_EXECUTION_HANDLER_CLASSNAME, holder);

@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author peter
  */
 public class PsiControlFlowPointcutExpression extends AopElementBase implements PsiPointcutExpression{
-  public PsiControlFlowPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiControlFlowPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -25,7 +25,7 @@ public class PsiControlFlowPointcutExpression extends AopElementBase implements 
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PointcutMatchDegree.FALSE;
   }
 

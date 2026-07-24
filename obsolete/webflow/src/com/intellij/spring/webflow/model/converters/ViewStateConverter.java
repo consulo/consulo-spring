@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 public class ViewStateConverter  implements CustomReferenceConverter {
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
-    final String stringValue = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
+    String stringValue = genericDomValue.getStringValue();
 
     if (stringValue != null && stringValue.contains(WebflowUtil.WEBFLOW_EL_PREFIX)) return PsiReference.EMPTY_ARRAY;
 

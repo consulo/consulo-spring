@@ -25,7 +25,7 @@ public class AopSyntaxHighlighterTest extends AopLiteFixture implements AopEleme
   }
 
   public void testTokenHighlights() throws Throwable {
-    final AopSyntaxHighlighter highlighter = new AopSyntaxHighlighter();
+    AopSyntaxHighlighter highlighter = new AopSyntaxHighlighter();
     
     assertOrderedEquals(highlighter.getTokenHighlights(AOP_THROWS), AopSyntaxHighlighter.AOP_KEYWORD);
     assertOrderedEquals(highlighter.getTokenHighlights(AOP_MODIFIER), AopSyntaxHighlighter.AOP_KEYWORD);
@@ -50,8 +50,8 @@ public class AopSyntaxHighlighterTest extends AopLiteFixture implements AopEleme
 
   }
 
-  private static void assertTokenHighlights(final AopSyntaxHighlighter highlighter, final TokenSet tokenSet, final TextAttributesKey expected) {
-    for (final IElementType type : tokenSet.getTypes()) {
+  private static void assertTokenHighlights(AopSyntaxHighlighter highlighter, TokenSet tokenSet, TextAttributesKey expected) {
+    for (IElementType type : tokenSet.getTypes()) {
       assertOrderedEquals(highlighter.getTokenHighlights(type), expected);
     }
   }

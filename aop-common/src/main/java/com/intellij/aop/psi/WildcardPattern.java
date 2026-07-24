@@ -17,7 +17,7 @@ public class WildcardPattern extends AopPsiTypePattern{
   private final AopPsiTypePattern myBound;
   private final boolean mySuper;
 
-  public WildcardPattern(final AopPsiTypePattern bound, final boolean aSuper) {
+  public WildcardPattern(AopPsiTypePattern bound, boolean aSuper) {
     myBound = bound;
     mySuper = aSuper;
   }
@@ -31,10 +31,10 @@ public class WildcardPattern extends AopPsiTypePattern{
     return mySuper;
   }
 
-  public boolean accepts(@Nonnull final PsiType type) {
+  public boolean accepts(@Nonnull PsiType type) {
     if (type instanceof PsiWildcardType) {
-      final PsiWildcardType wildcardType = (PsiWildcardType)type;
-      final PsiType bound = wildcardType.getBound();
+      PsiWildcardType wildcardType = (PsiWildcardType)type;
+      PsiType bound = wildcardType.getBound();
       if (myBound == null) return bound == null;
 
       if (bound == null) {
@@ -50,11 +50,11 @@ public class WildcardPattern extends AopPsiTypePattern{
   }
 
   @Nonnull
-  public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
+  public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     if (myBound == null) return PointcutMatchDegree.TRUE;
     if (mySuper) {
       if (type instanceof PsiWildcardType) {
-        final PsiWildcardType wildcardType = (PsiWildcardType)type;
+        PsiWildcardType wildcardType = (PsiWildcardType)type;
         if (!wildcardType.isSuper()) return PointcutMatchDegree.FALSE;
         if (myBound.accepts(wildcardType.getBound())) return PointcutMatchDegree.TRUE;
       }

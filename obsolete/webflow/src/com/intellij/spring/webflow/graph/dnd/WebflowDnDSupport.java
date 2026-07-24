@@ -25,7 +25,7 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
   private final WebflowDataModel myDataModel;
   private static final String UNKNOWN = "unknown";
 
-  public WebflowDnDSupport(final WebflowDataModel dataModel) {
+  public WebflowDnDSupport(WebflowDataModel dataModel) {
     myDataModel = dataModel;
   }
 
@@ -42,7 +42,7 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
     return nodes;
   }
 
-  public boolean canStartDragging(final WebflowNodeType WebflowNodeType) {
+  public boolean canStartDragging(WebflowNodeType WebflowNodeType) {
     //final WebflowDefinition WebflowDefinition = getDataModel().getWebflowDefinition();
     //if (WebflowDefinition != null) {
     //  if (WebflowNodeType == WebflowNodeType.START_STATE) {
@@ -54,7 +54,7 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
     return true;
   }
 
-  public WebflowNode drop(final WebflowNodeType webflowNodeType) {
+  public WebflowNode drop(WebflowNodeType webflowNodeType) {
     Flow flow = getDataModel().getFlow();
     switch (webflowNodeType) {
       case ACTION_STATE:
@@ -75,8 +75,8 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
 
   private static Function<Flow, WebflowNode> getDropActionStateFunction() {
     return new Function<Flow, WebflowNode>() {
-      public WebflowNode fun(final Flow flow) {
-        final ActionState actionState = flow.addActionState();
+      public WebflowNode fun(Flow flow) {
+        ActionState actionState = flow.addActionState();
         //actionState.getName().setStringValue(UNKNOWN);
         return new ActionStateNode(UNKNOWN, (ActionState)actionState.createStableCopy());
       }
@@ -85,8 +85,8 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
 
   private static Function<Flow, WebflowNode> getDropDecisionStateFunction() {
     return new Function<Flow, WebflowNode>() {
-      public WebflowNode fun(final Flow flow) {
-        final DecisionState state = flow.addDecisionState();
+      public WebflowNode fun(Flow flow) {
+        DecisionState state = flow.addDecisionState();
         return new DecisionStateNode(UNKNOWN, (DecisionState)state.createStableCopy());
       }
     };
@@ -94,8 +94,8 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
 
   private static Function<Flow, WebflowNode> getDropEndStateFunction() {
     return new Function<Flow, WebflowNode>() {
-      public WebflowNode fun(final Flow flow) {
-        final EndState state = flow.addEndState();
+      public WebflowNode fun(Flow flow) {
+        EndState state = flow.addEndState();
         return new EndStateNode(UNKNOWN, (EndState)state.createStableCopy());
       }
     };
@@ -103,8 +103,8 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
 
   private static Function<Flow, WebflowNode> getDropSubflowStateFunction() {
     return new Function<Flow, WebflowNode>() {
-      public WebflowNode fun(final Flow flow) {
-        final SubflowState state = flow.addSubflowState();
+      public WebflowNode fun(Flow flow) {
+        SubflowState state = flow.addSubflowState();
         return new SubflowStateNode(UNKNOWN, (SubflowState)state.createStableCopy());
       }
     };
@@ -112,8 +112,8 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
 
   private static Function<Flow, WebflowNode> getDropViewStateFunction() {
     return new Function<Flow, WebflowNode>() {
-      public WebflowNode fun(final Flow flow) {
-        final ViewState state = flow.addViewState();
+      public WebflowNode fun(Flow flow) {
+        ViewState state = flow.addViewState();
         return new ViewStateNode(UNKNOWN, (ViewState)state.createStableCopy());
       }
     };
@@ -123,7 +123,7 @@ public class WebflowDnDSupport implements GraphDnDSupport<WebflowNode, WebflowNo
                                          final Flow flow,
                                          final Function<Flow, WebflowNode> function) {
     return new WriteCommandAction<WebflowNode>(project, DomUtil.getFile(flow)) {
-      protected void run(final Result<WebflowNode> result) throws Throwable {
+      protected void run(Result<WebflowNode> result) throws Throwable {
         result.setResult(function.fun(flow));
       }
     }.execute().getResultObject();

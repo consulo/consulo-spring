@@ -45,25 +45,25 @@ public class ProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResolver {
   @Nonnull
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     if (context instanceof SpringBean) {
-      final SpringBean springBean = (SpringBean) context;
-      final PsiClassType type = getTargetType(springBean);
+      SpringBean springBean = (SpringBean) context;
+      PsiClassType type = getTargetType(springBean);
 
       if (isCglibExplicitlyEnabled(springBean) && type != null) {
         return Collections.singleton(type.getCanonicalText());
       }
 
-      final Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(springBean, PROXY_INTERFACES_PROPERTY_NAME);
+      Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(springBean, PROXY_INTERFACES_PROPERTY_NAME);
       if (!proxyInterfaceNames.isEmpty()) {
         return proxyInterfaceNames;
       }
 
-      final Set<String> interfaceNames = getTypesFromClassArrayProperty(springBean, INTERFACES_PROPERTY_NAME);
+      Set<String> interfaceNames = getTypesFromClassArrayProperty(springBean, INTERFACES_PROPERTY_NAME);
       if (!interfaceNames.isEmpty()) {
         return interfaceNames;
       }
 
       if (type != null) {
-        final Set<String> targetInterfaceNames = getAllInterfaceNames(type);
+        Set<String> targetInterfaceNames = getAllInterfaceNames(type);
         if (!targetInterfaceNames.isEmpty() && isAutodetectInterfacesEnabled(springBean)) {
           return targetInterfaceNames;
         } else {
@@ -76,25 +76,25 @@ public class ProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResolver {
 
   @Nullable
   private static PsiClassType getTargetType(@Nonnull SpringBean context) {
-    final PsiClassType fromTarget = getTypeFromProperty(context, TARGET_PROPERTY_NAME);
+    PsiClassType fromTarget = getTypeFromProperty(context, TARGET_PROPERTY_NAME);
     if (fromTarget != null) {
       return fromTarget;
     }
 
-    final String targetName = getPropertyValue(context, TARGET_NAME_PROPERTY_NAME);
+    String targetName = getPropertyValue(context, TARGET_NAME_PROPERTY_NAME);
     if (targetName != null) {
-      final PsiClassType fromTargetName = getTypeFromBeanName(context, targetName);
+      PsiClassType fromTargetName = getTypeFromBeanName(context, targetName);
       if (fromTargetName != null) {
         return fromTargetName;
       }
     }
 
-    final String targetClassName = getPropertyValue(context, TARGET_CLASS_PROPERTY_NAME);
+    String targetClassName = getPropertyValue(context, TARGET_CLASS_PROPERTY_NAME);
     if (targetClassName != null) {
-      final Project project = context.getManager().getProject();
-      final PsiManager psiManager = PsiManager.getInstance(project);
-      final GlobalSearchScope scope = consulo.language.psi.scope.GlobalSearchScope.allScope(project);
-      final PsiClass targetClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(targetClassName, scope);
+      Project project = context.getManager().getProject();
+      PsiManager psiManager = PsiManager.getInstance(project);
+      GlobalSearchScope scope = consulo.language.psi.scope.GlobalSearchScope.allScope(project);
+      PsiClass targetClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(targetClassName, scope);
       if (targetClass != null) {
         return JavaPsiFacade.getInstance(psiManager.getProject()).getElementFactory().createType(targetClass);
       }

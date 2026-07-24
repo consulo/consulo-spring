@@ -20,7 +20,7 @@ public class WebflowScopeReference extends PsiReferenceBase<PsiElement> {
   private final PsiElement myElement;
   private final GenericDomValue myDomValue;
 
-  public WebflowScopeReference(final PsiElement element, final TextRange range, final GenericDomValue domValue) {
+  public WebflowScopeReference(PsiElement element, TextRange range, GenericDomValue domValue) {
     super(element, range, true);
     myElement = element;
     myDomValue = domValue;
@@ -35,15 +35,15 @@ public class WebflowScopeReference extends PsiReferenceBase<PsiElement> {
   }
 
   public Object[] getVariants() {
-    final Module module = myDomValue.getModule();
+    Module module = myDomValue.getModule();
 
     assert module != null;
 
-    final List<WebflowScopeProvider> list =
+    List<WebflowScopeProvider> list =
         WebflowScopeProviderManager.getService(module).getAvailableProviders(myDomValue);
 
     return ContainerUtil.map2Array(list, new Function<WebflowScopeProvider, Object>() {
-      public Object fun(final WebflowScopeProvider provider) {
+      public Object fun(WebflowScopeProvider provider) {
         return provider.getScope().getName();
       }
     });

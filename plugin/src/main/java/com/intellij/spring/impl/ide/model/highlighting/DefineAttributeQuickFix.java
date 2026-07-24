@@ -23,7 +23,7 @@ public class DefineAttributeQuickFix implements LocalQuickFix {
     private static final Logger LOG = Logger.getInstance(DefineAttributeQuickFix.class);
     private final String myAttrName;
 
-    public DefineAttributeQuickFix(final String attrName) {
+    public DefineAttributeQuickFix(String attrName) {
         myAttrName = attrName;
     }
 
@@ -33,15 +33,15 @@ public class DefineAttributeQuickFix implements LocalQuickFix {
         return SpringLocalize.aopQuickfixDefine0Attr(myAttrName);
     }
 
-    public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+    public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
         try {
-            final XmlTag tag = (XmlTag) descriptor.getPsiElement();
+            XmlTag tag = (XmlTag) descriptor.getPsiElement();
             if (ReadonlyStatusHandler.getInstance(project)
                 .ensureFilesWritable(descriptor.getPsiElement().getContainingFile().getVirtualFile())
                 .hasReadonlyFiles()) {
                 return;
             }
-            final XmlAttribute attribute = tag.setAttribute(myAttrName, "", "");
+            XmlAttribute attribute = tag.setAttribute(myAttrName, "", "");
 
             OpenFileDescriptorFactory.getInstance(project)
                 .builder(tag.getContainingFile().getVirtualFile())

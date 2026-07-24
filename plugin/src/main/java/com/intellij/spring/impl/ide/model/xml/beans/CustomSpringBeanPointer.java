@@ -23,7 +23,7 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
   private final DomSpringBeanPointer myBasePointer;
   private final int myIndex;
 
-  private CustomSpringBeanPointer(@Nonnull final CustomBeanWrapper wrapper, CustomBean bean, int index) {
+  private CustomSpringBeanPointer(@Nonnull CustomBeanWrapper wrapper, CustomBean bean, int index) {
     super(bean.getBeanName());
     myIndex = index;
     myBasePointer = DomSpringBeanPointer.createDomSpringBeanPointer(wrapper);
@@ -37,10 +37,10 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
   public boolean isValid() {
     if (!myBasePointer.isValid()) return false;
 
-    final DomSpringBean baseBean = myBasePointer.getSpringBean();
+    DomSpringBean baseBean = myBasePointer.getSpringBean();
     if (!(baseBean instanceof CustomBeanWrapper)) return false;
 
-    final List<CustomBean> beans = ((CustomBeanWrapper)baseBean).getCustomBeans();
+    List<CustomBean> beans = ((CustomBeanWrapper)baseBean).getCustomBeans();
     if (beans.size() <= myIndex) return false;
 
     return true;
@@ -50,9 +50,9 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
     return myBasePointer.getPsiManager();
   }
 
-  public static CustomSpringBeanPointer createCustomSpringBeanPointer(final CustomBean bean) {
-    final CustomBeanWrapper wrapper = bean.getWrapper();
-    final int index = wrapper.getCustomBeans().indexOf(bean);
+  public static CustomSpringBeanPointer createCustomSpringBeanPointer(CustomBean bean) {
+    CustomBeanWrapper wrapper = bean.getWrapper();
+    int index = wrapper.getCustomBeans().indexOf(bean);
     assert index >= 0;
     return new CustomSpringBeanPointer(wrapper, bean, index);
   }
@@ -69,7 +69,7 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
     return getSpringBean().getIdentifyingPsiElement();
   }
 
-  public SpringBeanPointer derive(@Nonnull final String name) {
+  public SpringBeanPointer derive(@Nonnull String name) {
     return Comparing.equal(name, getName()) ? this : new DerivedSpringBeanPointer(this, name);
   }
 
@@ -82,12 +82,12 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof CustomSpringBeanPointer)) return false;
     if (!super.equals(o)) return false;
 
-    final CustomSpringBeanPointer that = (CustomSpringBeanPointer)o;
+    CustomSpringBeanPointer that = (CustomSpringBeanPointer)o;
 
     if (myIndex != that.myIndex) return false;
     if (myBasePointer != null ? !myBasePointer.equals(that.myBasePointer) : that.myBasePointer != null) return false;

@@ -36,9 +36,9 @@ public abstract class TxAnnotationDrivenImpl extends DomSpringBeanImpl implement
     return "org.springframework.transaction.interceptor.TransactionInterceptor";
   }
 
-  public PointcutMatchDegree accepts(final PsiMethod method) {
+  public PointcutMatchDegree accepts(PsiMethod method) {
     if (!isTransactionallyAnnotated(method)) {
-      final PsiClass psiClass = method.getContainingClass();
+      PsiClass psiClass = method.getContainingClass();
       if (psiClass == null) return PointcutMatchDegree.FALSE;
       if (isTransactionallyAnnotated(psiClass) || hasAnnotatedInterface(psiClass)) {
         return PointcutMatchDegree.TRUE;

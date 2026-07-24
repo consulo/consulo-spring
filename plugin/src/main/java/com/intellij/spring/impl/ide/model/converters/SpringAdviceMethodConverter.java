@@ -26,7 +26,7 @@ import jakarta.annotation.Nullable;
  * @author peter
  */
 public class SpringAdviceMethodConverter extends SpringBeanMethodConverter{
-  protected boolean checkParameterList(final PsiMethod method) {
+  protected boolean checkParameterList(PsiMethod method) {
     return true;
   }
 
@@ -38,7 +38,7 @@ public class SpringAdviceMethodConverter extends SpringBeanMethodConverter{
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<PsiMethod> genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<PsiMethod> genericDomValue, PsiElement element, ConvertContext context) {
     if (getPsiClass(context) == null) return PsiReference.EMPTY_ARRAY;
 
     return super.createReferences(genericDomValue, element, context);
@@ -46,10 +46,10 @@ public class SpringAdviceMethodConverter extends SpringBeanMethodConverter{
 
 
   @Nullable
-  protected PsiClass getPsiClass(final ConvertContext context) {
-    final SpringAspect aspect = context.getInvocationElement().getParentOfType(SpringAspect.class, false);
+  protected PsiClass getPsiClass(ConvertContext context) {
+    SpringAspect aspect = context.getInvocationElement().getParentOfType(SpringAspect.class, false);
     if (aspect != null) {
-      final SpringBeanPointer pointer = aspect.getRef().getValue();
+      SpringBeanPointer pointer = aspect.getRef().getValue();
       if (pointer != null) {
         return pointer.getBeanClass();
       }
@@ -57,18 +57,18 @@ public class SpringAdviceMethodConverter extends SpringBeanMethodConverter{
     return null;
   }
 
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
-    final GenericDomValue element = (GenericDomValue)context.getInvocationElement();
-    final String elementName = element.getStringValue();
-    final DomElement parent = element.getParent();
-    final PsiClass psiClass = getPsiClass(context);
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
+    GenericDomValue element = (GenericDomValue)context.getInvocationElement();
+    String elementName = element.getStringValue();
+    DomElement parent = element.getParent();
+    PsiClass psiClass = getPsiClass(context);
     if (psiClass != null && elementName != null && parent instanceof BasicAdvice) {
       boolean isAround = ((BasicAdvice)parent).getAdviceType() == AopAdviceType.AROUND;
       @NonNls String signature = isAround ?
                                  "public Object " + elementName + "(org.aspectj.lang.ProceedingJoinPoint pjp)" :
                                  "public void " + elementName + "(org.aspectj.lang.JoinPoint jp)";
       signature += " throws java.lang.Throwable";
-      @NonNls final String body = isAround ? "return pjp.proceed();" : "";
+      @NonNls String body = isAround ? "return pjp.proceed();" : "";
       CreateMethodQuickFix fix = CreateMethodQuickFix.createFix(psiClass, signature, body);
       return fix == null ? LocalQuickFix.EMPTY_ARRAY : new LocalQuickFix[]{fix};
     }

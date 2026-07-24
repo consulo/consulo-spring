@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpringHighlightingPerformanceTest extends SpringHighlightingTestCase {
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
   }
@@ -36,28 +36,28 @@ public class SpringHighlightingPerformanceTest extends SpringHighlightingTestCas
 
   public void testLargeProject() throws Throwable {
     myFixture.copyFileToProject("performance.xml");
-    final String fileText = VirtualFileUtil.loadText(myFixture.getTempDirFixture().getFile("performance.xml"));
-    final SpringFileSet fileSet = configureFileSet();
-    final String path = myFixture.getTempDirFixture().getTempDirPath();
-    final List<PsiFile> files = new ArrayList<PsiFile>();
+    String fileText = VirtualFileUtil.loadText(myFixture.getTempDirFixture().getFile("performance.xml"));
+    SpringFileSet fileSet = configureFileSet();
+    String path = myFixture.getTempDirFixture().getTempDirPath();
+    List<PsiFile> files = new ArrayList<PsiFile>();
     for (int i = 0; i < 10; i++) {
-      final String fileName = "performance" + i + ".xml";
-      final File file = new File(path, fileName);
+      String fileName = "performance" + i + ".xml";
+      File file = new File(path, fileName);
       file.createNewFile();
-      final VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
+      VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
       VirtualFileUtil.saveText(vFile, fileText);
 
       fileSet.addFile(vFile);
       files.add(PsiManager.getInstance(myProject).findFile(vFile));
     }
 
-    final List<LocalInspectionTool> inspections = getInspections();
+    List<LocalInspectionTool> inspections = getInspections();
 
     JavaPsiFacade.getInstance(myProject).findClass(CommonClassNames.JAVA_LANG_OBJECT, GlobalSearchScope.allScope(myProject)); //don't measure stubs rebuild
 
-    final long time = System.currentTimeMillis();
-    for (final PsiFile file : files) {
-      for (final LocalInspectionTool inspection : inspections) {
+    long time = System.currentTimeMillis();
+    for (PsiFile file : files) {
+      for (LocalInspectionTool inspection : inspections) {
         inspection.checkFile(file, InspectionManager.getInstance(myProject), false);
 
         PatchedWeakReference.clearAll();
@@ -69,9 +69,9 @@ public class SpringHighlightingPerformanceTest extends SpringHighlightingTestCas
   }
 
   private static List<LocalInspectionTool> getInspections() {
-    final List<LocalInspectionTool> inspections = ContainerUtil.map(
+    List<LocalInspectionTool> inspections = ContainerUtil.map(
       ApplicationManager.getApplication().getComponent(SpringApplicationComponent.class).getInspectionClasses(), new Function<Class, LocalInspectionTool>() {
-      public LocalInspectionTool fun(final Class aClass) {
+      public LocalInspectionTool fun(Class aClass) {
         try {
           return (LocalInspectionTool)aClass.newInstance();
         }

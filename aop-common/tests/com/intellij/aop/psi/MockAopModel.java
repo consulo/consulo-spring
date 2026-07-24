@@ -26,15 +26,15 @@ import java.util.List;
 */
 public abstract class MockAopModel extends LocalAopModel {
 
-  protected MockAopModel(@Nullable final PsiElement host, @Nonnull final PsiMethod pointcutMethod) {
+  protected MockAopModel(@Nullable PsiElement host, @Nonnull final PsiMethod pointcutMethod) {
     super(host, pointcutMethod, new AopAdvisedElementsSearcher(pointcutMethod.getManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     });
   }
 
-  protected MockAopModel(final AopAdvisedElementsSearcher searcher) {
+  protected MockAopModel(AopAdvisedElementsSearcher searcher) {
     super(null, null, searcher);
   }
 
@@ -42,7 +42,7 @@ public abstract class MockAopModel extends LocalAopModel {
     return Collections.emptyList();
   }
 
-  protected AopPointcut createMockPointcut(@NonNls final String qname) {
+  protected AopPointcut createMockPointcut(@NonNls String qname) {
     return createMockPointcut(qname, null, new MockXmlTag());
   }
 

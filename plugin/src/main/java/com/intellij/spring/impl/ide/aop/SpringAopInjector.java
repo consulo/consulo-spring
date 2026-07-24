@@ -78,7 +78,7 @@ public abstract class SpringAopInjector implements MultiHostInjector {
   public void injectLanguages(@Nonnull MultiHostRegistrar registrar, @Nonnull final PsiElement host) {
     final ProcessingContext context = new ProcessingContext();
     if (SPRING_AOP_INJECTION_PATTERN.accepts(host, context)) {
-      final SpringAdvisedElementsSearcher searcher = new SpringAdvisedElementsSearcher(host.getManager(), getBeansFromContext(host));
+      SpringAdvisedElementsSearcher searcher = new SpringAdvisedElementsSearcher(host.getManager(), getBeansFromContext(host));
       host.putUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL, new SpringAdviceLocalAopModel(host, context.get(SPRING_ADVICE_KEY), searcher));
       registrar.startInjecting(AopPointcutExpressionLanguage.getInstance());
       registrar.addPlace(null, null, (PsiLanguageInjectionHost)host, TextRange.from(1, host.getTextLength() - 2));
@@ -100,7 +100,7 @@ public abstract class SpringAopInjector implements MultiHostInjector {
               return context.get(SPRING_INTRO_KEY);
             }
 
-            public void defineDefaultImpl(final Project project, final ProblemDescriptor descriptor) throws IncorrectOperationException
+            public void defineDefaultImpl(Project project, ProblemDescriptor descriptor) throws IncorrectOperationException
 			{
             }
 
@@ -128,7 +128,7 @@ public abstract class SpringAopInjector implements MultiHostInjector {
   }
 
   private static List<SpringModel> getBeansFromContext(PsiElement host) {
-    final PsiFile file = host.getContainingFile();
+    PsiFile file = host.getContainingFile();
     if (file instanceof XmlFile) {
       return SpringUtils.getNonEmptySpringModelsByFile((XmlFile)file);
     }

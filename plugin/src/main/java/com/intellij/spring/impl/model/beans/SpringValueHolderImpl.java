@@ -16,7 +16,7 @@ import consulo.xml.dom.DomUtil;
 public abstract class SpringValueHolderImpl extends SpringElementsHolderImpl implements SpringValueHolder {
 
   public GenericDomValue<SpringBeanPointer> getRefElement() {
-    final SpringRef springRef = getRef();
+    SpringRef springRef = getRef();
     if (DomUtil.hasXml(springRef.getBean())) return springRef.getBean();
     if (DomUtil.hasXml(springRef.getLocal())) return springRef.getLocal();
     if (DomUtil.hasXml(springRef.getParentAttr())) return springRef.getParentAttr();
@@ -24,7 +24,7 @@ public abstract class SpringValueHolderImpl extends SpringElementsHolderImpl imp
   }
 
   public GenericDomValue<?> getValueElement() {
-    final SpringValue springValue = getValue();
+    SpringValue springValue = getValue();
     if (!DomUtil.hasXml(springValue)) return getValueAttr();
     return springValue;
   }

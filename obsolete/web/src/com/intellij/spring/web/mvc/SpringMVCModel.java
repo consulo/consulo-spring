@@ -57,16 +57,16 @@ public class SpringMVCModel {
   }
 
   @Nullable
-  public static SpringMVCModel getModel(final PsiElement element) {
-    final Module module = element.getModule();
+  public static SpringMVCModel getModel(PsiElement element) {
+    Module module = element.getModule();
     if (module == null) {
       return null;
     }
-    final SpringFacet springFacet = SpringFacet.getInstance(module);
+    SpringFacet springFacet = SpringFacet.getInstance(module);
     if (springFacet == null) {
       return null;
     }
-    final WebFacet webFacet = WebUtil.getWebFacet(element);
+    WebFacet webFacet = WebUtil.getWebFacet(element);
     return webFacet == null ? null : getModel(webFacet, springFacet);
   }
 
@@ -85,7 +85,7 @@ public class SpringMVCModel {
 
     @Nullable
     PsiElement resolve(String url) {
-      final PsiElementPointer pointer = urls.get(url);
+      PsiElementPointer pointer = urls.get(url);
       if (pointer != null) {
         return pointer.getPsiElement();
       }
@@ -104,9 +104,9 @@ public class SpringMVCModel {
   private final NotNullLazyValue<Collection<SpringModel>> myModels = new NotNullLazyValue<Collection<SpringModel>>() {
     @NotNull
     protected Collection<SpringModel> compute() {
-      final List<ServletFileSet> fileSets = SpringWebModelProvider.getServletSets(myWebFacet, mySpringFacet.getConfiguration());
+      List<ServletFileSet> fileSets = SpringWebModelProvider.getServletSets(myWebFacet, mySpringFacet.getConfiguration());
       return fileSets == null ? Collections.<SpringModel>emptyList() : ContainerUtil.mapNotNull(fileSets, new NullableFunction<SpringFileSet, SpringModel>() {
-        public SpringModel fun(final SpringFileSet springFileSet) {
+        public SpringModel fun(SpringFileSet springFileSet) {
           return SpringManager.getInstance(myWebFacet.getModule().getProject()).createModel(springFileSet, myWebFacet.getModule());
         }
       });
@@ -116,50 +116,50 @@ public class SpringMVCModel {
   private final NotNullLazyValue<Info> myMap = new NotNullLazyValue<Info>() {
     @NotNull
     protected Info compute() {
-      final Info info = new Info();
-      final JavaPsiFacade facade = JavaPsiFacade.getInstance(myWebFacet.getModule().getProject());
-      final GlobalSearchScope scope = GlobalSearchScope.allScope(myWebFacet.getModule().getProject());
-      final PsiClass controllerClass = facade.findClass("org.springframework.web.servlet.mvc.Controller", scope);
+      Info info = new Info();
+      JavaPsiFacade facade = JavaPsiFacade.getInstance(myWebFacet.getModule().getProject());
+      GlobalSearchScope scope = GlobalSearchScope.allScope(myWebFacet.getModule().getProject());
+      PsiClass controllerClass = facade.findClass("org.springframework.web.servlet.mvc.Controller", scope);
       if (controllerClass == null) {
         return info;
       }
-      final PsiClass simpleMappingClass = facade.findClass("org.springframework.web.servlet.handler.SimpleUrlHandlerMapping", scope);
-      final Collection<SpringModel> models = getServletModels();
+      PsiClass simpleMappingClass = facade.findClass("org.springframework.web.servlet.handler.SimpleUrlHandlerMapping", scope);
+      Collection<SpringModel> models = getServletModels();
       for (SpringModel model : models) {
-        final List<SpringBaseBeanPointer> list = model.findBeansByPsiClassWithInheritance(controllerClass);
+        List<SpringBaseBeanPointer> list = model.findBeansByPsiClassWithInheritance(controllerClass);
         for (SpringBaseBeanPointer beanPointer : list) {
-          final String name = beanPointer.getName();
+          String name = beanPointer.getName();
           if (name != null) {
             info.addUrl(name, beanPointer);
           }
         }
         if (simpleMappingClass != null) {
-          final List<SpringBaseBeanPointer> simpleMappings = model.findBeansByPsiClassWithInheritance(simpleMappingClass);
+          List<SpringBaseBeanPointer> simpleMappings = model.findBeansByPsiClassWithInheritance(simpleMappingClass);
           for (SpringBaseBeanPointer mapping : simpleMappings) {
-            final CommonSpringBean springBean = mapping.getSpringBean();
+            CommonSpringBean springBean = mapping.getSpringBean();
             if (springBean instanceof SpringBean) {
-              final SpringProperty urlMap = DomUtil.findByName(((SpringBean)springBean).getProperties(), "urlMap");
+              SpringProperty urlMap = DomUtil.findByName(((SpringBean)springBean).getProperties(), "urlMap");
               if (urlMap != null) {
                 for (SpringEntry entry: urlMap.getMap().getEntries()) {
-                  final String key = entry.getKeyAttr().getValue();
+                  String key = entry.getKeyAttr().getValue();
                   if (key != null) {
-                    final SpringBeanPointer springBeanPointer = entry.getRefElement().getValue();
+                    SpringBeanPointer springBeanPointer = entry.getRefElement().getValue();
                     if (springBeanPointer != null) {
                       info.addUrl(key, springBeanPointer.getBasePointer());
                     }
                   }
                 }
               }
-              final SpringProperty mappings = DomUtil.findByName(((SpringBean)springBean).getProperties(), "mappings");
+              SpringProperty mappings = DomUtil.findByName(((SpringBean)springBean).getProperties(), "mappings");
               if (mappings != null) {
-                final String s = mappings.getValue().getStringValue();
+                String s = mappings.getValue().getStringValue();
                 if (s != null) {
                   try {
-                    final Properties properties = new Properties();
+                    Properties properties = new Properties();
                     properties.load(new ByteArrayInputStream(s.getBytes()));
                     for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-                      final Object beanName = entry.getValue();
-                      final SpringBeanPointer bean = model.findBean((String)beanName);
+                      Object beanName = entry.getValue();
+                      SpringBeanPointer bean = model.findBean((String)beanName);
                       if (bean != null) {
                         info.addUrl((String)entry.getKey(), bean);
                       }
@@ -175,7 +175,7 @@ public class SpringMVCModel {
         }
       }
 
-      final List<SpringMVCRequestMapping> mappings = SpringMVCJamModel.getModel(myWebFacet.getModule()).getRequestMappings();
+      List<SpringMVCRequestMapping> mappings = SpringMVCJamModel.getModel(myWebFacet.getModule()).getRequestMappings();
       for (final SpringMVCRequestMapping<?> mapping : mappings) {
         for (String url: mapping.getUrls()) {
           info.addUrl(url, new PsiElementPointer() {
@@ -213,7 +213,7 @@ public class SpringMVCModel {
     }
   };
 
-  private SpringMVCModel(final WebFacet facet, final SpringFacet springFacet) {
+  private SpringMVCModel(WebFacet facet, SpringFacet springFacet) {
     myWebFacet = facet;
     mySpringFacet = springFacet;
   }
@@ -244,7 +244,7 @@ public class SpringMVCModel {
   }
 
   @Nullable
-  public PsiElement resolveUrl(final String url) {
+  public PsiElement resolveUrl(String url) {
     return myMap.getValue().resolve(url);
   }
 }

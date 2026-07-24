@@ -29,7 +29,7 @@ public class SpringArgNamesManipulator extends ArgNamesManipulator {
   private final XmlTag myTag;
   @NonNls private static final String ARG_NAMES = "arg-names";
 
-  public SpringArgNamesManipulator(final XmlTag tag) {
+  public SpringArgNamesManipulator(XmlTag tag) {
     myTag = tag;
   }
 
@@ -38,16 +38,16 @@ public class SpringArgNamesManipulator extends ArgNamesManipulator {
     return myTag.getAttributeValue(ARG_NAMES);
   }
 
-  public void setArgNames(@Nullable final String argNames) throws IncorrectOperationException
+  public void setArgNames(@Nullable String argNames) throws IncorrectOperationException
   {
     myTag.setAttribute(ARG_NAMES, argNames);
   }
 
   @Nonnull
   public PsiElement getArgNamesProblemElement() {
-    final XmlAttribute attribute = myTag.getAttribute(ARG_NAMES);
+    XmlAttribute attribute = myTag.getAttribute(ARG_NAMES);
     if (attribute != null) {
-      final XmlAttributeValue xmlAttributeValue = attribute.getValueElement();
+      XmlAttributeValue xmlAttributeValue = attribute.getValueElement();
       if (xmlAttributeValue != null && !xmlAttributeValue.getValueTextRange().isEmpty()) return xmlAttributeValue;
       return attribute.getFirstChild();
     }
@@ -76,14 +76,14 @@ public class SpringArgNamesManipulator extends ArgNamesManipulator {
   }
 
   public AopAdviceType getAdviceType() {
-    final DomElement element = DomManager.getDomManager(myTag.getProject()).getDomElement(myTag);
+    DomElement element = DomManager.getDomManager(myTag.getProject()).getDomElement(myTag);
     return element instanceof AopAdvice ? ((AopAdvice)element).getAdviceType() : null;
   }
 
-  private static PsiReference getParameterReference(final String qname, final XmlTag tag) {
-    final XmlAttribute attribute = tag.getAttribute(qname);
+  private static PsiReference getParameterReference(String qname, XmlTag tag) {
+    XmlAttribute attribute = tag.getAttribute(qname);
     if (attribute != null) {
-      final XmlAttributeValue element = attribute.getValueElement();
+      XmlAttributeValue element = attribute.getValueElement();
       if (element != null) {
         return element.getReference();
       }

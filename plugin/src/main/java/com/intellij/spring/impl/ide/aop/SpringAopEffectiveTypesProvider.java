@@ -15,11 +15,11 @@ import java.util.*;
 public class SpringAopEffectiveTypesProvider extends SpringBeanEffectiveTypeProvider {
 
 
-  public void processEffectiveTypes(@Nonnull final CommonSpringBean bean, final Collection<PsiClass> result) {
-    final Set<PsiClass> toAdd = new HashSet<PsiClass>();
+  public void processEffectiveTypes(@Nonnull CommonSpringBean bean, Collection<PsiClass> result) {
+    Set<PsiClass> toAdd = new HashSet<PsiClass>();
     List<PsiClass> toRemove = new ArrayList<>();
-    for (final PsiClass psiClass : result) {
-      for (final AopIntroduction introduction : AopJavaAnnotator.getBoundIntroductions(psiClass)) {
+    for (PsiClass psiClass : result) {
+      for (AopIntroduction introduction : AopJavaAnnotator.getBoundIntroductions(psiClass)) {
         ContainerUtil.addIfNotNull(toAdd, introduction.getImplementInterface().getValue());
       }
    }

@@ -31,7 +31,7 @@ public abstract class SpringBeanPointer implements PsiElementPointer {
 
   public boolean isReferenceTo(@Nullable CommonSpringBean springBean) {
     if (springBean == null) return false;
-    final PsiFile file = springBean.getContainingFile();
+    PsiFile file = springBean.getContainingFile();
     return file != null && file.equals(getContainingFile()) && springBean.equals(getSpringBean());
   }
 
@@ -53,7 +53,7 @@ public abstract class SpringBeanPointer implements PsiElementPointer {
 
   public abstract String[] getAliases();
 
-  public static SpringBaseBeanPointer createSpringBeanPointer(@Nonnull final CommonSpringBean springBean) {
+  public static SpringBaseBeanPointer createSpringBeanPointer(@Nonnull CommonSpringBean springBean) {
     if (springBean instanceof CustomBean) {
       return CustomSpringBeanPointer.createCustomSpringBeanPointer((CustomBean)springBean);
     }

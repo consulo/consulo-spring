@@ -13,15 +13,15 @@ public class WebflowGlobalTransitionsNodeRenederer extends AbstractColoredNodeCe
     super(ModificationTracker.EVER_CHANGED);
   }
 
-  public void tuneNode(final NodeRealizer realizer, final JPanel wrapper) {
+  public void tuneNode(NodeRealizer realizer, JPanel wrapper) {
     wrapper.removeAll();
 
     wrapper.setLayout(new BorderLayout());
 
-    final JPanel panel = new JPanel();
+    JPanel panel = new JPanel();
     panel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-    final JLabel jLabel = new JLabel(GlobalTransitionsNode.GLOBAL_TRANSITIONS_NODE_NAME);
+    JLabel jLabel = new JLabel(GlobalTransitionsNode.GLOBAL_TRANSITIONS_NODE_NAME);
     jLabel.setFont(jLabel.getFont().deriveFont(Font.BOLD));
 
     panel.add(jLabel);

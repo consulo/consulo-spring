@@ -20,30 +20,30 @@ import consulo.util.lang.Pair;
 public abstract class AbstractArgNamesInspection extends AbstractAopInspection {
     @Override
     protected void checkAopMethod(
-        final PsiMethod pointcutMethod,
-        final LocalAopModel model,
-        final ProblemsHolder holder,
-        final AopPointcutExpressionFile aopFile
+        PsiMethod pointcutMethod,
+        LocalAopModel model,
+        ProblemsHolder holder,
+        AopPointcutExpressionFile aopFile
     ) {
         checkAnnotation(pointcutMethod.getParameterList().getParameters(), holder, model.getArgNamesManipulator(), pointcutMethod);
     }
 
     @Override
-    protected void checkElement(final PsiElement element, final ProblemsHolder holder) {
+    protected void checkElement(PsiElement element, ProblemsHolder holder) {
         super.checkElement(element, holder);
         Application.get().getExtensionPoint(AopProvider.class).forEach(provider -> {
-            final Pair<? extends ArgNamesManipulator, PsiMethod> pair = provider.getCustomArgNamesManipulator(element);
+            Pair<? extends ArgNamesManipulator, PsiMethod> pair = provider.getCustomArgNamesManipulator(element);
             if (pair != null) {
-                final PsiMethod method = pair.second;
+                PsiMethod method = pair.second;
                 checkAnnotation(method.getParameterList().getParameters(), holder, pair.first, method);
             }
         });
     }
 
     protected abstract void checkAnnotation(
-        final PsiParameter[] parameters,
-        final ProblemsHolder holder,
-        final ArgNamesManipulator manipulator,
-        final PsiMethod method
+        PsiParameter[] parameters,
+        ProblemsHolder holder,
+        ArgNamesManipulator manipulator,
+        PsiMethod method
     );
 }

@@ -55,14 +55,14 @@ public class ELVariablesCollectorUtils {
   private ELVariablesCollectorUtils() {
   }
 
-  public static List<JspImplicitVariable> getImplicitVariables(final PsiElement host) {
-    final List<JspImplicitVariable> resultVars = new ArrayList<JspImplicitVariable>();
-    final PsiFile file = host.getContainingFile();
+  public static List<JspImplicitVariable> getImplicitVariables(PsiElement host) {
+    List<JspImplicitVariable> resultVars = new ArrayList<JspImplicitVariable>();
+    PsiFile file = host.getContainingFile();
     if (file instanceof XmlFile) {
-      final WebflowModel webflowModel = WebflowDomModelManager.getInstance(host.getProject()).getWebflowModel((XmlFile)file);
+      WebflowModel webflowModel = WebflowDomModelManager.getInstance(host.getProject()).getWebflowModel((XmlFile)file);
 
       if (webflowModel != null) {
-        final ProcessingContext context = createContext(webflowModel, host, resultVars);
+        ProcessingContext context = createContext(webflowModel, host, resultVars);
         addApplicationContextVariables(context);
         processWebflowContextVariables(context);
       }
@@ -71,25 +71,25 @@ public class ELVariablesCollectorUtils {
     return resultVars;
   }
 
-  private static ProcessingContext createContext(final WebflowModel webflowModel,
-                                                 final PsiElement host,
-                                                 final List<JspImplicitVariable> resultVars) {
+  private static ProcessingContext createContext(WebflowModel webflowModel,
+                                                 PsiElement host,
+                                                 List<JspImplicitVariable> resultVars) {
     return new ProcessingContext(webflowModel, host, resultVars);
   }
 
-  private static void addApplicationContextVariables(final ProcessingContext context) {
+  private static void addApplicationContextVariables(ProcessingContext context) {
     for (SpringModel model : SpringManager.getInstance(context.getProject()).getAllModels(context.getModule())) {
       SpringBeansAsJsfVariableUtil.addVariables(context.getResultVars(), model);
     }
   }
 
-  private static void addApplicationContextVariables(final ProcessingContext context, final Flow flow) {
-    final SpringManager springManager = SpringManager.getInstance(context.getProject());
+  private static void addApplicationContextVariables(ProcessingContext context, Flow flow) {
+    SpringManager springManager = SpringManager.getInstance(context.getProject());
 
     for (BeanImport beanImport : flow.getBeanImports()) {
-      final XmlFile xmlFile = beanImport.getResource().getValue();
+      XmlFile xmlFile = beanImport.getResource().getValue();
       if (xmlFile != null) {
-        final SpringModel springModel = springManager.getLocalSpringModel(xmlFile);
+        SpringModel springModel = springManager.getLocalSpringModel(xmlFile);
         if (springModel != null) {
           SpringBeansAsJsfVariableUtil.addVariables(context.getResultVars(), springModel);
         }
@@ -97,7 +97,7 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static void processWebflowContextVariables(final ProcessingContext context) {
+  private static void processWebflowContextVariables(ProcessingContext context) {
     collectScopeVariables(context);
     collectSettedVariables(context);
 
@@ -123,17 +123,17 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static void collectScopeVariables(final ProcessingContext context) {
-    final PsiType objectClassType = getObjectClassType(context.getProject());
+  private static void collectScopeVariables(ProcessingContext context) {
+    PsiType objectClassType = getObjectClassType(context.getProject());
 
-    final List<Evaluate> evaluates = collectEvaluates(context.getWebflowModel());
+    List<Evaluate> evaluates = collectEvaluates(context.getWebflowModel());
 
     for (WebflowScopeProvider scopeProvider : context.getAcceptedProviders()) {
-      for (final Evaluate evaluate : evaluates) {
+      for (Evaluate evaluate : evaluates) {
         String varName = getVariableName(scopeProvider.getScope(), evaluate.getResult().getStringValue());
         if (!StringUtil.isEmptyOrSpaces(varName) &&  isInProviderScope(scopeProvider, evaluate, context)) {
 
-          final PsiElement element =
+          PsiElement element =
               scopeProvider.getOrCreateScopeVariable(context.getFile(), varName, evaluate.getResult().getXmlAttribute());
           if (element != null) {
             addScopeVariable(context, scopeProvider.getScope(),
@@ -145,15 +145,15 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static void collectSettedVariables(final ProcessingContext context) {
-    final PsiType objectClassType = getObjectClassType(context.getProject());
+  private static void collectSettedVariables(ProcessingContext context) {
+    PsiType objectClassType = getObjectClassType(context.getProject());
 
-    final List<Set> sets = collectSetters(context.getWebflowModel());
+    List<Set> sets = collectSetters(context.getWebflowModel());
     for (WebflowScopeProvider scopeProvider : context.getAcceptedProviders()) {
-      for (final Set set : sets) {
+      for (Set set : sets) {
         String varName = getVariableName(scopeProvider.getScope(), set.getName().getStringValue());
         if (!StringUtil.isEmptyOrSpaces(varName) && isInProviderScope(scopeProvider, set, context)) {
-          final PsiElement element =
+          PsiElement element =
               scopeProvider.getOrCreateScopeVariable(context.getFile(), varName, set.getName().getXmlAttributeValue());
           if (element != null) {
             addScopeVariable(context,  scopeProvider.getScope(),
@@ -164,15 +164,15 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static boolean isInProviderScope(final WebflowScopeProvider scopeProvider, final DomElement domElement, final ProcessingContext context) {
-    final Set<DomElement> scopes = scopeProvider.getScopes(context.getDomElement());
+  private static boolean isInProviderScope(WebflowScopeProvider scopeProvider, DomElement domElement, ProcessingContext context) {
+    Set<DomElement> scopes = scopeProvider.getScopes(context.getDomElement());
     for (DomElement scope : scopes) {
       if (isParent(scope,  domElement)) return true;
     }
     return false;
   }
 
-  private static boolean isParent(final DomElement potentialParent, final DomElement domElement) {
+  private static boolean isParent(DomElement potentialParent, DomElement domElement) {
     DomElement currParent = domElement;
     while (currParent != null) {
       if (currParent.equals(potentialParent)) return true;
@@ -184,10 +184,10 @@ public class ELVariablesCollectorUtils {
 
   public static void collectInputVariables(final ProcessingContext context) {
     final PsiType objectClassType = getObjectClassType(context.getProject());
-    final Flow flow = context.getWebflowModel().getFlow();
+    Flow flow = context.getWebflowModel().getFlow();
 
     processFlowVariables(flow, new Processor<Flow>() {
-      public boolean process(final Flow flow) {
+      public boolean process(Flow flow) {
         for (Input input : flow.getInputs()) {
           String varName = input.getName().getStringValue();
           if (!StringUtil.isEmptyOrSpaces(varName)) {
@@ -203,7 +203,7 @@ public class ELVariablesCollectorUtils {
 
   }
 
-  private static void processFlowVariables(final Flow flow, final Processor<Flow> processor) {
+  private static void processFlowVariables(Flow flow, Processor<Flow> processor) {
     processor.process(flow);
 
     for (Flow parentFlow : WebflowUtil.getAllParentFlows(flow)) {
@@ -211,10 +211,10 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  public static void collectVars(final ProcessingContext context) {
-    final PsiType objectClassType = getObjectClassType(context.getProject());
+  public static void collectVars(ProcessingContext context) {
+    PsiType objectClassType = getObjectClassType(context.getProject());
 
-    for (final Var var : getVars(context)) {
+    for (Var var : getVars(context)) {
       String varName = var.getName().getStringValue();
       if (!StringUtil.isEmptyOrSpaces(varName)) {
         PsiType psiType = var.getClazz().getValue();
@@ -225,14 +225,14 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static List<Var> getVars(final ProcessingContext context) {
-    final List<Var> vars = new ArrayList<Var>();
-    final Flow flow = context.getWebflowModel().getFlow();
+  private static List<Var> getVars(ProcessingContext context) {
+    List<Var> vars = new ArrayList<Var>();
+    Flow flow = context.getWebflowModel().getFlow();
     vars.addAll(flow.getVars());
 
-    final DomElement domElement = context.getDomElement();
+    DomElement domElement = context.getDomElement();
     if (domElement != null) {
-      final ViewState state = domElement.getParentOfType(ViewState.class, false);
+      ViewState state = domElement.getParentOfType(ViewState.class, false);
       if (state != null) {
         vars.addAll(state.getVars());
       }
@@ -245,11 +245,11 @@ public class ELVariablesCollectorUtils {
     return vars;
   }
 
-  private static void addScopeVariable(final ProcessingContext context,
-                                       final WebflowScope webflowScope,
-                                       final JspImplicitVariableImpl implicitVariable) {
+  private static void addScopeVariable(ProcessingContext context,
+                                       WebflowScope webflowScope,
+                                       JspImplicitVariableImpl implicitVariable) {
     context.getResultVars().add(implicitVariable);
-    final Map<WebflowScope, List<JspImplicitVariable>> scopeVars = context.getScopeVariablesMap();
+    Map<WebflowScope, List<JspImplicitVariable>> scopeVars = context.getScopeVariablesMap();
 
     if (!scopeVars.containsKey(webflowScope)) scopeVars.put(webflowScope, new ArrayList<JspImplicitVariable>());
 
@@ -277,7 +277,7 @@ public class ELVariablesCollectorUtils {
       }
 
       @Override
-      public boolean equals(final Object obj) {
+      public boolean equals(Object obj) {
         if (obj instanceof JspImplicitVariableImpl) {
           if (getDeclaration() != null && getDeclaration().equals(((JspImplicitVariableImpl)obj).getDeclaration())) return true;
         }
@@ -286,19 +286,19 @@ public class ELVariablesCollectorUtils {
     };
   }
 
-  public static List<Evaluate> collectEvaluates(final WebflowModel webflowModel) {
+  public static List<Evaluate> collectEvaluates(WebflowModel webflowModel) {
     return collectEvaluates(webflowModel, true);
   }
 
-  public static List<Evaluate> collectEvaluates(final WebflowModel webflowModel, final boolean withParents) {
+  public static List<Evaluate> collectEvaluates(WebflowModel webflowModel, boolean withParents) {
     final List<Evaluate> evaluates = new ArrayList<Evaluate>();   //todo cache evaluates
 
-    final DomElementVisitor visitor = new DomElementVisitor() {
-      public void visitEvaluate(final Evaluate evaluate) {
+    DomElementVisitor visitor = new DomElementVisitor() {
+      public void visitEvaluate(Evaluate evaluate) {
         evaluates.add(evaluate);
       }
 
-      public void visitDomElement(final DomElement element) {
+      public void visitDomElement(DomElement element) {
         element.acceptChildren(this);
       }
     };
@@ -308,7 +308,7 @@ public class ELVariablesCollectorUtils {
     return evaluates;
   }
 
-  private static void visitFlow(final DomElementVisitor visitor, final Flow flow, final boolean withParents) {
+  private static void visitFlow(DomElementVisitor visitor, Flow flow, boolean withParents) {
     flow.accept(visitor);
 
     if (withParents) {
@@ -318,19 +318,19 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  public static List<Set> collectSetters(final WebflowModel webflowModel) {
+  public static List<Set> collectSetters(WebflowModel webflowModel) {
     return collectSetters(webflowModel, true);
   }
 
-  public static List<Set> collectSetters(final WebflowModel webflowModel, final boolean withParents) {
+  public static List<Set> collectSetters(WebflowModel webflowModel, boolean withParents) {
     final List<Set> sets = new ArrayList<Set>();
 
-    final DomElementVisitor visitor = new DomElementVisitor() {
-      public void visitSet(final Set set) {
+    DomElementVisitor visitor = new DomElementVisitor() {
+      public void visitSet(Set set) {
         sets.add(set);
       }
 
-      public void visitDomElement(final DomElement element) {
+      public void visitDomElement(DomElement element) {
         element.acceptChildren(this);
       }
     };
@@ -341,24 +341,24 @@ public class ELVariablesCollectorUtils {
   }
 
   @NotNull
-  private static PsiType getScopeResultType(final GenericAttributeValue<String> expressionAttr,
-                                            final GenericAttributeValue<PsiType> psiTypeAttr,
-                                            final PsiFile containingFile,
+  private static PsiType getScopeResultType(GenericAttributeValue<String> expressionAttr,
+                                            GenericAttributeValue<PsiType> psiTypeAttr,
+                                            PsiFile containingFile,
                                             final JspImplicitVariableImpl jspImplicitVariable) {
-    final PsiType type = psiTypeAttr.getValue();
+    PsiType type = psiTypeAttr.getValue();
     if (type != null) return type;
 
-    final XmlAttributeValue context = expressionAttr.getXmlAttributeValue();
+    XmlAttributeValue context = expressionAttr.getXmlAttributeValue();
     final Ref<PsiType> injectionType = new Ref<PsiType>();
 
     assert context != null;
 
     ((PsiLanguageInjectionHost)context).processInjectedPsi(new PsiLanguageInjectionHost.InjectedPsiVisitor() {
-      public void visit(@NotNull final PsiFile injectedPsi, @NotNull final List<PsiLanguageInjectionHost.Shred> places) {
-        final PsiElement at = injectedPsi.findElementAt(injectedPsi.getTextLength() - 1);
-        final ELExpressionHolder holder = PsiTreeUtil.getParentOfType(at, ELExpressionHolder.class);
+      public void visit(@NotNull PsiFile injectedPsi, @NotNull List<PsiLanguageInjectionHost.Shred> places) {
+        PsiElement at = injectedPsi.findElementAt(injectedPsi.getTextLength() - 1);
+        ELExpressionHolder holder = PsiTreeUtil.getParentOfType(at, ELExpressionHolder.class);
         if (holder != null) {
-          final PsiElement firstChild = holder.getFirstChild();
+          PsiElement firstChild = holder.getFirstChild();
 
           if (!isSelfReference(firstChild, jspImplicitVariable)) {
             injectionType.set(ELResolveUtil.resolveContextAsType(firstChild));
@@ -367,20 +367,20 @@ public class ELVariablesCollectorUtils {
       }
     });
 
-    final PsiType contextType = injectionType.get();
+    PsiType contextType = injectionType.get();
     if (contextType != null) return contextType;
 
     return getObjectClassType(containingFile.getProject());
   }
 
-  private static boolean isSelfReference(final PsiElement firstChild, final JspImplicitVariableImpl jspImplicitVariable) {
+  private static boolean isSelfReference(PsiElement firstChild, JspImplicitVariableImpl jspImplicitVariable) {
     ELVariable var = null;
     if (firstChild instanceof ELVariable) var = (ELVariable)firstChild;
     if (firstChild instanceof ELSelectExpression) var = ((ELSelectExpression)firstChild).getField();
 
 
     if (var != null) {
-      final PsiReference[] references = var.getReferences();
+      PsiReference[] references = var.getReferences();
       if (references.length > 0 && jspImplicitVariable.equals(references[0].resolve())) {
         return true;
       }
@@ -389,18 +389,18 @@ public class ELVariablesCollectorUtils {
   }
 
   @Nullable
-  public static String getVariableName(final WebflowScope scope, final String value) {
+  public static String getVariableName(WebflowScope scope, String value) {
     if (StringUtil.isEmptyOrSpaces(value)) return null;
 
-    final String s = StringUtil.trimStart(value, scope.getName() + ".");
+    String s = StringUtil.trimStart(value, scope.getName() + ".");
 
     return s.equals(value) || s.contains(".") ? null : s;
   }
 
   public static void collectPredefinedVariables(final ProcessingContext context) {
     for (Pair<String, String> pair : predefinedVars) {
-      final String varName = pair.first;
-      final String className = pair.second;
+      String varName = pair.first;
+      String className = pair.second;
 
       PsiType psiType = getPsiClassTypeByName(context.getProject(), className);
       if (psiType == null) psiType = getObjectClassType(context.getProject());
@@ -413,26 +413,26 @@ public class ELVariablesCollectorUtils {
     }
   }
 
-  private static PsiType getObjectClassType(final Project project) {
-    final PsiType psiType = getPsiClassTypeByName(project, CommonClassNames.JAVA_LANG_OBJECT);
+  private static PsiType getObjectClassType(Project project) {
+    PsiType psiType = getPsiClassTypeByName(project, CommonClassNames.JAVA_LANG_OBJECT);
 
     return psiType == null ? PsiType.VOID : psiType;
   }
 
   @Nullable
-  private static PsiType getPsiClassTypeByName(final Project project, final String className) {
-    final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
+  private static PsiType getPsiClassTypeByName(Project project, String className) {
+    JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
 
-    final PsiClass psiClass = psiFacade.findClass(className, GlobalSearchScope.allScope(project));
+    PsiClass psiClass = psiFacade.findClass(className, GlobalSearchScope.allScope(project));
 
     return psiClass == null ? null : psiFacade.getElementFactory().createType(psiClass);
   }
 
-  private static void addImplicitVariable(final PsiElement psiElement,
-                                          @Nullable final String name,
-                                          final List<JspImplicitVariable> result,
-                                          @Nullable final PsiType type,
-                                          final PsiFile file) {
+  private static void addImplicitVariable(PsiElement psiElement,
+                                          @Nullable String name,
+                                          List<JspImplicitVariable> result,
+                                          @Nullable PsiType type,
+                                          PsiFile file) {
 
     if (name == null || name.length() == 0 || type == null) return;
 
@@ -440,20 +440,20 @@ public class ELVariablesCollectorUtils {
   }
 
   @Nullable
-  private static JspImplicitVariableImpl createImplicitVariable(final WebflowDomElement element,
-                                                                @Nullable final String name,
-                                                                @Nullable final PsiType type,
-                                                                final PsiFile file) {
+  private static JspImplicitVariableImpl createImplicitVariable(WebflowDomElement element,
+                                                                @Nullable String name,
+                                                                @Nullable PsiType type,
+                                                                PsiFile file) {
 
     if (name == null || name.length() == 0 || type == null) return null;
 
-    final DomTarget target = DomTarget.getTarget(element);
+    DomTarget target = DomTarget.getTarget(element);
     assert target != null;
     return new JspImplicitVariableImpl(file, name, type, PomService.convertToPsi(target), JspImplicitVariableImpl.NESTED_RANGE);
   }
 
   @Nullable
-  public static DomElement getDomElement(final PsiElement host) {
+  public static DomElement getDomElement(PsiElement host) {
     return DomManager.getDomManager(host.getProject()).getDomElement(PsiTreeUtil.getParentOfType(host, XmlTag.class));
   }
 
@@ -464,7 +464,7 @@ public class ELVariablesCollectorUtils {
     private final DomElement myDomElement;
     private Map<WebflowScope, List<JspImplicitVariable>> myScopeVarsMap;
 
-    public ProcessingContext(final WebflowModel webflowModel, final PsiElement host, final List<JspImplicitVariable> resultVars) {
+    public ProcessingContext(WebflowModel webflowModel, PsiElement host, List<JspImplicitVariable> resultVars) {
       myWebflowModel = webflowModel;
       myHost = host;
       myResultVars = resultVars;

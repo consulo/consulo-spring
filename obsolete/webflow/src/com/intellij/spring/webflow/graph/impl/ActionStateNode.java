@@ -31,7 +31,7 @@ public class ActionStateNode extends WebflowBasicNode<ActionState> {
 
   public List<WebflowNamedAction> getAllNodeActions() {
     List<WebflowNamedAction> actions = new ArrayList<WebflowNamedAction>();
-    final ActionState state = getIdentifyingElement();
+    ActionState state = getIdentifyingElement();
     if (state.isValid()) {
       WebflowUtil.collectActons(state, actions);
       WebflowUtil.collectActons(state.getEntryActions(), actions);

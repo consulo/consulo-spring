@@ -25,14 +25,14 @@ public class SpringMVCJamModel {
     return ModuleServiceManager.getService(module, SpringMVCJamModel.class);
   }
 
-  public SpringMVCJamModel(@NotNull final Module module) {
+  public SpringMVCJamModel(@NotNull Module module) {
     myModule = module;
   }
 
 
   public List<SpringMVCRequestMapping> getRequestMappings() {
-    final JamService service = JamService.getJamService(myModule.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    JamService service = JamService.getJamService(myModule.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
     List<SpringMVCRequestMapping> result = new ArrayList<SpringMVCRequestMapping>();
     result.addAll(service.getJamClassElements(SpringMVCRequestMapping.ClassMapping.META, SpringMVCRequestMapping.REQUEST_MAPPING, scope));
     result.addAll(service.getJamMethodElements(SpringMVCRequestMapping.MethodMapping.META, SpringMVCRequestMapping.REQUEST_MAPPING, scope));
@@ -40,14 +40,14 @@ public class SpringMVCJamModel {
   }
 
   public Collection<SpringMVCModelAttribute> getModelAttributes() {
-    final List<SpringMVCRequestMapping> list = getRequestMappings();
-    final Set<SpringMVCModelAttribute> attributes = new THashSet<SpringMVCModelAttribute>(new TObjectHashingStrategy<SpringMVCModelAttribute>() {
-      public int computeHashCode(final SpringMVCModelAttribute object) {
-        final String name = object.getName();
+    List<SpringMVCRequestMapping> list = getRequestMappings();
+    Set<SpringMVCModelAttribute> attributes = new THashSet<SpringMVCModelAttribute>(new TObjectHashingStrategy<SpringMVCModelAttribute>() {
+      public int computeHashCode(SpringMVCModelAttribute object) {
+        String name = object.getName();
         return name == null ? 0 : name.hashCode();
       }
 
-      public boolean equals(final SpringMVCModelAttribute o1, final SpringMVCModelAttribute o2) {
+      public boolean equals(SpringMVCModelAttribute o1, SpringMVCModelAttribute o2) {
         return Comparing.equal(o1.getName(), o2.getName()) && Comparing.equal(o1.getType(), o2.getType());
       }
     });

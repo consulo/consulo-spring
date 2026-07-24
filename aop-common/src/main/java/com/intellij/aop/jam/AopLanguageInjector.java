@@ -69,7 +69,7 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
   @Override
   public void inject(@Nonnull MultiHostRegistrar registrar, @Nonnull PsiElement... operands) {
     PsiElement host = operands[0];
-    final ProcessingContext context = new ProcessingContext();
+    ProcessingContext context = new ProcessingContext();
     if (AOP_ANNO_PATTERN.accepts(host, context)) {
       final AopAdvisedElementsSearcher searcher = getAopAdvisedElementsSearcher(host);
       if (searcher != null) {
@@ -89,8 +89,8 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
                   container = AopModuleService.getPointcut(method);
                 }
 
-                final PsiModifierList modifierList = method.getContainingClass().getModifierList();
-                final String modifiers = modifierList == null ? "NOMODIFIERS" : modifierList.getText();
+                PsiModifierList modifierList = method.getContainingClass().getModifierList();
+                String modifiers = modifierList == null ? "NOMODIFIERS" : modifierList.getText();
                 LOG.error("No AOP JAM for method: " + method.getClass().getName() + "; modifiers: " + method.getModifierList()
                                                                                                             .getText() + "; in class: " + modifiers + "; again: " + container);
               }
@@ -111,10 +111,10 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
       }
     }
     else if (AOP_INTRO_PATTERN.accepts(host, context)) {
-      final AopAdvisedElementsSearcher searcher = getAopAdvisedElementsSearcher(host);
+      AopAdvisedElementsSearcher searcher = getAopAdvisedElementsSearcher(host);
       if (searcher != null) {
-        final PsiField field = context.get(AOP_FIELD_KEY);
-        final PsiAnnotation annotation = field.getModifierList().findAnnotation(AopConstants.DECLARE_PARENTS_ANNO);
+        PsiField field = context.get(AOP_FIELD_KEY);
+        PsiAnnotation annotation = field.getModifierList().findAnnotation(AopConstants.DECLARE_PARENTS_ANNO);
         host.putUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL, new JavaIntroLocalAopModel(host, searcher, annotation, field));
         registrar.startInjecting(AopPointcutExpressionLanguage.getInstance());
         for (int i = 0; i < operands.length; i++) {
@@ -145,19 +145,19 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
   }
 
   @Nullable
-  public static AopAdvisedElementsSearcher getAopAdvisedElementsSearcher(final PsiElement element) {
-    final List<AopProvider> providers = getAopProviders(element);
+  public static AopAdvisedElementsSearcher getAopAdvisedElementsSearcher(PsiElement element) {
+    List<AopProvider> providers = getAopProviders(element);
     if (providers.isEmpty()) return null;
 
-    final PsiClass psiClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
+    PsiClass psiClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
     if (psiClass == null) return null;
 
     return providers.get(0).getAdvisedElementsSearcher(PsiUtilBase.getOriginalElement(psiClass, PsiClass.class));
   }
 
   @Nonnull
-  public static List<AopProvider> getAopProviders(final PsiElement element) {
-    final PsiClass psiClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
+  public static List<AopProvider> getAopProviders(PsiElement element) {
+    PsiClass psiClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
     if (psiClass == null) return Collections.emptyList();
 
     return ContainerUtil.findAll(AopProvider.EXTENSION_POINT_NAME.getExtensionList(),
@@ -169,8 +169,8 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
     private final PsiAnnotation myAnnotation;
     private final PsiField myField;
 
-    public JavaIntroLocalAopModel(final PsiElement host,
-                                  final AopAdvisedElementsSearcher searcher, final PsiAnnotation annotation, final PsiField field) {
+    public JavaIntroLocalAopModel(PsiElement host,
+                                  AopAdvisedElementsSearcher searcher, PsiAnnotation annotation, PsiField field) {
       super(host, null, searcher);
       myAnnotation = annotation;
       myField = field;
@@ -192,14 +192,14 @@ public class AopLanguageInjector implements ConcatenationAwareInjector {
         }
 
         @Override
-        public void defineDefaultImpl(final Project project, final ProblemDescriptor descriptor) throws IncorrectOperationException {
-          final VirtualFile virtualFile = myField.getContainingFile().getVirtualFile();
+        public void defineDefaultImpl(Project project, ProblemDescriptor descriptor) throws IncorrectOperationException {
+          VirtualFile virtualFile = myField.getContainingFile().getVirtualFile();
           AnnotationTextUtil.setAnnotationParameter(myAnnotation, AopConstants.DEFAULT_IMPL_PARAM, "a");
-          final PsiAnnotationMemberValue value =
+          PsiAnnotationMemberValue value =
             myField.getModifierList()
                    .findAnnotation(AopConstants.DECLARE_PARENTS_ANNO)
                    .findDeclaredAttributeValue(AopConstants.DEFAULT_IMPL_PARAM);
-          final int offset = value.getTextRange().getStartOffset();
+          int offset = value.getTextRange().getStartOffset();
           value.delete();
           OpenFileDescriptorFactory.getInstance(project).builder(virtualFile).offset(offset).build().navigate(true);
         }

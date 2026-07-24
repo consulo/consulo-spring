@@ -73,9 +73,9 @@ public class DomSpringModelImpl2 extends BaseSpringModel implements DomSpringMod
     return getComponentScans(getAllDomBeans());
   }
 
-  private static List<DomComponentScan> getComponentScans(final Collection<SpringBaseBeanPointer> allDomBeans) {
+  private static List<DomComponentScan> getComponentScans(Collection<SpringBaseBeanPointer> allDomBeans) {
     return ContainerUtil.mapNotNull(allDomBeans, domSpringBeanPointer -> {
-      final CommonSpringBean domSpringBean = domSpringBeanPointer.getSpringBean();
+      CommonSpringBean domSpringBean = domSpringBeanPointer.getSpringBean();
       if (domSpringBean instanceof DomComponentScan) {
         return (DomComponentScan)domSpringBean;
       }

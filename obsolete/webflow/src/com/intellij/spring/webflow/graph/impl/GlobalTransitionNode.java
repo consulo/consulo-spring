@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class GlobalTransitionNode extends WebflowBasicNode<GenericAttributeValue<String>> {
   private final Transition myTransition;
 
-  public GlobalTransitionNode(final Transition transition, final GenericAttributeValue<String> identifying) {
+  public GlobalTransitionNode(Transition transition, GenericAttributeValue<String> identifying) {
     super(identifying, identifying.getValue());
     myTransition = transition;
   }
@@ -34,7 +34,7 @@ public abstract class GlobalTransitionNode extends WebflowBasicNode<GenericAttri
   }
 
   public static class OnExceptionTransition extends GlobalTransitionNode {
-    public OnExceptionTransition(final Transition transition, final GenericAttributeValue<String> identifying) {
+    public OnExceptionTransition(Transition transition, GenericAttributeValue<String> identifying) {
       super(transition, identifying);
     }
 
@@ -44,7 +44,7 @@ public abstract class GlobalTransitionNode extends WebflowBasicNode<GenericAttri
   }
 
   public static class OnTransition extends GlobalTransitionNode {
-    public OnTransition(final Transition transition, final GenericAttributeValue<String> identifying) {
+    public OnTransition(Transition transition, GenericAttributeValue<String> identifying) {
       super(transition, identifying);
     }
 

@@ -12,7 +12,7 @@ import jakarta.annotation.Nonnull;
  */
 public interface PsiPointcutExpression extends AopPatternContainer {
   @Nonnull
-  PointcutMatchDegree acceptsSubject(final PointcutContext context, PsiMember member);
+  PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member);
 
   @Nonnull
   AopPointcutExpressionFile getContainingFile();

@@ -12,8 +12,8 @@ public class SpringAliasGenerateProvider extends BasicSpringDomGenerateProvider<
     super(getDescription(Alias.class), Alias.class);
   }
 
-  public Alias generate(@Nullable final DomElement parent, final Editor editor) {
-    final Alias alias = super.generate(parent, editor);
+  public Alias generate(@Nullable DomElement parent, Editor editor) {
+    Alias alias = super.generate(parent, editor);
 
     if (alias != null) {
       alias.getAlias().ensureXmlElementExists();
@@ -23,11 +23,11 @@ public class SpringAliasGenerateProvider extends BasicSpringDomGenerateProvider<
     return alias;
   }
 
-  protected DomElement getElementToNavigate(final Alias alias) {
+  protected DomElement getElementToNavigate(Alias alias) {
     return alias.getAliasedBean();
   }
 
-  protected void doNavigate(final DomElementNavigationProvider navigateProvider, final DomElement element) {
+  protected void doNavigate(DomElementNavigationProvider navigateProvider, DomElement element) {
     navigateProvider.navigate(((Alias)element).getAliasedBean(), true);
   }
 }

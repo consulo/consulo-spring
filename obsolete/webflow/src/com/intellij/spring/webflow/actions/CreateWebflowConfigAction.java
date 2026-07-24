@@ -27,16 +27,16 @@ public class CreateWebflowConfigAction extends CreateFileAction {
           SpringIcons.CONFIG_FILE);
   }
 
-  protected boolean isAvailable(final DataContext dataContext) {
+  protected boolean isAvailable(DataContext dataContext) {
     if (!super.isAvailable(dataContext)) {
       return false;
     }
-    final Module module = LangDataKeys.MODULE.getData(dataContext);
+    Module module = LangDataKeys.MODULE.getData(dataContext);
     return module != null && SpringFacet.getInstance(module) != null;
   }
 
   @NotNull
-  protected PsiElement[] invokeDialog(final Project project, PsiDirectory directory) {
+  protected PsiElement[] invokeDialog(Project project, PsiDirectory directory) {
     MyInputValidator validator = new MyInputValidator(project, directory);
     Messages.showInputDialog(project, IdeBundle.message("prompt.enter.new.file.name"),
                              IdeBundle.message("title.new.file"), Messages.getQuestionIcon(), null, validator);
@@ -44,12 +44,12 @@ public class CreateWebflowConfigAction extends CreateFileAction {
   }
 
    @NotNull
-  protected PsiElement[] create(final String newName, final PsiDirectory directory) throws Exception {
-    final FileTemplate template = getWebflowConfigTemplate();
+  protected PsiElement[] create(String newName, PsiDirectory directory) throws Exception {
+    FileTemplate template = getWebflowConfigTemplate();
 
-    @NonNls final String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
+    @NonNls String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
 
-    final PsiElement psiElement = FileTemplateUtil.createFromTemplate(template, fileName, null, directory);
+    PsiElement psiElement = FileTemplateUtil.createFromTemplate(template, fileName, null, directory);
 
     return new PsiElement[] {psiElement};
   }

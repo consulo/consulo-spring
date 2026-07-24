@@ -36,7 +36,7 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
     dialogWrapper.show();
 
     if (dialogWrapper.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-      final ReadonlyStatusHandler.OperationStatus status = ReadonlyStatusHandler.getInstance(xmlFile.getProject()).ensureFilesWritable(xmlFile.getVirtualFile());
+      ReadonlyStatusHandler.OperationStatus status = ReadonlyStatusHandler.getInstance(xmlFile.getProject()).ensureFilesWritable(xmlFile.getVirtualFile());
       if (status.hasReadonlyFiles()) return;
 
       new WriteCommandAction(module.getProject()) {
@@ -53,10 +53,10 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
     }
   }
 
-  protected void addFacet(final consulo.module.Module module) {
+  protected void addFacet(consulo.module.Module module) {
     if (module == null) return;
 
-    final String facetId = getFacetId();
+    String facetId = getFacetId();
     if (!StringUtil.isEmptyOrSpaces(facetId)) {
       /*
       TODO [VISTALL]
@@ -82,17 +82,17 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
     return null;
   }
 
-  protected abstract LibrariesInfo getLibrariesInfo(final Module module);
+  protected abstract LibrariesInfo getLibrariesInfo(Module module);
 
-  protected abstract List<TemplateInfo> getTemplateInfos(final consulo.module.Module module);
+  protected abstract List<TemplateInfo> getTemplateInfos(consulo.module.Module module);
 
-  private static void moveCaretIfNeeded(final Project project, final Editor editor, final XmlFile xmlFile) {
-    final SpringBean bean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, xmlFile);
+  private static void moveCaretIfNeeded(Project project, Editor editor, XmlFile xmlFile) {
+    SpringBean bean = SpringUtils.getSpringBeanForCurrentCaretPosition(editor, xmlFile);
     if (bean != null) {
       SpringBean springBean = SpringUtils.getTopLevelBean(bean);
 
       if (springBean.getXmlTag() != null) {
-        final TextRange range = springBean.getXmlTag().getTextRange();
+        TextRange range = springBean.getXmlTag().getTextRange();
         int offset = range.getEndOffset();
         editor.getCaretModel().moveToOffset(offset);
         editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);

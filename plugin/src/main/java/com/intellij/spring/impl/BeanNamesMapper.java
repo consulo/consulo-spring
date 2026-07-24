@@ -29,8 +29,8 @@ public class BeanNamesMapper {
 
   public BeanNamesMapper(BaseSpringModel model) {
 
-    final Collection<? extends SpringBaseBeanPointer> springBeans = model.getAllCommonBeans();
-    final Collection<SpringBaseBeanPointer> ownBeans = model.getOwnBeans();
+    Collection<? extends SpringBaseBeanPointer> springBeans = model.getAllCommonBeans();
+    Collection<SpringBaseBeanPointer> ownBeans = model.getOwnBeans();
 
     myBeansMap = new HashMap<>(springBeans.size());
     myAliasesMap = new HashMap<>();
@@ -48,10 +48,10 @@ public class BeanNamesMapper {
       }
     };
 
-    for (final SpringBaseBeanPointer bean : springBeans) {
-      final String beanName = bean.getName();
+    for (SpringBaseBeanPointer bean : springBeans) {
+      String beanName = bean.getName();
       if (StringUtil.isNotEmpty(beanName)) {
-        final SpringBaseBeanPointer duplication = myBeansMap.put(beanName, bean);
+        SpringBaseBeanPointer duplication = myBeansMap.put(beanName, bean);
         if (duplication != null && ownBeans.contains(duplication)) {
           if (ownBeans.contains(bean)) {
             myDuplicatedNames.add(beanName);
@@ -61,27 +61,27 @@ public class BeanNamesMapper {
           }
         }
         myAllBeanNames.putValue(beanName, beanName);
-        for (final String alias : bean.getAliases()) {
+        for (String alias : bean.getAliases()) {
           registerAlias(beanName, alias);
         }
       }
     }
 
-    final List<Alias> aliases = model.getAliases(true);
+    List<Alias> aliases = model.getAliases(true);
     for (Alias anAlias : aliases) {
       registerAlias(anAlias.getAliasedBean().getStringValue(), anAlias.getAlias().getStringValue());
     }
   }
 
   @Nullable
-  public SpringBeanPointer getBean(@Nonnull final String beanName) {
+  public SpringBeanPointer getBean(@Nonnull String beanName) {
     String curName = beanName;
     Set<String> visited = null;
     while (true) {
       SpringBeanPointer bean = myBeansMap.get(curName);
       if (bean != null) return bean.derive(beanName);
 
-      final String newName = myAliasesMap.get(curName);
+      String newName = myAliasesMap.get(curName);
       if (newName == null || (visited != null && visited.contains(curName))) return null;
 
       if (visited == null) {
@@ -100,18 +100,18 @@ public class BeanNamesMapper {
     return myDuplicatedNames.contains(name);
   }
 
-  private void registerAlias(String beanName, final String alias) {
+  private void registerAlias(String beanName, String alias) {
 
     if (!StringUtil.isNotEmpty(alias) || !StringUtil.isNotEmpty(beanName) || Comparing.equal(beanName, alias)) {
       return;
     }
 
-    final String duplication = myAliasesMap.put(alias, beanName);
+    String duplication = myAliasesMap.put(alias, beanName);
     if (duplication != null || myBeansMap.containsKey(alias)) {
       myDuplicatedNames.add(alias);
     }
 
-    final HashSet<String> aliases = new HashSet<>();
+    HashSet<String> aliases = new HashSet<>();
     aliases.add(alias);
     while (!myBeansMap.containsKey(beanName)) {
       beanName = myAliasesMap.get(beanName);

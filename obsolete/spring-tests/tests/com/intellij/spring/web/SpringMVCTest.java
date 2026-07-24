@@ -45,10 +45,10 @@ public class SpringMVCTest extends SpringHighlightingTestCase<WebModuleFixtureBu
 
   public void testJamModel() throws Throwable {
     myFixture.copyDirectoryToProject("", "");
-    final WebFacet webFacet = WebFacet.getInstances(myModule).iterator().next();
-    final SpringMVCModel mvcModel = SpringMVCModel.getModel(webFacet, SpringFacet.getInstance(myModule));
+    WebFacet webFacet = WebFacet.getInstances(myModule).iterator().next();
+    SpringMVCModel mvcModel = SpringMVCModel.getModel(webFacet, SpringFacet.getInstance(myModule));
     assertNotNull(mvcModel);
-    final Collection<SpringModel> springModels = mvcModel.getAllModels();
+    Collection<SpringModel> springModels = mvcModel.getAllModels();
     assertEquals(1, springModels.size());
     Set<String> urls = mvcModel.getAllUrls();
     assertEquals(new HashSet<String>(Arrays.asList("/class.form", "/method.form", "/anotherUrl.form", "/register.form")), urls);

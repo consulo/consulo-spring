@@ -41,7 +41,7 @@ public class SpringAopWarningsInspection extends BasicDomElementsInspection<Bean
         return HighlightDisplayLevel.WARNING;
     }
 
-    protected void checkDomElement(final DomElement element, final DomElementAnnotationHolder holder, final DomHighlightingHelper helper) {
+    protected void checkDomElement(DomElement element, DomElementAnnotationHolder holder, DomHighlightingHelper helper) {
         if (element.getXmlTag() == null) {
             return;
         }
@@ -55,7 +55,7 @@ public class SpringAopWarningsInspection extends BasicDomElementsInspection<Bean
             );
         }
         else if (element instanceof SpringAspect) {
-            final GenericAttributeValue<SpringBeanPointer> ref = ((SpringAspect) element).getRef();
+            GenericAttributeValue<SpringBeanPointer> ref = ((SpringAspect) element).getRef();
             if (ref.getXmlAttribute() == null) {
                 holder.createProblem(
                     element,
@@ -66,9 +66,9 @@ public class SpringAopWarningsInspection extends BasicDomElementsInspection<Bean
                 return;
             }
 
-            final SpringBeanPointer pointer = ref.getValue();
+            SpringBeanPointer pointer = ref.getValue();
             if (pointer != null) {
-                final PsiClass beanClass = pointer.getBeanClass();
+                PsiClass beanClass = pointer.getBeanClass();
                 if (beanClass != null
                     && (!AopJavaAnnotator.getBoundAdvices(beanClass).isEmpty()
                     || !AopJavaAnnotator.getBoundIntroductions(beanClass).isEmpty())) {

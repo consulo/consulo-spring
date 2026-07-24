@@ -34,20 +34,20 @@ public class SpringDomAnnotator implements Annotator {
     new Function<SpringBaseBeanPointer, Collection<? extends PsiElement>>() {
 
       @Nonnull
-      public Collection<? extends PsiElement> apply(final SpringBaseBeanPointer pointer) {
+      public Collection<? extends PsiElement> apply(SpringBaseBeanPointer pointer) {
         return ContainerUtil.createMaybeSingletonList(pointer.getPsiElement());
       }
     };
 
   private static void annotateBean(DomSpringBean bean, AnnotationHolder holder) {
-    final XmlTag tag = bean.getXmlTag();
+    XmlTag tag = bean.getXmlTag();
     if (tag == null) return;
 
-    final SpringModel model = SpringUtils.getSpringModel(bean);
-    final List<SpringBaseBeanPointer> children = model.getChildren(SpringBeanPointer.createSpringBeanPointer(bean));
+    SpringModel model = SpringUtils.getSpringModel(bean);
+    List<SpringBaseBeanPointer> children = model.getChildren(SpringBeanPointer.createSpringBeanPointer(bean));
     if (children.size() > 0) {
 
-      final NavigationGutterIconBuilder<SpringBaseBeanPointer> iconBuilder =
+      NavigationGutterIconBuilder<SpringBaseBeanPointer> iconBuilder =
         NavigationGutterIconBuilder.create(SpringImplIconGroup.gutterParentbeangutter(), CONVERTER);
       iconBuilder.
                    setTargets(children).
@@ -60,7 +60,7 @@ public class SpringDomAnnotator implements Annotator {
 
   public void annotate(PsiElement psiElement, AnnotationHolder holder) {
     if (psiElement instanceof XmlTag) {
-      final DomElement element = DomManager.getDomManager(psiElement.getProject()).getDomElement((XmlTag)psiElement);
+      DomElement element = DomManager.getDomManager(psiElement.getProject()).getDomElement((XmlTag)psiElement);
       if (element instanceof DomSpringBean) {
         annotateBean((DomSpringBean)element, holder);
       }

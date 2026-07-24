@@ -11,32 +11,32 @@ import jakarta.annotation.Nullable;
 @ExtensionImpl
 public class AopPointcutExpressionFindUsagesProvider implements FindUsagesProvider {
   @Override
-  public boolean canFindUsagesFor(@Nonnull final PsiElement psiElement) {
+  public boolean canFindUsagesFor(@Nonnull PsiElement psiElement) {
     return false;
   }
 
   @Override
   @Nullable
-  public String getHelpId(@Nonnull final PsiElement psiElement) {
+  public String getHelpId(@Nonnull PsiElement psiElement) {
     return null;
   }
 
   @Override
   @Nonnull
-  public String getType(@Nonnull final PsiElement element) {
+  public String getType(@Nonnull PsiElement element) {
     throw new UnsupportedOperationException("Method getType is not yet implemented in " + getClass().getName());
   }
 
   @Override
   @Nonnull
-  public String getDescriptiveName(@Nonnull final PsiElement element) {
+  public String getDescriptiveName(@Nonnull PsiElement element) {
     throw new UnsupportedOperationException("Method getDescriptiveName is not yet implemented in " + getClass().getName() + "; element=" + element + " of class=" + element
       .getClass());
   }
 
   @Override
   @Nonnull
-  public String getNodeText(@Nonnull final PsiElement element, final boolean useFullName) {
+  public String getNodeText(@Nonnull PsiElement element, boolean useFullName) {
     throw new UnsupportedOperationException("Method getNodeText is not yet implemented in " + getClass().getName());
   }
 

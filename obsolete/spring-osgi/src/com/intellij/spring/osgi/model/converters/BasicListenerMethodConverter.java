@@ -18,7 +18,7 @@ public abstract class BasicListenerMethodConverter extends SpringBeanMethodConve
     return new MethodAccepter() {
 
       public boolean accept(PsiMethod method) {
-        final String containing = method.getContainingClass().getQualifiedName();
+        String containing = method.getContainingClass().getQualifiedName();
 
         return checkParameterList(method, context) &&
                checkModifiers(method) &&
@@ -31,16 +31,16 @@ public abstract class BasicListenerMethodConverter extends SpringBeanMethodConve
   }
 
   @Override
-  protected PsiClass getPsiClass(final ConvertContext context) {
-    final BasicListener registrationListener = getBasicListener(context);
+  protected PsiClass getPsiClass(ConvertContext context) {
+    BasicListener registrationListener = getBasicListener(context);
 
     if (registrationListener != null) {
       if (!DomUtil.hasXml(registrationListener.getRef())) {
-        final SpringBean bean = registrationListener.getBean();
+        SpringBean bean = registrationListener.getBean();
         if (bean != null) return bean.getBeanClass();
       }
       else {
-        final SpringBeanPointer value = registrationListener.getRef().getValue();
+        SpringBeanPointer value = registrationListener.getRef().getValue();
         if (value != null) {
           return value.getBeanClass();
         }
@@ -51,31 +51,31 @@ public abstract class BasicListenerMethodConverter extends SpringBeanMethodConve
   }
 
   @Nullable
-  private static BasicListener getBasicListener(final ConvertContext context) {
+  private static BasicListener getBasicListener(ConvertContext context) {
     return context.getInvocationElement().getParentOfType(BasicListener.class, false);
   }
 
-  protected abstract boolean checkParameterList(final PsiMethod method, final ConvertContext context);
+  protected abstract boolean checkParameterList(PsiMethod method, ConvertContext context);
 
-  public static boolean checkType(@Nullable final PsiType type, final String className, final Project project) {
+  public static boolean checkType(@Nullable PsiType type, String className, Project project) {
     if (type == null) return false;
     if(className.equals(type.getCanonicalText())) return true;
 
-    final PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project));
+    PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project));
 
     return psiClass != null && type.isAssignableFrom(JavaPsiFacade.getInstance(project).getElementFactory().createType(psiClass));
 
   }
 
   @Override
-  protected boolean checkReturnType(final ConvertContext context, final PsiMethod method, final boolean forCompletion) {
-    final PsiType returnType = method.getReturnType();
+  protected boolean checkReturnType(ConvertContext context, PsiMethod method, boolean forCompletion) {
+    PsiType returnType = method.getReturnType();
 
     return PsiType.VOID.equals(returnType);
   }
 
   @Override
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
     return LocalQuickFix.EMPTY_ARRAY; //todo serega.vasiliev
   }
 }

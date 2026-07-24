@@ -49,25 +49,25 @@ public class SpringToolDomExtender extends DomExtender<CustomBeanWrapper> {
   @Nullable
   public static XmlTag getToolAnnotationTag(@Nullable PsiElement declaration, boolean allowRecursion) {
     if (declaration instanceof XmlTag) {
-      final XmlTag xmlTag = (XmlTag)declaration;
-      final XmlTag[] tags = xmlTag.findSubTags("annotation", XmlUtil.XML_SCHEMA_URI);
+      XmlTag xmlTag = (XmlTag)declaration;
+      XmlTag[] tags = xmlTag.findSubTags("annotation", XmlUtil.XML_SCHEMA_URI);
       if (tags.length > 0) {
-        final XmlTag[] tags1 = tags[0].findSubTags("appinfo", XmlUtil.XML_SCHEMA_URI);
+        XmlTag[] tags1 = tags[0].findSubTags("appinfo", XmlUtil.XML_SCHEMA_URI);
         if (tags1.length > 0) {
-          final XmlTag[] tags2 = tags1[0].findSubTags("annotation", SpringConstants.TOOL_NAMESPACE);
+          XmlTag[] tags2 = tags1[0].findSubTags("annotation", SpringConstants.TOOL_NAMESPACE);
           if (tags2.length > 0) {
             return tags2[0];
           }
         }
       }
-      final XmlAttribute attribute = xmlTag.getAttribute("type");
+      XmlAttribute attribute = xmlTag.getAttribute("type");
       if (allowRecursion && attribute != null) {
-        final XmlAttributeValue value = attribute.getValueElement();
+        XmlAttributeValue value = attribute.getValueElement();
         if (value != null) {
-          for (final PsiReference reference : value.getReferences()) {
-            final PsiElement element = reference.resolve();
+          for (PsiReference reference : value.getReferences()) {
+            PsiElement element = reference.resolve();
             if (element instanceof XmlTag) {
-              final XmlTag annotationTag = getToolAnnotationTag(element, false);
+              XmlTag annotationTag = getToolAnnotationTag(element, false);
               if (annotationTag != null) {
                 return annotationTag;
               }
@@ -85,33 +85,33 @@ public class SpringToolDomExtender extends DomExtender<CustomBeanWrapper> {
     return CustomBeanWrapper.class;
   }
 
-  public void registerExtensions(@Nonnull final CustomBeanWrapper element, @Nonnull final DomExtensionsRegistrar registrar) {
-    final XmlTag tag = element.getXmlTag();
+  public void registerExtensions(@Nonnull CustomBeanWrapper element, @Nonnull DomExtensionsRegistrar registrar) {
+    XmlTag tag = element.getXmlTag();
     assert tag != null;
-    for (final XmlAttribute attribute : tag.getAttributes()) {
-      final XmlAttributeDescriptor descriptor = attribute.getDescriptor();
+    for (XmlAttribute attribute : tag.getAttributes()) {
+      XmlAttributeDescriptor descriptor = attribute.getDescriptor();
       if (descriptor instanceof XmlAttributeDescriptorImpl) {
-        final XmlTag annotationTag = getToolAnnotationTag(descriptor.getDeclaration(), true);
+        XmlTag annotationTag = getToolAnnotationTag(descriptor.getDeclaration(), true);
         if (annotationTag != null) {
           boolean ref = "ref".equals(annotationTag.getAttributeValue("kind"));
-          final PsiClass expectedTypeClass = getExpectedTypeClass(element, annotationTag);
+          PsiClass expectedTypeClass = getExpectedTypeClass(element, annotationTag);
           if (expectedTypeClass != null) {
             final PsiClassType
               expectedType = JavaPsiFacade.getInstance(expectedTypeClass.getProject()).getElementFactory().createType(expectedTypeClass);
-            final XmlName xmlName = new XmlName(attribute.getName());
+            XmlName xmlName = new XmlName(attribute.getName());
             if (ref) {
               registrar.registerAttributeChildExtension(xmlName, MetadataRefValue.class).setConverter(new SpringBeanResolveConverter() {
                 @Nullable
-                public List<PsiClassType> getRequiredClasses(final ConvertContext context) {
+                public List<PsiClassType> getRequiredClasses(ConvertContext context) {
                   return Arrays.asList(expectedType);
                 }
               });
             }
             else {
               if (CommonClassNames.JAVA_LANG_CLASS.equals(expectedType.getCanonicalText())) {
-                final DomExtension extension = registrar.registerAttributeChildExtension(xmlName, new ParameterizedTypeImpl
+                DomExtension extension = registrar.registerAttributeChildExtension(xmlName, new ParameterizedTypeImpl
                   (GenericAttributeValue.class, PsiClass.class));
-                final XmlTag[] tags1 = annotationTag.findSubTags("assignable-to", SpringConstants.TOOL_NAMESPACE);
+                XmlTag[] tags1 = annotationTag.findSubTags("assignable-to", SpringConstants.TOOL_NAMESPACE);
                 if (tags1.length > 0) {
                   final String assignableFrom = tags1[0].getAttributeValue("type");
                   if (assignableFrom != null) {
@@ -134,10 +134,10 @@ public class SpringToolDomExtender extends DomExtender<CustomBeanWrapper> {
     }
   }
 
-  private static PsiClass getExpectedTypeClass(final CustomBeanWrapper element, final XmlTag annotationTag) {
-    final XmlFile file = DomUtil.getFile(element);
-    final XmlTag[] expectedTypeTags = annotationTag.findSubTags("expected-type", SpringConstants.TOOL_NAMESPACE);
-    final String value = expectedTypeTags.length > 0 ? expectedTypeTags[0].getAttributeValue("type") : null;
+  private static PsiClass getExpectedTypeClass(CustomBeanWrapper element, XmlTag annotationTag) {
+    XmlFile file = DomUtil.getFile(element);
+    XmlTag[] expectedTypeTags = annotationTag.findSubTags("expected-type", SpringConstants.TOOL_NAMESPACE);
+    String value = expectedTypeTags.length > 0 ? expectedTypeTags[0].getAttributeValue("type") : null;
     return DomJavaUtil.findClass(value != null ? value : CommonClassNames.JAVA_LANG_OBJECT, file, element.getModule(), null);
   }
 

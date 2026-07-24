@@ -14,7 +14,7 @@ import jakarta.annotation.Nonnull;
  */
 public class AopModifierList extends AopElementBase {
 
-  public AopModifierList(@Nonnull final ASTNode node) {
+  public AopModifierList(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -23,11 +23,11 @@ public class AopModifierList extends AopElementBase {
   }
 
   public boolean accepts(PsiModifierListOwner owner) {
-    for (final ASTNode node : getNode().getChildren(null)) {
+    for (ASTNode node : getNode().getChildren(null)) {
       if (node.getElementType() == AopElementTypes.AOP_MODIFIER &&  !owner.hasModifierProperty(node.getText())) return false;
     }
 
-    for (final AopNotExpression expression : findChildrenByClass(AopNotExpression.class)) {
+    for (AopNotExpression expression : findChildrenByClass(AopNotExpression.class)) {
       if (owner.hasModifierProperty(expression.getLastChild().getNode().getText())) return false;
     }
 

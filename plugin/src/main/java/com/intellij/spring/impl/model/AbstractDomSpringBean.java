@@ -65,11 +65,11 @@ public abstract class AbstractDomSpringBean implements CommonSpringBean {
     if (visited != null && visited.contains(this)) return null;
 
     if (considerFactories) {
-      final GenericValue<PsiMethod> value = getFactoryMethod();
-      final PsiMethod factoryMethod = value == null ? null : value.getValue();
-      final GenericValue<SpringBeanPointer> factoryBean = getFactoryBean();
+      GenericValue<PsiMethod> value = getFactoryMethod();
+      PsiMethod factoryMethod = value == null ? null : value.getValue();
+      GenericValue<SpringBeanPointer> factoryBean = getFactoryBean();
       if (factoryMethod != null && SpringBeanFactoryMethodConverter.isValidFactoryMethod(factoryMethod, factoryBean != null && factoryBean.getValue() != null)) {
-        final PsiType returnType = factoryMethod.getReturnType();
+        PsiType returnType = factoryMethod.getReturnType();
         if (returnType instanceof PsiClassType) {
           if (!factoryMethod.hasTypeParameters()) {
             return ((PsiClassType)returnType).resolve();
@@ -80,10 +80,10 @@ public abstract class AbstractDomSpringBean implements CommonSpringBean {
       }
     }
 
-    final String className = getClassName();
+    String className = getClassName();
     if (className != null) {
-      final String convertedName = StringUtil.replace(className, "$", ".");
-      final PsiClass psiClass = JavaPsiFacade.getInstance(getPsiManager().getProject()).findClass(convertedName, getSearchScope());
+      String convertedName = StringUtil.replace(className, "$", ".");
+      PsiClass psiClass = JavaPsiFacade.getInstance(getPsiManager().getProject()).findClass(convertedName, getSearchScope());
       if (psiClass != null) return psiClass;
     }
 

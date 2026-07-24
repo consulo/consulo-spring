@@ -23,17 +23,17 @@ public class SpringGuttersTest extends SpringHighlightingTestCase {
   }
 
   public void testClassGutter() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "config.xml");
     assertNotNull(myFixture.findGutter("Bean.java"));
   }
 
   public void testPropertyGutter() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "propertyGutter.xml");
-    final GutterIconRenderer renderer = myFixture.findGutter("BeanWithProperties.java");
+    GutterIconRenderer renderer = myFixture.findGutter("BeanWithProperties.java");
     assertNotNull(renderer);
-    final AnAction anAction = renderer.getClickAction();
+    AnAction anAction = renderer.getClickAction();
     assert anAction != null;
     anAction.actionPerformed(null);
   }

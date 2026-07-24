@@ -21,8 +21,8 @@ public abstract class TypedCollectionImpl implements TypedCollection, TypeHolder
   }
 
   @Nonnull
-  public static List<PsiType> getRequiredTypes(final TypedCollection collection) {
-    final PsiClass psiClass = collection.getValueType().getValue();
+  public static List<PsiType> getRequiredTypes(TypedCollection collection) {
+    PsiClass psiClass = collection.getValueType().getValue();
     return psiClass == null ? Collections.<PsiType>emptyList() : Collections.<PsiType>singletonList(
       JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass));
   }

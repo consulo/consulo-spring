@@ -14,7 +14,7 @@ public class SpringSecurityProjectComponent implements ProjectComponent {
     return project.getComponent(SpringSecurityProjectComponent.class);
   }
 
-  public SpringSecurityProjectComponent(final Project project) {
+  public SpringSecurityProjectComponent(Project project) {
 
     myProject = project;
   }

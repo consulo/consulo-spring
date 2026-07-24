@@ -14,11 +14,11 @@ import jakarta.annotation.Nonnull;
  */
 public class AopTypeParameterList extends AopAbstractList<PsiType> {
 
-  public AopTypeParameterList(@Nonnull final ASTNode node) {
+  public AopTypeParameterList(@Nonnull ASTNode node) {
     super(node);
   }
 
-  protected PsiType getPsiType(@Nonnull final PsiType psiType) {
+  protected PsiType getPsiType(@Nonnull PsiType psiType) {
     return psiType;
   }
 

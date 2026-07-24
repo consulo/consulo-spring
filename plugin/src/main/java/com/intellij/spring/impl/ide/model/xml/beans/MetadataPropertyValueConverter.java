@@ -14,7 +14,7 @@ import jakarta.annotation.Nonnull;
 public class MetadataPropertyValueConverter extends PropertyValueConverter {
   private final PsiType myRequiredClass;
 
-  public MetadataPropertyValueConverter(final PsiType requiredClass) {
+  public MetadataPropertyValueConverter(PsiType requiredClass) {
     myRequiredClass = requiredClass;
   }
 

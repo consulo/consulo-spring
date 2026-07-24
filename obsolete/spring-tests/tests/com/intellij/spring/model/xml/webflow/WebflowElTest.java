@@ -46,8 +46,8 @@ public class WebflowElTest extends SpringHighlightingTestCase<WebModuleFixtureBu
   }
 
   private void createFileSet() throws Throwable {
-    final String path = myFixture.getTempDirPath() + File.separatorChar + "spring-beans.xml";
-    final String url = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, path);
+    String path = myFixture.getTempDirPath() + File.separatorChar + "spring-beans.xml";
+    String url = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, path);
     configureFileSet().addFile(url);
   }
 

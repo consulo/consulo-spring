@@ -14,7 +14,7 @@ import java.util.Collection;
  * @author peter
  */
 public class AopArrayExpression extends AopElementBase implements AopTypeExpression {
-  public AopArrayExpression(@Nonnull final ASTNode node) {
+  public AopArrayExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -33,14 +33,14 @@ public class AopArrayExpression extends AopElementBase implements AopTypeExpress
   @Override
   @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
-    final boolean varargs = isVarargs();
+    boolean varargs = isVarargs();
     return ContainerUtil.map2List(getTypeReference().getPatterns(), aopPsiTypePattern -> new ArrayPattern(aopPsiTypePattern, varargs));
   }
 
   @Override
   @RequiredReadAction
   public String getTypePattern() {
-    final String pattern = getTypeReference().getTypePattern();
+    String pattern = getTypeReference().getTypePattern();
     return pattern == null ? null : isVarargs() ? pattern + "..." : pattern + "[]";
   }
 

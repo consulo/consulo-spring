@@ -21,7 +21,7 @@ public abstract class AopAbstractList<T> extends AopElementBase {
   private static final TokenSet LIST_ELEMENT_TYPES = TokenSet.create(AopElementTypes.AOP_DOT_DOT, AopElementTypes.AOP_REFERENCE_HOLDER);
   private final NotNullLazyValue<ArrayTailCondition<T>> myMatcher;
 
-  public AopAbstractList(@Nonnull final ASTNode node) {
+  public AopAbstractList(@Nonnull ASTNode node) {
     super(node);
     myMatcher = new NotNullLazyValue<>() {
       @Nonnull
@@ -48,10 +48,10 @@ public abstract class AopAbstractList<T> extends AopElementBase {
     return myMatcher.getValue().value(context, matcher, list, 0);
   }
 
-  private ArrayTailCondition<T> createMatcher(final PsiElement[] aopParameters, final int matchStart) {
+  private ArrayTailCondition<T> createMatcher(PsiElement[] aopParameters, int matchStart) {
     if (matchStart >= aopParameters.length) return (context, matcher, array, start) -> PointcutMatchDegree.valueOf(start >= array.length);
-    final PsiElement psiElement = aopParameters[matchStart];
-    final ArrayTailCondition<T> tail = createMatcher(aopParameters, matchStart + 1);
+    PsiElement psiElement = aopParameters[matchStart];
+    ArrayTailCondition<T> tail = createMatcher(aopParameters, matchStart + 1);
     if (psiElement instanceof AopReferenceHolder pattern) {
       return (context, matcher, array, start) -> {
         if (start >= array.length) return PointcutMatchDegree.FALSE;

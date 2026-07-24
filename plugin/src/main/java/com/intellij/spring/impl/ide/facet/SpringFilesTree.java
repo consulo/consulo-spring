@@ -31,35 +31,35 @@ import java.util.function.Function;
 public class SpringFilesTree extends CheckboxTreeBase {
   
   private static final Comparator<PsiFile> FILE_COMPARATOR = new Comparator<PsiFile>() {
-    public int compare(final PsiFile o1, final PsiFile o2) {
+    public int compare(PsiFile o1, PsiFile o2) {
       return o1.getName().compareTo(o2.getName());
     }
   };
 
   public SpringFilesTree() {
     super(new CheckboxTreeCellRendererBase() {
-      public void customizeCellRenderer(final JTree tree,
-                                        final Object value,
-                                        final boolean selected,
-                                        final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+      public void customizeCellRenderer(JTree tree,
+                                        Object value,
+                                        boolean selected,
+                                        boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
-        final ColoredTreeCellRenderer renderer = getTextRenderer();
-        final Object object = ((CheckedTreeNode)value).getUserObject();
+        ColoredTreeCellRenderer renderer = getTextRenderer();
+        Object object = ((CheckedTreeNode)value).getUserObject();
         if (object instanceof consulo.module.Module) {
-          final consulo.module.Module module = (consulo.module.Module)object;
+          consulo.module.Module module = (consulo.module.Module)object;
           renderer.setIcon(AllIcons.Nodes.Module);
-          final String moduleName = module.getName();
+          String moduleName = module.getName();
           renderer.append(moduleName, SimpleTextAttributes.REGULAR_ATTRIBUTES);
         } else if (object instanceof PsiFile) {
-          final PsiFile psiFile = (PsiFile)object;
-          final Image icon = IconDescriptorUpdaters.getIcon(psiFile, 0);
+          PsiFile psiFile = (PsiFile)object;
+          Image icon = IconDescriptorUpdaters.getIcon(psiFile, 0);
           renderer.setIcon(icon);
-          final String fileName = psiFile.getName();
+          String fileName = psiFile.getName();
           renderer.append(fileName, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-          final VirtualFile virtualFile = psiFile.getVirtualFile();
+          VirtualFile virtualFile = psiFile.getVirtualFile();
           if (virtualFile != null) {
             String path = virtualFile.getPath();
-            final int i = path.indexOf(StandardFileSystems.JAR_SEPARATOR);
+            int i = path.indexOf(StandardFileSystems.JAR_SEPARATOR);
             if (i >= 0) {
               path = path.substring(i + StandardFileSystems.JAR_SEPARATOR.length());
             }
@@ -70,7 +70,7 @@ public class SpringFilesTree extends CheckboxTreeBase {
           renderer.setIcon(VirtualFileManager.getInstance().getFileIcon(file, null, 0));
           renderer.append(file.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
           String path = file.getPath();
-          final int i = path.indexOf(StandardFileSystems.JAR_SEPARATOR);
+          int i = path.indexOf(StandardFileSystems.JAR_SEPARATOR);
           if (i >= 0) {
             path = path.substring(i + StandardFileSystems.JAR_SEPARATOR.length());
           }
@@ -80,8 +80,8 @@ public class SpringFilesTree extends CheckboxTreeBase {
     }, null);
 
     TreeUIHelper.getInstance().installTreeSpeedSearch(this, new Function<TreePath, String>() {
-      public String apply(final TreePath treePath) {
-        final Object object = ((CheckedTreeNode)treePath.getLastPathComponent()).getUserObject();
+      public String apply(TreePath treePath) {
+        Object object = ((CheckedTreeNode)treePath.getLastPathComponent()).getUserObject();
         if (object instanceof consulo.module.Module) {
           return ((Module)object).getName();
         } else if (object instanceof PsiFile) {
@@ -95,15 +95,15 @@ public class SpringFilesTree extends CheckboxTreeBase {
     }, true);
   }
 
-  public Set<PsiFile> buildModuleNodes(final MultiMap<Module,PsiFile> files,
-															final MultiMap<VirtualFile, PsiFile> jars,
-															final SpringFileSet fileSet) {
+  public Set<PsiFile> buildModuleNodes(MultiMap<Module,PsiFile> files,
+                                       MultiMap<VirtualFile, PsiFile> jars,
+                                       SpringFileSet fileSet) {
 
-    final CheckedTreeNode root = (CheckedTreeNode)getModel().getRoot();
-    final HashSet<PsiFile> psiFiles = new HashSet<PsiFile>();
-    final List<consulo.module.Module> modules = new ArrayList<consulo.module.Module>(files.keySet());
+    CheckedTreeNode root = (CheckedTreeNode)getModel().getRoot();
+    HashSet<PsiFile> psiFiles = new HashSet<PsiFile>();
+    List<consulo.module.Module> modules = new ArrayList<consulo.module.Module>(files.keySet());
     Collections.sort(modules, new Comparator<consulo.module.Module>() {
-      public int compare(final consulo.module.Module o1, final consulo.module.Module o2) {
+      public int compare(consulo.module.Module o1, consulo.module.Module o2) {
         return o1.getName().compareTo(o2.getName());
       }
     });
@@ -115,22 +115,22 @@ public class SpringFilesTree extends CheckboxTreeBase {
         List<PsiFile> moduleFiles = new ArrayList<PsiFile>(files.get(module));
         Collections.sort(moduleFiles, FILE_COMPARATOR);
         for (PsiFile file: moduleFiles) {
-          final CheckedTreeNode fileNode = createFileNode(file, fileSet);
+          CheckedTreeNode fileNode = createFileNode(file, fileSet);
           moduleNode.add(fileNode);
           psiFiles.add(file);
         }
       }
     }
     for (VirtualFile file: jars.keySet()) {
-      final List<PsiFile> list = new ArrayList<PsiFile>(jars.get(file));
-      final PsiFile jar = list.get(0).getManager().findFile(file);
+      List<PsiFile> list = new ArrayList<PsiFile>(jars.get(file));
+      PsiFile jar = list.get(0).getManager().findFile(file);
       if (jar != null) {
-        final CheckedTreeNode jarNode = new CheckedTreeNode(jar);
+        CheckedTreeNode jarNode = new CheckedTreeNode(jar);
         jarNode.setChecked(false);
         root.add(jarNode);
         Collections.sort(list, FILE_COMPARATOR);
         for (PsiFile psiFile: list) {
-          final CheckedTreeNode vfNode = createFileNode(psiFile, fileSet);
+          CheckedTreeNode vfNode = createFileNode(psiFile, fileSet);
           jarNode.add(vfNode);
           psiFiles.add(psiFile);
         }
@@ -149,7 +149,7 @@ public class SpringFilesTree extends CheckboxTreeBase {
         if (!checkedTreeNode.isChecked()) {
           return true;
         }
-        final Object object = checkedTreeNode.getUserObject();
+        Object object = checkedTreeNode.getUserObject();
         VirtualFile virtualFile = null;
         if (object instanceof XmlFile) {
           virtualFile = ((XmlFile)object).getVirtualFile();
@@ -168,8 +168,8 @@ public class SpringFilesTree extends CheckboxTreeBase {
     });
 
     for (Iterator<VirtualFilePointer> i = fileSet.getFiles().iterator(); i.hasNext();) {
-      final VirtualFilePointer pointer = i.next();
-      final VirtualFile file = pointer.getFile();
+      VirtualFilePointer pointer = i.next();
+      VirtualFile file = pointer.getFile();
       if (file == null || !configured.contains(file)) {
         result[0] = true;
         i.remove();
@@ -178,14 +178,14 @@ public class SpringFilesTree extends CheckboxTreeBase {
   }
 
   private static CheckedTreeNode createFileNode(PsiFile file, SpringFileSet fileSet) {
-    final CheckedTreeNode fileNode = new CheckedTreeNode(file);
+    CheckedTreeNode fileNode = new CheckedTreeNode(file);
     fileNode.setChecked(fileSet.hasFile(file.getVirtualFile()));
     return fileNode;
   }
 
   public void addFile(VirtualFile file) {
-    final CheckedTreeNode root = (CheckedTreeNode)getModel().getRoot();
-    final CheckedTreeNode treeNode = new CheckedTreeNode(file);
+    CheckedTreeNode root = (CheckedTreeNode)getModel().getRoot();
+    CheckedTreeNode treeNode = new CheckedTreeNode(file);
     root.add(treeNode);
     DefaultTreeModel model = (DefaultTreeModel)getModel();
     model.nodeStructureChanged(root);

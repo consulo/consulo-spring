@@ -29,18 +29,18 @@ import java.util.List;
 public class PropertyValueConverter extends WrappingConverter {
 
   @Nonnull
-  public List<? extends PsiType> getValueTypes(final GenericDomValue element) {
+  public List<? extends PsiType> getValueTypes(GenericDomValue element) {
     if (element instanceof TypeHolder) {
-      final List<? extends PsiType> psiTypes = ((TypeHolder)element).getRequiredTypes();
+      List<? extends PsiType> psiTypes = ((TypeHolder)element).getRequiredTypes();
       if (!psiTypes.isEmpty())
       return psiTypes;
     }
-    final DomElement parent = element.getParent();
+    DomElement parent = element.getParent();
     return parent instanceof TypeHolder ? ((TypeHolder)parent).getRequiredTypes() : Collections.<PsiType>emptyList();
   }
 
   @Nonnull
-  public List<Converter> getConverters(@Nonnull final GenericDomValue element) {
+  public List<Converter> getConverters(@Nonnull GenericDomValue element) {
     
     XmlElement xmlElement = element.getXmlElement();
     if (xmlElement instanceof XmlAttribute) {
@@ -50,17 +50,17 @@ public class PropertyValueConverter extends WrappingConverter {
       }
     }
     Project project = element.getManager().getProject();
-    final GenericDomValueConvertersRegistry registry = SpringManager.getInstance(project).getValueProvidersRegistry();
-    final List<? extends PsiType> types = getValueTypes(element);
-    final ArrayList<Converter> list = new ArrayList<Converter>(types.size());
+    GenericDomValueConvertersRegistry registry = SpringManager.getInstance(project).getValueProvidersRegistry();
+    List<? extends PsiType> types = getValueTypes(element);
+    ArrayList<Converter> list = new ArrayList<Converter>(types.size());
     if (types.isEmpty()) {
-      final Converter converter = registry.getConverter(element, null);
+      Converter converter = registry.getConverter(element, null);
       if (converter != null) {
         list.add(converter);
       }
     }
     for (PsiType type : types) {
-      final Converter converter = registry.getConverter(element, type);
+      Converter converter = registry.getConverter(element, type);
       if (converter != null) {
         list.add(converter);
       } else {
@@ -70,8 +70,8 @@ public class PropertyValueConverter extends WrappingConverter {
     return list;
   }
 
-  public Converter getConverter(@Nonnull final GenericDomValue domElement) {
-    final List<Converter> converters = getConverters(domElement);
+  public Converter getConverter(@Nonnull GenericDomValue domElement) {
+    List<Converter> converters = getConverters(domElement);
     return converters.isEmpty() ? null : converters.get(0);
   }
 }

@@ -23,7 +23,7 @@ public class SpringBeansQualifiersTest extends SpringHighlightingTestCase<JavaMo
     return false;
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
 
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
@@ -35,7 +35,7 @@ public class SpringBeansQualifiersTest extends SpringHighlightingTestCase<JavaMo
 
     new WriteCommandAction.Simple(myProject) {
       protected void run() throws Throwable {
-        final SpringFileSet fileSet = configureFileSet();
+        SpringFileSet fileSet = configureFileSet();
         myFixture.copyFileToProject("qualified_highlighting.xml"); // stereotypes with qualifiers
         fileSet.addFile(myFixture.getTempDirFixture().getFile("qualified_highlighting.xml"));
 
@@ -123,7 +123,7 @@ public class SpringBeansQualifiersTest extends SpringHighlightingTestCase<JavaMo
 
     myFixture.configureByFiles("example/FooServiceWithQualifier.java", "example/FooAutowiredService.java");
 
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "stereotipes.xml");
 
     List<? extends SpringService> services = SpringJamModel.getModel(myModule).getServices();
@@ -147,13 +147,13 @@ public class SpringBeansQualifiersTest extends SpringHighlightingTestCase<JavaMo
   }
 
   public void testQualifierWithoutValue() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "stereotipes.xml");
     myFixture.testHighlighting(true, false, true, "example/QualifierWithoutValue.java");
   }
 
   public void testAutowiredWithCustomQualifier() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "stereotipes.xml");
     myFixture.testHighlighting(true, false, true, "example/AutowiredWithCustomQualifier.java", "example/CustomQualifier.java");
   }

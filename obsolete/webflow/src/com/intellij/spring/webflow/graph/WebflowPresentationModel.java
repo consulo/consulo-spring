@@ -42,7 +42,7 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
 
   private boolean myMoveSelectionMode;
 
-  public WebflowPresentationModel(final Graph2D graph, Project project) {
+  public WebflowPresentationModel(Graph2D graph, Project project) {
     super(graph, false);
     myProject = project;
     setShowEdgeLabels(true);
@@ -50,8 +50,8 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     customizeDefaultSettings(GraphSettingsProvider.getInstance(project).getSettings(graph));
   }
 
-  private static void customizeDefaultSettings(final GraphSettings settings) {
-    final HierarchicGroupLayouter groupLayouter = settings.getGroupLayouter();
+  private static void customizeDefaultSettings(GraphSettings settings) {
+    HierarchicGroupLayouter groupLayouter = settings.getGroupLayouter();
 
     groupLayouter.setOrientationLayouter(GraphManager.getGraphManager().createOrientationLayouter(OrientationLayouter.TOP_TO_BOTTOM));
     groupLayouter.setMinimalNodeDistance(20);
@@ -60,7 +60,7 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
   }
 
   @NotNull
-  public NodeRealizer getNodeRealizer(final WebflowNode node) {
+  public NodeRealizer getNodeRealizer(WebflowNode node) {
     return node.getNodeType()== WebflowNodeType.GLOBAL_TRANSITIONS
            ? GraphViewUtil.createNodeRealizer("WebflowGlobalTransitionsNodeRenderer", getGlobalTransitionsRenderer()) : GraphViewUtil.createNodeRealizer("WebflowNodeRenderer", getRenderer());
   }
@@ -80,10 +80,10 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
   }
 
   @NotNull
-  public EdgeRealizer getEdgeRealizer(final WebflowEdge edge) {
-    final PolyLineEdgeRealizer edgeRealizer = GraphManager.getGraphManager().createPolyLineEdgeRealizer();
+  public EdgeRealizer getEdgeRealizer(WebflowEdge edge) {
+    PolyLineEdgeRealizer edgeRealizer = GraphManager.getGraphManager().createPolyLineEdgeRealizer();
 
-    final boolean elseIfEdge = edge instanceof WebflowIfEdge.Else;
+    boolean elseIfEdge = edge instanceof WebflowIfEdge.Else;
 
     edgeRealizer.setLineType(elseIfEdge ? LineType.DASHED_1 : LineType.LINE_1);
 
@@ -91,7 +91,7 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     edgeRealizer.setArrow(Arrow.STANDARD);
 
     if (edge instanceof WebflowTransitionEdge) {
-      final boolean onEventTransition = ((WebflowTransitionEdge)edge).isOnEventTransition();
+      boolean onEventTransition = ((WebflowTransitionEdge)edge).isOnEventTransition();
       if (!onEventTransition) {
          edgeRealizer.setLineType(LineType.DASHED_1);
          edgeRealizer.setLineColor(new Color(128, 0, 0));
@@ -101,12 +101,12 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     return edgeRealizer;
   }
 
-  public boolean editNode(final WebflowNode node) {
+  public boolean editNode(WebflowNode node) {
     return super.editNode(node);
   }
 
-  public boolean editEdge(final WebflowEdge webflowEdge) {
-    final XmlElement xmlElement = webflowEdge.getIdentifyingElement().getXmlElement();
+  public boolean editEdge(WebflowEdge webflowEdge) {
+    XmlElement xmlElement = webflowEdge.getIdentifyingElement().getXmlElement();
     if (xmlElement instanceof Navigatable) {
       OpenSourceUtil.navigate(new Navigatable[]{(Navigatable)xmlElement}, true);
       return true;
@@ -118,15 +118,15 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     return myProject;
   }
 
-  public String getNodeTooltip(final WebflowNode node) {
+  public String getNodeTooltip(WebflowNode node) {
     return node.getName();
   }
 
-  public String getEdgeTooltip(final WebflowEdge edge) {
+  public String getEdgeTooltip(WebflowEdge edge) {
     return "";
   }
 
-  public void customizeSettings(final Graph2DView view, final EditMode editMode) {
+  public void customizeSettings(Graph2DView view, EditMode editMode) {
     editMode.allowEdgeCreation(!myMoveSelectionMode);
 
     editMode.allowMovePorts(true);
@@ -139,17 +139,17 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
 
   public DeleteProvider getDeleteProvider() {
     return new DeleteProvider<WebflowNode, WebflowEdge>() {
-      public boolean canDeleteNode(@NotNull final WebflowNode node) {
+      public boolean canDeleteNode(@NotNull WebflowNode node) {
         return !((CellEditorMode)getGraphBuilder().getEditMode().getEditNodeMode()).isCellEditing();
       }
 
-      public boolean canDeleteEdge(@NotNull final WebflowEdge edge) {
+      public boolean canDeleteEdge(@NotNull WebflowEdge edge) {
         return true;
       }
 
       public boolean deleteNode(@NotNull final WebflowNode node) {
         new WriteCommandAction(getProject()) {
-          protected void run(final Result result) throws Throwable {
+          protected void run(Result result) throws Throwable {
              node.getIdentifyingElement().undefine();
           }
         }.execute();
@@ -159,7 +159,7 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
 
       public boolean deleteEdge(@NotNull final WebflowEdge edge) {
         new WriteCommandAction(getProject()) {
-          protected void run(final Result result) throws Throwable {
+          protected void run(Result result) throws Throwable {
              edge.getIdentifyingElement().undefine();
           }
         }.execute();
@@ -174,16 +174,16 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     if (webflowNode.getNodeType() == WebflowNodeType.GLOBAL_TRANSITIONS) return null;
 
     return new SimpleNodeCellEditor<WebflowNode>(webflowNode, getProject()) {
-      protected String getEditorValue(final WebflowNode value) {
-        final String s = value.getName();
+      protected String getEditorValue(WebflowNode value) {
+        String s = value.getName();
         return s == null ? "" : s;
       }
 
-      protected void setEditorValue(final WebflowNode value, final String newValue) {
+      protected void setEditorValue(WebflowNode value, final String newValue) {
         final DomElement element = value.getIdentifyingElement();
         if (element instanceof Identified) {
           new WriteCommandAction(myProject) {
-            protected void run(final Result result) throws Throwable {
+            protected void run(Result result) throws Throwable {
               ((Identified)element).getId().setStringValue(newValue);
             }
           }.execute();
@@ -195,8 +195,8 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
   }
 
 
-  public DefaultActionGroup getNodeActionGroup(final WebflowNode webflowNode) {
-    final DefaultActionGroup group = super.getNodeActionGroup(webflowNode);
+  public DefaultActionGroup getNodeActionGroup(WebflowNode webflowNode) {
+    DefaultActionGroup group = super.getNodeActionGroup(webflowNode);
 
     group.add(ActionManager.getInstance().getAction("Webflow.Designer"), Constraints.FIRST);
 
@@ -207,20 +207,20 @@ public class WebflowPresentationModel extends SelectionDependenciesPresentationM
     return myMoveSelectionMode;
   }
 
-  public void setMoveSelectionMode(final boolean moveSelectionMode) {
+  public void setMoveSelectionMode(boolean moveSelectionMode) {
     myMoveSelectionMode = moveSelectionMode;
   }
 
   @Override
   public EdgeCreationPolicy<WebflowNode> getEdgeCreationPolicy() {
     return new EdgeCreationPolicy<WebflowNode>() {
-      public boolean acceptSource(@NotNull final WebflowNode source) {
-         final DomElement element = source.getIdentifyingElement();
+      public boolean acceptSource(@NotNull WebflowNode source) {
+         DomElement element = source.getIdentifyingElement();
 
         return element.isValid() && (element instanceof TransitionOwner || element instanceof DecisionState);
       }
 
-      public boolean acceptTarget(@NotNull final WebflowNode target) {
+      public boolean acceptTarget(@NotNull WebflowNode target) {
         return true;
       }
     };

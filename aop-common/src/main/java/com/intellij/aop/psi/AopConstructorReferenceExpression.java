@@ -12,7 +12,7 @@ import jakarta.annotation.Nonnull;
  * @author peter
  */
 public class AopConstructorReferenceExpression extends AopMemberReferenceExpression {
-  public AopConstructorReferenceExpression(@Nonnull final ASTNode node) {
+  public AopConstructorReferenceExpression(@Nonnull ASTNode node) {
     super(node);
   }
 

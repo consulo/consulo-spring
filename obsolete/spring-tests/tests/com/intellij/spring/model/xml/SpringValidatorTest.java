@@ -31,16 +31,16 @@ public class SpringValidatorTest extends HeavySpringTestCase {
   }
 
   public void testSpringValidator() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFile(fileSet, "first.xml");
 
     ValidationConfiguration.getInstance(myProject).setSelected(new SpringValidator(new SpringApplicationComponent()).getDescription(), true);
     ValidationConfiguration.getInstance(myProject).VALIDATE_ON_BUILD = true;
-    final InspectionProfileImpl inspectionProfile =
+    InspectionProfileImpl inspectionProfile =
       (InspectionProfileImpl)InspectionProjectProfileManager.getInstance(myProject).getProjectProfileImpl();
     inspectionProfile.initInspectionTools();
     final CompilerManager compilerManager = CompilerManager.getInstance(myProject);
-    final com.intellij.openapi.compiler.Compiler[] compilers = compilerManager.getCompilers(Compiler.class);
+    com.intellij.openapi.compiler.Compiler[] compilers = compilerManager.getCompilers(Compiler.class);
     for (Compiler compiler: compilers) {
       compilerManager.removeCompiler(compiler);
     }
@@ -53,7 +53,7 @@ public class SpringValidatorTest extends HeavySpringTestCase {
                                                                PsiDocumentManager.getInstance(myProject),
                                                                PsiManager.getInstance(myProject),
                                                                validator) {
-      public ProcessingItem[] process(final CompileContext context, final ProcessingItem[] items) {
+      public ProcessingItem[] process(CompileContext context, ProcessingItem[] items) {
         counter[0] += items.length;
         return super.process(context, items);
       }
@@ -64,7 +64,7 @@ public class SpringValidatorTest extends HeavySpringTestCase {
     final Semaphore semaphore = new Semaphore();
     semaphore.down();
     compilerManager.make(myModule, new CompileStatusNotification() {
-      public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
+      public void finished(boolean aborted, int errors, int warnings, CompileContext compileContext) {
         assertEquals(1, counter[0]);
         assertEquals(0, errors);
         assertEquals(0, warnings);

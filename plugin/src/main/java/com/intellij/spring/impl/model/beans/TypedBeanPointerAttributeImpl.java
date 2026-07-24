@@ -24,7 +24,7 @@ public abstract class TypedBeanPointerAttributeImpl implements TypedBeanPointerA
 
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final List<PsiClassType> list = ((SpringBeanResolveConverter)getConverter()).getRequiredClasses(new AbstractConvertContext() {
+    List<PsiClassType> list = ((SpringBeanResolveConverter)getConverter()).getRequiredClasses(new AbstractConvertContext() {
       @Nonnull
       public DomElement getInvocationElement() {
         return TypedBeanPointerAttributeImpl.this;

@@ -28,9 +28,9 @@ public class SpringAnnotationConfigUtils {
   }
 
   // <context:annotation-config/> : implicitly registered post-processors include AutowiredAnnotationBeanPostProcessor, CommonAnnotationBeanPostProcessor, PersistenceAnnotationBeanPostProcessor, RequiredAnnotationBeanPostProcessor.
-  public static boolean containsAnnotationConfigBean(@Nonnull final SpringModel springModel) {
+  public static boolean containsAnnotationConfigBean(@Nonnull SpringModel springModel) {
     for (SpringBaseBeanPointer beanPointer : springModel.getAllDomBeans()) {
-      final CommonSpringBean domSpringBean = beanPointer.getSpringBean();
+      CommonSpringBean domSpringBean = beanPointer.getSpringBean();
       if (domSpringBean instanceof AnnotationConfig) {
         return true;
       }
@@ -39,9 +39,9 @@ public class SpringAnnotationConfigUtils {
   }
 
   // <context:annotation-config/> : implicitly registered post-processors include AutowiredAnnotationBeanPostProcessor, CommonAnnotationBeanPostProcessor, PersistenceAnnotationBeanPostProcessor, RequiredAnnotationBeanPostProcessor.
-  public static boolean containsComponentScanBean(@Nonnull final SpringModel springModel) {
+  public static boolean containsComponentScanBean(@Nonnull SpringModel springModel) {
     for (SpringBaseBeanPointer beanPointer : springModel.getAllDomBeans()) {
-      final CommonSpringBean domSpringBean = beanPointer.getSpringBean();
+      CommonSpringBean domSpringBean = beanPointer.getSpringBean();
       if (domSpringBean instanceof DomComponentScan) {
         return true;
       }
@@ -49,26 +49,26 @@ public class SpringAnnotationConfigUtils {
     return false;
   }
 
-  public static boolean containsAutowiredAnnotationBeanPostProcessor(@Nonnull final SpringModel springModel) {
+  public static boolean containsAutowiredAnnotationBeanPostProcessor(@Nonnull SpringModel springModel) {
     return isBeanExists(springModel, AUTOWIRED_ANNOTATION_BPP) || containsAnnotationConfigBean(springModel) || containsComponentScanBean(springModel);
   }
 
-  public static boolean containsRequiredAnnotationBeanPostProcessor(@Nonnull final SpringModel springModel) {
+  public static boolean containsRequiredAnnotationBeanPostProcessor(@Nonnull SpringModel springModel) {
     return isBeanExists(springModel, REQUIRED_ANNOTATION_BPP) || containsAnnotationConfigBean(springModel);
   }
 
-  public static boolean containsCommonAnnotationBeanPostProcessor(@Nonnull final SpringModel springModel) {
+  public static boolean containsCommonAnnotationBeanPostProcessor(@Nonnull SpringModel springModel) {
     return isBeanExists(springModel, COMMON_ANNOTATION_BPP) || containsAnnotationConfigBean(springModel) || containsComponentScanBean(springModel);
   }
 
-  public static boolean containsPersistenceAnnotationBeanPostProcessor(@Nonnull final SpringModel springModel) {
+  public static boolean containsPersistenceAnnotationBeanPostProcessor(@Nonnull SpringModel springModel) {
     return isBeanExists(springModel, PERSISTENCE_ANNOTATION_BPP) || containsAnnotationConfigBean(springModel);
   }
 
-  private static boolean isBeanExists(final SpringModel springModel, final String qualifiedName) {
-    final Module module = springModel.getModule();
+  private static boolean isBeanExists(SpringModel springModel, String qualifiedName) {
+    Module module = springModel.getModule();
     if (module != null) {
-      final PsiClass psiClass = JavaPsiFacade.getInstance(module.getProject())
+      PsiClass psiClass = JavaPsiFacade.getInstance(module.getProject())
                                              .findClass(qualifiedName, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false));
       if (psiClass != null) {
         return springModel.findBeansByPsiClass(psiClass).size() > 0;

@@ -36,7 +36,7 @@ import jakarta.annotation.Nonnull;
 public class SpringReferenceContributor extends PsiReferenceContributor {
   public static final String SPRING_URI = "http://www.springframework.org/tags";
 
-  public void registerReferenceProviders(final PsiReferenceRegistrar registrar) {
+  public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
     PsiReferenceProvider propertiesReferenceProvider = new PropertiesReferenceProvider(false);
 
     //duplicated in FtlLiteralExpression
@@ -51,10 +51,10 @@ public class SpringReferenceContributor extends PsiReferenceContributor {
                                         new SpringBeanNamesReferenceProvider());
 
     registrar.registerReferenceProvider(XmlPatterns.xmlAttributeValue().with(new PatternCondition<XmlAttributeValue>("customBeanId") {
-      public boolean accepts(@Nonnull final XmlAttributeValue attributeValue, final ProcessingContext context) {
-        final DomSpringBean element = DomUtil.findDomElement(attributeValue, DomSpringBean.class);
+      public boolean accepts(@Nonnull XmlAttributeValue attributeValue, ProcessingContext context) {
+        DomSpringBean element = DomUtil.findDomElement(attributeValue, DomSpringBean.class);
         if (element instanceof CustomBeanWrapper) {
-          for (final CustomBean customBean : ((CustomBeanWrapper)element).getCustomBeans()) {
+          for (CustomBean customBean : ((CustomBeanWrapper)element).getCustomBeans()) {
             if (customBean.getIdAttribute() == attributeValue.getParent()) {
               context.put("bean", customBean);
               return true;
@@ -65,7 +65,7 @@ public class SpringReferenceContributor extends PsiReferenceContributor {
       }
     }), new PsiReferenceProvider() {
       @Nonnull
-      public PsiReference[] getReferencesByElement(@Nonnull final PsiElement element, @Nonnull final ProcessingContext context) {
+      public PsiReference[] getReferencesByElement(@Nonnull PsiElement element, @Nonnull ProcessingContext context) {
         CustomBean bean = (CustomBean)context.get("bean");
         return new PsiReference[]{PsiReferenceBase.createSelfReference(element, bean.getIdentifyingPsiElement())};
       }
@@ -76,9 +76,9 @@ public class SpringReferenceContributor extends PsiReferenceContributor {
       new PsiReferenceProvider() {
         @Nonnull
         @Override
-        public PsiReference[] getReferencesByElement(@Nonnull final PsiElement element, @Nonnull final ProcessingContext context) {
-          final PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
-          final PsiType type = PropertyUtil.getPropertyType(member);
+        public PsiReference[] getReferencesByElement(@Nonnull final PsiElement element, @Nonnull ProcessingContext context) {
+          PsiMember member = PsiTreeUtil.getParentOfType(element, PsiMember.class);
+          PsiType type = PropertyUtil.getPropertyType(member);
           final PsiClass required = type instanceof PsiClassType ? ((PsiClassType)type).resolve() : null;
           return new PsiReference[]{new SpringBeanReference((PsiLiteralExpression)element, required) {
             @Override

@@ -17,16 +17,16 @@ public class SingleObjectTypeResolver implements ObjectTypeResolver {
 
   private final Set<String> myTypes;
 
-  public SingleObjectTypeResolver(final String type) {
+  public SingleObjectTypeResolver(String type) {
     myTypes = new HashSet<String>(StringUtil.split(type, ","));
   }
 
   @Nonnull
-  public Set<String> getObjectType(@Nonnull final CommonSpringBean bean) {
+  public Set<String> getObjectType(@Nonnull CommonSpringBean bean) {
     return myTypes;
   }
 
-  public boolean accept(@Nonnull final String factoryClassName) {
+  public boolean accept(@Nonnull String factoryClassName) {
     return true;
   }
 }

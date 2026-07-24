@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SpringMVCMetaData implements MetaDataContributor {
 
-  public void contributeMetaData(final MetaDataRegistrar registrar) {
+  public void contributeMetaData(MetaDataRegistrar registrar) {
     registrar.registerMetaData(new AnnotationMetaDataFilter(SpringMVCRequestMapping.REQUEST_MAPPING), RequestMappingMeta.class);
 
     registrar.registerMetaData(new AnnotationMetaDataFilter(SpringMVCModelAttribute.MODEL_ATTRIBUTE), ModelAttributeMeta.class);
@@ -23,14 +23,14 @@ public class SpringMVCMetaData implements MetaDataContributor {
   public static class RequestMappingMeta extends JamPsiAnnotationParameterMetaData<SpringMVCRequestMapping> {
 
     @NotNull
-    protected SpringMVCRequestMapping getModelElement(final PsiModifierListOwner owner, final PsiAnnotation annotation) {
+    protected SpringMVCRequestMapping getModelElement(PsiModifierListOwner owner, PsiAnnotation annotation) {
       return JamService.getJamService(owner.getProject()).getJamElement(SpringMVCRequestMapping.class, owner);
     }
   }
 
   public static class ModelAttributeMeta extends JamPsiAnnotationParameterMetaData<SpringMVCModelAttribute> {
     @NotNull
-    protected SpringMVCModelAttribute getModelElement(final PsiModifierListOwner owner, final PsiAnnotation annotation) {
+    protected SpringMVCModelAttribute getModelElement(PsiModifierListOwner owner, PsiAnnotation annotation) {
       return JamService.getJamService(owner.getProject()).getJamElement(SpringMVCModelAttribute.class, owner);
     }
   }

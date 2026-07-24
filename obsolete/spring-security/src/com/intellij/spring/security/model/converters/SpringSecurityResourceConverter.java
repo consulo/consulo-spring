@@ -16,7 +16,7 @@ public class SpringSecurityResourceConverter implements CustomReferenceConverter
 
   @NotNull
   public PsiReference[] createReferences(GenericDomValue<String> value, PsiElement element, ConvertContext context) {
-    final String s = value.getStringValue();
+    String s = value.getStringValue();
     if (s == null || element == null) {
       return PsiReference.EMPTY_ARRAY;
     }

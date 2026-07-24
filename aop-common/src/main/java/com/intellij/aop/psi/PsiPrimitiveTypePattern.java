@@ -17,7 +17,7 @@ public class PsiPrimitiveTypePattern extends AopPsiTypePattern {
     myType = type;
   }
 
-  public boolean accepts(@Nonnull final PsiType type) {
+  public boolean accepts(@Nonnull PsiType type) {
     return type.equals(myType);
   }
 

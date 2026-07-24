@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  */
 public class PsiBeanPointcutExpression extends AopElementBase implements PsiPointcutExpression {
 
-  public PsiBeanPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiBeanPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -49,22 +49,22 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return acceptsClass(member instanceof PsiClass ? (PsiClass)member : member.getContainingClass());
   }
 
-  private PointcutMatchDegree acceptsClass(final PsiClass psiClass) {
-    final PsiReference reference = getReference();
+  private PointcutMatchDegree acceptsClass(PsiClass psiClass) {
+    PsiReference reference = getReference();
     if (reference == null) return PointcutMatchDegree.FALSE;
 
-    final Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
+    Module module = ModuleUtilCore.findModuleForPsiElement(psiClass);
     if (module == null) return PointcutMatchDegree.FALSE;
 
-    final Pattern pattern = Pattern.compile(reference.getCanonicalText().replaceAll(" ", "").replaceAll("\\*", "\\.\\*"));
+    Pattern pattern = Pattern.compile(reference.getCanonicalText().replaceAll(" ", "").replaceAll("\\*", "\\.\\*"));
 
-    for (final SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
-      for (final SpringBaseBeanPointer pointer : model.findBeansByPsiClass(psiClass)) {
-        final String name = pointer.getName();
+    for (SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
+      for (SpringBaseBeanPointer pointer : model.findBeansByPsiClass(psiClass)) {
+        String name = pointer.getName();
         if (StringUtil.isNotEmpty(name) && pattern.matcher(name).matches()) {
           return PointcutMatchDegree.TRUE;
         }
@@ -76,7 +76,7 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
 
   @Override
   public PsiReference getReference() {
-    final String s = getText();
+    String s = getText();
     final int start = s.indexOf('(');
     if (start < 0) return null;
 
@@ -86,7 +86,7 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
       public PsiElement resolve() {
         final Ref<PsiElement> bean = Ref.create(null);
         processBeans(new Processor<SpringBaseBeanPointer>() {
-          public boolean process(final SpringBaseBeanPointer s) {
+          public boolean process(SpringBaseBeanPointer s) {
             if (getCanonicalText().equals(s.getName())) {
               bean.set(s.getSpringBean().getIdentifyingPsiElement());
               return false;
@@ -98,16 +98,16 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
       }
 
       @Override
-      public PsiElement handleElementRename(final String newText) throws IncorrectOperationException {
-        final AopPointcutExpressionFile file = (AopPointcutExpressionFile)PsiFileFactory.getInstance(getProject())
+      public PsiElement handleElementRename(String newText) throws IncorrectOperationException {
+        AopPointcutExpressionFile file = (AopPointcutExpressionFile)PsiFileFactory.getInstance(getProject())
                                                                                         .createFileFromText("a",
                                                                                                             AopPointcutExpressionFileType.INSTANCE,
                                                                                                             "bean(" + newText + ")");
-        final PsiBeanPointcutExpression pointcutExpression = (PsiBeanPointcutExpression)file.getPointcutExpression();
+        PsiBeanPointcutExpression pointcutExpression = (PsiBeanPointcutExpression)file.getPointcutExpression();
         assert pointcutExpression != null;
-        final ASTNode parent = getNode().getTreeParent();
+        ASTNode parent = getNode().getTreeParent();
         parent.replaceChild(getNode(), pointcutExpression.getNode());
-        final ASTNode node = parent.findChildByType(getNode().getElementType());
+        ASTNode node = parent.findChildByType(getNode().getElementType());
         assert node != null;
         return node.getPsi();
       }
@@ -115,8 +115,8 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
       public Object[] getVariants() {
         final List<LookupElement> result = new ArrayList<LookupElement>();
         processBeans(new Processor<SpringBaseBeanPointer>() {
-          public boolean process(final SpringBaseBeanPointer bean) {
-            final String name = bean.getName();
+          public boolean process(SpringBaseBeanPointer bean) {
+            String name = bean.getName();
             if (name != null && name.indexOf('#') < 0) {
               result.add(LookupElementBuilder.create(name).withIcon(SpringIcons.SPRING_BEAN_ICON));
             }
@@ -128,11 +128,11 @@ public class PsiBeanPointcutExpression extends AopElementBase implements PsiPoin
     };
   }
 
-  private boolean processBeans(final Processor<SpringBaseBeanPointer> processor) {
-    final AopAdvisedElementsSearcher searcher = getContainingFile().getAopModel().getAdvisedElementsSearcher();
+  private boolean processBeans(Processor<SpringBaseBeanPointer> processor) {
+    AopAdvisedElementsSearcher searcher = getContainingFile().getAopModel().getAdvisedElementsSearcher();
     if (!(searcher instanceof SpringAdvisedElementsSearcher)) return true;
-    for (final SpringModel model : ((SpringAdvisedElementsSearcher)searcher).getSpringModels()) {
-      for (final SpringBaseBeanPointer pointer : model.getAllCommonBeans(true)) {
+    for (SpringModel model : ((SpringAdvisedElementsSearcher)searcher).getSpringModels()) {
+      for (SpringBaseBeanPointer pointer : model.getAllCommonBeans(true)) {
         if (!processor.process(pointer)) return false;
 
       }

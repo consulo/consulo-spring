@@ -32,15 +32,15 @@ public class SpringBeanMoveHandler extends MoveHandlerDelegate {
   }
 
 
-  public boolean isValidTarget(final PsiElement psiElement) {
-    final SpringBean springBean = SpringUtils.findBeanFromPsiElement(psiElement);
+  public boolean isValidTarget(PsiElement psiElement) {
+    SpringBean springBean = SpringUtils.findBeanFromPsiElement(psiElement);
     return springBean != null && (springBean.getParent() instanceof Beans || springBean.getParent() instanceof SpringValueHolder);
   }
 
-  public boolean tryToMove(final PsiElement element,
+  public boolean tryToMove(PsiElement element,
                            final Project project,
-                           final DataContext dataContext,
-                           @Nullable final PsiReference reference,
+                           DataContext dataContext,
+                           @Nullable PsiReference reference,
                            final Editor editor) {
     final SpringBean springBean = SpringUtils.findBeanFromPsiElement(element);
     if (springBean == null) {

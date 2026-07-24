@@ -23,20 +23,20 @@ import java.util.List;
 
 public class FlowNameConverter extends ResolvingConverter<Flow> implements CustomReferenceConverter<Flow> {
 
-  public Flow fromString(@Nullable @NonNls final String s, final ConvertContext context) {
+  public Flow fromString(@Nullable @NonNls String s, ConvertContext context) {
      return WebflowUtil.findFlowByName(s, context.getModule());
   }
 
-  public String toString(@Nullable final Flow flow, final ConvertContext context) {
+  public String toString(@Nullable Flow flow, ConvertContext context) {
     return WebflowUtil.getFlowName(flow, context.getModule());
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue<Flow> flowGenericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<Flow> flowGenericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
 
-    final Flow flow = flowGenericDomValue.getValue();
+    Flow flow = flowGenericDomValue.getValue();
     if (flow == null) return PsiReference.EMPTY_ARRAY;
 
     return new PsiReference[]{createFlowNameReference(flow, element, context)};
@@ -53,14 +53,14 @@ public class FlowNameConverter extends ResolvingConverter<Flow> implements Custo
 
       public Object[] getVariants() {
         return ContainerUtil.map2Array(getAllFlows(currentFlowFile, context.getModule()), new Function<Flow, Object>() {
-          public Object fun(final Flow flow) {
-            final String flowName = WebflowUtil.getFlowName(flow, context.getModule());
+          public Object fun(Flow flow) {
+            String flowName = WebflowUtil.getFlowName(flow, context.getModule());
             return flowName == null ? "" : flowName;
           }
         });
       }
 
-      public PsiElement handleElementRename(final String newElementName) throws IncorrectOperationException {
+      public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
         if (resolve() instanceof XmlFile) {
           String name = getNameWithoutExtension(newElementName);
           return super.handleElementRename(name == null ? newElementName : name);
@@ -68,9 +68,9 @@ public class FlowNameConverter extends ResolvingConverter<Flow> implements Custo
         return super.handleElementRename(newElementName);
       }
 
-      public PsiElement bindToElement(@NotNull final PsiElement element) throws IncorrectOperationException {
+      public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
         if (element instanceof XmlFile) {
-          final VirtualFile file = ((XmlFile)element).getVirtualFile();
+          VirtualFile file = ((XmlFile)element).getVirtualFile();
           if (file != null) {
             return super.handleElementRename(file.getNameWithoutExtension());
           }
@@ -78,7 +78,7 @@ public class FlowNameConverter extends ResolvingConverter<Flow> implements Custo
         return getElement();
       }
 
-      public String getNameWithoutExtension(final String fileName) {
+      public String getNameWithoutExtension(String fileName) {
         int index = fileName.lastIndexOf('.');
         if (index < 0) return fileName;
         return fileName.substring(0, index);
@@ -88,13 +88,13 @@ public class FlowNameConverter extends ResolvingConverter<Flow> implements Custo
   }
 
   @NotNull
-  public Collection<? extends Flow> getVariants(final ConvertContext context) {
-    final Module module = context.getModule();
+  public Collection<? extends Flow> getVariants(ConvertContext context) {
+    Module module = context.getModule();
 
     return getAllFlows(context.getFile().getOriginalFile(), module);
   }
 
-  private static List<Flow> getAllFlows(final PsiFile originalFile, final Module module) {
+  private static List<Flow> getAllFlows(PsiFile originalFile, Module module) {
     return WebflowUtil.getAllFlows(module, Collections.singletonList(originalFile));
   }
 

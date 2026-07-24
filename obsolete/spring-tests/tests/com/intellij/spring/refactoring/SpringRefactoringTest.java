@@ -34,13 +34,13 @@ public class SpringRefactoringTest extends SpringHighlightingTestCase<JavaModule
 
   public void testMoveBean() throws Throwable {
     myFixture.configureByFiles("move-from.xml", "move-to.xml");
-    final Editor editor = myFixture.getEditor();
-    final int offset = editor.getCaretModel().getOffset();
-    final PsiElement psiElement = myFixture.getFile().findElementAt(offset);
-    final SpringBean springBean = SpringUtils.findBeanFromPsiElement(psiElement);
-    final VirtualFile file = myFixture.getTempDirFixture().getFile("move-to.xml");
+    Editor editor = myFixture.getEditor();
+    int offset = editor.getCaretModel().getOffset();
+    PsiElement psiElement = myFixture.getFile().findElementAt(offset);
+    SpringBean springBean = SpringUtils.findBeanFromPsiElement(psiElement);
+    VirtualFile file = myFixture.getTempDirFixture().getFile("move-to.xml");
     assert file != null;
-    final PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file);
+    PsiFile psiFile = PsiManager.getInstance(myProject).findFile(file);
     SpringBeanMoveDialog.doMove((XmlFile)psiFile, springBean, myProject);
     myFixture.checkResultByFile("move-from_after.xml");
     myFixture.checkResultByFile("move-to.xml", "move-to_after.xml", false);
@@ -68,16 +68,16 @@ public class SpringRefactoringTest extends SpringHighlightingTestCase<JavaModule
     CodeInsightTestUtil.doIntentionTest(myFixture, "usePNamespaceValueTag", new UsePNamespaceIntention().getText());
   }
 
-  private void doInline(final String file) throws Throwable {
-    final PsiReference reference = myFixture.getReferenceAtCaretPositionWithAssertion(file + ".xml");
-    final EditorEx editor = (EditorEx)myFixture.getEditor();
+  private void doInline(String file) throws Throwable {
+    PsiReference reference = myFixture.getReferenceAtCaretPositionWithAssertion(file + ".xml");
+    EditorEx editor = (EditorEx)myFixture.getEditor();
     DataContext dataContext = SimpleDataContext.getSimpleContext(DataConstants.PSI_ELEMENT, reference.resolve(), editor.getDataContext());
     new InlineRefactoringActionHandler().invoke(myProject, editor, myFixture.getFile(), dataContext);
     myFixture.checkResultByFile(file + "_after.xml");
   }
 
   @Override
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     if (getName().equals("testMoveBean")) {
       addSpringJar(moduleBuilder);

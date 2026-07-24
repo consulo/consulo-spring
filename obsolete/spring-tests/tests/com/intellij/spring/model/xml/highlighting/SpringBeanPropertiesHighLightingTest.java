@@ -23,7 +23,7 @@ import java.util.*;
 public class SpringBeanPropertiesHighLightingTest extends SpringHighlightingTestCase<JavaModuleFixtureBuilder> {
   private static final Set<String> WANT_TESTDATA = CollectionFactory.newTroveSet("testSpringPropertyRef", "testSpringPropertyInnerBean", "testSpringPropertyListSetMapProperties", "testSpringPropertyValueType", "testParentProperty");
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
   }
@@ -46,7 +46,7 @@ public class SpringBeanPropertiesHighLightingTest extends SpringHighlightingTest
   }
 
   public void testSpringPropertyValueType() throws Throwable {
-    final InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
+    InjectionValueStyleInspection inspection = new InjectionValueStyleInspection();
     myFixture.disableInspections(inspection);
     myFixture.testHighlighting("spring-bean-property-value-type.xml");
   }
@@ -63,7 +63,7 @@ public class SpringBeanPropertiesHighLightingTest extends SpringHighlightingTest
     new WriteCommandAction.Simple(myProject) {
       protected void run() throws Throwable {
         myFixture.configureByFiles("propertyRename.xml", "RenameBeanProperty.java");
-        final BeanProperty beanProperty = SpringPropertiesUtil.getBeanProperty(myFixture.getEditor(), myFixture.getFile());
+        BeanProperty beanProperty = SpringPropertiesUtil.getBeanProperty(myFixture.getEditor(), myFixture.getFile());
         BeanPropertyRenameHandler.doRename(beanProperty, "newName", false);
         myFixture.checkResultByFile("propertyRename_after.xml");
         myFixture.checkResultByFile("RenameBeanProperty.java", "RenameBeanProperty_after.java", true);
@@ -76,9 +76,9 @@ public class SpringBeanPropertiesHighLightingTest extends SpringHighlightingTest
   }
 
   public void testPNamespaceSetterUsages() throws Throwable {
-    final PsiClass psiClass = myFixture.addClass("package foo.bar; " + "public class PTestBean {" + "    public void setFoo(String s){}" + "}");
+    PsiClass psiClass = myFixture.addClass("package foo.bar; " + "public class PTestBean {" + "    public void setFoo(String s){}" + "}");
     myFixture.configureByFile(getTestName(true) + ".xml");
-    final Collection<PsiReference> usages = MethodReferencesSearch.search(psiClass.getMethods()[0]).findAll();
+    Collection<PsiReference> usages = MethodReferencesSearch.search(psiClass.getMethods()[0]).findAll();
     assertEquals(1, usages.size());
   }
 
@@ -94,11 +94,11 @@ public class SpringBeanPropertiesHighLightingTest extends SpringHighlightingTest
     checkCreatePropertyFix("createPropertyQuickFix3.xml", "CreatePropertyQuickFix3.after", "Create setter for");
   }
 
-  private void checkCreatePropertyFix(final String path, final String afterFile, final String prefix) throws Throwable {
-    final List<IntentionAction> actions = myFixture.getAvailableIntentions(path, "CreatePropertyQuickFix.java", "FooBean.java");
+  private void checkCreatePropertyFix(String path, String afterFile, String prefix) throws Throwable {
+    List<IntentionAction> actions = myFixture.getAvailableIntentions(path, "CreatePropertyQuickFix.java", "FooBean.java");
     Collections.sort(actions, new Comparator<IntentionAction>() {
 
-      public int compare(final IntentionAction o1, final IntentionAction o2) {
+      public int compare(IntentionAction o1, IntentionAction o2) {
         return o1.getText().compareTo(o2.getText());
       }
     });

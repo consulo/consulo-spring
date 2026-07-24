@@ -31,8 +31,8 @@ public class SpringBootModelProvider implements SpringModelProvider {
   public void collectFilesets(@Nonnull SpringModuleExtension extension, @Nonnull Consumer<SpringFileSet> consumer) {
     Module module = extension.getModule();
 
-    final JamService service = JamService.getJamService(module.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
+    JamService service = JamService.getJamService(module.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
 
     List<SpringJamElement> elements = new ArrayList<>();
     elements.addAll(service.getJamClassElements(SpringBootApplicationElement.META,

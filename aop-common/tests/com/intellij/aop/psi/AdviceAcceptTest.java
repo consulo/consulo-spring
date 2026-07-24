@@ -45,7 +45,7 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
   }
 
   public void testSpringAfterReturning() throws Throwable {
-    final PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
+    PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
                                                                    "void foo239(String str) {}" +
                                                                    "AbstractString foo() {} " +
                                                                    "String bar() {} " +
@@ -69,22 +69,22 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
                                  "<aop:aspectj-autoproxy>\n" +
                                  "</beans>", 0, true);
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     domManager.registerFileDescription(new SpringDomFileDescription(), getTestRootDisposable());
     final Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
     IdeaTestUtil.registerExtension(AopProvider.EXTENSION_POINT_NAME, new SpringAopProvider() {
       @Nonnull
-      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull final Module module) {
+      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull Module module) {
         return addAopAspects(new THashSet<AopAspect>(), beans);
       }
     }, myTestRootDisposable);
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final SpringAspect aspect = aopConfig.getAspects().get(0);
-    final BasicAdvice advice = aspect.getAdvices().get(0);
-    final PsiPointcutExpression expression = advice.getPointcutExpression();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    SpringAspect aspect = aopConfig.getAspects().get(0);
+    BasicAdvice advice = aspect.getAdvices().get(0);
+    PsiPointcutExpression expression = advice.getPointcutExpression();
 
-    final PsiMethod foo = beanClass.getMethods()[1];
-    final PsiMethod bar = beanClass.getMethods()[2];
+    PsiMethod foo = beanClass.getMethods()[1];
+    PsiMethod bar = beanClass.getMethods()[2];
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(expression), foo));
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(expression), bar));
     assertEquals(PointcutMatchDegree.FALSE, AopAdviceUtil.accepts(advice, foo));
@@ -92,7 +92,7 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
   }
 
   public void testSpringWithParameter() throws Throwable {
-    final PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
+    PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
                                                                    "void foo239(String str) {}" +
                                                                    "AbstractString foo() {} " +
                                                                    "String bar() {} " +
@@ -116,24 +116,24 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
                                  "<aop:aspectj-autoproxy>\n" +
                                  "</beans>",0,true);
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     domManager.registerFileDescription(new SpringDomFileDescription(), getTestRootDisposable());
     final Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
     IdeaTestUtil.registerExtension(AopProvider.EXTENSION_POINT_NAME, new SpringAopProvider() {
       @Nonnull
-      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull final consulo.module.Module module) {
+      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull consulo.module.Module module) {
         return addAopAspects(new THashSet<AopAspect>(), beans);
       }
     }, myTestRootDisposable);
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final SpringAspect aspect = aopConfig.getAspects().get(0);
-    final BasicAdvice advice = aspect.getAdvices().get(0);
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    SpringAspect aspect = aopConfig.getAspects().get(0);
+    BasicAdvice advice = aspect.getAdvices().get(0);
 
     assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, beanClass.getMethods()[0]));
   }
 
   public void testJavaAfterReturning() throws Throwable {
-    final PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
+    PsiClass beanClass = myFixture.addClass("public class BeanClass {" +
                                                                    "void foo239(String lst) {}" +
                                                                    "AbstractString foo() {} " +
                                                                    "String bar() {} " +
@@ -142,16 +142,16 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
                                                                    "}");
 
     final PsiMethod adviceMethod = beanClass.getMethods()[3];
-    final AopAdvice advice = new AopAfterReturningAdviceImpl() {
+    AopAdvice advice = new AopAfterReturningAdviceImpl() {
       @Override
       public PsiMethod getPsiElement() {
         return adviceMethod;
       }
     };
-    final PsiPointcutExpression expression = advice.getPointcutExpression();
+    PsiPointcutExpression expression = advice.getPointcutExpression();
 
-    final PsiMethod foo = beanClass.getMethods()[1];
-    final PsiMethod bar = beanClass.getMethods()[2];
+    PsiMethod foo = beanClass.getMethods()[1];
+    PsiMethod bar = beanClass.getMethods()[2];
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(expression), foo));
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(expression), bar));
     assertEquals(PointcutMatchDegree.FALSE, AopAdviceUtil.accepts(advice, foo));

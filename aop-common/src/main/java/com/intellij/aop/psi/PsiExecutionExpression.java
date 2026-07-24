@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class PsiExecutionExpression extends MethodPatternPointcut {
 
-  public PsiExecutionExpression(@Nonnull final ASTNode node) {
+  public PsiExecutionExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -25,22 +25,22 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     if (!(member instanceof PsiMethod)) return PointcutMatchDegree.FALSE;
 
-    final AopMemberReferenceExpression methodReference = getMethodReference();
+    AopMemberReferenceExpression methodReference = getMethodReference();
     if (methodReference == null) return PointcutMatchDegree.FALSE;
 
-    final PsiMethod method = (PsiMethod)member;
+    PsiMethod method = (PsiMethod)member;
 
-    final AopReferenceExpression expression = methodReference.getReferenceExpression();
+    AopReferenceExpression expression = methodReference.getReferenceExpression();
     if (expression == null || !expression.getRegex().matcher(method.getName()).matches()) return PointcutMatchDegree.FALSE;
 
-    final AopModifierList modifierList = getModifierList();
-    final AopParameterList parameterList = getParameterList();
-    final AopReferenceHolder returnType = getReturnType();
-    final AopThrowsList throwsList = getThrowsList();
-    final AopAnnotationHolder annotationHolder = getAnnotationHolder();
+    AopModifierList modifierList = getModifierList();
+    AopParameterList parameterList = getParameterList();
+    AopReferenceHolder returnType = getReturnType();
+    AopThrowsList throwsList = getThrowsList();
+    AopAnnotationHolder annotationHolder = getAnnotationHolder();
 
     if (modifierList != null && !modifierList.accepts(member)) return PointcutMatchDegree.FALSE;
     if (!acceptsReturnType(returnType, method.getReturnType())) return PointcutMatchDegree.FALSE;
@@ -54,19 +54,19 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
 
   }
 
-  private static boolean processClass(PsiClass aClass, PsiMethod method, Set<PsiClass> visited, final Collection<AopPsiTypePattern> patterns) {
-    final PsiMethod psiMethod = aClass.findMethodBySignature(method, true);
+  private static boolean processClass(PsiClass aClass, PsiMethod method, Set<PsiClass> visited, Collection<AopPsiTypePattern> patterns) {
+    PsiMethod psiMethod = aClass.findMethodBySignature(method, true);
     if (psiMethod == null) return false;
 
     if (acceptsMethodClassAndName(aClass, patterns)) return true;
 
     visited.add(aClass);
-    final PsiClass superClass = aClass.getSuperClass();
+    PsiClass superClass = aClass.getSuperClass();
     if (superClass != null && !visited.contains(superClass) && processClass(superClass, method, visited, patterns)) {
       return true;
     }
 
-    for (final PsiClass intf : aClass.getInterfaces()) {
+    for (PsiClass intf : aClass.getInterfaces()) {
       if (!visited.contains(intf) && processClass(intf, method, visited, patterns)) {
         return true;
       }
@@ -74,7 +74,7 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
     return false;
   }
 
-  private static boolean acceptsMethodClassAndName(@Nonnull final PsiClass declaringClass, final Collection<AopPsiTypePattern> patterns) {
+  private static boolean acceptsMethodClassAndName(@Nonnull PsiClass declaringClass, Collection<AopPsiTypePattern> patterns) {
     if (AopPsiTypePattern.accepts(patterns, JavaPsiFacade.getInstance(declaringClass.getProject()).getElementFactory().createType(
         declaringClass)) ==
         PointcutMatchDegree.TRUE) {
@@ -83,7 +83,7 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
     return false;
   }
 
-  private static boolean acceptsReturnType(final AopReferenceHolder returnType, final PsiType methodReturnType) {
+  private static boolean acceptsReturnType(AopReferenceHolder returnType, PsiType methodReturnType) {
     if (returnType == null || methodReturnType == null) return true;
     if (returnType.accepts(methodReturnType) == PointcutMatchDegree.TRUE) return true;
     return false;

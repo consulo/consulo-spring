@@ -38,9 +38,9 @@ public class FileSetEditor extends DialogWrapper {
 
   public static final DefaultListCellRenderer FILESET_RENDERER = new DefaultListCellRenderer() {
     @Override
-    public Component getListCellRendererComponent(final JList list,
+    public Component getListCellRendererComponent(JList list,
                                                   Object value,
-                                                  final int index, final boolean isSelected, final boolean cellHasFocus) {
+                                                  int index, boolean isSelected, boolean cellHasFocus) {
       if (value == null) {
         value = SpringBundle.message("fileset.none");
       }
@@ -61,7 +61,7 @@ public class FileSetEditor extends DialogWrapper {
   private final CheckedTreeNode myRoot = new CheckedTreeNode(null);
   private final SpringFileSet myOriginalSet;
 
-  public FileSetEditor(final @Nonnull consulo.module.Module module, final SpringFileSet fileSet, final Set<SpringFileSet> allSets) {
+  public FileSetEditor(@Nonnull consulo.module.Module module, SpringFileSet fileSet, Set<SpringFileSet> allSets) {
     super(module.getProject(), true);
 
     myOriginalSet = fileSet;
@@ -70,11 +70,11 @@ public class FileSetEditor extends DialogWrapper {
     init(fileSet, allSets, new SpringConfigsSearcher(module), module.getProject());
   }
 
-  protected FileSetEditor(final Component parent,
-                          final SpringFileSet fileSet,
-                          final Collection<SpringFileSet> allSets,
-                          final SpringConfigsSearcher searcher,
-                          final Project project) {
+  protected FileSetEditor(Component parent,
+                          SpringFileSet fileSet,
+                          Collection<SpringFileSet> allSets,
+                          SpringConfigsSearcher searcher,
+                          Project project) {
 
     super(parent, true);
 
@@ -84,30 +84,30 @@ public class FileSetEditor extends DialogWrapper {
     init(fileSet, allSets, searcher, project);
   }
 
-  private void init(final SpringFileSet fileSet,
-                    final Collection<SpringFileSet> allSets,
-                    final SpringConfigsSearcher searcher,
-                    @Nullable final Project project) {
+  private void init(SpringFileSet fileSet,
+                    Collection<SpringFileSet> allSets,
+                    SpringConfigsSearcher searcher,
+                    @Nullable Project project) {
 
     setTitle(SpringBundle.message("config.fileset.editor.title"));
     myFilesTree.setModel(new DefaultTreeModel(myRoot));
     searcher.search();
-    final MultiMap<Module, PsiFile> files = searcher.getFilesByModules();
-    final MultiMap<VirtualFile, PsiFile> jars = searcher.getJars();
-    final Set<PsiFile> psiFiles = myFilesTree.buildModuleNodes(files, jars, fileSet);
-    final List<VirtualFile> virtualFiles = searcher.getVirtualFiles();
+    MultiMap<Module, PsiFile> files = searcher.getFilesByModules();
+    MultiMap<VirtualFile, PsiFile> jars = searcher.getJars();
+    Set<PsiFile> psiFiles = myFilesTree.buildModuleNodes(files, jars, fileSet);
+    List<VirtualFile> virtualFiles = searcher.getVirtualFiles();
 
     for (VirtualFile virtualFile : virtualFiles) {
       myFilesTree.addFile(virtualFile);
     }
 
     if (project != null) {
-      final PsiManager psiManager = PsiManager.getInstance(project);
-      final Collection<VirtualFilePointer> list = fileSet.getFiles();
+      PsiManager psiManager = PsiManager.getInstance(project);
+      Collection<VirtualFilePointer> list = fileSet.getFiles();
       for (VirtualFilePointer pointer : list) {
-        final VirtualFile file = pointer.getFile();
+        VirtualFile file = pointer.getFile();
         if (file != null) {
-          final PsiFile psiFile = psiManager.findFile(file);
+          PsiFile psiFile = psiManager.findFile(file);
           if (psiFile != null && psiFiles.contains(psiFile)) {
             continue;
           }
@@ -119,7 +119,7 @@ public class FileSetEditor extends DialogWrapper {
     TreeUtil.expandAll(myFilesTree);
     myFilesTree.getModel().addTreeModelListener(new TreeModelAdapter() {
       @Override
-      public void treeNodesChanged(final TreeModelEvent e) {
+      public void treeNodesChanged(TreeModelEvent e) {
         updateFileSet();
       }
     });
@@ -127,7 +127,7 @@ public class FileSetEditor extends DialogWrapper {
     mySetName.setText(fileSet.getName());
     mySetName.addDocumentListener(new DocumentAdapter() {
       @Override
-      public void documentChanged(final DocumentEvent e) {
+      public void documentChanged(DocumentEvent e) {
         updateFileSet();
       }
     });
@@ -143,7 +143,7 @@ public class FileSetEditor extends DialogWrapper {
 
     myParentBox.addItemListener(new ItemListener() {
       @Override
-      public void itemStateChanged(final ItemEvent e) {
+      public void itemStateChanged(ItemEvent e) {
         updateFileSet();
       }
     });
@@ -174,14 +174,14 @@ public class FileSetEditor extends DialogWrapper {
     if (myFileSet.getFiles().size() != myOriginalSet.getFiles().size()) {
       return true;
     }
-    final List<VirtualFilePointer> pointers = new ArrayList<>(myFileSet.getFiles());
-    final List<VirtualFilePointer> originalPointers = new ArrayList<>(myOriginalSet.getFiles());
+    List<VirtualFilePointer> pointers = new ArrayList<>(myFileSet.getFiles());
+    List<VirtualFilePointer> originalPointers = new ArrayList<>(myOriginalSet.getFiles());
     for (int i = 0; i < pointers.size(); i++) {
       if (!pointers.get(i).getUrl().equals(originalPointers.get(i).getUrl())) {
         return true;
       }
     }
-    final boolean b = myFileSet.getDependencies().equals(myOriginalSet.getDependencies());
+    boolean b = myFileSet.getDependencies().equals(myOriginalSet.getDependencies());
     return !myFileSet.getName().equals(myOriginalSet.getName()) || !b;
   }
 
@@ -206,10 +206,10 @@ public class FileSetEditor extends DialogWrapper {
 
   @Override
   protected Action[] createLeftSideActions() {
-    final AbstractAction locateAction = new AbstractAction(SpringBundle.message("config.locate.button")) {
+    AbstractAction locateAction = new AbstractAction(SpringBundle.message("config.locate.button")) {
       @Override
-      public void actionPerformed(final ActionEvent e) {
-        final VirtualFile[] files =
+      public void actionPerformed(ActionEvent e) {
+        VirtualFile[] files =
           IdeaFileChooser.chooseFiles(new FileChooserDescriptor(true, false, true, false, true, true), myMainPanel, null, null);
         if (files.length > 0) {
           for (VirtualFile file : files) {

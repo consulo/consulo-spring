@@ -14,7 +14,7 @@ import java.util.List;
 public class GlobalTransitionsNode extends WebflowBasicNode<GlobalTransitions>{
   @NonNls public static String GLOBAL_TRANSITIONS_NODE_NAME = "<< Global Transitions >>";
 
-  public GlobalTransitionsNode(@NotNull final GlobalTransitions identifyingElement) {
+  public GlobalTransitionsNode(@NotNull GlobalTransitions identifyingElement) {
     super(identifyingElement, GLOBAL_TRANSITIONS_NODE_NAME);
   }
 

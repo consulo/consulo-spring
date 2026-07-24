@@ -48,11 +48,11 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
 
   public void testOr() throws Throwable {
     assertUnorderedCollection(parse("foo||int").getPatterns(), new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertEquals("foo", assertInstanceOf(aopPsiTypePattern, PsiClassTypePattern.class).getText());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertEquals(PsiType.INT, assertInstanceOf(aopPsiTypePattern, PsiPrimitiveTypePattern.class).getType());
       }
     });
@@ -60,11 +60,11 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
 
   public void testAnd() throws Throwable {
     assertUnorderedCollection(assertInstanceOf(assertOneElement(parse("foo.*&&*.bar").getPatterns()), AndPsiTypePattern.class).getPatterns(), new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertEquals("foo.*", assertInstanceOf(aopPsiTypePattern, PsiClassTypePattern.class).getText());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertEquals("*.bar", assertInstanceOf(aopPsiTypePattern, PsiClassTypePattern.class).getText());
       }
     });
@@ -75,26 +75,26 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
   }
 
   public void testGenerics() throws Throwable {
-    final GenericPattern pattern =
+    GenericPattern pattern =
       assertInstanceOf(assertOneElement(parse("foo<bar,?,? extends foo, ? super bar>").getPatterns()), GenericPattern.class);
     assertEquals("foo", assertInstanceOf(pattern.getErasure(), PsiClassTypePattern.class).getText());
     assertOrderedCollection(pattern.getParameters(), new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertEquals("bar", assertInstanceOf(aopPsiTypePattern, PsiClassTypePattern.class).getText());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
         assertNull(assertInstanceOf(aopPsiTypePattern, WildcardPattern.class).getBound());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final WildcardPattern wildcardPattern = assertInstanceOf(aopPsiTypePattern, WildcardPattern.class);
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        WildcardPattern wildcardPattern = assertInstanceOf(aopPsiTypePattern, WildcardPattern.class);
         assertEquals("foo", assertInstanceOf(wildcardPattern.getBound(), PsiClassTypePattern.class).getText());
         assertFalse(wildcardPattern.isSuper());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final WildcardPattern wildcardPattern = assertInstanceOf(aopPsiTypePattern, WildcardPattern.class);
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        WildcardPattern wildcardPattern = assertInstanceOf(aopPsiTypePattern, WildcardPattern.class);
         assertEquals("bar", assertInstanceOf(wildcardPattern.getBound(), PsiClassTypePattern.class).getText());
         assertTrue(wildcardPattern.isSuper());
       }
@@ -103,28 +103,28 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
   }
 
   public void testEnumInGenerics() throws Throwable {
-    final Collection<AopPsiTypePattern> patterns = parse("foo<foo||bar,int||long>").getPatterns();
+    Collection<AopPsiTypePattern> patterns = parse("foo<foo||bar,int||long>").getPatterns();
     assertUnorderedCollection(patterns, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
         assertEquals("foo", ((PsiClassTypePattern)parameters[0]).getText());
         assertEquals(PsiType.INT, ((PsiPrimitiveTypePattern)parameters[1]).getType());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
         assertEquals("foo", ((PsiClassTypePattern)parameters[0]).getText());
         assertEquals(PsiType.LONG, ((PsiPrimitiveTypePattern)parameters[1]).getType());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
         assertEquals("bar", ((PsiClassTypePattern)parameters[0]).getText());
         assertEquals(PsiType.INT, ((PsiPrimitiveTypePattern)parameters[1]).getType());
       }
     }, new Consumer<AopPsiTypePattern>() {
-      public void consume(final AopPsiTypePattern aopPsiTypePattern) {
-        final AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
+      public void consume(AopPsiTypePattern aopPsiTypePattern) {
+        AopPsiTypePattern[] parameters = assertInstanceOf(aopPsiTypePattern, GenericPattern.class).getParameters();
         assertEquals("bar", ((PsiClassTypePattern)parameters[0]).getText());
         assertEquals(PsiType.LONG, ((PsiPrimitiveTypePattern)parameters[1]).getType());
       }
@@ -145,7 +145,7 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
   }
 
   public void testNonReferenceQualifiers() throws Throwable {
-    final ConcatenationPattern pattern = assertInstanceOf(assertOneElement(parse("(int).bar").getPatterns()), ConcatenationPattern.class);
+    ConcatenationPattern pattern = assertInstanceOf(assertOneElement(parse("(int).bar").getPatterns()), ConcatenationPattern.class);
     assertEquals(PsiType.INT, assertInstanceOf(pattern.getLeft(), PsiPrimitiveTypePattern.class).getType());
     assertEquals("bar", assertInstanceOf(pattern.getRight(), PsiClassTypePattern.class).getText());
     assertFalse(pattern.isDoubleDot());
@@ -158,10 +158,10 @@ public class AopTypeExpressionsPatternsTest extends JavaCodeInsightFixtureTestCa
   }
 
   private AopTypeExpression parse(String text) throws IOException {
-    final AopPointcutExpressionFile file = (AopPointcutExpressionFile) PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, "args(" + text + ")");
+    AopPointcutExpressionFile file = (AopPointcutExpressionFile) PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, "args(" + text + ")");
     LiteFixture.setContext(file, myContext);
     file.setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));

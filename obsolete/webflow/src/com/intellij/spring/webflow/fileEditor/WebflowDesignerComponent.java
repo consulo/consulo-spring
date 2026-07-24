@@ -46,12 +46,12 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
   private final XmlFile myXmlFile;
   private final WebflowDataModel myDataModel;
 
-  public WebflowDesignerComponent(final XmlFile xmlFile) {
+  public WebflowDesignerComponent(XmlFile xmlFile) {
     myXmlFile = xmlFile;
-    final Project project = xmlFile.getProject();
+    Project project = xmlFile.getProject();
 
-    final Graph2D graph = GraphManager.getGraphManager().createGraph2D();
-    final Graph2DView view = GraphManager.getGraphManager().createGraph2DView();
+    Graph2D graph = GraphManager.getGraphManager().createGraph2D();
+    Graph2DView view = GraphManager.getGraphManager().createGraph2DView();
     myDataModel = new WebflowDataModel(xmlFile);
     WebflowPresentationModel presentationModel = new WebflowPresentationModel(graph, project);
 
@@ -59,12 +59,12 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
 
     GraphViewUtil.addDataProvider(view, new MyDataProvider(myBuilder));
 
-    final Splitter splitter = new Splitter(false, 0.85f);
+    Splitter splitter = new Splitter(false, 0.85f);
 
     setLayout(new BorderLayout());
 
     final SimpleDnDPanel simpleDnDPanel = GraphDnDUtils.createDnDActions(project, myBuilder, new WebflowDnDSupport(myDataModel));
-    final JComponent graphComponent = myBuilder.getView().getJComponent();
+    JComponent graphComponent = myBuilder.getView().getJComponent();
 
     splitter.setSecondComponent(simpleDnDPanel.getTree());
     splitter.setFirstComponent(graphComponent);
@@ -79,7 +79,7 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
     myBuilder.getView().fitContent();
     
     DomManager.getDomManager(myBuilder.getProject()).addDomEventListener(new DomEventAdapter() {
-      public void eventOccured(final DomEvent event) {
+      public void eventOccured(DomEvent event) {
         if (isShowing()) {
           simpleDnDPanel.getBuilder().updateFromRoot();
           myBuilder.queueUpdate();
@@ -96,17 +96,17 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
     actions.addSeparator();
     actions.add(GraphViewUtil.getBasicToolbar(myBuilder));
 
-    final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
+    ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
 
     return actionToolbar.getComponent();
   }
 
   public List<DomElement> getSelectedDomElements() {
     List<DomElement> selected = new ArrayList<DomElement>();
-    final Graph2D graph = myBuilder.getGraph();
+    Graph2D graph = myBuilder.getGraph();
     for (Node n : graph.getNodeArray()) {
       if (graph.isSelected(n)) {
-        final WebflowNode nodeObject = myBuilder.getNodeObject(n);
+        WebflowNode nodeObject = myBuilder.getNodeObject(n);
         if (nodeObject != null) {
           ContainerUtil.addIfNotNull(nodeObject.getIdentifyingElement(), selected);
         }
@@ -115,7 +115,7 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
     return selected;
   }
 
-  public void setSelectedDomElement(final DomElement domElement) {
+  public void setSelectedDomElement(DomElement domElement) {
 
   }
 
@@ -135,11 +135,11 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
       return SPRING_WEBFLOW_DESIGNER_NAVIGATION_PROVIDER_NAME;
     }
 
-    public void navigate(final DomElement domElement, final boolean requestFocus) {
+    public void navigate(DomElement domElement, boolean requestFocus) {
       setSelectedDomElement(domElement);
     }
 
-    public boolean canNavigate(final DomElement domElement) {
+    public boolean canNavigate(DomElement domElement) {
       return domElement.isValid();
     }
   }
@@ -153,7 +153,7 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
   }
 
   @Nullable
-  public Object getData(@NonNls final String dataId) {
+  public Object getData(@NonNls String dataId) {
     if (dataId.equals(SPRING_WEBFLOW_DESIGNER_COMPONENT)) return this;
 
     return null;
@@ -167,7 +167,7 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
     private final Project myProject;
     private final Graph2D myGraph;
 
-    public MyDataProvider(final GraphBuilder<WebflowNode, WebflowEdge> builder) {
+    public MyDataProvider(GraphBuilder<WebflowNode, WebflowEdge> builder) {
       myProject = builder.getProject();
       myGraph = builder.getGraph();
     }
@@ -180,7 +180,7 @@ public class WebflowDesignerComponent extends JPanel implements DataProvider, Di
       else if (dataId.equals(DataConstants.PSI_ELEMENT)) {
         for (Node node : myGraph.getNodeArray()) {
           if (myGraph.getRealizer(node).isSelected()) {
-            final WebflowNode webflowNode = myBuilder.getNodeObject(node);
+            WebflowNode webflowNode = myBuilder.getNodeObject(node);
             if (webflowNode != null) {
               return webflowNode.getIdentifyingElement().getXmlElement();
             }

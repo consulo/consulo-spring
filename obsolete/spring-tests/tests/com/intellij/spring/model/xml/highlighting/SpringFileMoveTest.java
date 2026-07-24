@@ -35,7 +35,7 @@ public class SpringFileMoveTest extends SpringHighlightingTestCase {
     myFixture.checkResultByFile("src1/move.xml", "src1/move_after_foo_import.xml", false);
   }
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.addSourceRoot("src1");
     moduleBuilder.addSourceRoot("src2");

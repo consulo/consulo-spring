@@ -13,7 +13,7 @@ public abstract class WebflowBasicNode<T extends DomElement> implements WebflowN
   private final T myIdentifyingElement;
   private final String myName;
 
-  protected WebflowBasicNode(@NotNull final T identifyingElement, @Nullable final String name) {
+  protected WebflowBasicNode(@NotNull T identifyingElement, @Nullable String name) {
     myIdentifyingElement = identifyingElement;
     myName = name;
   }
@@ -27,11 +27,11 @@ public abstract class WebflowBasicNode<T extends DomElement> implements WebflowN
     return myIdentifyingElement;
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final WebflowBasicNode that = (WebflowBasicNode)o;
+    WebflowBasicNode that = (WebflowBasicNode)o;
 
     if (!myIdentifyingElement.equals(that.myIdentifyingElement)) return false;
 

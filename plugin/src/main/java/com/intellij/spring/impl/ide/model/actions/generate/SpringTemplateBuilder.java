@@ -62,14 +62,14 @@ public class SpringTemplateBuilder {
    * @param model
    * @return true if closing tag needed
    */
-  private boolean createValue(final PsiType type, final SpringModel model) {
+  private boolean createValue(PsiType type, SpringModel model) {
     if (type instanceof PsiClassType) {
       if (CommonClassNames.JAVA_LANG_OBJECT.equals(type.getCanonicalText())) {
         createAttr("value");  // IDEADEV-17789
         return false;
       }
       else {
-        final PsiClassType psiClassType = (PsiClassType)type;
+        PsiClassType psiClassType = (PsiClassType)type;
         if (SpringUtils.isAssignable(myProject, psiClassType, CommonClassNames.JAVA_UTIL_PROPERTIES)) {
           createProperties();
           return true;
@@ -102,12 +102,12 @@ public class SpringTemplateBuilder {
     }
   }
 
-  public void createValueAndClose(final PsiType type, final SpringModel model, @NonNls String tagName) {
-    final boolean closingTagNeeded = createValue(type, model);
+  public void createValueAndClose(PsiType type, SpringModel model, @NonNls String tagName) {
+    boolean closingTagNeeded = createValue(type, model);
     addTextSegment(closingTagNeeded ? "</" + tagName + ">" : "/>");
   }
 
-  private void createAttr(final PsiClassType type, final SpringModel model, boolean key) {
+  private void createAttr(PsiClassType type, SpringModel model, boolean key) {
     boolean canBeReferenced = !SpringUtils.getBeansByType(type, model).isEmpty();
     if (canBeReferenced || !isConvertable(type)) {
       createAttr(key ? "key-ref" : "ref");
@@ -117,7 +117,7 @@ public class SpringTemplateBuilder {
     }
   }
 
-  private static boolean isConvertable(final PsiType type) {
+  private static boolean isConvertable(PsiType type) {
     return myConvertableTypes.contains(type.getCanonicalText());
   }
 
@@ -130,54 +130,54 @@ public class SpringTemplateBuilder {
 
   private void createProperties() {
     myTemplate.addTextSegment(">\n<props>\n<prop key=\"");
-    final MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
+    MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
     myTemplate.addVariable("PROP_KEY", node, node, true);
     myTemplate.addTextSegment("\">");
     myTemplate.addVariable("PROP_VALUE", node, node, true);
     myTemplate.addTextSegment("</prop>\n</props>");
   }
 
-  public void createCollection(final String name) {
+  public void createCollection(String name) {
     myTemplate.addTextSegment(">\n<" + name + ">\n");
     myTemplate.addTextSegment("<value>");
-    final MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
+    MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
     myTemplate.addVariable(name + myCount++, node, node, true);
     myTemplate.addTextSegment("</value>\n");
     myTemplate.addTextSegment("</" + name + ">\n");
   }
 
-  private void createAttr(final String name) {
+  private void createAttr(String name) {
     myTemplate.addTextSegment(" " + name + "=\"");
-    final MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
+    MacroCallNode node = new MacroCallNode(MacroFactory.createMacro("complete"));
     myTemplate.addVariable(name + myCount++, node, node, true);
     myTemplate.addTextSegment("\"");
   }
 
-  public void addTextSegment(@NonNls final String s) {
+  public void addTextSegment(@NonNls String s) {
     myTemplate.addTextSegment(s);
   }
 
-  public void startTemplate(final Editor editor) {
+  public void startTemplate(Editor editor) {
     TemplateManager.getInstance(myProject).startTemplate(editor, myTemplate);
   }
 
-  public static void preparePlace(final Editor editor, final Project project, final DomElement element) {
-    final DomElement copy = element.createStableCopy();
+  public static void preparePlace(Editor editor, Project project, DomElement element) {
+    DomElement copy = element.createStableCopy();
     PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
-    final XmlTag tag = copy.getXmlTag();
+    XmlTag tag = copy.getXmlTag();
     assert tag != null;
-    final int offset = tag.getTextOffset();
+    int offset = tag.getTextOffset();
     editor.getDocument().deleteString(offset, tag.getTextRange().getEndOffset());
     PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(editor.getDocument());
     editor.getCaretModel().moveToOffset(offset);
   }
 
   public static Editor getEditor(ProblemDescriptor descriptor) {
-    final PsiFile psiFile = descriptor.getPsiElement().getContainingFile();
-    final Project project = psiFile.getProject();
-    final VirtualFile virtualFile = psiFile.getVirtualFile();
+    PsiFile psiFile = descriptor.getPsiElement().getContainingFile();
+    Project project = psiFile.getProject();
+    VirtualFile virtualFile = psiFile.getVirtualFile();
     assert virtualFile != null;
-    final Editor editor = FileEditorManager.getInstance(project)
+    Editor editor = FileEditorManager.getInstance(project)
                                            .openTextEditor(OpenFileDescriptorFactory.getInstance(project).builder(virtualFile).build(),
                                                            false);
     assert editor != null;

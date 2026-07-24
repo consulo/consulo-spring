@@ -51,7 +51,7 @@ public class SpringCompletionContributor extends CompletionContributor {
     }
     ApplicationManager.getApplication().runReadAction(new Runnable() {
       public void run() {
-        final GenericDomValueReference reference = getReference(parameters);
+        GenericDomValueReference reference = getReference(parameters);
         if (reference == null) {
           return;
         }
@@ -74,9 +74,9 @@ public class SpringCompletionContributor extends CompletionContributor {
     if (!(parameters.getPosition() instanceof XmlToken)) return null;
 
     PsiReference[] references = parameters.getPosition().getParent().getReferences();
-    for (final PsiReference psiReference : references) {
+    for (PsiReference psiReference : references) {
       if (psiReference instanceof GenericDomValueReference) {
-        final Converter converter = ((GenericDomValueReference)psiReference).getConverter();
+        Converter converter = ((GenericDomValueReference)psiReference).getConverter();
         if (converter instanceof SpringBeanResolveConverter) {
           return (GenericDomValueReference)psiReference;
         }
@@ -88,7 +88,7 @@ public class SpringCompletionContributor extends CompletionContributor {
   @Override
   public String advertise(@Nonnull CompletionParameters parameters) {
     if (parameters.getCompletionType() == CompletionType.BASIC && getReference(parameters) != null) {
-      final String shortcut = getActionShortcut(IdeActions.ACTION_SMART_TYPE_COMPLETION);
+      String shortcut = getActionShortcut(IdeActions.ACTION_SMART_TYPE_COMPLETION);
       if (shortcut != null) {
         return CompletionBundle.message("completion.smart.hint", shortcut);
       }

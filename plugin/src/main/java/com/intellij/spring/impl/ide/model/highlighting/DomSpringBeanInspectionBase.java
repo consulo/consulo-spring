@@ -36,12 +36,12 @@ public abstract class DomSpringBeanInspectionBase<State> extends DomElementsInsp
     }
 
     @Override
-    public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, State state) {
-        final XmlFile xmlFile = domFileElement.getFile();
+    public void checkFileElement(DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, State state) {
+        XmlFile xmlFile = domFileElement.getFile();
         final Beans beans = domFileElement.getRootElement();
         final SpringModel model = SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
-        final Consumer<DomElement> consumer = new Consumer<DomElement>() {
-            public void accept(final DomElement element) {
+        Consumer<DomElement> consumer = new Consumer<DomElement>() {
+            public void accept(DomElement element) {
                 if (element instanceof DomSpringBean) {
                     checkBean((DomSpringBean) element, beans, holder, model);
                 }
@@ -55,9 +55,9 @@ public abstract class DomSpringBeanInspectionBase<State> extends DomElementsInsp
 
     protected void checkBean(
         DomSpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel
     ) {
     }
 }

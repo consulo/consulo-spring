@@ -33,24 +33,24 @@ public class SpringAopCompletionContributor extends CompletionContributor {
 
   public SpringAopCompletionContributor() {
     extend(CompletionType.BASIC, AopCompletionData.POINTCUT_PATTERN, new CompletionProvider() {
-      public void addCompletions(@Nonnull final CompletionParameters parameters,
-                                 final ProcessingContext context,
-                                 @Nonnull final CompletionResultSet result) {
-        final AopPointcutExpressionFile file = (AopPointcutExpressionFile)parameters.getPosition().getContainingFile();
-        final AopAdvisedElementsSearcher searcher = file.getAopModel().getAdvisedElementsSearcher();
-        final boolean isSpring = searcher instanceof SpringAdvisedElementsSearcher;
+      public void addCompletions(@Nonnull CompletionParameters parameters,
+                                 ProcessingContext context,
+                                 @Nonnull CompletionResultSet result) {
+        AopPointcutExpressionFile file = (AopPointcutExpressionFile)parameters.getPosition().getContainingFile();
+        AopAdvisedElementsSearcher searcher = file.getAopModel().getAdvisedElementsSearcher();
+        boolean isSpring = searcher instanceof SpringAdvisedElementsSearcher;
         if (isSpring) {
-          for (final String pointcut : SPRING20_AOP_POINTCUTS) {
+          for (String pointcut : SPRING20_AOP_POINTCUTS) {
             result.addElement(AopCompletionData.createPointcutDesignatorElement(pointcut));
           }
 
-          final Module module = ModuleUtilCore.findModuleForPsiElement(parameters.getPosition());
+          Module module = ModuleUtilCore.findModuleForPsiElement(parameters.getPosition());
           if (module != null && SpringUtils.isSpring25(module)) {
             result.addElement(AopCompletionData.createPointcutDesignatorElement("bean"));
           }
         }
 
-        final Set<String> designators = AopCompletionData.getAllPointcutDesignators();
+        Set<String> designators = AopCompletionData.getAllPointcutDesignators();
         result.runRemainingContributors(parameters, r -> {
           LookupElement lookupElement = r.getLookupElement();
           if (!isSpring || !designators.contains(lookupElement.getLookupString())) {

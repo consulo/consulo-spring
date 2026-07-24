@@ -32,7 +32,7 @@ public class CustomBeanParserUtil {
   private CustomBeanParserUtil() {
   }
 
-  static void parseCustomBean(final String tagText, int timeout) {
+  static void parseCustomBean(String tagText, int timeout) {
     List result;
     try {
       result = getAdditionalBeans(tagText, timeout);
@@ -62,25 +62,25 @@ public class CustomBeanParserUtil {
 
   public static List getAdditionalBeans(String text, int timeout) throws Throwable {
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    final MyBeanDefinitionsRegistry registry = new MyBeanDefinitionsRegistry();
+    MyBeanDefinitionsRegistry registry = new MyBeanDefinitionsRegistry();
 
     final XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(registry);
 
     reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_NONE);
     reader.setNamespaceAware(true);
     reader.setDocumentLoader(new DocumentLoader(){
-      public Document loadDocument(final InputSource inputSource, final EntityResolver entityResolver, final ErrorHandler errorHandler,
-                                   final int validationMode, final boolean namespaceAware) throws Exception {
+      public Document loadDocument(InputSource inputSource, EntityResolver entityResolver, ErrorHandler errorHandler,
+                                   int validationMode, boolean namespaceAware) throws Exception {
         factory.setNamespaceAware(namespaceAware);
         factory.setValidating(false);
-        final DocumentBuilder builder = factory.newDocumentBuilder();
+        DocumentBuilder builder = factory.newDocumentBuilder();
         if (entityResolver != null) {
           builder.setEntityResolver(entityResolver);
         }
         if (errorHandler != null) {
           builder.setErrorHandler(errorHandler);
         }
-        final Document document = builder.parse(inputSource);
+        Document document = builder.parse(inputSource);
         process(document.getDocumentElement(), EMPTY_INT_ARRAY);
         return document;
       }
@@ -96,9 +96,9 @@ public class CustomBeanParserUtil {
             "Check your classpath for outdated XML APIs (Xerces, etc.)");
         }
         int index = 0;
-        final NodeList nodes = element.getChildNodes();
+        NodeList nodes = element.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
-          final Node node = nodes.item(i);
+          Node node = nodes.item(i);
           if (node instanceof Element) {
             process((Element)node, append(path, index));
             index++;
@@ -108,7 +108,7 @@ public class CustomBeanParserUtil {
     });
     reader.setProblemReporter(new LenientProblemReporter());
     reader.setSourceExtractor(new SourceExtractor() {
-      public Object extractSource(final Object sourceCandidate, final Resource definingResource) {
+      public Object extractSource(Object sourceCandidate, Resource definingResource) {
         return sourceCandidate instanceof Element ? ((Element)sourceCandidate).getUserData(COPY_KEY) : null;
       }
     });
@@ -117,7 +117,7 @@ public class CustomBeanParserUtil {
     final SemaphoreCopy reads = new SemaphoreCopy();
     reads.down();
     final Throwable[] exception = new Throwable[1];
-    final Thread thread = new Thread() {
+    Thread thread = new Thread() {
       public void run() {
         try {
           reader.loadBeanDefinitions(resource);
@@ -139,7 +139,7 @@ public class CustomBeanParserUtil {
     Throwable throwable = exception[0];
     if (throwable != null) {
       while (throwable instanceof BeanDefinitionStoreException) {
-        final Throwable cause = ((BeanDefinitionStoreException)throwable).getRootCause();
+        Throwable cause = ((BeanDefinitionStoreException)throwable).getRootCause();
         if (cause == null) break;
         throwable = cause;
       }
@@ -155,17 +155,17 @@ public class CustomBeanParserUtil {
     return array;
   }
 
-  public static int[] realloc (final int [] array, final int newSize) {
+  public static int[] realloc (int [] array, int newSize) {
     if (newSize == 0) {
       return EMPTY_INT_ARRAY;
     }
 
-    final int oldSize = array.length;
+    int oldSize = array.length;
     if (oldSize == newSize) {
       return array;
     }
 
-    final int [] result = new int [newSize];
+    int [] result = new int [newSize];
     System.arraycopy(array, 0, result, 0, Math.min (oldSize, newSize));
     return result;
   }
@@ -184,14 +184,14 @@ public class CustomBeanParserUtil {
       }
     }
 
-    public synchronized boolean waitFor(final long timeout) {
+    public synchronized boolean waitFor(long timeout) {
       try {
         if (mySemaphore == 0) return true;
-        final long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         long waitTime = timeout;
         while (mySemaphore > 0) {
           wait(waitTime);
-          final long elapsed = System.currentTimeMillis() - startTime;
+          long elapsed = System.currentTimeMillis() - startTime;
           if (elapsed < timeout) {
             waitTime = timeout - elapsed;
           }

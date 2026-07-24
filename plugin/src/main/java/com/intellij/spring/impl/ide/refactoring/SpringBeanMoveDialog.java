@@ -55,11 +55,11 @@ public class SpringBeanMoveDialog extends RefactoringDialog {
     init();
 
     final PsiFile psiFile = springBean.getContainingFile();
-    final List<String> list = RecentsManager.getInstance(project).getRecentEntries(SPRING_CONFIG_FILE_RECENTS);
+    List<String> list = RecentsManager.getInstance(project).getRecentEntries(SPRING_CONFIG_FILE_RECENTS);
     if (list != null) {
-      final List<String> recentEntries = new ArrayList<String>(list);
+      List<String> recentEntries = new ArrayList<String>(list);
       if (psiFile != null) {
-        final VirtualFile virtualFile = psiFile.getVirtualFile();
+        VirtualFile virtualFile = psiFile.getVirtualFile();
         if (virtualFile != null) {
           recentEntries.remove(virtualFile.getPath());
         }
@@ -67,15 +67,15 @@ public class SpringBeanMoveDialog extends RefactoringDialog {
       ((EditorComboBox)myFileCombo.getComboBox()).setHistory(ArrayUtil.toStringArray(recentEntries));
     }
     myFileCombo.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        final ConfigFileChooser chooser = new ConfigFileChooser(project, psiFile);
+      public void actionPerformed(ActionEvent e) {
+        ConfigFileChooser chooser = new ConfigFileChooser(project, psiFile);
         chooser.show();
-        final XmlFile selectedFile = chooser.getSelectedFile();
+        XmlFile selectedFile = chooser.getSelectedFile();
         if (selectedFile != null) {
-          final VirtualFile virtualFile = selectedFile.getVirtualFile();
+          VirtualFile virtualFile = selectedFile.getVirtualFile();
           assert virtualFile != null;
-          final String path = virtualFile.getPath();
-          final DefaultComboBoxModel model = (DefaultComboBoxModel)myFileCombo.getComboBox().getModel();
+          String path = virtualFile.getPath();
+          DefaultComboBoxModel model = (DefaultComboBoxModel)myFileCombo.getComboBox().getModel();
           if (model.getIndexOf(path) < 0) {
             model.addElement(path);
           }
@@ -88,11 +88,11 @@ public class SpringBeanMoveDialog extends RefactoringDialog {
 
   @Nullable
   private XmlFile getTargetFile() {
-    final String path = (String)myFileCombo.getComboBox().getSelectedItem();
+    String path = (String)myFileCombo.getComboBox().getSelectedItem();
     if (path != null) {
-      final VirtualFile virtualFile = VirtualFileManager.getInstance().findFileByUrl(VirtualFileUtil.pathToUrl(path.trim()));
+      VirtualFile virtualFile = VirtualFileManager.getInstance().findFileByUrl(VirtualFileUtil.pathToUrl(path.trim()));
       if (virtualFile != null) {
-        final PsiFile psiFile = PsiManager.getInstance(myProject).findFile(virtualFile);
+        PsiFile psiFile = PsiManager.getInstance(myProject).findFile(virtualFile);
         return psiFile instanceof XmlFile ? (XmlFile)psiFile : null;
       }
     }
@@ -108,10 +108,10 @@ public class SpringBeanMoveDialog extends RefactoringDialog {
   }
 
   protected void doAction() {
-    final XmlFile file = getTargetFile();
+    XmlFile file = getTargetFile();
     if (file != null) {
       doMove(file, mySpringBean, myProject);
-      final VirtualFile virtualFile = file.getVirtualFile();
+      VirtualFile virtualFile = file.getVirtualFile();
       assert virtualFile != null;
       RecentsManager.getInstance(myProject).registerRecentEntry(SPRING_CONFIG_FILE_RECENTS, virtualFile.getPath());
     }
@@ -123,24 +123,24 @@ public class SpringBeanMoveDialog extends RefactoringDialog {
     new WriteCommandAction.Simple(project, SpringBundle.message("move.bean"), psiFile, file) {
       protected void run() throws Throwable {
 
-        final DomFileElement<Beans> fileElement = DomManager.getDomManager(project).getFileElement(file, Beans.class);
+        DomFileElement<Beans> fileElement = DomManager.getDomManager(project).getFileElement(file, Beans.class);
         assert fileElement != null;
-        final Beans beans = fileElement.getRootElement();
-        final SpringBean bean = beans.addBean();
+        Beans beans = fileElement.getRootElement();
+        SpringBean bean = beans.addBean();
 
         SpringModelVisitor.visitBean(new SpringModelVisitor() {
-          protected boolean visitRef(final SpringRef ref) {
+          protected boolean visitRef(SpringRef ref) {
             visitRefBase(ref);
             return super.visitRef(ref);
           }
 
-          protected boolean visitIdref(final Idref idref) {
+          protected boolean visitIdref(Idref idref) {
             visitRefBase(idref);
             return super.visitIdref(idref);
           }
 
           private void visitRefBase(RefBase refBase) {
-            final String local = refBase.getLocal().getStringValue();
+            String local = refBase.getLocal().getStringValue();
             if (local != null) {
               refBase.getBean().setStringValue(local);
               refBase.getLocal().undefine();

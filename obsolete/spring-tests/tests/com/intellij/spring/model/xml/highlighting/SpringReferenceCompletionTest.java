@@ -9,7 +9,7 @@ public class SpringReferenceCompletionTest extends SpringHighlightingTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     try {
-      final SpringFileSet fileSet = configureFileSet();
+      SpringFileSet fileSet = configureFileSet();
 
       addFileToSet(fileSet, "spring-beans.xml");
     }
@@ -17,7 +17,7 @@ public class SpringReferenceCompletionTest extends SpringHighlightingTestCase {
       throw new Exception(t);
     }
   }
-   protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+   protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
      super.configureModule(moduleBuilder);
      addSpringJar(moduleBuilder);
    }

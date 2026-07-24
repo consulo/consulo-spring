@@ -42,12 +42,12 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
 
     protected SpringModelVisitor createVisitor(
         final DomElementAnnotationHolder holder,
-        final Beans beans,
-        final SpringModel model,
+        Beans beans,
+        SpringModel model,
         Object state
     ) {
         return new SpringModelVisitor() {
-            protected boolean visitValueHolder(final SpringValueHolder valueHolder) {
+            protected boolean visitValueHolder(SpringValueHolder valueHolder) {
                 checkValueHolder(holder, valueHolder);
                 return true;
             }
@@ -55,17 +55,17 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
     }
 
     protected void checkBean(
-        final SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel, Object state
+        SpringBean springBean,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel, Object state
     ) {
-        for (final SpringValueHolderDefinition property : SpringUtils.getValueHolders(springBean)) {
+        for (SpringValueHolderDefinition property : SpringUtils.getValueHolders(springBean)) {
             checkValueHolder(holder, property);
         }
     }
 
-    private static void checkValueHolder(final DomElementAnnotationHolder holder, final SpringValueHolderDefinition valueHolder) {
+    private static void checkValueHolder(DomElementAnnotationHolder holder, SpringValueHolderDefinition valueHolder) {
         checkValue(valueHolder, holder);
         checkRefBean(valueHolder, holder);
         if (valueHolder instanceof SpringEntry) {
@@ -74,17 +74,17 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static void checkValue(final SpringValueHolderDefinition valueHolder, final DomElementAnnotationHolder holder) {
-        final PsiType type = SpringBeanUtil.getRequiredType(valueHolder);
+    private static void checkValue(SpringValueHolderDefinition valueHolder, DomElementAnnotationHolder holder) {
+        PsiType type = SpringBeanUtil.getRequiredType(valueHolder);
         if (type != null && type.getCanonicalText().equals(Properties.class.getName())) {
             return; // IDEADEV-18731
         }
 
-        final GenericDomValue<?> value = valueHolder.getValueElement();
+        GenericDomValue<?> value = valueHolder.getValueElement();
         if (value != null && !(value instanceof GenericAttributeValue)) {
-            final String s = value.getStringValue();
+            String s = value.getStringValue();
             if (s != null && !isMultiline(s) && (!(value instanceof SpringValue) || !DomUtil.hasXml(((SpringValue) value).getType()))) {
-                final LocalQuickFix fix = new ValueQuickFix(valueHolder);
+                LocalQuickFix fix = new ValueQuickFix(valueHolder);
                 holder.createProblem(
                     value,
                     HighlightSeverity.ERROR,
@@ -99,12 +99,12 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
         return s.trim().indexOf('\n') >= 0;
     }
 
-    private static void checkRefBean(final SpringValueHolderDefinition valueHolder, final DomElementAnnotationHolder holder) {
+    private static void checkRefBean(SpringValueHolderDefinition valueHolder, DomElementAnnotationHolder holder) {
         if (valueHolder instanceof SpringValueHolder) {
-            final SpringRef ref = ((SpringValueHolder) valueHolder).getRef();
-            final GenericAttributeValue<SpringBeanPointer> bean = ref.getBean();
+            SpringRef ref = ((SpringValueHolder) valueHolder).getRef();
+            GenericAttributeValue<SpringBeanPointer> bean = ref.getBean();
             if (DomUtil.hasXml(bean)) {
-                final LocalQuickFix fix = new RefQuickFix((SpringValueHolder) valueHolder);
+                LocalQuickFix fix = new RefQuickFix((SpringValueHolder) valueHolder);
                 holder.createProblem(ref, HighlightSeverity.ERROR, SpringLocalize.modelInspectionInjectionValueStyleRefMessage().get(), fix)
                     .highlightWholeElement();
             }
@@ -131,7 +131,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
     private static class ValueQuickFix implements LocalQuickFix {
         private final SpringValueHolderDefinition myValueHolder;
 
-        public ValueQuickFix(final SpringValueHolderDefinition valueHolder) {
+        public ValueQuickFix(SpringValueHolderDefinition valueHolder) {
             myValueHolder = valueHolder.createStableCopy();
         }
 
@@ -141,33 +141,33 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
             return SpringLocalize.modelInspectionInjectionValueStyleValueFix(myValueHolder instanceof SpringKey ? KEY : VALUE);
         }
 
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
-            final XmlElement xmlElement = myValueHolder.getXmlElement();
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
+            XmlElement xmlElement = myValueHolder.getXmlElement();
             if (xmlElement == null || !CodeInsightUtilCore.getInstance().preparePsiElementForWrite(xmlElement)) {
                 return;
             }
-            final GenericDomValue<?> valueElement = myValueHolder.getValueElement();
+            GenericDomValue<?> valueElement = myValueHolder.getValueElement();
             assert valueElement != null;
-            final String val = valueElement.getStringValue();
+            String val = valueElement.getStringValue();
             if (myValueHolder instanceof SpringKey) {
-                final SpringEntry entry = (SpringEntry) myValueHolder.getParent();
+                SpringEntry entry = (SpringEntry) myValueHolder.getParent();
                 assert entry != null;
                 entry.getKeyAttr().setStringValue(val);
                 myValueHolder.undefine();
-                final XmlTag tag = entry.getXmlTag();
+                XmlTag tag = entry.getXmlTag();
                 assert tag != null;
                 tag.collapseIfEmpty();
             }
             else {
                 if (myValueHolder instanceof SpringValueHolder) {
-                    final SpringValueHolder holder = (SpringValueHolder) myValueHolder;
+                    SpringValueHolder holder = (SpringValueHolder) myValueHolder;
                     holder.getValueAttr().undefine();
                     holder.getValue().undefine();
                 }
-                final GenericDomValue<?> element = myValueHolder.getValueElement();
+                GenericDomValue<?> element = myValueHolder.getValueElement();
                 assert element != null;
                 element.setStringValue(val);
-                final XmlTag tag = myValueHolder.getXmlTag();
+                XmlTag tag = myValueHolder.getXmlTag();
                 assert tag != null;
                 tag.collapseIfEmpty();
             }
@@ -177,14 +177,14 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
     private static class RefQuickFix implements LocalQuickFix {
         private final SpringValueHolder myValueHolder;
 
-        public RefQuickFix(final SpringValueHolder valueHolder) {
+        public RefQuickFix(SpringValueHolder valueHolder) {
             myValueHolder = valueHolder.createStableCopy();
         }
 
         @Nonnull
         @Override
         public LocalizeValue getName() {
-            final String attr;
+            String attr;
             if (myValueHolder instanceof SpringKey) {
                 attr = KEY_REF;
             }
@@ -197,25 +197,25 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
             return SpringLocalize.modelInspectionInjectionValueStyleRefFix(attr);
         }
 
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
-            final XmlElement element = myValueHolder.getXmlElement();
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
+            XmlElement element = myValueHolder.getXmlElement();
             if (element == null || !CodeInsightUtilCore.getInstance().preparePsiElementForWrite(element)) {
                 return;
             }
-            final String val = myValueHolder.getRef().getBean().getStringValue();
+            String val = myValueHolder.getRef().getBean().getStringValue();
             if (myValueHolder instanceof SpringKey) {
-                final SpringEntry entry = (SpringEntry) myValueHolder.getParent();
+                SpringEntry entry = (SpringEntry) myValueHolder.getParent();
                 assert entry != null;
                 entry.getKeyRef().setStringValue(val);
                 myValueHolder.undefine();
-                final XmlTag tag = entry.getXmlTag();
+                XmlTag tag = entry.getXmlTag();
                 assert tag != null;
                 tag.collapseIfEmpty();
             }
             else {
                 myValueHolder.getRefAttr().setStringValue(val);
                 myValueHolder.getRef().undefine();
-                final XmlTag tag = myValueHolder.getXmlTag();
+                XmlTag tag = myValueHolder.getXmlTag();
                 assert tag != null;
                 tag.collapseIfEmpty();
             }

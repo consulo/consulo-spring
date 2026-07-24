@@ -56,9 +56,9 @@ public enum SpringSchemaVersion {
 
   @Nullable
   public static SpringSchemaVersion getVersion(XmlFile file) {
-    final XmlDocument document = file.getDocument();
+    XmlDocument document = file.getDocument();
     if (document != null) {
-      final String uri = XmlUtil.getDtdUri(document);
+      String uri = XmlUtil.getDtdUri(document);
       if (uri != null) {
         for (SpringSchemaVersion version: ALL_VERSIONS) {
           if (version.myNamespace.equals(uri)) {

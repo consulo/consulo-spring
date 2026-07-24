@@ -19,9 +19,9 @@ import jakarta.annotation.Nullable;
 public class SpringXmlStructureViewBuilderProvider implements XmlStructureViewBuilderProvider {
   @Nullable
   public StructureViewBuilder createStructureViewBuilder(@Nonnull final XmlFile file) {
-    final SpringManager springManager = SpringManager.getInstance(file.getProject());
+    SpringManager springManager = SpringManager.getInstance(file.getProject());
     if (springManager.isSpringBeans(file)) {
-      final SpringModel localSpringModel = springManager.getLocalSpringModel(file);
+      SpringModel localSpringModel = springManager.getLocalSpringModel(file);
       if (localSpringModel != null) {
         return new TreeBasedStructureViewBuilder() {
           @Nonnull
@@ -29,7 +29,7 @@ public class SpringXmlStructureViewBuilderProvider implements XmlStructureViewBu
             return new SpringStructureViewModel(file) {
               @Nonnull
               public Sorter[] getSorters() {
-                final SpringManager springManager = SpringManager.getInstance(file.getProject());
+                SpringManager springManager = SpringManager.getInstance(file.getProject());
                 return springManager.isSpringBeans(file) ? new Sorter[]{Sorter.ALPHA_SORTER} : Sorter.EMPTY_ARRAY;
               }
             };
@@ -46,7 +46,7 @@ public class SpringXmlStructureViewBuilderProvider implements XmlStructureViewBu
           }
 
           @Nonnull
-          public StructureView createStructureView(final FileEditor fileEditor, final Project project) {
+          public StructureView createStructureView(FileEditor fileEditor, Project project) {
             return new SpringStructureViewComponent(fileEditor, createStructureViewModel(), project);
 
           }

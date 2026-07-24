@@ -26,7 +26,7 @@ public class SpringTxDomExtender extends DomExtender<Beans> {
     return Beans.class;
   }
 
-  public void registerExtensions(@Nonnull final Beans element, @Nonnull final DomExtensionsRegistrar registrar) {
+  public void registerExtensions(@Nonnull Beans element, @Nonnull DomExtensionsRegistrar registrar) {
     registrar.registerCollectionChildrenExtension(new XmlName("advice", SpringConstants.TX_NAMESPACE_KEY), Advice.class);
     registrar.registerCollectionChildrenExtension(new XmlName("annotation-driven", SpringConstants.TX_NAMESPACE_KEY), AnnotationDriven.class);
   }

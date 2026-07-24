@@ -65,7 +65,7 @@ public class AopPointcutExpressionParserDefinition implements ParserDefinition, 
 
   @Nonnull
   public PsiElement createElement(ASTNode node) {
-    final IElementType elementType = node.getElementType();
+    IElementType elementType = node.getElementType();
     if (elementType == AOP_ANNOTATION_EXPRESSION) return new AopAnnotationExpression(node);
     if (elementType == AOP_ANNOTATION_HOLDER) return new AopAnnotationHolder(node);
     if (elementType == AOP_ANNOTATION_VALUES) return new AopElementBase(node) {

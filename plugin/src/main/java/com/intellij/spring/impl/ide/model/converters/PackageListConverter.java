@@ -24,17 +24,17 @@ import java.util.regex.Pattern;
  */
 public class PackageListConverter extends Converter<Collection<PsiJavaPackage>> implements CustomReferenceConverter {
 
-  public Collection<PsiJavaPackage> fromString(@Nullable @NonNls final String s, final ConvertContext context) {
+  public Collection<PsiJavaPackage> fromString(@Nullable @NonNls String s, ConvertContext context) {
     if (s == null) {
       return Collections.emptyList();
     }
-    final XmlAttributeValue xmlAttributeValue = ((GenericAttributeValue)context.getInvocationElement()).getXmlAttributeValue();
+    XmlAttributeValue xmlAttributeValue = ((GenericAttributeValue)context.getInvocationElement()).getXmlAttributeValue();
 
     if (xmlAttributeValue == null) {
       return Collections.emptyList();
     }
-    final PsiReference[] psiReferences = xmlAttributeValue.getReferences();
-    final Collection<PsiJavaPackage> list = new HashSet<PsiJavaPackage>();
+    PsiReference[] psiReferences = xmlAttributeValue.getReferences();
+    Collection<PsiJavaPackage> list = new HashSet<PsiJavaPackage>();
     for (PsiReference psiReference : psiReferences) {
       if (psiReference instanceof PsiPackageReference) {
         list.addAll(((PsiPackageReference)psiReference).getReferenceSet().resolvePackage());
@@ -43,26 +43,26 @@ public class PackageListConverter extends Converter<Collection<PsiJavaPackage>> 
     return list;
   }
 
-  public String toString(@Nullable final Collection<PsiJavaPackage> psiPackages, final ConvertContext context) {
+  public String toString(@Nullable Collection<PsiJavaPackage> psiPackages, ConvertContext context) {
     return null;
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, final PsiElement element, ConvertContext context) {
     final String text = genericDomValue.getStringValue();
     if (text == null) {
       return PsiReference.EMPTY_ARRAY;
     }
     final ArrayList<PsiReference> list = new ArrayList<PsiReference>();
     new DelimitedListProcessor(",") {
-      protected void processToken(final int start, final int end, final boolean delimitersOnly) {
-        final PackageReferenceSet referenceSet = new PackageReferenceSet(text.substring(start, end), element, 1 + start) {
+      protected void processToken(final int start, final int end, boolean delimitersOnly) {
+        PackageReferenceSet referenceSet = new PackageReferenceSet(text.substring(start, end), element, 1 + start) {
           @Override
-          public Collection<PsiJavaPackage> resolvePackageName(final PsiJavaPackage context, final String packageName) {
+          public Collection<PsiJavaPackage> resolvePackageName(PsiJavaPackage context, String packageName) {
             if (packageName.contains("*")) {
-              final Pattern pattern = PatternUtil.fromMask(packageName);
-              final PsiJavaPackage[] psiPackages = context.getSubPackages();
-              final ArrayList<PsiJavaPackage> packages = new ArrayList<PsiJavaPackage>(psiPackages.length);
+              Pattern pattern = PatternUtil.fromMask(packageName);
+              PsiJavaPackage[] psiPackages = context.getSubPackages();
+              ArrayList<PsiJavaPackage> packages = new ArrayList<PsiJavaPackage>(psiPackages.length);
               for (PsiJavaPackage aPackage : psiPackages) {
                 if (pattern.matcher(aPackage.getName()).matches()) {
                   packages.add(aPackage);

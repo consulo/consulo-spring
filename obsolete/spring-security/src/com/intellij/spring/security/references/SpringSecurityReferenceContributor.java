@@ -16,7 +16,7 @@ import com.intellij.xml.util.XmlUtil;
 
 public class SpringSecurityReferenceContributor extends PsiReferenceContributor {
 
-  public void registerReferenceProviders(final PsiReferenceRegistrar registrar) {
+  public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
     //@Secured("ROLE_USER") and new GrantedAuthorityImpl("ROLE_USER")
     registrar.registerReferenceProvider(
       literalExpression().withSuperParent(2, psiNewExpression(SpringSecurityClassesConstants.GRANTED_AUTHORITY)),

@@ -17,7 +17,7 @@ public abstract class WebflowBasicEdge<T extends DomElement> implements WebflowE
     return mySource;
   }
 
-  public WebflowBasicEdge(final WebflowNode source, final WebflowNode target, final T identifying) {
+  public WebflowBasicEdge(WebflowNode source, WebflowNode target, T identifying) {
     mySource = source;
     myTarget = target;
     myIdentifying = identifying;
@@ -32,11 +32,11 @@ public abstract class WebflowBasicEdge<T extends DomElement> implements WebflowE
     return myIdentifying;
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final WebflowBasicEdge that = (WebflowBasicEdge)o;
+    WebflowBasicEdge that = (WebflowBasicEdge)o;
 
     if (mySource != null ? !mySource.equals(that.mySource) : that.mySource != null) return false;
     if (myTarget != null ? !myTarget.equals(that.myTarget) : that.myTarget != null) return false;

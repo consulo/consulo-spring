@@ -17,12 +17,12 @@ public class BeanReferenceFactoryBeanTypeResolver extends AbstractTypeResolver {
   @NonNls private static final String TARGET_NAME_PROPERTY_NAME = "targetBeanName";
 
   @Nonnull
-  public Set<String> getObjectType(@Nonnull final CommonSpringBean context) {
+  public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     if (context instanceof SpringBean) {
-      final SpringBean bean = (SpringBean)context;
-      final String targetBeanName = getPropertyValue(context, TARGET_NAME_PROPERTY_NAME);
+      SpringBean bean = (SpringBean)context;
+      String targetBeanName = getPropertyValue(context, TARGET_NAME_PROPERTY_NAME);
       if (targetBeanName != null) {
-        final PsiClassType fromTargetName = getTypeFromBeanName(bean, targetBeanName);
+        PsiClassType fromTargetName = getTypeFromBeanName(bean, targetBeanName);
         if (fromTargetName != null) {
           return Collections.singleton(fromTargetName.getCanonicalText());
         }
@@ -31,7 +31,7 @@ public class BeanReferenceFactoryBeanTypeResolver extends AbstractTypeResolver {
     return Collections.emptySet();
   }
 
-  public boolean accept(@Nonnull final String factoryClassName) {
+  public boolean accept(@Nonnull String factoryClassName) {
     return FACTORY_CLASS.equals(factoryClassName);
   }
 }

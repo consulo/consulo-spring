@@ -26,12 +26,12 @@ import jakarta.annotation.Nonnull;
 @ExtensionImpl
 public class LookupMethodInspection extends SpringBeanInspectionBase {
     private static void checkLookupMethodReturnType(
-        final LookupMethod lookupMethod,
-        final PsiMethod method,
-        final DomElementAnnotationHolder holder
+        LookupMethod lookupMethod,
+        PsiMethod method,
+        DomElementAnnotationHolder holder
     ) {
 
-        final PsiType returnType = method.getReturnType();
+        PsiType returnType = method.getReturnType();
         if (returnType == null) {
             holder.createProblem(
                 lookupMethod.getName(),
@@ -45,9 +45,9 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
             );
         }
         else {
-            final SpringBeanPointer beanPointer = lookupMethod.getBean().getValue();
+            SpringBeanPointer beanPointer = lookupMethod.getBean().getValue();
             if (beanPointer != null) {
-                final PsiClass beanClass = beanPointer.getBeanClass();
+                PsiClass beanClass = beanPointer.getBeanClass();
                 if (beanClass == null) {
                     holder.createProblem(
                         lookupMethod.getBean(),
@@ -56,7 +56,7 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
 
                 }
                 else {
-                    final PsiClass returnClass = ((PsiClassType) returnType).resolve();
+                    PsiClass returnClass = ((PsiClassType) returnType).resolve();
                     assert returnClass != null;
                     if (!SpringUtils.isEffectiveClassType(returnType, beanPointer.getSpringBean())
                         && !InheritanceUtil.isInheritorOrSelf(beanClass, returnClass, true)) {
@@ -74,9 +74,9 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
     }
 
     private static void checkLookupMethodIdentifiers(
-        final LookupMethod lookupMethod,
-        final DomElementAnnotationHolder holder,
-        final PsiMethod method
+        LookupMethod lookupMethod,
+        DomElementAnnotationHolder holder,
+        PsiMethod method
     ) {
 
         if (!(method.hasModifierProperty(PsiModifier.PUBLIC) || method.hasModifierProperty(PsiModifier.PROTECTED))) {
@@ -92,12 +92,12 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel, Object state
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel, Object state
     ) {
         for (LookupMethod lookupMethod : springBean.getLookupMethods()) {
-            final PsiMethod method = lookupMethod.getName().getValue();
+            PsiMethod method = lookupMethod.getName().getValue();
             if (method != null) {
                 checkLookupMethodIdentifiers(lookupMethod, holder, method);
                 checkLookupMethodReturnType(lookupMethod, method, holder);

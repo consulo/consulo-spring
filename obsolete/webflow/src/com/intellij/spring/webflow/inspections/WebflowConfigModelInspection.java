@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class WebflowConfigModelInspection extends SpringBeanInspectionBase {
 
-  public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder) {
-    final Beans beans = domFileElement.getRootElement();
+  public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder) {
+    Beans beans = domFileElement.getRootElement();
 
     for (Executor executor : DomUtil.getDefinedChildrenOfType(beans, Executor.class)) {
       WebflowUtil.checkBeanOfSpecificType(executor.getRegistryRef(), Registry.FLOW_DEFINITION_REGISTRY_CLASS, holder);

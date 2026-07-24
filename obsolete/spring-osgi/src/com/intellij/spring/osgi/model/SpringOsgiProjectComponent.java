@@ -11,7 +11,7 @@ public class SpringOsgiProjectComponent implements ProjectComponent {
     return project.getComponent(SpringOsgiProjectComponent.class);
   }
 
-  public SpringOsgiProjectComponent(final Project project) {
+  public SpringOsgiProjectComponent(Project project) {
      
   }
 

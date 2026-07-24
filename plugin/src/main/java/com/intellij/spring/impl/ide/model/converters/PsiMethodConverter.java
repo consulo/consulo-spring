@@ -53,17 +53,17 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     }
   }
 
-  public PsiMethod fromString(@Nullable final String methodName, final ConvertContext context) {
+  public PsiMethod fromString(@Nullable String methodName, ConvertContext context) {
     if (methodName == null || methodName.length() == 0) {
       return null;
     }
-    final PsiClass psiClass = getPsiClass(context);
+    PsiClass psiClass = getPsiClass(context);
     if (psiClass != null) {
-      final PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, true);
+      PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, true);
       if (psiMethods.length == 0) {
         return null;
       }
-      final MethodAccepter accepter = getMethodAccepter(context, false);
+      MethodAccepter accepter = getMethodAccepter(context, false);
       for (PsiMethod method : psiMethods) {
         if (accepter.accept(method)) {
           return method;
@@ -76,24 +76,24 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     }
   }
 
-  public String toString(@Nullable final PsiMethod psiMethods, final ConvertContext context) {
+  public String toString(@Nullable PsiMethod psiMethods, ConvertContext context) {
     return null;
   }
 
   @Nullable
-  protected abstract PsiClass getPsiClass(final ConvertContext context);
+  protected abstract PsiClass getPsiClass(ConvertContext context);
 
-  protected MethodAccepter getMethodAccepter(ConvertContext context, final boolean forCompletion) {
+  protected MethodAccepter getMethodAccepter(ConvertContext context, boolean forCompletion) {
     return myMethodAccepter;
   }
 
   private Object[] getVariants(ConvertContext context) {
-    final PsiClass psiClass = getPsiClass(context);
+    PsiClass psiClass = getPsiClass(context);
     if (psiClass == null) {
       return EMPTY_ARRAY;
     }
-    final ArrayList<Object> result = new ArrayList<Object>();
-    final MethodAccepter methodAccepter = getMethodAccepter(context, true);
+    ArrayList<Object> result = new ArrayList<Object>();
+    MethodAccepter methodAccepter = getMethodAccepter(context, true);
     PsiMethod[] methods;
     if (psiClass.isEnum()) {
       MethodResolveProcessor processor = new MethodResolveProcessor();
@@ -110,7 +110,7 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
                                                  PsiFormatUtil.SHOW_PARAMETERS,
                                                  PsiFormatUtil.SHOW_NAME | PsiFormatUtil.SHOW_TYPE);
 
-        final PsiType returnType = method.getReturnType();
+        PsiType returnType = method.getReturnType();
         LookupElementBuilder value = LookupElementBuilder.create(method.getName())
                                                          .withIcon(IconDescriptorUpdaters.getIcon(method, 0))
                                                          .withTailText(tail)
@@ -122,9 +122,9 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<PsiMethod> genericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<PsiMethod> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
 
     return new PsiReference[]{new MyReference(element, genericDomValue, context)};
   }
@@ -133,8 +133,8 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     private final GenericDomValue<PsiMethod> myGenericDomValue;
     private final ConvertContext myContext;
 
-    public MyReference(final PsiElement element,
-                       final GenericDomValue<PsiMethod> genericDomValue,
+    public MyReference(PsiElement element,
+                       GenericDomValue<PsiMethod> genericDomValue,
                        ConvertContext context) {
       super(element);
       myGenericDomValue = genericDomValue;
@@ -154,9 +154,9 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
       return true;
     }
 
-    public PsiElement bindToElement(@Nonnull final PsiElement element) throws IncorrectOperationException {
+    public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
       assert element instanceof PsiMethod : "PsiMethod expected";
-      final PsiMethod psiMethod = (PsiMethod)element;
+      PsiMethod psiMethod = (PsiMethod)element;
       myGenericDomValue.setStringValue(psiMethod.getName());
       return psiMethod;
     }
@@ -172,7 +172,7 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     }
   }
 
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
     return new LocalQuickFix[0];
   }
 }

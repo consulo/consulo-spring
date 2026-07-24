@@ -36,11 +36,11 @@ public abstract class AbstractTypeResolver implements ObjectTypeResolver {
   @NonNls private static final String CLASS_ARRAY_EDITOR_SEPARATOR = ",";
 
   @Nullable
-  protected static String getPropertyValue(@Nonnull final CommonSpringBean bean, @Nonnull final String propertyName) {
+  protected static String getPropertyValue(@Nonnull CommonSpringBean bean, @Nonnull String propertyName) {
     if (bean instanceof SpringBean) {
-      final SpringPropertyDefinition property = SpringUtils.findPropertyByName((SpringBean)bean, propertyName);
+      SpringPropertyDefinition property = SpringUtils.findPropertyByName((SpringBean)bean, propertyName);
       if (property != null) {
-        final String value = SpringUtils.getStringPropertyValue(property);
+        String value = SpringUtils.getStringPropertyValue(property);
         if (value != null) return value;
       }
     }
@@ -48,8 +48,8 @@ public abstract class AbstractTypeResolver implements ObjectTypeResolver {
   }
 
   @Nonnull
-  protected static Set<String> getListOrSetValues(@Nonnull final SpringBean bean, @Nonnull String propertyName) {
-    final SpringPropertyDefinition property = SpringUtils.findPropertyByName(bean, propertyName);
+  protected static Set<String> getListOrSetValues(@Nonnull SpringBean bean, @Nonnull String propertyName) {
+    SpringPropertyDefinition property = SpringUtils.findPropertyByName(bean, propertyName);
     if (property != null) {
       return SpringUtils.getListOrSetValues(property);
     }
@@ -58,10 +58,10 @@ public abstract class AbstractTypeResolver implements ObjectTypeResolver {
 
   // @see org.springframework.beans.propertyeditors.ClassArrayEditor.setAsText(String text)
   @Nonnull
-  protected static Set<String> getTypesFromClassArrayProperty(@Nonnull final SpringBean context, final String propertyName) {
-    final SpringPropertyDefinition property = SpringUtils.findPropertyByName(context, propertyName);
+  protected static Set<String> getTypesFromClassArrayProperty(@Nonnull SpringBean context, String propertyName) {
+    SpringPropertyDefinition property = SpringUtils.findPropertyByName(context, propertyName);
     if (property != null) {
-      final String stringValue = SpringUtils.getStringPropertyValue(property);
+      String stringValue = SpringUtils.getStringPropertyValue(property);
       if (stringValue != null) {
         return splitAndTrim(stringValue, CLASS_ARRAY_EDITOR_SEPARATOR);
       } else {
@@ -73,36 +73,36 @@ public abstract class AbstractTypeResolver implements ObjectTypeResolver {
 
   @Nonnull
   private static Set<String> splitAndTrim(@Nonnull String value, @Nonnull String separator) {
-    final List<String> parts = StringUtil.split(value, separator);
-    final Set<String> trimmedParts = new HashSet<String>(parts.size());
+    List<String> parts = StringUtil.split(value, separator);
+    Set<String> trimmedParts = new HashSet<String>(parts.size());
     for (String part : parts) {
       trimmedParts.add(part.trim());
     }
     return trimmedParts;
   }
 
-  protected static boolean isBooleanProperySetAndTrue(@Nonnull final SpringBean context, @Nonnull final String propertyName) {
-    final String value = getPropertyValue(context, propertyName);
+  protected static boolean isBooleanProperySetAndTrue(@Nonnull SpringBean context, @Nonnull String propertyName) {
+    String value = getPropertyValue(context, propertyName);
     return value != null && BooleanValueConverter.getInstance(true).isTrue(value);
   }
 
-  protected static boolean isBooleanProperySetAndFalse(@Nonnull final SpringBean context, @Nonnull final String propertyName) {
-    final String value = getPropertyValue(context, propertyName);
+  protected static boolean isBooleanProperySetAndFalse(@Nonnull SpringBean context, @Nonnull String propertyName) {
+    String value = getPropertyValue(context, propertyName);
     return value != null && !BooleanValueConverter.getInstance(true).isTrue(value);
   }
 
   @Nullable
-  protected static PsiClassType getTypeFromProperty(@Nonnull final SpringBean context, @Nonnull final String propertyName) {
-    final SpringPropertyDefinition targetProperty = SpringUtils.findPropertyByName(context, propertyName);
+  protected static PsiClassType getTypeFromProperty(@Nonnull SpringBean context, @Nonnull String propertyName) {
+    SpringPropertyDefinition targetProperty = SpringUtils.findPropertyByName(context, propertyName);
 
     if (targetProperty != null) {
       if (targetProperty instanceof SpringProperty) {
         // support chained FactoryBean resolving only for inner beans
-        final SpringProperty property = (SpringProperty)targetProperty;
-        final SpringBean bean = property.getBean();
+        SpringProperty property = (SpringProperty)targetProperty;
+        SpringBean bean = property.getBean();
         if (DomUtil.hasXml(bean)) {
-          final PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(bean);
-          final PsiManager psiManager = bean.getPsiManager();
+          PsiClass[] classes = SpringUtils.getEffectiveBeanTypes(bean);
+          PsiManager psiManager = bean.getPsiManager();
           if (classes.length > 0 && psiManager != null) {
             return JavaPsiFacade.getInstance(psiManager.getProject()).getElementFactory().createType(classes[0]);
           }
@@ -115,17 +115,17 @@ public abstract class AbstractTypeResolver implements ObjectTypeResolver {
 
   @Nullable
   protected static PsiClassType getTypeFromBeanName(@Nonnull SpringBean context, @Nonnull String beanName) {
-    final SpringModel model = SpringUtils.getSpringModel(context);
+    SpringModel model = SpringUtils.getSpringModel(context);
     return getTypeFromNonFactoryBean(model.findBean(beanName));
   }
 
   @Nullable
-  private static PsiClassType getTypeFromNonFactoryBean(@Nullable final SpringBeanPointer bean) {
+  private static PsiClassType getTypeFromNonFactoryBean(@Nullable SpringBeanPointer bean) {
     // chained FactoryBean resolving is not supported for top-level beans (to avoid circularity handling)
     if (bean != null) {
-      final PsiClass targetBeanClass = bean.getBeanClass();
+      PsiClass targetBeanClass = bean.getBeanClass();
       if (targetBeanClass != null && !SpringFactoryBeansManager.isBeanFactory(targetBeanClass)) {
-        final PsiManager psiManager = bean.getPsiManager();
+        PsiManager psiManager = bean.getPsiManager();
         if (psiManager != null) {
           return JavaPsiFacade.getInstance(psiManager.getProject()).getElementFactory().createType(targetBeanClass);
         }

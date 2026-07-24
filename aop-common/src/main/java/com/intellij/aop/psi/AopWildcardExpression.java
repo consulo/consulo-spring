@@ -16,7 +16,7 @@ import java.util.Collection;
  * @author peter
  */
 public class AopWildcardExpression extends AopElementBase implements AopTypeExpression {
-  public AopWildcardExpression(@Nonnull final ASTNode node) {
+  public AopWildcardExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -31,8 +31,8 @@ public class AopWildcardExpression extends AopElementBase implements AopTypeExpr
 
   @Nonnull
   public Collection<AopPsiTypePattern> getPatterns() {
-    final AopTypeExpression bound = getBound();
-    final boolean isSuper = isSuper();
+    AopTypeExpression bound = getBound();
+    boolean isSuper = isSuper();
     if (bound == null) return Arrays.<AopPsiTypePattern>asList(new WildcardPattern(null, isSuper));
 
     return ContainerUtil.map2List(bound.getPatterns(), aopPsiTypePattern -> new WildcardPattern(aopPsiTypePattern, isSuper));

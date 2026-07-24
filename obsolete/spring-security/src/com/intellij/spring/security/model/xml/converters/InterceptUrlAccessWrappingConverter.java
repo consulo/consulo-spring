@@ -14,7 +14,7 @@ public class InterceptUrlAccessWrappingConverter extends WrappingConverter {
   public static SecurityExpressionRootMethodsConverter EXPRESSION_ROOT_METHODS_CONVERTER = new SecurityExpressionRootMethodsConverter();
 
   @Nullable
-  public Converter getConverter(@NotNull final GenericDomValue element) {
+  public Converter getConverter(@NotNull GenericDomValue element) {
     if (EXPRESSION_ROOT_METHODS_CONVERTER.getExpressionRootMethod(element) != null) {
       return EXPRESSION_ROOT_METHODS_CONVERTER;
     }

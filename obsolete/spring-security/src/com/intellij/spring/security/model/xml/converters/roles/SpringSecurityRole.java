@@ -14,7 +14,7 @@ import javax.swing.*;
 public class SpringSecurityRole extends RenameableFakePsiElement {
   private String myRoleName;
 
-  public SpringSecurityRole(@NotNull final String roleName, final PsiFile containingFile) {
+  public SpringSecurityRole(@NotNull String roleName, PsiFile containingFile) {
     super(containingFile);
     myRoleName = roleName;
   }
@@ -34,7 +34,7 @@ public class SpringSecurityRole extends RenameableFakePsiElement {
 
   @Override
   public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-    final PsiElement res = super.setName(name);
+    PsiElement res = super.setName(name);
     myRoleName = name;
     return res;
   }

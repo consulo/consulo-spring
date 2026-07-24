@@ -64,14 +64,14 @@ public class JdkProxiedBeanTypeInspection extends InjectionValueTypeInspection {
     protected void checkBeanClass(
         @Nonnull CommonSpringBean springBean,
         @Nonnull PsiType psiType,
-        final DomElement annotatedElement,
+        DomElement annotatedElement,
         @Nonnull DomElementAnnotationHolder holder
     ) {
-        final PsiClass psiClass = psiType instanceof PsiClassType ? ((PsiClassType) psiType).resolve() : null;
+        PsiClass psiClass = psiType instanceof PsiClassType ? ((PsiClassType) psiType).resolve() : null;
         if (psiClass == null || psiClass.isInterface()) {
             return;
         }
-        final Set<PsiClass> interfaces = new HashSet<PsiClass>();
+        Set<PsiClass> interfaces = new HashSet<PsiClass>();
 
         interfaces.addAll(getInterfacesToReplaceClassWith(psiClass));
 
@@ -98,17 +98,17 @@ public class JdkProxiedBeanTypeInspection extends InjectionValueTypeInspection {
                     .createCachedValue(new CachedValueProvider<Set<PsiClass>>() {
                         public Result<Set<PsiClass>> compute() {
                             ProgressManager.getInstance().checkCanceled();
-                            for (final AopProvider provider : AopLanguageInjector.getAopProviders(psiClass)) {
-                                final AopAdvisedElementsSearcher elementsSearcher = provider.getAdvisedElementsSearcher(psiClass);
+                            for (AopProvider provider : AopLanguageInjector.getAopProviders(psiClass)) {
+                                AopAdvisedElementsSearcher elementsSearcher = provider.getAdvisedElementsSearcher(psiClass);
                                 if (elementsSearcher instanceof SpringAdvisedElementsSearcher) {
-                                    final SpringAdvisedElementsSearcher searcher = (SpringAdvisedElementsSearcher) elementsSearcher;
+                                    SpringAdvisedElementsSearcher searcher = (SpringAdvisedElementsSearcher) elementsSearcher;
                                     if (searcher.isJdkProxyType() && isAdvised(psiClass)) {
                                         final Set<PsiClass> interfaces = new HashSet<PsiClass>();
                                         JamCommonUtil.processSuperClassList(
                                             psiClass,
                                             new consulo.ide.impl.idea.util.containers.ArrayListSet<PsiClass>(),
                                             new Processor<PsiClass>() {
-                                                public boolean process(final PsiClass psiClass) {
+                                                public boolean process(PsiClass psiClass) {
                                                     interfaces.addAll(Arrays.asList(psiClass.getInterfaces()));
                                                     return true;
                                                 }
@@ -145,7 +145,7 @@ public class JdkProxiedBeanTypeInspection extends InjectionValueTypeInspection {
         return "JdkProxiedBeanTypeInspection";
     }
 
-    private static boolean isAdvised(final PsiClass psiClass) {
+    private static boolean isAdvised(PsiClass psiClass) {
         return !AopJavaAnnotator.getBoundAdvices(psiClass).isEmpty() ||
             !AopJavaAnnotator.getBoundIntroductions(psiClass).isEmpty();
     }
@@ -153,7 +153,7 @@ public class JdkProxiedBeanTypeInspection extends InjectionValueTypeInspection {
     private static class SwitchToCglibProxyingFix implements LocalQuickFix {
         private final DomElement myElement;
 
-        public SwitchToCglibProxyingFix(final DomElement element) {
+        public SwitchToCglibProxyingFix(DomElement element) {
             myElement = element;
         }
 
@@ -163,9 +163,9 @@ public class JdkProxiedBeanTypeInspection extends InjectionValueTypeInspection {
             return SpringLocalize.useCglibProxying();
         }
 
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             Beans beans = (Beans) DomUtil.getFileElement(myElement).getRootElement();
-            final List<AopConfig> configs = DomUtil.getDefinedChildrenOfType(beans, AopConfig.class);
+            List<AopConfig> configs = DomUtil.getDefinedChildrenOfType(beans, AopConfig.class);
             if (!configs.isEmpty()) {
                 configs.get(0).getProxyTargetClass().setValue(Boolean.TRUE);
                 return;

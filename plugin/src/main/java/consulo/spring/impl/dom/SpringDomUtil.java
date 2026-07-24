@@ -28,17 +28,17 @@ import java.util.List;
 public class SpringDomUtil {
   @Nonnull
   @RequiredReadAction
-  public static List<SpringModel> createModels(final SpringFileSet set, final Module module) {
-    final PsiManager psiManager = PsiManager.getInstance(module.getProject());
+  public static List<SpringModel> createModels(SpringFileSet set, Module module) {
+    PsiManager psiManager = PsiManager.getInstance(module.getProject());
     List<SpringModel> list = new ArrayList<>();
         for (VirtualFilePointer filePointer : set.getFiles()) {
-      final VirtualFile file = filePointer.getFile();
+      VirtualFile file = filePointer.getFile();
       if (file == null) {
         continue;
       }
-      final PsiFile psiFile = psiManager.findFile(file);
+      PsiFile psiFile = psiManager.findFile(file);
       if (psiFile instanceof XmlFile) {
-        final DomFileElement<Beans> dom = getDomRoot((XmlFile) psiFile, Beans.class);
+        DomFileElement<Beans> dom = getDomRoot((XmlFile) psiFile, Beans.class);
         if (dom != null) {
           list.add(new DomSpringModelImpl2(dom, Collections.singleton((XmlFile) psiFile), module, set));
           //addIncludes(files, dom);
@@ -50,7 +50,7 @@ public class SpringDomUtil {
 
   @Nullable
   public static <T extends DomElement> T getDom(@Nonnull XmlFile configFile, @Nonnull Class<T> clazz) {
-    final DomFileElement<T> element = getDomRoot(configFile, clazz);
+    DomFileElement<T> element = getDomRoot(configFile, clazz);
     return element == null ? null : element.getRootElement();
   }
 

@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 public class SpringGenerateTemplatesHolder extends ArrayList<Pair<PsiElement, Supplier<Template>>> {
   private final Project myProject;
 
-  public SpringGenerateTemplatesHolder(final Project project) {
+  public SpringGenerateTemplatesHolder(Project project) {
     myProject = project;
   }
 
@@ -34,7 +34,7 @@ public class SpringGenerateTemplatesHolder extends ArrayList<Pair<PsiElement, Su
   }
 
   public void runTemplates() {
-    final TemplateManager manager = TemplateManager.getInstance(myProject);
+    TemplateManager manager = TemplateManager.getInstance(myProject);
 
 
     runTemplates(manager, 0);
@@ -44,14 +44,14 @@ public class SpringGenerateTemplatesHolder extends ArrayList<Pair<PsiElement, Su
   private void runTemplates(final TemplateManager manager, final int index) {
     if(index >= size()) return;
     new WriteCommandAction(myProject) {
-      protected void run(final Result result) throws Throwable {
+      protected void run(Result result) throws Throwable {
         Pair<PsiElement, Supplier<Template>> pair = get(index);
         Editor editor = getEditor(pair.getFirst());
         if (editor != null) {
           PsiDocumentManager.getInstance(myProject).doPostponedOperationsAndUnblockDocument(editor.getDocument());
-          final Supplier<Template> factory = pair.getSecond();
+          Supplier<Template> factory = pair.getSecond();
           if (factory != null) {
-            final Template template = factory.get();
+            Template template = factory.get();
             if (template != null) {
               manager.startTemplate(editor, template, new TemplateEditingAdapter() {
                 public void templateFinished(Template template) {
@@ -72,10 +72,10 @@ public class SpringGenerateTemplatesHolder extends ArrayList<Pair<PsiElement, Su
   }
 
   @Nullable
-  private Editor getEditor(final PsiElement element) {
-    final PsiFile psiFile = element.getContainingFile();
+  private Editor getEditor(PsiElement element) {
+    PsiFile psiFile = element.getContainingFile();
     if (psiFile != null) {
-      final VirtualFile virtualFile = psiFile.getVirtualFile();
+      VirtualFile virtualFile = psiFile.getVirtualFile();
       if (virtualFile != null) {
         TextRange range = element.getTextRange();
         int textOffset = range.getStartOffset();

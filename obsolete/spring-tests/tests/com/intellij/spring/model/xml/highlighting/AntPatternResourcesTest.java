@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NonNls;
 
 public class AntPatternResourcesTest extends SpringHighlightingTestCase {
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     addSpringJar(moduleBuilder);
   }

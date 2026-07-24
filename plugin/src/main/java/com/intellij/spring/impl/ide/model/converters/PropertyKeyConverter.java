@@ -11,13 +11,13 @@ import jakarta.annotation.Nonnull;
 public class PropertyKeyConverter extends WrappingConverter {
 
   @Nullable
-  public Converter getConverter(@Nonnull final GenericDomValue domValue) {
-    final CustomConverterRegistry registry = getRegistry(domValue.getManager().getProject());
+  public Converter getConverter(@Nonnull GenericDomValue domValue) {
+    CustomConverterRegistry registry = getRegistry(domValue.getManager().getProject());
 
     return registry.getCustomConverter(getClass(), domValue);
   }
 
-  private static CustomConverterRegistry getRegistry(final Project project) {
+  private static CustomConverterRegistry getRegistry(Project project) {
     return SpringManager.getInstance(project).getCustomConverterRegistry();
   }
 

@@ -28,54 +28,54 @@ import java.util.*;
 public class SpringOsgiServiceCommonInspection extends SpringOsgiBaseInspection {
 
   @Override
-  protected void checkOsgiService(final Service service,
-                                  final Beans beans,
-                                  final DomElementAnnotationHolder holder,
-                                  final SpringModel springModel) {
+  protected void checkOsgiService(Service service,
+                                  Beans beans,
+                                  DomElementAnnotationHolder holder,
+                                  SpringModel springModel) {
     super.checkOsgiService(service, beans, holder, springModel);
 
     //checkIsInterfaces(service, holder);
     checkRefBeanIsAssignable(service, holder);
   }
 
-  private static void checkIsInterfaces(final Service service, final DomElementAnnotationHolder holder) {
-    final Map<DomElement, PsiClass> serviceInterfaces = getServiceInterfaces(service);
+  private static void checkIsInterfaces(Service service, DomElementAnnotationHolder holder) {
+    Map<DomElement, PsiClass> serviceInterfaces = getServiceInterfaces(service);
     for (DomElement domElement : serviceInterfaces.keySet()) {
-      final PsiClass psiClass = serviceInterfaces.get(domElement);
+      PsiClass psiClass = serviceInterfaces.get(domElement);
       if (psiClass != null && !psiClass.isInterface()) {
         holder.createProblem(domElement, SpringOsgiBundle.message("service.common.inspection.is.interface"));
       }
     }
   }
 
-  private static void checkRefBeanIsAssignable(final Service service, final DomElementAnnotationHolder holder) {
-    final Set<PsiClass> mustBeImplemned = new HashSet<PsiClass>(getServiceInterfaces(service).values());
+  private static void checkRefBeanIsAssignable(Service service, DomElementAnnotationHolder holder) {
+    Set<PsiClass> mustBeImplemned = new HashSet<PsiClass>(getServiceInterfaces(service).values());
 
-    final SpringBeanPointer beanPointer = service.getRef().getValue();
+    SpringBeanPointer beanPointer = service.getRef().getValue();
     if (beanPointer != null) {
       checkIsImplemented(service.getRef(), beanPointer.getSpringBean(), mustBeImplemned, holder);
     }
 
-    final SpringBean innerBean = service.getBean();
+    SpringBean innerBean = service.getBean();
     if (innerBean != null && DomUtil.hasXml(innerBean)) {
       checkIsImplemented(innerBean, innerBean, mustBeImplemned, holder);
     }
   }
 
-  private static Map<DomElement, PsiClass> getServiceInterfaces(final InterfacesOwner interfacesOwner) {
-    final Project project = interfacesOwner.getManager().getProject();
+  private static Map<DomElement, PsiClass> getServiceInterfaces(InterfacesOwner interfacesOwner) {
+    Project project = interfacesOwner.getManager().getProject();
     Map<DomElement, PsiClass> interfaces = new HashMap<DomElement, PsiClass>();
 
-    final GenericAttributeValue<PsiClass> anInterface = interfacesOwner.getInterface();
-    final PsiClass psiClass = anInterface.getValue();
+    GenericAttributeValue<PsiClass> anInterface = interfacesOwner.getInterface();
+    PsiClass psiClass = anInterface.getValue();
     if (psiClass != null) {
       interfaces.put(anInterface, psiClass);
     }
 
     for (SpringValue value : interfacesOwner.getInterfaces().getValues()) {
-      final String stringValue = value.getStringValue();
+      String stringValue = value.getStringValue();
       if (!StringUtil.isEmptyOrSpaces(stringValue)) {
-        final PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(stringValue, GlobalSearchScope.allScope(project));
+        PsiClass aClass = JavaPsiFacade.getInstance(project).findClass(stringValue, GlobalSearchScope.allScope(project));
         if (aClass != null) {
           interfaces.put(value, aClass);
         }
@@ -84,11 +84,11 @@ public class SpringOsgiServiceCommonInspection extends SpringOsgiBaseInspection 
     return interfaces;
   }
 
-  private static void checkIsImplemented(final DomElement domElement,
-                                         final CommonSpringBean bean,
-                                         final Set<PsiClass> mustBeImplmented,
-                                         final DomElementAnnotationHolder holder) {
-    final Collection<PsiClass> psiClasses = getSupportedTypes(bean);
+  private static void checkIsImplemented(DomElement domElement,
+                                         CommonSpringBean bean,
+                                         Set<PsiClass> mustBeImplmented,
+                                         DomElementAnnotationHolder holder) {
+    Collection<PsiClass> psiClasses = getSupportedTypes(bean);
     for (PsiClass aClass : mustBeImplmented) {
       boolean implemented = false;
       for (PsiClass supportedType : psiClasses) {

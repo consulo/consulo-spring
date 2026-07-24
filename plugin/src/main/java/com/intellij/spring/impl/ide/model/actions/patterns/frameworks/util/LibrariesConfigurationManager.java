@@ -38,15 +38,15 @@ public class LibrariesConfigurationManager implements Disposable {
   private static final String DOC_LINKS_RESOURCE_XML = "/resources/frameworks/libraries.xml";
 
   public LibrariesConfigurationManager() {
-    final LibrariesConfigurationInfo libs =
+    LibrariesConfigurationInfo libs =
       XmlSerializer.deserialize(LibrariesConfigurationInfo.class.getResource(DOC_LINKS_RESOURCE_XML), LibrariesConfigurationInfo.class);
 
     assert libs != null;
     assert libs.getLibraryConfigurationInfos() != null;
 
     for (LibraryConfigurationInfo libInfo : libs.getLibraryConfigurationInfos()) {
-      final String frameworkId = libInfo.getFrameworkId();
-      final LibraryInfo info = new LibraryInfo(libInfo.getJarName(), libInfo.getVersion(), libInfo.getDownloadUrl(),
+      String frameworkId = libInfo.getFrameworkId();
+      LibraryInfo info = new LibraryInfo(libInfo.getJarName(), libInfo.getVersion(), libInfo.getDownloadUrl(),
                                                libInfo.getPresentationdUrl(), getRequredClasses(libInfo.getRequiredClasses()));
 
       if (myLibraries.get(frameworkId) == null) myLibraries.put(frameworkId, new ArrayList<LibraryInfo>());
@@ -55,14 +55,14 @@ public class LibrariesConfigurationManager implements Disposable {
     }
   }
 
-  private static String[] getRequredClasses(final String requiredClasses) {
-    final List<String> strings = StringUtil.split(requiredClasses, REQUIRED_CLASSES_DELIMITER);
+  private static String[] getRequredClasses(String requiredClasses) {
+    List<String> strings = StringUtil.split(requiredClasses, REQUIRED_CLASSES_DELIMITER);
     return ArrayUtil.toStringArray(strings);
   }
 
   @Nullable
-  public LibraryInfo[] getLibraryInfos(final String frameworkId) {
-    final List<LibraryInfo> libraryInfos = myLibraries.get(frameworkId);
+  public LibraryInfo[] getLibraryInfos(String frameworkId) {
+    List<LibraryInfo> libraryInfos = myLibraries.get(frameworkId);
 
     return libraryInfos == null ? LibraryInfo.EMPTY_ARRAY : libraryInfos.toArray(new LibraryInfo[libraryInfos.size()]);
   }

@@ -30,7 +30,7 @@ import jakarta.annotation.Nonnull;
 
 public class SpringStereotypeQualifierMetaData extends JamSupportMetaData<SpringJamQualifier> {
 
-  public void setName(final String name) throws IncorrectOperationException {
+  public void setName(String name) throws IncorrectOperationException {
     PsiAnnotation annotation = getElement().getAnnotation();
     AnnotationTextUtil.setAnnotationParameter(annotation, getParameterName(), AnnotationTextUtil.quote(name), true);
   }
@@ -40,7 +40,7 @@ public class SpringStereotypeQualifierMetaData extends JamSupportMetaData<Spring
     return "value";
   }
 
-  public void init(final PsiElement element) {
+  public void init(PsiElement element) {
     PsiModifierListOwner owner = PsiTreeUtil.getParentOfType(element, PsiModifierListOwner.class);
     if (owner != null) {
       SpringJamQualifier component = getModelElement(owner, (PsiAnnotation)element);
@@ -51,7 +51,7 @@ public class SpringStereotypeQualifierMetaData extends JamSupportMetaData<Spring
   }
 
   @Nonnull
-  protected SpringJamQualifier getModelElement(final PsiModifierListOwner owner, final PsiAnnotation annotation) {
+  protected SpringJamQualifier getModelElement(PsiModifierListOwner owner, PsiAnnotation annotation) {
     return new SpringJamQualifier(annotation, owner, null);
   }
 }

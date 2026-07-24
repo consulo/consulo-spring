@@ -24,7 +24,7 @@ public abstract class JamPsiMemberSpringBean<T extends PsiMember> extends Common
   public abstract T getPsiElement();
 
   @Nullable
-  public PsiClass getBeanClass(final boolean considerFactories) {
+  public PsiClass getBeanClass(boolean considerFactories) {
     return getBeanClass();
   }
 

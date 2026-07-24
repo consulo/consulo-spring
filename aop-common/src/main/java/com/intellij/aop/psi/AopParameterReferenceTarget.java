@@ -17,7 +17,7 @@ import jakarta.annotation.Nullable;
 public class AopParameterReferenceTarget implements AopReferenceTarget {
   private final PsiParameter myParameter;
 
-  public AopParameterReferenceTarget(final PsiParameter parameter) {
+  public AopParameterReferenceTarget(PsiParameter parameter) {
     myParameter = parameter;
   }
 
@@ -26,12 +26,12 @@ public class AopParameterReferenceTarget implements AopReferenceTarget {
     return myParameter.getType().getCanonicalText();
   }
 
-  public PointcutMatchDegree canBeInstance(final PsiClass psiClass, final boolean allowPatterns) {
-    final PsiType type = myParameter.getType();
+  public PointcutMatchDegree canBeInstance(PsiClass psiClass, boolean allowPatterns) {
+    PsiType type = myParameter.getType();
     if (type instanceof PsiClassType) {
-      final PsiClass superClass = ((PsiClassType)type).resolve();
+      PsiClass superClass = ((PsiClassType)type).resolve();
       if (superClass != null) {
-        final PointcutMatchDegree degree = PsiTargetExpression.canBeInstanceOf(allowPatterns, superClass, psiClass);
+        PointcutMatchDegree degree = PsiTargetExpression.canBeInstanceOf(allowPatterns, superClass, psiClass);
         if (degree != null) {
           return degree;
         }
@@ -40,7 +40,7 @@ public class AopParameterReferenceTarget implements AopReferenceTarget {
     return PointcutMatchDegree.FALSE;
   }
 
-  public PointcutMatchDegree accepts(final PsiType actualType) {
+  public PointcutMatchDegree accepts(PsiType actualType) {
     return PointcutMatchDegree.valueOf(actualType.equals(myParameter.getType()));
   }
 
@@ -50,7 +50,7 @@ public class AopParameterReferenceTarget implements AopReferenceTarget {
 
   @Nullable
   public PsiClass findClass() {
-    final PsiType type = myParameter.getType();
+    PsiType type = myParameter.getType();
     return type instanceof PsiClassType ? ((PsiClassType)type).resolve() : null;
   }
 

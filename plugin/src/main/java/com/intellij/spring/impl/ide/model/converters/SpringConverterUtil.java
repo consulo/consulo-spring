@@ -49,27 +49,27 @@ public class SpringConverterUtil {
   }
 
   @Nullable
-  public static SpringModel getSpringModel(final ConvertContext context) {
+  public static SpringModel getSpringModel(ConvertContext context) {
     return getSpringModel(context.getInvocationElement());
   }
 
   @Nullable
-  public static SpringModel getSpringModel(final DomElement element) {
-    final XmlFile xmlFile = (XmlFile)DomUtil.getFile(element).getOriginalFile();
+  public static SpringModel getSpringModel(DomElement element) {
+    XmlFile xmlFile = (XmlFile)DomUtil.getFile(element).getOriginalFile();
 
     return SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
   }
 
   @Nullable
-  public static DomSpringBean getCurrentBean(final ConvertContext context) {
+  public static DomSpringBean getCurrentBean(ConvertContext context) {
     return getCurrentBean(context.getInvocationElement());
   }
 
   @Nullable
-  public static CommonSpringBean getCurrentBeanCustomAware(final ConvertContext context) {
+  public static CommonSpringBean getCurrentBeanCustomAware(ConvertContext context) {
     DomSpringBean bean = getCurrentBean(context);
     if (bean instanceof CustomBeanWrapper) {
-      final CustomBeanWrapper wrapper = (CustomBeanWrapper)bean;
+      CustomBeanWrapper wrapper = (CustomBeanWrapper)bean;
       List<CustomBean> list = wrapper.getCustomBeans();
       if (!list.isEmpty()) {
         return list.get(0);
@@ -79,14 +79,14 @@ public class SpringConverterUtil {
   }
 
   @Nullable
-  public static DomSpringBean getCurrentBean(final DomElement element) {
-    final XmlTag tag = element.getXmlTag();
+  public static DomSpringBean getCurrentBean(DomElement element) {
+    XmlTag tag = element.getXmlTag();
     if (tag != null) {
-      final XmlTag originalElement = PsiUtilBase.getOriginalElement(tag, XmlTag.class);
+      XmlTag originalElement = PsiUtilBase.getOriginalElement(tag, XmlTag.class);
       if (originalElement != tag && originalElement != null) {
-        final DomElement domElement = DomManager.getDomManager(originalElement.getProject()).getDomElement(originalElement);
+        DomElement domElement = DomManager.getDomManager(originalElement.getProject()).getDomElement(originalElement);
         if (domElement != null) {
-          final DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
+          DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
           if (springBean != null) {
             return springBean;
           }
@@ -96,7 +96,7 @@ public class SpringConverterUtil {
     return element.getParentOfType(DomSpringBean.class, false);
   }
 
-  public static boolean isConvertable(@Nonnull final PsiType from, @Nonnull PsiType to, Project project) {
+  public static boolean isConvertable(@Nonnull PsiType from, @Nonnull PsiType to, Project project) {
 
     if (to instanceof PsiClassType) {
       to = ((PsiClassType)to).rawType();
@@ -107,11 +107,11 @@ public class SpringConverterUtil {
     }
 
     for (Class registerdClass : myConverters.keySet()) {
-      final PsiType registeredFromType = findType(registerdClass, project);
+      PsiType registeredFromType = findType(registerdClass, project);
       if (registeredFromType != null && from.isAssignableFrom(registeredFromType)) {
         Class[] classes = myConverters.get(registerdClass);
         for (Class aClass : classes) {
-          final PsiType registeredTooType = findType(aClass, project);
+          PsiType registeredTooType = findType(aClass, project);
           if (registeredTooType != null && (registeredTooType.equals(to) || registeredTooType.isAssignableFrom(to))) {
             return true;
           }
@@ -123,12 +123,12 @@ public class SpringConverterUtil {
 
   @Nullable
   public static PsiType findType(Class aClass, Project project) {
-    final PsiManager psiManager = PsiManager.getInstance(project);
+    PsiManager psiManager = PsiManager.getInstance(project);
 
     if (aClass.isArray()) {
-      final Class componentType = aClass.getComponentType();
+      Class componentType = aClass.getComponentType();
 
-      final PsiType componentClassType = findType(componentType, project);
+      PsiType componentClassType = findType(componentType, project);
       return componentClassType != null ? componentClassType.createArrayType() : null;
     }
     else if (aClass.isPrimitive()) {
@@ -136,7 +136,7 @@ public class SpringConverterUtil {
     }
     else {
 
-      final PsiClass psiClass =
+      PsiClass psiClass =
         JavaPsiFacade.getInstance(psiManager.getProject()).findClass(aClass.getName(), GlobalSearchScope.allScope(project));
       if (psiClass == null) return null;
 
@@ -144,14 +144,14 @@ public class SpringConverterUtil {
     }
   }
 
-  private static boolean isStringConvertable(final PsiType requiredType) {
+  private static boolean isStringConvertable(PsiType requiredType) {
     if (requiredType instanceof PsiClassType) {
-      final PsiClass psiClass = ((PsiClassType)requiredType).resolve();
+      PsiClass psiClass = ((PsiClassType)requiredType).resolve();
       if (psiClass != null) {
         for (PsiMethod constructor : psiClass.getConstructors()) {
-          final PsiParameterList parameterList = constructor.getParameterList();
+          PsiParameterList parameterList = constructor.getParameterList();
           if (parameterList.getParametersCount() == 1) {
-            final PsiParameter parameter = parameterList.getParameters()[0];
+            PsiParameter parameter = parameterList.getParameters()[0];
             if (String.class.getCanonicalName().equals(parameter.getType().getCanonicalText())) {
               return true;
             }

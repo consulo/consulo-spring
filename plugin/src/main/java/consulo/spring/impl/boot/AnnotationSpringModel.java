@@ -89,9 +89,9 @@ public class AnnotationSpringModel extends BaseSpringModel implements SpringMode
 
   @Override
   protected void processBeans(Consumer<SpringJamElement> consumer) {
-    final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
+    GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule);
 
-    final JamService service = JamService.getJamService(myModule.getProject());
+    JamService service = JamService.getJamService(myModule.getProject());
 
     for (SpringBootConfigurationElement jamClassElement : service.getJamClassElements(SpringBootConfigurationElement.META,
                                                                                       SpringAnnotationsConstants.SPRING_BOOT_CONFIGURATION_ANNOTATION,
@@ -123,8 +123,8 @@ public class AnnotationSpringModel extends BaseSpringModel implements SpringMode
   public List<? extends ComponentScan> getComponentScans() {
     Module module = getModule();
 
-    final JamService service = JamService.getJamService(module.getProject());
-    final GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
+    JamService service = JamService.getJamService(module.getProject());
+    GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
 
     List<SpringBootApplicationElement> configurations =
       service.getJamClassElements(SpringBootApplicationElement.META, SpringAnnotationsConstants.SPRING_BOOT_APPLICATION_ANNOTATION, scope);

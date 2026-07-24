@@ -10,11 +10,11 @@ import consulo.util.lang.ComparatorUtil;
 public abstract class ReplacedMethodImpl implements ReplacedMethod {
 
   public int hashCode() {
-    final String value = getName().getStringValue();
+    String value = getName().getStringValue();
     return value == null ? 0 : value.hashCode();
   }
 
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     return obj instanceof ReplacedMethod &&
            ComparatorUtil.equalsNullable(getName().getStringValue(), ((ReplacedMethod)obj).getName().getStringValue());
   }

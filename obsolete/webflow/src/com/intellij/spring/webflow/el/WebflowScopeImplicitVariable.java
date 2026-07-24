@@ -16,13 +16,13 @@ import java.util.List;
 public class WebflowScopeImplicitVariable extends JspImplicitVariableImpl implements JspImplicitVariableWithCustomResolve {
   private final Factory<List<JspImplicitVariable>> myFactory;
 
-  public WebflowScopeImplicitVariable(final WebflowScope scope, final PsiElement element, final Factory<List<JspImplicitVariable>> factory) {
+  public WebflowScopeImplicitVariable(WebflowScope scope, PsiElement element, Factory<List<JspImplicitVariable>> factory) {
 
     super(element, scope.getName(), PsiType.VOID, element, NESTED_RANGE);
     myFactory = factory;
   }
 
-  public boolean process(final ELExpression element, final ELElementProcessor processor) {
+  public boolean process(ELExpression element, ELElementProcessor processor) {
     for (PsiVariable variable : myFactory.create()) {
       if (!processor.processVariable(variable)) {
         break;

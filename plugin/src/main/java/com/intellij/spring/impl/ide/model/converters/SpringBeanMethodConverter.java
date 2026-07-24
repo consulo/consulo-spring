@@ -31,38 +31,38 @@ public class SpringBeanMethodConverter extends PsiMethodConverter {
     return new MethodAccepter() {
 
       public boolean accept(PsiMethod method) {
-        final String containing = method.getContainingClass().getQualifiedName();
+        String containing = method.getContainingClass().getQualifiedName();
         return checkParameterList(method) && checkModifiers(method) && checkReturnType(context, method, forCompletion) &&
                !method.isConstructor() && containing != null && !containing.equals(CommonClassNames.JAVA_LANG_OBJECT);
       }
     };
   }
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return method.hasModifierProperty(PsiModifier.PUBLIC) && !method.hasModifierProperty(PsiModifier.ABSTRACT);
   }
 
-  protected boolean checkParameterList(final PsiMethod method) {
+  protected boolean checkParameterList(PsiMethod method) {
     return method.getParameterList().getParametersCount() == 0;
   }
 
-  protected boolean checkReturnType(final ConvertContext context, final PsiMethod method, final boolean forCompletion) {
+  protected boolean checkReturnType(ConvertContext context, PsiMethod method, boolean forCompletion) {
     return true;
   }
 
   @Nullable
-  protected PsiClass getPsiClass(final ConvertContext context) {
-    final SpringBean springBean = context.getInvocationElement().getParentOfType(SpringBean.class, false);
+  protected PsiClass getPsiClass(ConvertContext context) {
+    SpringBean springBean = context.getInvocationElement().getParentOfType(SpringBean.class, false);
     return springBean != null ? springBean.getBeanClass() : null;
   }
 
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
-    final DomSpringBean springBean = SpringConverterUtil.getCurrentBean(context);
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
+    DomSpringBean springBean = SpringConverterUtil.getCurrentBean(context);
     if (springBean != null) {
-      final GenericDomValue element = (GenericDomValue)context.getInvocationElement();
+      GenericDomValue element = (GenericDomValue)context.getInvocationElement();
 
-      final String elementName = element.getStringValue();
-      final PsiClass beanClass = springBean.getBeanClass();
+      String elementName = element.getStringValue();
+      PsiClass beanClass = springBean.getBeanClass();
       if (elementName != null && elementName.length() > 0 && beanClass != null) {
         LocalQuickFix fix = createNewMethodQuickFix(beanClass, elementName, context);
 
@@ -74,19 +74,19 @@ public class SpringBeanMethodConverter extends PsiMethodConverter {
   }
 
   @Nullable
-  private static LocalQuickFix createNewMethodQuickFix(@Nonnull final PsiClass beanClass,
-																						  final String elementName,
-																						  final ConvertContext context) {
+  private static LocalQuickFix createNewMethodQuickFix(@Nonnull PsiClass beanClass,
+																						  String elementName,
+																						  ConvertContext context) {
     return CreateMethodQuickFix.createFix(beanClass, getNewMethodSignature(elementName, context), getNewMethodBody(elementName, context));
   }
 
   @NonNls
-  protected static String getNewMethodSignature(final String elementName, final ConvertContext context) {
+  protected static String getNewMethodSignature(String elementName, ConvertContext context) {
     return "public void " + elementName + "()";
   }
 
   @NonNls
-  protected static String getNewMethodBody(final String elementName, final ConvertContext context) {
+  protected static String getNewMethodBody(String elementName, ConvertContext context) {
     return "";
   }
 

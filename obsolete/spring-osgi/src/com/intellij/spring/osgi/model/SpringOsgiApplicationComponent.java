@@ -36,7 +36,7 @@ public class SpringOsgiApplicationComponent implements ApplicationComponent, Ins
   }
 
   private static void registerDomFileDescriptionComponents() {
-    final SpringDomFileDescription springDomFileDescription = SpringDomFileDescription.getInstance();
+    SpringDomFileDescription springDomFileDescription = SpringDomFileDescription.getInstance();
 
     springDomFileDescription.registerNamespacePolicy(SpringOsgiConstants.OSGI_NAMESPACE_KEY, SpringOsgiConstants.OSGI_NAMESPACE);
     springDomFileDescription.registerNamespacePolicy(SpringOsgiConstants.OSGI_COMPENDIUM_NAMESPACE_KEY, SpringOsgiConstants.OSGI_COMPENDIUM_NAMESPACE);

@@ -15,7 +15,7 @@ public class TypeArgumentMatcher implements PairFunction<PsiType, AopReferenceTa
   protected TypeArgumentMatcher() {
   }
 
-  public PointcutMatchDegree fun(final PsiType actualType, final AopReferenceTarget holder) {
+  public PointcutMatchDegree fun(PsiType actualType, AopReferenceTarget holder) {
     return holder.accepts(actualType);
   }
 

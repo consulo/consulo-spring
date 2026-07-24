@@ -20,19 +20,19 @@ public class AopPsiTypePatternsUtil {
 
   static {
     addAnder(PsiPrimitiveTypePattern.class, PsiPrimitiveTypePattern.class, new PairFunction<PsiPrimitiveTypePattern, PsiPrimitiveTypePattern, AopPsiTypePattern>() {
-      public AopPsiTypePattern fun(final PsiPrimitiveTypePattern psiPrimitiveTypePattern,
-                                   final PsiPrimitiveTypePattern psiPrimitiveTypePattern1) {
+      public AopPsiTypePattern fun(PsiPrimitiveTypePattern psiPrimitiveTypePattern,
+                                   PsiPrimitiveTypePattern psiPrimitiveTypePattern1) {
         return psiPrimitiveTypePattern.accepts(psiPrimitiveTypePattern1.getType())
                ? psiPrimitiveTypePattern : AopPsiTypePattern.FALSE;
       }
     });
 
     addAnder(AopPsiTypePattern.class, AndPsiTypePattern.class, new PairFunction<AopPsiTypePattern, AndPsiTypePattern, AopPsiTypePattern>() {
-      public AopPsiTypePattern fun(final AopPsiTypePattern aopPsiTypePattern, final AndPsiTypePattern aopPsiTypePattern1) {
-        final Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
-        final AopPsiTypePattern[] patterns = aopPsiTypePattern1.getPatterns();
-        for (final AopPsiTypePattern pattern : patterns) {
-          final AopPsiTypePattern pattern1 = conjunctPatterns(pattern, aopPsiTypePattern);
+      public AopPsiTypePattern fun(AopPsiTypePattern aopPsiTypePattern, AndPsiTypePattern aopPsiTypePattern1) {
+        Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
+        AopPsiTypePattern[] patterns = aopPsiTypePattern1.getPatterns();
+        for (AopPsiTypePattern pattern : patterns) {
+          AopPsiTypePattern pattern1 = conjunctPatterns(pattern, aopPsiTypePattern);
           if (pattern1 instanceof AndPsiTypePattern) {
             result.addAll(Arrays.asList(((AndPsiTypePattern)pattern1).getPatterns()));
           } else {
@@ -44,7 +44,7 @@ public class AopPsiTypePatternsUtil {
     });
 
     addAnder(AopPsiTypePattern.class, AopPsiTypePattern.class, new PairFunction<AopPsiTypePattern, AopPsiTypePattern, AopPsiTypePattern>() {
-      public AopPsiTypePattern fun(final AopPsiTypePattern aopPsiTypePattern, final AopPsiTypePattern aopPsiTypePattern1) {
+      public AopPsiTypePattern fun(AopPsiTypePattern aopPsiTypePattern, AopPsiTypePattern aopPsiTypePattern1) {
         return new AndPsiTypePattern(aopPsiTypePattern, aopPsiTypePattern1);
       }
     });
@@ -56,8 +56,8 @@ public class AopPsiTypePatternsUtil {
     if (pattern1 == AopPsiTypePattern.TRUE) return pattern2;
     if (pattern2 == AopPsiTypePattern.TRUE) return pattern1;
 
-    for (final Pair<Pair<Class, Class>, PairFunction> ander : ourAnders) {
-      final Pair<Class, Class> pair = ander.first;
+    for (Pair<Pair<Class, Class>, PairFunction> ander : ourAnders) {
+      Pair<Class, Class> pair = ander.first;
       if (pair.first.isInstance(pattern1) && pair.second.isInstance(pattern2)) return (AopPsiTypePattern)ander.second.fun(pattern1, pattern2);
       if (pair.first.isInstance(pattern2) && pair.second.isInstance(pattern1)) return (AopPsiTypePattern)ander.second.fun(pattern2, pattern1);
     }

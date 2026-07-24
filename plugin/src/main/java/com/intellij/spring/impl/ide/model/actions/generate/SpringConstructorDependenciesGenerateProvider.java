@@ -23,13 +23,13 @@ public class SpringConstructorDependenciesGenerateProvider extends AbstractDomGe
     super(SpringBundle.message("spring.generate.constructor.dependencies"), ConstructorArg.class);
   }
 
-  protected DomElement getParentDomElement(final Project project, final Editor editor, final PsiFile file) {
+  protected DomElement getParentDomElement(Project project, Editor editor, PsiFile file) {
     return SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
   }
 
-  public ConstructorArg generate(@Nullable final DomElement parent, final Editor editor) {
+  public ConstructorArg generate(@Nullable DomElement parent, Editor editor) {
     if ( !(parent instanceof SpringBean)) return null;
-    final List<Pair<SpringInjection,SpringGenerateTemplatesHolder>> list = GenerateSpringBeanDependenciesUtil.generateDependenciesFor((SpringBean)parent, false);
+    List<Pair<SpringInjection,SpringGenerateTemplatesHolder>> list = GenerateSpringBeanDependenciesUtil.generateDependenciesFor((SpringBean)parent, false);
 
     for (Pair<SpringInjection, SpringGenerateTemplatesHolder> pair : list) {
       pair.getSecond().runTemplates();
@@ -37,11 +37,11 @@ public class SpringConstructorDependenciesGenerateProvider extends AbstractDomGe
     return  list.size() > 0 ? (ConstructorArg)list.get(0).getFirst() : null;
   }
 
-  protected void doNavigate(final DomElementNavigationProvider navigateProvider, final DomElement element) {
+  protected void doNavigate(DomElementNavigationProvider navigateProvider, DomElement element) {
    //super.doNavigate(navigateProvider, element);
   }
   
-  public boolean isAvailableForElement(@Nonnull final DomElement contextElement) {
+  public boolean isAvailableForElement(@Nonnull DomElement contextElement) {
     return contextElement instanceof SpringBean && GenerateSpringBeanDependenciesUtil.acceptBean((SpringBean)contextElement, false);
   }
 

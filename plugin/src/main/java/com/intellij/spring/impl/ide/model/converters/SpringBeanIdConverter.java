@@ -39,9 +39,9 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
   private static final FieldRetrievingFactoryBeanConverter CONVERTER = new FieldRetrievingFactoryBeanConverter(true);
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
-															  final PsiElement element,
-															  final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
     if (genericDomValue.getParent() instanceof CustomBeanWrapper) return PsiReference.EMPTY_ARRAY;
     if (CONDITION.value((GenericDomValue)context.getInvocationElement())) {
       return CONVERTER.createReferences(genericDomValue, element, context);
@@ -61,7 +61,7 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
       }
 
       public Object[] getVariants() {
-        final DomSpringBean springBean = genericDomValue.getParentOfType(DomSpringBean.class, false);
+        DomSpringBean springBean = genericDomValue.getParentOfType(DomSpringBean.class, false);
 
         List<String> names = suggestUnusedBeanNames(springBean);
 
@@ -70,13 +70,13 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
         return ArrayUtil.toStringArray(names);
       }
 
-      public PsiElement bindToElement(@Nonnull final PsiElement element) throws IncorrectOperationException {
+      public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
         return element;
       }
     }};
   }
 
-  private static List<String> suggestUnusedBeanNames(final DomSpringBean springBean) {
+  private static List<String> suggestUnusedBeanNames(DomSpringBean springBean) {
     PsiClass beanClass = springBean.getBeanClass();
     PsiType psiType = beanClass == null ? null : JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory().createType(beanClass);
 
@@ -86,7 +86,7 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
     List<String> unusedReferences = new ArrayList<String>();
 
     for (SpringBeanPointer pointer : list) {
-      final CommonSpringBean bean = pointer.getSpringBean();
+      CommonSpringBean bean = pointer.getSpringBean();
       if (bean instanceof DomSpringBean) {
         DomSpringBean domSpringBean = (DomSpringBean)bean;
         for (SpringValueHolderDefinition definition : DomUtil.getDefinedChildrenOfType(domSpringBean, SpringValueHolderDefinition.class)) {

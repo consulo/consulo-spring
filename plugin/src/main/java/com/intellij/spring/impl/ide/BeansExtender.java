@@ -19,7 +19,7 @@ public class BeansExtender extends DomExtender<Beans> {
     return Beans.class;
   }
 
-  public void registerExtensions(@Nonnull final Beans element, @Nonnull final DomExtensionsRegistrar registrar) {
+  public void registerExtensions(@Nonnull Beans element, @Nonnull DomExtensionsRegistrar registrar) {
     SpringDefaultDomExtender.registerDefaultBeanExtensions(registrar);
 
     registrar.registerCollectionChildrenExtension(new XmlName("config", SpringConstants.AOP_NAMESPACE_KEY), AopConfig.class);

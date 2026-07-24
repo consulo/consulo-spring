@@ -112,7 +112,7 @@ public abstract class JspSpiUtil {
 
   public static boolean isJarFile(@Nullable VirtualFile file) {
     if (file != null){
-      final String ext = file.getExtension();
+      String ext = file.getExtension();
       if(ext != null && ext.equalsIgnoreCase(JAR_EXTENSION)) {
         return true;
       }
@@ -131,11 +131,11 @@ public abstract class JspSpiUtil {
     return urls;
   } */
 
-  public static void processClassPathItems(final VirtualFile virtualFile, final Module module, final Consumer<VirtualFile> consumer) {
+  public static void processClassPathItems(VirtualFile virtualFile, Module module, Consumer<VirtualFile> consumer) {
     processClassPathItems(virtualFile, module, consumer, true);
   }
 
-  public static void processClassPathItems(final VirtualFile virtualFile, final Module module, final Consumer<VirtualFile> consumer,
+  public static void processClassPathItems(VirtualFile virtualFile, Module module, Consumer<VirtualFile> consumer,
                                            boolean includeModuleOutput) {
     if (isJarFile(virtualFile)){
       consumer.accept(virtualFile);
@@ -147,7 +147,7 @@ public abstract class JspSpiUtil {
         enumerator = enumerator.withoutModuleSourceEntries();
       }
       for (VirtualFile root : enumerator.getClassesRoots()) {
-        final VirtualFile file;
+        VirtualFile file;
         if (root.getFileSystem() instanceof ArchiveFileSystem) {
           file = ArchiveVfsUtil.getVirtualFileForJar(root);
         }

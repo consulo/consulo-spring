@@ -30,14 +30,14 @@ public class PNamespaceUndefinedElementFixProvider extends XmlUndefinedElementFi
   @Nullable
   @Override
   public IntentionAction[] createFixes(@Nonnull XmlAttribute element) {
-    final PsiClass psiClass = PNamespaceDescriptor.getClass((XmlTag) element.getParent());
+    PsiClass psiClass = PNamespaceDescriptor.getClass((XmlTag) element.getParent());
     if (psiClass != null) {
       PsiType type = null;
-      @NonNls final String localName = ((XmlAttribute) element).getLocalName();
-      final Project project = element.getProject();
+      @NonNls String localName = ((XmlAttribute) element).getLocalName();
+      Project project = element.getProject();
       if (localName.endsWith("-ref")) {
-        final SpringModel model = SpringManager.getInstance(project).getSpringModelByFile((XmlFile) element.getContainingFile());
-        final SpringBeanPointer pointer = SpringUtils.getBeanPointer(model, ((XmlAttribute) element).getDisplayValue());
+        SpringModel model = SpringManager.getInstance(project).getSpringModelByFile((XmlFile) element.getContainingFile());
+        SpringBeanPointer pointer = SpringUtils.getBeanPointer(model, ((XmlAttribute) element).getDisplayValue());
         if (pointer != null && pointer.getEffectiveBeanType().length > 0) {
           type = JavaPsiFacade.getInstance(project).getElementFactory().createType(pointer.getEffectiveBeanType()[0]);
         }

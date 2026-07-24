@@ -28,10 +28,10 @@ import java.util.List;
 @ExtensionImpl
 public class DuplicatedBeanNamesInspection extends SpringBeanInspectionBase<Object> {
     @Override
-    public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, Object state) {
-        final XmlFile xmlFile = domFileElement.getFile();
-        final SpringModel model = SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
-        final Beans beans = domFileElement.getRootElement();
+    public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder, Object state) {
+        XmlFile xmlFile = domFileElement.getFile();
+        SpringModel model = SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
+        Beans beans = domFileElement.getRootElement();
         for (CommonSpringBean bean : SpringUtils.getChildBeans(beans, false)) {
             if (bean instanceof DomSpringBean) {
                 checkBean((DomSpringBean) bean, holder, model);
@@ -42,20 +42,20 @@ public class DuplicatedBeanNamesInspection extends SpringBeanInspectionBase<Obje
         }
     }
 
-    private static void checkBean(final DomSpringBean bean, final DomElementAnnotationHolder holder, final SpringModel springModel) {
-        final String id = bean.getId().getStringValue();
+    private static void checkBean(DomSpringBean bean, DomElementAnnotationHolder holder, SpringModel springModel) {
+        String id = bean.getId().getStringValue();
         if (id != null && springModel.isNameDuplicated(id)) {
             holder.createProblem(bean.getId(), HighlightSeverity.ERROR, SpringLocalize.springBeanDublicateBeanName().get());
         }
 
         if (bean instanceof SpringBean) {
-            final SpringBean springBean = (SpringBean) bean;
-            final GenericAttributeValue<List<String>> name = springBean.getName();
-            final String value = name.getStringValue();
+            SpringBean springBean = (SpringBean) bean;
+            GenericAttributeValue<List<String>> name = springBean.getName();
+            String value = name.getStringValue();
             if (value != null) {
-                final StringTokenizer tokenizer = new StringTokenizer(value, SpringUtils.SPRING_DELIMITERS);
+                StringTokenizer tokenizer = new StringTokenizer(value, SpringUtils.SPRING_DELIMITERS);
                 while (tokenizer.hasMoreTokens()) {
-                    final String s = tokenizer.nextToken();
+                    String s = tokenizer.nextToken();
                     if (springModel.isNameDuplicated(s)) {
                         holder.createProblem(
                             name,
@@ -69,9 +69,9 @@ public class DuplicatedBeanNamesInspection extends SpringBeanInspectionBase<Obje
         }
     }
 
-    private static void checkAlias(final Alias alias, final DomElementAnnotationHolder holder, final SpringModel model) {
-        final GenericAttributeValue<String> value = alias.getAlias();
-        final String aliasName = value.getStringValue();
+    private static void checkAlias(Alias alias, DomElementAnnotationHolder holder, SpringModel model) {
+        GenericAttributeValue<String> value = alias.getAlias();
+        String aliasName = value.getStringValue();
         if (aliasName != null && model.isNameDuplicated(aliasName)) {
             holder.createProblem(value, HighlightSeverity.ERROR, SpringLocalize.springBeanDublicateBeanName().get());
         }

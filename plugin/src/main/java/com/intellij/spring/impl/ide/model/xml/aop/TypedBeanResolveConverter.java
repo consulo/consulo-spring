@@ -19,11 +19,11 @@ import java.util.List;
 public class TypedBeanResolveConverter extends SpringBeanResolveConverter {
 
   @Nullable
-  public List<PsiClassType> getRequiredClasses(final ConvertContext context) {
-    final DomElement element = context.getInvocationElement();
-    final RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
+  public List<PsiClassType> getRequiredClasses(ConvertContext context) {
+    DomElement element = context.getInvocationElement();
+    RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
     assert type != null;
-    final PsiClass aClass = DomJavaUtil.findClass(type.value(), context.getFile(), context.getModule(), null);
+    PsiClass aClass = DomJavaUtil.findClass(type.value(), context.getFile(), context.getModule(), null);
     return aClass == null ? null : Arrays.asList(JavaPsiFacade.getInstance(context.getFile().getProject()).getElementFactory().createType(aClass));
   }
 }

@@ -44,12 +44,12 @@ public abstract class HeavySpringTestCase extends BasicSpringTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    final TestFixtureBuilder<IdeaProjectTestFixture> projectBuilder = JavaTestFixtureFactory.createFixtureBuilder();
+    TestFixtureBuilder<IdeaProjectTestFixture> projectBuilder = JavaTestFixtureFactory.createFixtureBuilder();
 
     myTempDirTestFixture = IdeaTestFixtureFactory.getFixtureFactory().createTempDirTestFixture();
     myTempDirTestFixture.setUp();
 
-    final JavaModuleFixtureBuilder moduleBuilder = projectBuilder.addModule(JavaModuleFixtureBuilder.class);
+    JavaModuleFixtureBuilder moduleBuilder = projectBuilder.addModule(JavaModuleFixtureBuilder.class);
 //    moduleBuilder.addLibraryJars("spring", PathManager.getHomePath().replace(File.separatorChar, '/') + super.getBasePath(), "spring2.jar");
     if (myModifiable) {
       moduleBuilder.addContentRoot(myTempDirTestFixture.getTempDirPath());
@@ -72,7 +72,7 @@ public abstract class HeavySpringTestCase extends BasicSpringTestCase {
 
   protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {}
 
-  protected void addSpringJar(final JavaModuleFixtureBuilder moduleBuilder) {
+  protected void addSpringJar(JavaModuleFixtureBuilder moduleBuilder) {
     moduleBuilder.addLibraryJars("spring", PathManager.getHomePath().replace(File.separatorChar, '/') + super.getBasePath(), "spring2.jar");
   }
 
@@ -91,22 +91,22 @@ public abstract class HeavySpringTestCase extends BasicSpringTestCase {
   protected SpringFileSet configureFileSet() throws Throwable {
     myFacet = createFacet();
 
-    final SpringFacetConfiguration configuration = myFacet.getConfiguration();
-    final Set<SpringFileSet> list = configuration.getFileSets();
-    final SpringFileSet fileSet = new SpringFileSet("", "default", configuration);
+    SpringFacetConfiguration configuration = myFacet.getConfiguration();
+    Set<SpringFileSet> list = configuration.getFileSets();
+    SpringFileSet fileSet = new SpringFileSet("", "default", configuration);
     list.add(fileSet);
     return fileSet;
   }
 
   protected SpringFacet createFacet() {
-    final RunResult<SpringFacet> runResult = new WriteCommandAction<SpringFacet>(myFixture.getProject()) {
-      protected void run(final Result<SpringFacet> result) throws Throwable {
+    RunResult<SpringFacet> runResult = new WriteCommandAction<SpringFacet>(myFixture.getProject()) {
+      protected void run(Result<SpringFacet> result) throws Throwable {
         String name = SpringFacetType.INSTANCE.getPresentableName();
-        final SpringFacet facet = FacetManager.getInstance(myFixture.getModule()).addFacet(SpringFacetType.INSTANCE, name, null);
+        SpringFacet facet = FacetManager.getInstance(myFixture.getModule()).addFacet(SpringFacetType.INSTANCE, name, null);
         result.setResult(facet);
       }
     }.execute();
-    final Throwable throwable = runResult.getThrowable();
+    Throwable throwable = runResult.getThrowable();
     if (throwable != null) {
       throw new RuntimeException(throwable);
     }
@@ -114,14 +114,14 @@ public abstract class HeavySpringTestCase extends BasicSpringTestCase {
     return runResult.getResultObject();
   }
 
-  protected VirtualFile addFile(final SpringFileSet fileSet, final String path) {
+  protected VirtualFile addFile(SpringFileSet fileSet, String path) {
     
-    final String dir = myModifiable ? myTempDirTestFixture.getTempDirPath() : getTestDataPath();
-    final VirtualFile file = getFile(dir + "/" + path);
+    String dir = myModifiable ? myTempDirTestFixture.getTempDirPath() : getTestDataPath();
+    VirtualFile file = getFile(dir + "/" + path);
     assert file != null : "cannot find file: " + path;
     fileSet.addFile(file);
 
-    final SpringFacet springFacet = SpringFacet.getInstance(myModule);
+    SpringFacet springFacet = SpringFacet.getInstance(myModule);
     assert springFacet != null;
     springFacet.getConfiguration().setModified();
 

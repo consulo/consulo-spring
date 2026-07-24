@@ -34,15 +34,15 @@ public class SpringTypeDeclarationProvider extends TypeDeclarationProvider {
       return getBeanTypeDeclaration(((CustomBeanFakePsiElement)symbol).getBean());
     }
     if (symbol instanceof XmlTag) {
-      final XmlTag tag = (XmlTag)symbol;
-      final DomElement element = DomManager.getDomManager(tag.getProject()).getDomElement(tag);
+      XmlTag tag = (XmlTag)symbol;
+      DomElement element = DomManager.getDomManager(tag.getProject()).getDomElement(tag);
       if (element instanceof DomSpringBean) {
         return getBeanTypeDeclaration((DomSpringBean)element);
       }
     }
     if (symbol instanceof PsiAnnotation) {
-      final PsiMember member = PsiTreeUtil.getParentOfType(symbol, PsiMember.class);
-      final CommonSpringBean springBean =
+      PsiMember member = PsiTreeUtil.getParentOfType(symbol, PsiMember.class);
+      CommonSpringBean springBean =
         member == null ? null : JamService.getJamService(symbol.getProject()).getJamElement(JamPsiMemberSpringBean.class, member);
       if (springBean != null) {
         return getBeanTypeDeclaration(springBean);
@@ -52,8 +52,8 @@ public class SpringTypeDeclarationProvider extends TypeDeclarationProvider {
   }
 
   @Nullable
-  private static PsiElement[] getBeanTypeDeclaration(final CommonSpringBean bean) {
-    final PsiClass psiClass = bean.getBeanClass(true);
+  private static PsiElement[] getBeanTypeDeclaration(CommonSpringBean bean) {
+    PsiClass psiClass = bean.getBeanClass(true);
     return psiClass != null ? new PsiElement[]{psiClass} : null;
   }
 }

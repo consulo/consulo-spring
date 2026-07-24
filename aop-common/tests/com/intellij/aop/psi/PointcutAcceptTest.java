@@ -46,7 +46,7 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     myFixture.addClass("package java.lang; public class Exception {}");
     myFixture.addClass("package java.util; public class SomeExc {}");
 
-    final PsiClass psiClass = myFixture.addClass(
+    PsiClass psiClass = myFixture.addClass(
       "package java.lang;" +
       "import annos.*;" +
       "@" + CommonClassNames.JAVA_LANG_DEPRECATED + " " +
@@ -88,8 +88,8 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
       }
 
       @Nullable
-      protected PsiPointcutExpression getPointcutExpression(@Nullable final PsiAnnotationMemberValue value) {
-        final PsiPointcutExpression expression = parsePointcutExpression((String)((PsiLiteralExpression)value).getValue());
+      protected PsiPointcutExpression getPointcutExpression(@Nullable PsiAnnotationMemberValue value) {
+        PsiPointcutExpression expression = parsePointcutExpression((String)((PsiLiteralExpression)value).getValue());
         expression.getContainingFile().setAopModel(new LocalAopModel(null, method, new AllAdvisedElementsSearcher(getPsiManager())));
         return expression;
       }
@@ -98,8 +98,8 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
 
   public void testTypeReference() throws Throwable {
     AopReferenceHolder pattern = parseTypeExpression(CommonClassNames.JAVA_LANG_OBJECT);
-    final PsiClassType object = getJavaFacade().getElementFactory().createTypeByFQClassName(CommonClassNames.JAVA_LANG_OBJECT);
-    final PsiArrayType array = new PsiArrayType(object);
+    PsiClassType object = getJavaFacade().getElementFactory().createTypeByFQClassName(CommonClassNames.JAVA_LANG_OBJECT);
+    PsiArrayType array = new PsiArrayType(object);
     assertEquals(PointcutMatchDegree.TRUE, pattern.accepts(object));
     assertEquals(PointcutMatchDegree.FALSE, pattern.accepts(PsiType.VOID));
     assertEquals(PointcutMatchDegree.FALSE, pattern.accepts(array));
@@ -136,9 +136,9 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testArrays() throws Throwable {
-    final PsiType string = getJavaFacade().getElementFactory().createTypeFromText("String", null);
-    final PsiType stringArray = getJavaFacade().getElementFactory().createTypeFromText("String[]", null);
-    final PsiType stringVarargs = getJavaFacade().getElementFactory().createTypeFromText("String...", null);
+    PsiType string = getJavaFacade().getElementFactory().createTypeFromText("String", null);
+    PsiType stringArray = getJavaFacade().getElementFactory().createTypeFromText("String[]", null);
+    PsiType stringVarargs = getJavaFacade().getElementFactory().createTypeFromText("String...", null);
 
     AopReferenceHolder pattern = parseTypeExpression("String...");
     assertEquals(PointcutMatchDegree.FALSE, pattern.accepts(PsiType.VOID));
@@ -161,18 +161,18 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     return parseClass("class A {" + s + "}").getMethods()[0];
   }
 
-  private PsiClass parseClass(final String text) {
+  private PsiClass parseClass(String text) {
     return ((PsiJavaFile)createLightFile(StdFileTypes.JAVA, text)).getClasses()[0];
   }
 
   public void testSubtypes() throws Throwable {
-    final PsiClass xObjectClass = myFixture.addClass("public class XObject { void foo() {}; }");
-    final PsiClass stringClass = myFixture.addClass("public class XString extends XObject { void foo(); }");
-    final PsiClass nonObjectClass = myFixture.addClass("public class NonObject { void foo(); }");
+    PsiClass xObjectClass = myFixture.addClass("public class XObject { void foo() {}; }");
+    PsiClass stringClass = myFixture.addClass("public class XString extends XObject { void foo(); }");
+    PsiClass nonObjectClass = myFixture.addClass("public class NonObject { void foo(); }");
 
-    final PsiType object = getJavaFacade().getElementFactory().createTypeFromText("XObject", null);
-    final PsiType string = getJavaFacade().getElementFactory().createTypeFromText("XString", null);
-    final PsiType nonObject = getJavaFacade().getElementFactory().createTypeFromText("NonObject", null);
+    PsiType object = getJavaFacade().getElementFactory().createTypeFromText("XObject", null);
+    PsiType string = getJavaFacade().getElementFactory().createTypeFromText("XString", null);
+    PsiType nonObject = getJavaFacade().getElementFactory().createTypeFromText("NonObject", null);
 
     AopReferenceHolder pattern = parseTypeExpression("XObject+");
     assertEquals(PointcutMatchDegree.TRUE, pattern.accepts(object));
@@ -180,21 +180,21 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(PointcutMatchDegree.FALSE, pattern.accepts(nonObject));
     assertEquals(PointcutMatchDegree.FALSE, pattern.accepts(PsiType.VOID));
 
-    final PsiPointcutExpression expression = parsePointcutExpression("execution (void XObject+.foo())");
+    PsiPointcutExpression expression = parsePointcutExpression("execution (void XObject+.foo())");
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(), xObjectClass.getMethods()[0]));
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(), stringClass.getMethods()[0]));
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), nonObjectClass.getMethods()[0]));
   }
 
   private AopReferenceHolder parseTypeExpression(String type) {
-    final AopPointcutExpressionFile file =
+    AopPointcutExpressionFile file =
       (AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, "execution(* *(" + type + "))");
-    final AopReferenceHolder type1 =
+    AopReferenceHolder type1 =
       (AopReferenceHolder)((PsiExecutionExpression)file.getPointcutExpression()).getParameterList().getParameters()[0];
     assertEquals(type, type1.getText());
     LiteFixture.setContext(file, parseClass( "class Foo {}"));
     file.setAopModel(new LocalAopModel(new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented");
       }
     }));
@@ -340,19 +340,19 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     assertSuitableMethods("(args(*, String)) or !(args(..,String))", 0, 1, 2, 3, 4, 5, 6, 11, 12);
   }
 
-  private void assertThrows(@NonNls final String text, final int... acceptedMethods) {
+  private void assertThrows(@NonNls String text, int... acceptedMethods) {
     assertSuitableMethods("execution(* *(..) throws " + text + ")", acceptedMethods);
   }
 
-  private void assertExecution(@NonNls final String text, final int... acceptedMethods) {
+  private void assertExecution(@NonNls String text, int... acceptedMethods) {
     assertSuitableMethods("execution(" + text + ")", acceptedMethods);
   }
 
-  private void assertArgs(@NonNls final String text, final int... acceptedMethods) {
+  private void assertArgs(@NonNls String text, int... acceptedMethods) {
     assertSuitableMethods("args(" + text + ")", acceptedMethods);
   }
 
-  private void assertSuitableMethods(@NonNls String text, final int... acceptedMethods) {
+  private void assertSuitableMethods(@NonNls String text, int... acceptedMethods) {
     assertSuitableMethods(parsePointcutExpression(text), acceptedMethods);
   }
 
@@ -368,7 +368,7 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     myFixture.addClass("public @Anno interface Zoo {}");
     myFixture.addClass("public final class Boo {}");
 
-    final PsiPointcutExpression expression = parsePointcutExpression("@args(Anno)");
+    PsiPointcutExpression expression = parsePointcutExpression("@args(Anno)");
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method() {}")));
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method(int b) {}")));
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method(Bar b, int a) {}")));
@@ -387,7 +387,7 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     myFixture.addClass("public @Anno interface Zoo {}");
     myFixture.addClass("public final class Boo {}");
 
-    final PsiPointcutExpression expression = parsePointcutExpression("@args(Anno)");
+    PsiPointcutExpression expression = parsePointcutExpression("@args(Anno)");
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method() {}")));
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method(int b) {}")));
     assertEquals(PointcutMatchDegree.FALSE, expression.acceptsSubject(new PointcutContext(), parseMethod("void method(Bar b, int a) {}")));
@@ -418,7 +418,7 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     assertAtTargetThisWithin("class Foo implements Goo { void foo() {}; }", PointcutMatchDegree.FALSE, PointcutMatchDegree.FALSE);
   }
 
-  private void assertAtTargetThisWithin(@NonNls final String classText, final PointcutMatchDegree targetWithin, final PointcutMatchDegree _this) {
+  private void assertAtTargetThisWithin(@NonNls String classText, PointcutMatchDegree targetWithin, PointcutMatchDegree _this) {
     assertEquals(targetWithin, parsePointcutExpression("@target(Anno)").acceptsSubject(new PointcutContext(), parseClass(
        classText).getMethods()[0]));
     assertEquals(targetWithin, parsePointcutExpression("@within(Anno)").acceptsSubject(new PointcutContext(), parseClass(
@@ -446,30 +446,30 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     assertTargetThisWithin("util.Bar", parseClass("package java; public class A {public void foo() {}}"), PointcutMatchDegree.FALSE, PointcutMatchDegree.MAYBE, PointcutMatchDegree.FALSE);
     assertTargetThisWithin("util.Bar", parseClass("package java; public final class A {public void foo() {}}"), PointcutMatchDegree.FALSE, PointcutMatchDegree.FALSE, PointcutMatchDegree.FALSE);
 
-    final PsiClass clazz = myFixture.addClass("package java; public class A {public void foo() {}}");
-    final PsiPointcutExpression expression = parsePointcutExpression("target(x)");
+    PsiClass clazz = myFixture.addClass("package java; public class A {public void foo() {}}");
+    PsiPointcutExpression expression = parsePointcutExpression("target(x)");
     expression.getContainingFile().setAopModel(new LocalAopModel(null, parseMethod("public void foo(java.A x) {}"), new AopAdvisedElementsSearcher(getPsiManager()) {
-      public boolean process(final Processor<PsiClass> processor) {
+      public boolean process(Processor<PsiClass> processor) {
         throw new UnsupportedOperationException("Method doProcess is not yet implemented in " + getClass().getName());
       }
     }));
     assertEquals(PointcutMatchDegree.TRUE, expression.acceptsSubject(new PointcutContext(expression), clazz.getMethods()[0]));
   }
 
-  private void assertTargetThisWithin(String pattern, final PsiClass psiClass, final PointcutMatchDegree target, final PointcutMatchDegree _this, final PointcutMatchDegree within) {
+  private void assertTargetThisWithin(String pattern, PsiClass psiClass, PointcutMatchDegree target, PointcutMatchDegree _this, PointcutMatchDegree within) {
     assertEquals(target, parsePointcutExpression("target(" + pattern + ")").acceptsSubject(new PointcutContext(), psiClass.getMethods()[0]));
     assertEquals(_this, parsePointcutExpression("this(" + pattern + ")").acceptsSubject(new PointcutContext(), psiClass.getMethods()[0]));
     assertEquals(within, parsePointcutExpression("within(" + pattern + ")").acceptsSubject(new PointcutContext(), psiClass.getMethods()[0]));
   }
 
-  private void assertSuitableMethods(final PsiPointcutExpression expression, final int... acceptedMethods) {
+  private void assertSuitableMethods(PsiPointcutExpression expression, int... acceptedMethods) {
     assertSuitableMethods(expression, getJavaFacade().findClass("java.lang.YObject"), acceptedMethods);
   }
 
-  private static void assertSuitableMethods(final PsiPointcutExpression expression, final PsiClass aClass, final int... acceptedMethods) {
-    final PsiMethod[] methods = aClass.getMethods();
+  private static void assertSuitableMethods(PsiPointcutExpression expression, PsiClass aClass, int... acceptedMethods) {
+    PsiMethod[] methods = aClass.getMethods();
     List<PsiMethod> actual = new ArrayList<PsiMethod>();
-    for (final PsiMethod psiMethod : methods) {
+    for (PsiMethod psiMethod : methods) {
       if (expression.acceptsSubject(new PointcutContext(expression), psiMethod) == PointcutMatchDegree.TRUE) {
         actual.add(psiMethod);
       }
@@ -481,10 +481,10 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
     assertOrderedEquals(actual, expected);
   }
 
-  private PsiPointcutExpression parsePointcutExpression(@NonNls final String text) {
-    final AopPointcutExpressionFile file = (AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, text);
-    final PsiPointcutExpression expression = file.getPointcutExpression();
-    final PsiClass objectClass = getJavaFacade().findClass("java.lang.YObject");
+  private PsiPointcutExpression parsePointcutExpression(@NonNls String text) {
+    AopPointcutExpressionFile file = (AopPointcutExpressionFile)createLightFile(AopPointcutExpressionFileType.INSTANCE, text);
+    PsiPointcutExpression expression = file.getPointcutExpression();
+    PsiClass objectClass = getJavaFacade().findClass("java.lang.YObject");
     LiteFixture.setContext(file, objectClass);
     file.setAopModel(myAopModel);
     return expression;

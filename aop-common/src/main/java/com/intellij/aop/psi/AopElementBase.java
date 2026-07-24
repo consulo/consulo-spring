@@ -12,7 +12,7 @@ import consulo.language.ast.ASTNode;
  * @author peter
  */
 public class AopElementBase extends ASTWrapperPsiElement {
-  public AopElementBase(@Nonnull final ASTNode node) {
+  public AopElementBase(@Nonnull ASTNode node) {
     super(node);
   }
 

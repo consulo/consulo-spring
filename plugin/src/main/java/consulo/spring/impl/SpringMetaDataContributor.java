@@ -29,8 +29,8 @@ public class SpringMetaDataContributor implements MetaDataContributor {
     metaDataRegistrar.registerMetaData(new ElementFilter() {
       public boolean isAcceptable(Object element, PsiElement context) {
         if (element instanceof XmlTag) {
-          final XmlTag tag = (XmlTag)element;
-          final DomElement domElement = DomManager.getDomManager(tag.getProject()).getDomElement(tag);
+          XmlTag tag = (XmlTag)element;
+          DomElement domElement = DomManager.getDomManager(tag.getProject()).getDomElement(tag);
           if (!(domElement instanceof DomSpringBean)) {
             return false;
           }

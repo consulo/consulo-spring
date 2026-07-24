@@ -38,19 +38,19 @@ public class SpringBeanNameConventionInspection extends SpringBeanInspectionBase
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel,
         Object state
     ) {
-        final String beanId = springBean.getId().getStringValue();
+        String beanId = springBean.getId().getStringValue();
 
         if (acceptBean(springBean, beanId)) {
             checkName(springBean.getId(), beanId, holder);
         }
     }
 
-    private static boolean acceptBean(final SpringBean springBean, final String beanId) {
+    private static boolean acceptBean(SpringBean springBean, String beanId) {
         return !StringUtil.isEmpty(beanId) && (!FieldRetrievingFactoryBeanConverter.isFieldRetrivingFactoryBean(springBean) ||
             !FieldRetrievingFactoryBeanConverter.isResolved(springBean.getManager().getProject(), beanId));
 
@@ -61,15 +61,15 @@ public class SpringBeanNameConventionInspection extends SpringBeanInspectionBase
         return HighlightDisplayLevel.WARNING;
     }
 
-    private static void checkAlias(final Alias alias, final DomElementAnnotationHolder holder) {
-        final String aliasName = alias.getAlias().getStringValue();
+    private static void checkAlias(Alias alias, DomElementAnnotationHolder holder) {
+        String aliasName = alias.getAlias().getStringValue();
 
         checkName(alias.getAlias(), aliasName, holder);
     }
 
-    private static void checkName(final DomElement domElement, @Nonnull final String name, final DomElementAnnotationHolder holder) {
+    private static void checkName(DomElement domElement, @Nonnull String name, DomElementAnnotationHolder holder) {
         PsiNameHelper psiNameHelper = JavaPsiFacade.getInstance(domElement.getManager().getProject()).getNameHelper();
-        final boolean identifier = psiNameHelper.isIdentifier(name);
+        boolean identifier = psiNameHelper.isIdentifier(name);
         if (!identifier) {
             boolean keyword = psiNameHelper.isKeyword(name); // IDEADEV-15506
             if (!keyword) {

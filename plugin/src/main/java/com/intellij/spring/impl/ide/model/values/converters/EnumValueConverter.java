@@ -23,10 +23,10 @@ import java.util.Locale;
 public class EnumValueConverter extends Converter<PsiField> implements CustomReferenceConverter {
 
   @Nonnull
-  public static PsiReference[] createReferences(final PsiType type, final GenericDomValue genericDomValue, final PsiElement element) {
-    final String stringValue = genericDomValue.getStringValue();
+  public static PsiReference[] createReferences(PsiType type, GenericDomValue genericDomValue, PsiElement element) {
+    String stringValue = genericDomValue.getStringValue();
     if (type != null && type instanceof PsiClassType) {
-      final PsiClass psiClass = ((PsiClassType)type).resolve();
+      PsiClass psiClass = ((PsiClassType)type).resolve();
       if (psiClass != null) {
         return new PsiReference[]{createReference(psiClass, element, stringValue)};
       }
@@ -38,7 +38,7 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
   private static PsiReference createReference(final PsiClass psiClass, final PsiElement element, final String stringValue) {
     return new PsiReferenceBase<PsiElement>(element, true) {
       public PsiElement resolve() {
-        final PsiField psiField = psiClass.findFieldByName(stringValue, false);
+        PsiField psiField = psiClass.findFieldByName(stringValue, false);
         if (psiField == null && !psiClass.isEnum()) {
           return element;
         }
@@ -51,11 +51,11 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
     };
   }
 
-  public PsiField fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  public PsiField fromString(@Nullable @NonNls String s, ConvertContext context) {
     return null;
   }
 
-  public String toString(@Nullable PsiField s, final ConvertContext context) {
+  public String toString(@Nullable PsiField s, ConvertContext context) {
     return null;
   }
 
@@ -64,9 +64,9 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
     Converter converter = genericDomValue.getConverter();
     while (converter instanceof WrappingConverter) {
       if (converter instanceof PropertyValueConverter) {
-        final List<? extends PsiType> types = ((PropertyValueConverter)converter).getValueTypes(genericDomValue);
+        List<? extends PsiType> types = ((PropertyValueConverter)converter).getValueTypes(genericDomValue);
         for (PsiType type : types) {
-          final PsiReference[] psiReferences = createReferences(type, genericDomValue, element);
+          PsiReference[] psiReferences = createReferences(type, genericDomValue, element);
           if (psiReferences.length > 0) {
             return psiReferences;
           }
@@ -82,11 +82,11 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
 
     public boolean value(Pair<PsiType, GenericDomValue> pair) {
 
-      final PsiType type = pair.getFirst();
+      PsiType type = pair.getFirst();
       if (type != null && type instanceof PsiClassType) {
         if (EXCLUDE_CLASSES.contains(type.getCanonicalText())) return false;
         
-        final PsiClass psiClass = ((PsiClassType)type).resolve();
+        PsiClass psiClass = ((PsiClassType)type).resolve();
         if (psiClass != null) {
           if (psiClass.isEnum()) {
             return true;
@@ -104,14 +104,14 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
     }
   }
 
-  private static PsiField[] getFields(@Nonnull final PsiClass psiClass) {
-    final ArrayList<PsiField> fields = new ArrayList<PsiField>();
-    final PsiField[] psiFields = psiClass.getFields();
+  private static PsiField[] getFields(@Nonnull PsiClass psiClass) {
+    ArrayList<PsiField> fields = new ArrayList<PsiField>();
+    PsiField[] psiFields = psiClass.getFields();
     for (PsiField psiField : psiFields) {
       if (psiField.hasModifierProperty(PsiModifier.STATIC) && psiField.hasModifierProperty(PsiModifier.PUBLIC)) {
-        final PsiType type = psiField.getType();
+        PsiType type = psiField.getType();
         if (type instanceof PsiClassType) {
-          final PsiClass typeClass = ((PsiClassType)type).resolve();
+          PsiClass typeClass = ((PsiClassType)type).resolve();
           if (typeClass != null && typeClass.equals(psiClass)) {
             fields.add(psiField);
           }

@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 public abstract class WebflowIfEdge extends WebflowBasicEdge<GenericAttributeValue<Object>> {
   private final If myIfElement;
 
-  public WebflowIfEdge(final WebflowNode source,
-                       final WebflowNode target,
-                       final If ifElement,
-                       final GenericAttributeValue<Object> identifying) {
+  public WebflowIfEdge(WebflowNode source,
+                       WebflowNode target,
+                       If ifElement,
+                       GenericAttributeValue<Object> identifying) {
     super(source, target, identifying);
     myIfElement = ifElement;
   }
@@ -26,16 +26,16 @@ public abstract class WebflowIfEdge extends WebflowBasicEdge<GenericAttributeVal
 
   public static class Then extends WebflowIfEdge {
 
-    public Then(final WebflowNode source, final WebflowNode target, final If ifElement, final GenericAttributeValue<Object> identifying) {
+    public Then(WebflowNode source, WebflowNode target, If ifElement, GenericAttributeValue<Object> identifying) {
       super(source, target, ifElement, identifying);
     }
 
     @NotNull
     public String getName() {
-      final GenericAttributeValue<String> value = getIfElement().getTest();
+      GenericAttributeValue<String> value = getIfElement().getTest();
 
       if (value.isValid() && DomUtil.hasXml(value)) {
-        final String stringValue = value.getStringValue();
+        String stringValue = value.getStringValue();
         if (stringValue != null) return stringValue;
       }
 
@@ -44,7 +44,7 @@ public abstract class WebflowIfEdge extends WebflowBasicEdge<GenericAttributeVal
   }
 
   public static class Else extends WebflowIfEdge {
-    public Else(final WebflowNode source, final WebflowNode target, final If ifElement, final GenericAttributeValue<Object> identifying) {
+    public Else(WebflowNode source, WebflowNode target, If ifElement, GenericAttributeValue<Object> identifying) {
       super(source, target, ifElement, identifying);
     }
 

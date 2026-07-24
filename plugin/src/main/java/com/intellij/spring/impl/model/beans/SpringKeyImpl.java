@@ -20,9 +20,9 @@ public abstract class SpringKeyImpl extends SpringValueHolderImpl implements Spr
   
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final SpringEntry entry = (SpringEntry)getParent();
+    SpringEntry entry = (SpringEntry)getParent();
     assert entry != null;
-    final PsiType type = entry.getRequiredKeyType();
+    PsiType type = entry.getRequiredKeyType();
     return type == null ? Collections.<PsiType>emptyList() : Collections.singletonList(type);
   }
 }

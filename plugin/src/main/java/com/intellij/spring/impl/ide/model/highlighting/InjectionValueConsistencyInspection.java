@@ -44,8 +44,8 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
 
     protected SpringModelVisitor createVisitor(
         final DomElementAnnotationHolder holder,
-        final Beans beans,
-        final SpringModel model,
+        Beans beans,
+        SpringModel model,
         Object state
     ) {
         return new SpringModelVisitor() {
@@ -61,17 +61,17 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
                 return true;
             }
 
-            protected boolean visitMapEntry(final SpringEntry entry) {
+            protected boolean visitMapEntry(SpringEntry entry) {
                 checkMapEntry(holder, entry);
                 return true;
             }
 
-            protected boolean visitRef(final SpringRef ref) {
+            protected boolean visitRef(SpringRef ref) {
                 checkRef(ref, holder);
                 return true;
             }
 
-            protected boolean visitIdref(final Idref idref) {
+            protected boolean visitIdref(Idref idref) {
                 checkIdref(idref, holder);
                 return true;
             }
@@ -83,10 +83,10 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         DomElementAnnotationHolder holder,
         @Nonnull LocalizeValue elementName
     ) {
-        final boolean hasRefAttribute = valueHolder.getRefAttr().getXmlAttribute() != null;
-        final boolean hasValueAttribute = valueHolder.getValueAttr().getXmlAttribute() != null;
+        boolean hasRefAttribute = valueHolder.getRefAttr().getXmlAttribute() != null;
+        boolean hasValueAttribute = valueHolder.getValueAttr().getXmlAttribute() != null;
 
-        final Set<DomElement> values = getValues(valueHolder);
+        Set<DomElement> values = getValues(valueHolder);
 
         if (!hasRefAttribute && !hasValueAttribute && values.size() == 0) {
             reportNoValue(valueHolder, holder, elementName);
@@ -108,10 +108,10 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         }
     }
 
-    private static void checkMapEntry(final DomElementAnnotationHolder holder, final SpringEntry entry) {
-        final boolean hasKeyAttr = DomUtil.hasXml(entry.getKeyAttr());
-        final boolean hasKeyElement = DomUtil.hasXml(entry.getKey());
-        final boolean hasKeyRef = DomUtil.hasXml(entry.getKeyRef());
+    private static void checkMapEntry(DomElementAnnotationHolder holder, SpringEntry entry) {
+        boolean hasKeyAttr = DomUtil.hasXml(entry.getKeyAttr());
+        boolean hasKeyElement = DomUtil.hasXml(entry.getKey());
+        boolean hasKeyRef = DomUtil.hasXml(entry.getKeyRef());
         if (!hasKeyAttr && !hasKeyElement && !hasKeyRef) {
             holder.createProblem(entry, SpringLocalize.modelInspectionInjectionValueEntryKey().get()).highlightWholeElement();
         }
@@ -130,14 +130,14 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         checkValueHolder(entry, holder, SpringLocalize.springBeanMapEntry());
     }
 
-    private static void checkRef(final SpringRef ref, final DomElementAnnotationHolder holder) {
+    private static void checkRef(SpringRef ref, DomElementAnnotationHolder holder) {
         if (!DomUtil.hasXml(ref)) {
             return;
         }
 
-        final boolean hasBean = ref.getBean().getXmlAttribute() != null;
-        final boolean hasLocal = ref.getLocal().getXmlAttribute() != null;
-        final boolean hasParent = ref.getParentAttr().getXmlAttribute() != null;
+        boolean hasBean = ref.getBean().getXmlAttribute() != null;
+        boolean hasLocal = ref.getLocal().getXmlAttribute() != null;
+        boolean hasParent = ref.getParentAttr().getXmlAttribute() != null;
         if (!hasBean && !hasLocal && !hasParent) {
             holder.createProblem(ref, HighlightSeverity.ERROR,
                 SpringBundle.message("spring.bean.ref.attributes.must.specify"),
@@ -155,13 +155,13 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         }
     }
 
-    private static void checkIdref(final Idref ref, final DomElementAnnotationHolder holder) {
+    private static void checkIdref(Idref ref, DomElementAnnotationHolder holder) {
         if (!DomUtil.hasXml(ref)) {
             return;
         }
 
-        final boolean hasBean = ref.getBean().getXmlAttribute() != null;
-        final boolean hasLocal = ref.getLocal().getXmlAttribute() != null;
+        boolean hasBean = ref.getBean().getXmlAttribute() != null;
+        boolean hasLocal = ref.getLocal().getXmlAttribute() != null;
         if (!hasBean && !hasLocal) {
             holder.createProblem(ref, HighlightSeverity.ERROR,
                 SpringBundle.message("spring.bean.idref.attributes.must.specify"),
@@ -178,7 +178,7 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
     }
 
     @Nonnull
-    private static Set<DomElement> getValues(final SpringElementsHolder elementsHolder) {
+    private static Set<DomElement> getValues(SpringElementsHolder elementsHolder) {
         Set<DomElement> values = new HashSet<DomElement>(DomUtil.getDefinedChildrenOfType(elementsHolder, DomSpringBean.class));
         addValue(elementsHolder.getIdref(), values);
         addValue(elementsHolder.getList(), values);
@@ -198,8 +198,8 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
     }
 
     private static void reportSubtags(
-        @Nonnull final Set<DomElement> values,
-        final DomElementAnnotationHolder holder,
+        @Nonnull Set<DomElement> values,
+        DomElementAnnotationHolder holder,
         @Nonnull LocalizeValue message
     ) {
         for (DomElement value : values) {
@@ -208,7 +208,7 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         }
     }
 
-    private static void reportAttribute(final DomElement element, final DomElementAnnotationHolder holder, @Nonnull LocalizeValue message) {
+    private static void reportAttribute(DomElement element, DomElementAnnotationHolder holder, @Nonnull LocalizeValue message) {
         if (DomUtil.hasXml(element)) {
             holder.createProblem(element, HighlightSeverity.ERROR, message.get(), new RemoveDomElementQuickFix(element))
                 .highlightWholeElement();
@@ -216,33 +216,33 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
     }
 
     private static void reportNoValue(
-        final SpringValueHolder injection,
-        final DomElementAnnotationHolder holder,
+        SpringValueHolder injection,
+        DomElementAnnotationHolder holder,
         @Nonnull LocalizeValue elementName
     ) {
-        final List<? extends PsiType> types = injection.getRequiredTypes();
-        final ArrayList<LocalQuickFix> quickFixes = new ArrayList<LocalQuickFix>();
+        List<? extends PsiType> types = injection.getRequiredTypes();
+        ArrayList<LocalQuickFix> quickFixes = new ArrayList<LocalQuickFix>();
         quickFixes.add(new AddDomElementQuickFix<DomElement>(injection.getValueAttr()));
 
         for (PsiType type : types) {
             if (type instanceof PsiClassType) {
-                final PsiClass psiClass = ((PsiClassType) type).resolve();
+                PsiClass psiClass = ((PsiClassType) type).resolve();
                 quickFixes.add(0, new AddRefFix(injection.getRefAttr(), psiClass));
                 if (psiClass != null) {
-                    final Project project = psiClass.getProject();
-                    final PsiManager psiManager = PsiManager.getInstance(project);
-                    final GlobalSearchScope scope = (GlobalSearchScope) ProjectScopes.getAllScope(project);
-                    final PsiClass listClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(List.class.getName(), scope);
+                    Project project = psiClass.getProject();
+                    PsiManager psiManager = PsiManager.getInstance(project);
+                    GlobalSearchScope scope = (GlobalSearchScope) ProjectScopes.getAllScope(project);
+                    PsiClass listClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(List.class.getName(), scope);
                     if (listClass != null && InheritanceUtil.isInheritorOrSelf(psiClass, listClass, true)) {
                         quickFixes.add(0, new AddListFix(injection.getList()));
                     }
                     else {
-                        final PsiClass mapClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(Map.class.getName(), scope);
+                        PsiClass mapClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(Map.class.getName(), scope);
                         if (mapClass != null && InheritanceUtil.isInheritorOrSelf(psiClass, mapClass, true)) {
                             quickFixes.add(0, new AddMapFix(injection.getMap()));
                         }
                         else {
-                            final PsiClass setClass =
+                            PsiClass setClass =
                                 JavaPsiFacade.getInstance(psiManager.getProject()).findClass(Set.class.getName(), scope);
                             if (setClass != null && InheritanceUtil.isInheritorOrSelf(psiClass, setClass, true)) {
                                 quickFixes.add(0, new AddListFix(injection.getSet()));
@@ -300,12 +300,12 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             super.applyFix(project, descriptor);
             if (myPsiClass != null) {
-                final XmlElement element = myElement.getXmlElement();
+                XmlElement element = myElement.getXmlElement();
                 assert element != null;
-                final XmlFile xmlFile = (XmlFile) element.getContainingFile();
-                final SpringModel model = SpringManager.getInstance(project).getSpringModelByFile(xmlFile);
+                XmlFile xmlFile = (XmlFile) element.getContainingFile();
+                SpringModel model = SpringManager.getInstance(project).getSpringModelByFile(xmlFile);
                 if (model != null) {
-                    final List<SpringBaseBeanPointer> list = model.findBeansByEffectivePsiClassWithInheritance(myPsiClass);
+                    List<SpringBaseBeanPointer> list = model.findBeansByEffectivePsiClassWithInheritance(myPsiClass);
                     if (list.size() == 1) {
                         myElement.setStringValue(SpringUtils.getReferencedName(list.get(0), model.getAllCommonBeans(true)));
                     }
@@ -326,7 +326,7 @@ public class InjectionValueConsistencyInspection extends SpringBeanInspectionBas
         }
 
         public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
-            final SpringValue value = myElement.addValue();
+            SpringValue value = myElement.addValue();
             value.setStringValue("x");
             value.setStringValue("");
         }

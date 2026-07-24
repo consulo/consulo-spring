@@ -31,15 +31,15 @@ public class SpringAutowireUtil {
   }
 
   public static Map<PsiMethod, Collection<SpringBaseBeanPointer>> getByTypeAutowiredProperties(SpringBean springBean,
-                                                                                               final SpringModel model) {
+                                                                                               SpringModel model) {
     Map<PsiMethod, Collection<SpringBaseBeanPointer>> autowiredMap = new HashMap<PsiMethod, Collection<SpringBaseBeanPointer>>();
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
     if (beanClass != null) {
       if (model != null && isByTypeAutowired(springBean)) {
         for (PsiMethod psiMethod : beanClass.getAllMethods()) {
           if (isPropertyAutowired(psiMethod, springBean)) {
-            final PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-            final Collection<SpringBaseBeanPointer> list = autowireByType(model, parameter.getType());
+            PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
+            Collection<SpringBaseBeanPointer> list = autowireByType(model, parameter.getType());
             if (list.size() > 0) {
               autowiredMap.put(psiMethod, list);
             }
@@ -52,8 +52,8 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  private static List<SpringBaseBeanPointer> excludeAutowireCandidates(@Nullable final List<SpringBaseBeanPointer> beans) {
-    final List<SpringBaseBeanPointer> beanPointers = new ArrayList<SpringBaseBeanPointer>();
+  private static List<SpringBaseBeanPointer> excludeAutowireCandidates(@Nullable List<SpringBaseBeanPointer> beans) {
+    List<SpringBaseBeanPointer> beanPointers = new ArrayList<SpringBaseBeanPointer>();
     if (beans != null) {
       for (SpringBaseBeanPointer bean : beans) {
         if (isAutowireCandidate(bean.getSpringBean())) {
@@ -65,11 +65,11 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  public static List<SpringBaseBeanPointer> excludeAutowireCandidatesForCommonBeans(@Nullable final List<SpringBaseBeanPointer> beans) {
-    final List<SpringBaseBeanPointer> list = new ArrayList<SpringBaseBeanPointer>();
+  public static List<SpringBaseBeanPointer> excludeAutowireCandidatesForCommonBeans(@Nullable List<SpringBaseBeanPointer> beans) {
+    List<SpringBaseBeanPointer> list = new ArrayList<SpringBaseBeanPointer>();
     if (beans != null) {
       for (SpringBaseBeanPointer beanPointer : beans) {
-        final CommonSpringBean commonSpringBean = beanPointer.getSpringBean();
+        CommonSpringBean commonSpringBean = beanPointer.getSpringBean();
         if (commonSpringBean instanceof DomSpringBean) {
           if (isAutowireCandidate(commonSpringBean)) {
             list.add(beanPointer);
@@ -83,35 +83,35 @@ public class SpringAutowireUtil {
     return list;
   }
 
-  private static boolean isAutowireCandidate(final CommonSpringBean springBean) {
+  private static boolean isAutowireCandidate(CommonSpringBean springBean) {
     if (!(springBean instanceof SpringBean)) return true;
-    final Boolean autoWireCandidate = ((SpringBean)springBean).getAutowireCandidate().getValue();
+    Boolean autoWireCandidate = ((SpringBean)springBean).getAutowireCandidate().getValue();
 
     return autoWireCandidate == null || autoWireCandidate.booleanValue();
 
   }
 
   public static Map<PsiType, Collection<SpringBaseBeanPointer>> getConstructorAutowiredProperties(SpringBean springBean,
-                                                                                                  final SpringModel model) {
+                                                                                                  SpringModel model) {
     Map<PsiType, Collection<SpringBaseBeanPointer>> autowiredMap = new HashMap<PsiType, Collection<SpringBaseBeanPointer>>();
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
     if (beanClass != null) {
       if (isConstructorAutowire(springBean)) {
-        final boolean instantiatedByFactory = SpringConstructorArgResolveUtil.isInstantiatedByFactory(springBean);
+        boolean instantiatedByFactory = SpringConstructorArgResolveUtil.isInstantiatedByFactory(springBean);
 
         PsiMethod checkedMethod = instantiatedByFactory
           ? springBean.getFactoryMethod().getValue()
           : SpringConstructorArgResolveUtil.getSpringBeanConstructor(springBean, model);
 
         if (checkedMethod != null) {
-          final List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
+          List<ConstructorArg> list = SpringUtils.getConstructorArgs(springBean);
           Map<Integer, ConstructorArg> indexedArgs = SpringConstructorArgResolveUtil.getIndexedConstructorArgs(list);
-          final PsiParameter[] parameters = checkedMethod.getParameterList().getParameters();
+          PsiParameter[] parameters = checkedMethod.getParameterList().getParameters();
           for (int i = 0; i < parameters.length; i++) {
             PsiParameter parameter = parameters[i];
             if (!SpringConstructorArgResolveUtil.acceptParameter(parameter, list, indexedArgs, i)) {
-              final PsiType psiType = parameter.getType();
-              final Collection<SpringBaseBeanPointer> springBeans = autowireByType(model, psiType);
+              PsiType psiType = parameter.getType();
+              Collection<SpringBaseBeanPointer> springBeans = autowireByType(model, psiType);
               if (springBeans.size() > 0) {
                 autowiredMap.put(psiType, springBeans);
               }
@@ -124,7 +124,7 @@ public class SpringAutowireUtil {
     return autowiredMap;
   }
 
-  private static boolean isPropertyDefined(final SpringBean springBean, final String propertyName) {
+  private static boolean isPropertyDefined(SpringBean springBean, String propertyName) {
     for (SpringPropertyDefinition springProperty : springBean.getAllProperties()) {
       if (propertyName.equals(springProperty.getPropertyName())) {
         return true;
@@ -135,16 +135,16 @@ public class SpringAutowireUtil {
 
   public static Map<PsiMethod, SpringBaseBeanPointer> getByNameAutowiredProperties(SpringBean springBean) {
     Map<PsiMethod, SpringBaseBeanPointer> autowiredMap = new HashMap<PsiMethod, SpringBaseBeanPointer>();
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
     if (beanClass != null) {
-      final SpringModel model = SpringUtils.getSpringModel(springBean);
+      SpringModel model = SpringUtils.getSpringModel(springBean);
       if (isByNameAutowired(springBean)) {
         for (PsiMethod psiMethod : beanClass.getAllMethods()) {
           if (PropertyUtil.isSimplePropertySetter(psiMethod)) {
-            final PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-            final Collection<SpringBaseBeanPointer> list = autowireByType(model, parameter.getType());
+            PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
+            Collection<SpringBaseBeanPointer> list = autowireByType(model, parameter.getType());
 
-            final String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
+            String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
             for (SpringBaseBeanPointer bean : list) {
               if (SpringUtils.getAllBeanNames(bean.getSpringBean()).contains(propertyName)) {
                 autowiredMap.put(psiMethod, bean);
@@ -158,12 +158,12 @@ public class SpringAutowireUtil {
     return autowiredMap;
   }
 
-  private static boolean isPropertyAutowired(final PsiMethod psiMethod, final SpringBean springBean) {
+  private static boolean isPropertyAutowired(PsiMethod psiMethod, SpringBean springBean) {
     if (PropertyUtil.isSimplePropertySetter(psiMethod)) {
-      final PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
-      final PsiType psiType = parameter.getType();
+      PsiParameter parameter = psiMethod.getParameterList().getParameters()[0];
+      PsiType psiType = parameter.getType();
       if (psiType instanceof PsiClassType) {
-        final PsiClass psiClass = ((PsiClassType)psiType).resolve();
+        PsiClass psiClass = ((PsiClassType)psiType).resolve();
 
         return psiClass != null && !isPropertyDefined(springBean, PropertyUtil.getPropertyNameBySetter(psiMethod));
       }
@@ -171,26 +171,26 @@ public class SpringAutowireUtil {
     return false;
   }
 
-  public static boolean isByTypeAutowired(final SpringBean springBean) {
+  public static boolean isByTypeAutowired(SpringBean springBean) {
     return springBean.getBeanAutowire().equals(Autowire.BY_TYPE);
   }
 
-  public static boolean isByNameAutowired(final SpringBean springBean) {
+  public static boolean isByNameAutowired(SpringBean springBean) {
     return springBean.getBeanAutowire().equals(Autowire.BY_NAME);
   }
 
-  public static boolean isConstructorAutowire(final SpringBean springBean) {
+  public static boolean isConstructorAutowire(SpringBean springBean) {
     return springBean.getBeanAutowire().equals(Autowire.CONSTRUCTOR);
   }
 
-  public static Map<PsiMember, List<SpringBaseBeanPointer>> getAutowireAnnotationProperties(final CommonSpringBean springBean,
-                                                                                            @Nonnull final SpringModel model) {
+  public static Map<PsiMember, List<SpringBaseBeanPointer>> getAutowireAnnotationProperties(CommonSpringBean springBean,
+                                                                                            @Nonnull SpringModel model) {
     Map<PsiMember, List<SpringBaseBeanPointer>> map = new HashMap<PsiMember, List<SpringBaseBeanPointer>>();
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
     if (beanClass != null) {
       for (PsiMethod psiMethod : getAnnotatedAutowiredMethods(beanClass)) {
         for (PsiParameter parameter : psiMethod.getParameterList().getParameters()) {
-          final PsiAnnotation psiAnnotation = getQualifiedAnnotation(parameter, model.getModule());
+          PsiAnnotation psiAnnotation = getQualifiedAnnotation(parameter, model.getModule());
           if (psiAnnotation != null) {
             addAutowiredBeans(map, psiMethod, getQualifiedBeans(psiAnnotation, model));
           }
@@ -201,7 +201,7 @@ public class SpringAutowireUtil {
       }
 
       for (PsiField psiField : getAnnotatedAutowiredFields(beanClass)) {
-        final PsiAnnotation psiAnnotation = getQualifiedAnnotation(psiField, model.getModule());
+        PsiAnnotation psiAnnotation = getQualifiedAnnotation(psiField, model.getModule());
         if (psiAnnotation != null) {
           addAutowiredBeans(map, psiField, getQualifiedBeans(psiAnnotation, model));
         }
@@ -214,10 +214,10 @@ public class SpringAutowireUtil {
     return map;
   }
 
-  private static void addAutowiredBeans(final Map<PsiMember, List<SpringBaseBeanPointer>> map, final PsiMember psiMember,
+  private static void addAutowiredBeans(Map<PsiMember, List<SpringBaseBeanPointer>> map, PsiMember psiMember,
 
-                                        final List<SpringBaseBeanPointer> beans) {
-    final List<SpringBaseBeanPointer> list = excludeAutowireCandidatesForCommonBeans(beans);
+                                        List<SpringBaseBeanPointer> beans) {
+    List<SpringBaseBeanPointer> list = excludeAutowireCandidatesForCommonBeans(beans);
     if (list.size() > 0) {
       if (!map.containsKey(psiMember)) {
         map.put(psiMember, list);
@@ -229,8 +229,8 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  public static List<SpringBaseBeanPointer> getQualifiedBeans(@Nonnull final PsiAnnotation psiAnnotation,
-                                                              @Nullable final SpringModel model) {
+  public static List<SpringBaseBeanPointer> getQualifiedBeans(@Nonnull PsiAnnotation psiAnnotation,
+                                                              @Nullable SpringModel model) {
     //3.11.3. Fine-tuning annotation-based autowiring with qualifiers
     if (model == null) return Collections.emptyList();
     SpringJamQualifier qualifier = new SpringJamQualifier(psiAnnotation, null, null);
@@ -238,20 +238,20 @@ public class SpringAutowireUtil {
   }
 
   @Nullable
-  public static PsiAnnotation getQualifiedAnnotation(final PsiModifierListOwner modifierListOwner) {
+  public static PsiAnnotation getQualifiedAnnotation(PsiModifierListOwner modifierListOwner) {
     return getQualifiedAnnotation(modifierListOwner, ModuleUtilCore.findModuleForPsiElement(modifierListOwner));
   }
 
   @Nullable
-  private static PsiAnnotation getQualifiedAnnotation(final PsiModifierListOwner modifierListOwner, @Nullable final Module module) {
+  private static PsiAnnotation getQualifiedAnnotation(PsiModifierListOwner modifierListOwner, @Nullable Module module) {
     if (module == null) return null;
 
-    final List<PsiClass> annotationTypeClasses = JamAnnotationTypeUtil.getQualifierAnnotationTypesWithChildren(module);
+    List<PsiClass> annotationTypeClasses = JamAnnotationTypeUtil.getQualifierAnnotationTypesWithChildren(module);
 
     for (PsiClass annotationTypeClass : annotationTypeClasses) {
       if ((JamAnnotationTypeUtil.isAcceptedFor(annotationTypeClass, ElementType.FIELD) && modifierListOwner instanceof PsiField) ||
         (JamAnnotationTypeUtil.isAcceptedFor(annotationTypeClass, ElementType.PARAMETER) && modifierListOwner instanceof PsiParameter)) {
-        final PsiAnnotation annotation = AnnotationUtil.findAnnotation(modifierListOwner, annotationTypeClass.getQualifiedName());
+        PsiAnnotation annotation = AnnotationUtil.findAnnotation(modifierListOwner, annotationTypeClass.getQualifiedName());
 
         if (annotation != null) {
           return annotation;
@@ -263,33 +263,33 @@ public class SpringAutowireUtil {
   }
 
   @Nullable
-  public static PsiAnnotation getAutowiredAnnotation(final @Nonnull PsiModifierListOwner owner) {
+  public static PsiAnnotation getAutowiredAnnotation(@Nonnull PsiModifierListOwner owner) {
     return AnnotationUtil.findAnnotation(owner, SpringAnnotationsConstants.INJECT_ANNOTATIONS);
   }
 
   @Nullable
-  public static PsiAnnotation getResourceAnnotation(final @Nonnull PsiModifierListOwner owner) {
-    final PsiModifierList modifierList = owner.getModifierList();
+  public static PsiAnnotation getResourceAnnotation(@Nonnull PsiModifierListOwner owner) {
+    PsiModifierList modifierList = owner.getModifierList();
     if (modifierList != null) {
       return modifierList.findAnnotation(SpringAnnotationsConstants.JAVAX_RESOURCE_ANNOTATION);
     }
     return null;
   }
 
-  public static boolean isAutowiredByAnnotation(final @Nonnull PsiModifierListOwner owner) {
+  public static boolean isAutowiredByAnnotation(@Nonnull PsiModifierListOwner owner) {
     return AnnotationUtil.isAnnotated(owner, SpringAnnotationsConstants.INJECT_ANNOTATIONS, 0);
   }
 
-  public static boolean isRequired(final @Nonnull PsiModifierListOwner owner) {
-    final PsiModifierList modifierList = owner.getModifierList();
+  public static boolean isRequired(@Nonnull PsiModifierListOwner owner) {
+    PsiModifierList modifierList = owner.getModifierList();
     if (modifierList != null) {
-      final PsiAnnotation required = modifierList.findAnnotation(SpringAnnotationsConstants.REQUIRED_ANNOTATION);
+      PsiAnnotation required = modifierList.findAnnotation(SpringAnnotationsConstants.REQUIRED_ANNOTATION);
       if (required != null) {
         return true;
       }
-      final PsiAnnotation autowiredAnnotation = getAutowiredAnnotation(owner);
+      PsiAnnotation autowiredAnnotation = getAutowiredAnnotation(owner);
       if (autowiredAnnotation != null) {
-        final Boolean value = AnnotationModelUtil.getBooleanValue(autowiredAnnotation, "required", true).getValue();
+        Boolean value = AnnotationModelUtil.getBooleanValue(autowiredAnnotation, "required", true).getValue();
         return value == null || value.booleanValue();
       }
     }
@@ -297,8 +297,8 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  public static List<PsiMethod> getAnnotatedAutowiredMethods(@Nonnull final PsiClass psiClass) {
-    final List<PsiMethod> methods = new ArrayList<PsiMethod>();
+  public static List<PsiMethod> getAnnotatedAutowiredMethods(@Nonnull PsiClass psiClass) {
+    List<PsiMethod> methods = new ArrayList<PsiMethod>();
     for (PsiMethod psiMethod : psiClass.getAllMethods()) {
       if (isAutowiredByAnnotation(psiMethod)) {
         methods.add(psiMethod);
@@ -308,8 +308,8 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  public static List<PsiField> getAnnotatedAutowiredFields(@Nonnull final PsiClass psiClass) {
-    final List<PsiField> fields = new ArrayList<PsiField>();
+  public static List<PsiField> getAnnotatedAutowiredFields(@Nonnull PsiClass psiClass) {
+    List<PsiField> fields = new ArrayList<PsiField>();
     for (PsiField psiField : psiClass.getAllFields()) {
       if (isAutowiredByAnnotation(psiField)) {
         fields.add(psiField);
@@ -319,14 +319,14 @@ public class SpringAutowireUtil {
   }
 
   @Nonnull
-  public static List<SpringBaseBeanPointer> autowireByType(@Nonnull final SpringModel model, final PsiType psiType) {
+  public static List<SpringBaseBeanPointer> autowireByType(@Nonnull SpringModel model, PsiType psiType) {
     if (psiType instanceof PsiClassType) {
       PsiType beanType = PsiUtil.extractIterableTypeParameter(psiType, false);
       if (beanType == null) {
         beanType = psiType;
       }
       if (beanType instanceof PsiClassType) {
-        final PsiClass psiClass = ((PsiClassType)beanType).resolve();
+        PsiClass psiClass = ((PsiClassType)beanType).resolve();
         if (psiClass != null) {
           return excludeAutowireCandidates(model.findBeansByEffectivePsiClassWithInheritance(psiClass));
         }
@@ -348,7 +348,7 @@ public class SpringAutowireUtil {
     ));
 
   public static boolean isAutowiredByDefault(@Nonnull PsiType psiType) {
-    final String text = psiType.getCanonicalText();
+    String text = psiType.getCanonicalText();
     return text != null && STANDARD_AUTOWIRINGS.contains(text);
   }
 }

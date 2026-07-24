@@ -49,18 +49,18 @@ public class SpringRequiredPropertyInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         final SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel, Object state
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel, Object state
     ) {
         if (springBean.isAbstract()) {
             return;
         }
-        final PsiClass psiClass = springBean.getBeanClass();
+        PsiClass psiClass = springBean.getBeanClass();
         if (psiClass != null) {
-            final Map<String, PsiMethod> properties = PropertyUtil.getAllProperties(psiClass, true, false);
-            final List<SpringPropertyDefinition> list = springBean.getAllProperties();
-            final List<String> missing = new ArrayList<String>();
+            Map<String, PsiMethod> properties = PropertyUtil.getAllProperties(psiClass, true, false);
+            List<SpringPropertyDefinition> list = springBean.getAllProperties();
+            List<String> missing = new ArrayList<String>();
             final List<PsiMethod> missingMethods = new ArrayList<PsiMethod>();
             for (Map.Entry<String, PsiMethod> entry : properties.entrySet()) {
                 if (AnnotationUtil.findAnnotation(entry.getValue(), SpringAnnotationsConstants.REQUIRED_ANNOTATION) != null) {
@@ -71,7 +71,7 @@ public class SpringRequiredPropertyInspection extends SpringBeanInspectionBase {
                 }
             }
             if (!missing.isEmpty()) {
-                final DomElement element = DomUtil.hasXml(springBean.getClazz()) ? springBean.getClazz() : springBean;
+                DomElement element = DomUtil.hasXml(springBean.getClazz()) ? springBean.getClazz() : springBean;
                 holder.createProblem(
                     element,
                     HighlightSeverity.ERROR,
@@ -83,11 +83,11 @@ public class SpringRequiredPropertyInspection extends SpringBeanInspectionBase {
                             return SpringLocalize.createMissingProperties();
                         }
 
-                        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+                        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                             if (!ReadonlyStatusHandler.getInstance(project)
                                 .ensureFilesWritable(descriptor.getPsiElement().getContainingFile().getVirtualFile())
                                 .hasReadonlyFiles()) {
-                                final Editor editor = SpringTemplateBuilder.getEditor(descriptor);
+                                Editor editor = SpringTemplateBuilder.getEditor(descriptor);
                                 SpringPropertiesGenerateProvider.doGenerate(editor, springBean, project,
                                     missingMethods.toArray(new PsiMethod[missingMethods.size()])
                                 );
@@ -99,9 +99,9 @@ public class SpringRequiredPropertyInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static boolean isDefined(final List<SpringPropertyDefinition> list, final String property) {
+    private static boolean isDefined(List<SpringPropertyDefinition> list, String property) {
         for (SpringPropertyDefinition definition : list) {
-            final String name = definition.getPropertyName();
+            String name = definition.getPropertyName();
             if (name != null && name.equals(property)) {
                 return true;
             }

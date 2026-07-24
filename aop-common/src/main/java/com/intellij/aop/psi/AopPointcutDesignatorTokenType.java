@@ -8,7 +8,7 @@ package com.intellij.aop.psi;
  * @author peter
 */
 public class AopPointcutDesignatorTokenType extends AopElementType {
-  public AopPointcutDesignatorTokenType(final String typeName) {
+  public AopPointcutDesignatorTokenType(String typeName) {
     super(typeName);
   }
 }

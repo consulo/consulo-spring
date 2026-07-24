@@ -21,24 +21,24 @@ import java.util.function.Predicate;
 public abstract class AopPsiTypePattern {
   public static final AopPsiTypePattern FALSE = new AopPsiTypePattern() {
     @Override
-    public boolean accepts(@Nonnull final PsiType type) {
+    public boolean accepts(@Nonnull PsiType type) {
       return false;
     }
 
     @Nonnull
     @Override
-    public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
+    public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
       return PointcutMatchDegree.FALSE;
     }
   };
   public static final AopPsiTypePattern TRUE = new AopPsiTypePattern() {
     @Override
-    public boolean accepts(@Nonnull final PsiType type) {
+    public boolean accepts(@Nonnull PsiType type) {
       return true;
     }
 
     @Override
-    public boolean accepts(@Nonnull final String qualifiedName) {
+    public boolean accepts(@Nonnull String qualifiedName) {
       return true;
     }
 
@@ -49,7 +49,7 @@ public abstract class AopPsiTypePattern {
     
     @Nonnull
     @Override
-    public PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
+    public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
       return PointcutMatchDegree.TRUE;
     }
   };
@@ -69,13 +69,13 @@ public abstract class AopPsiTypePattern {
     return canBeAssignableFrom(type, new HashSet<>());
   }
 
-  private PointcutMatchDegree canBeAssignableFrom(final PsiType type, final Set<PsiType> visited) {
+  private PointcutMatchDegree canBeAssignableFrom(PsiType type, Set<PsiType> visited) {
     visited.add(type);
     if (accepts(type)) return PointcutMatchDegree.TRUE;
     boolean maybe = false;
-    for (final PsiType superType : getSuperTypes(type)) {
+    for (PsiType superType : getSuperTypes(type)) {
       if (!visited.contains(superType)) {
-        final PointcutMatchDegree degree = canBeAssignableFrom(superType, visited);
+        PointcutMatchDegree degree = canBeAssignableFrom(superType, visited);
         if (degree == PointcutMatchDegree.TRUE) return degree;
         maybe = degree == PointcutMatchDegree.MAYBE;
       }
@@ -83,16 +83,16 @@ public abstract class AopPsiTypePattern {
     return maybe ? PointcutMatchDegree.MAYBE : PointcutMatchDegree.FALSE;
   }
 
-  private static PsiType[] getSuperTypes(final PsiType type) {
+  private static PsiType[] getSuperTypes(PsiType type) {
     if (type instanceof PsiWildcardType && ((PsiWildcardType)type).getBound() == null) {
       return PsiType.EMPTY_ARRAY;
     }
     return type.getSuperTypes();
   }
 
-  protected static boolean processSubPackages(final PsiJavaPackage pkg, Predicate<PsiJavaPackage> processor) {
+  protected static boolean processSubPackages(PsiJavaPackage pkg, Predicate<PsiJavaPackage> processor) {
     if (!processor.test(pkg)) return false;
-    for (final PsiJavaPackage aPackage : pkg.getSubPackages()) {
+    for (PsiJavaPackage aPackage : pkg.getSubPackages()) {
       if (!processSubPackages(aPackage, processor)) return false;
     }
     return true;
@@ -102,8 +102,8 @@ public abstract class AopPsiTypePattern {
     return accepts(expression.getPatterns(), psiType);
   }
 
-  public static PointcutMatchDegree accepts(final Collection<AopPsiTypePattern> patterns, final PsiType psiType) {
-    for (final AopPsiTypePattern pattern : patterns) {
+  public static PointcutMatchDegree accepts(Collection<AopPsiTypePattern> patterns, PsiType psiType) {
+    for (AopPsiTypePattern pattern : patterns) {
       if (pattern.accepts(psiType)) return PointcutMatchDegree.TRUE;
     }
     return PointcutMatchDegree.FALSE;

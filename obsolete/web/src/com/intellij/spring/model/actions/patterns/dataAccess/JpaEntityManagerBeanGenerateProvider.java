@@ -31,18 +31,18 @@ public class JpaEntityManagerBeanGenerateProvider extends SpringBeanGenerateProv
     super(SpringBundle.message("spring.patterns.data.access.jpa.entity.manager.factory"), null);
   }
 
-  protected void runTemplate(final Editor editor, final PsiFile file, final SpringBean springBean) {
+  protected void runTemplate(Editor editor, PsiFile file, SpringBean springBean) {
     super.runTemplate(editor, file, springBean);
     ((DomTemplateRunnerImpl)DomTemplateRunner.getInstance(file.getProject())).runTemplate(springBean,editor, getTemplate(springBean));
   }
 
-  protected Template getTemplate(final SpringBean springBean) {
+  protected Template getTemplate(SpringBean springBean) {
     return getTemplate(springBean.getManager().getProject());
   }
 
   public static Template getTemplate(Project project) {
-    final TemplateManager manager = TemplateManager.getInstance(project);
-    final Template template = manager.createTemplate("", "");
+    TemplateManager manager = TemplateManager.getInstance(project);
+    Template template = manager.createTemplate("", "");
     template.setToReformat(true);
 
     Expression expression = new MacroCallNode(MacroFactory.createMacro("complete"));
@@ -73,21 +73,21 @@ public class JpaEntityManagerBeanGenerateProvider extends SpringBeanGenerateProv
       }
 
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
-        final Project project = context.getProject();
-        final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(context.getEditor().getDocument());
+        Project project = context.getProject();
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(context.getEditor().getDocument());
         if(psiFile == null) return LookupElement.EMPTY_ARRAY;
-        final Module module = psiFile.getModule();
+        Module module = psiFile.getModule();
 
         if(module == null) return LookupElement.EMPTY_ARRAY;
 
-        final JpaFacet jpaFacet = JpaFacet.getInstance(module);
+        JpaFacet jpaFacet = JpaFacet.getInstance(module);
 
         if(jpaFacet == null) return LookupElement.EMPTY_ARRAY;
 
         LinkedHashSet<LookupElement> items = new LinkedHashSet<LookupElement>();
 
         for (PersistenceUnit persistenceUnit : jpaFacet.getPersistenceUnits()) {
-          final String stringValue = persistenceUnit.getName().getStringValue();
+          String stringValue = persistenceUnit.getName().getStringValue();
           if (StringUtil.isNotEmpty(stringValue)) {
             items.add(LookupElementBuilder.create(stringValue).setIcon(ElementPresentationManager.getIcon(persistenceUnit)));
           }

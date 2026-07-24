@@ -22,19 +22,19 @@ import java.util.List;
 public class SpringBeanLookupMethodConverter extends SpringBeanMethodConverter {
 
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return method.hasModifierProperty(PsiModifier.PUBLIC) || method.hasModifierProperty(PsiModifier.PROTECTED);
   }
 
-  protected boolean checkReturnType(final ConvertContext context, final PsiMethod method, final boolean forCompletion) {
-    final PsiType returnType = method.getReturnType();
+  protected boolean checkReturnType(ConvertContext context, PsiMethod method, boolean forCompletion) {
+    PsiType returnType = method.getReturnType();
     if (PsiType.VOID.equals(returnType) || returnType instanceof PsiPrimitiveType) return false;
 
     if (forCompletion) {
-      final PsiClass[] possibleReturnTypes = getValidReturnTypes(context);
+      PsiClass[] possibleReturnTypes = getValidReturnTypes(context);
       if (possibleReturnTypes.length > 0 && returnType != null) {
         for (PsiClass possibleReturnType : possibleReturnTypes) {
-          final PsiClassType classType = JavaPsiFacade.getInstance(possibleReturnType.getProject()).getElementFactory().createType(possibleReturnType);
+          PsiClassType classType = JavaPsiFacade.getInstance(possibleReturnType.getProject()).getElementFactory().createType(possibleReturnType);
           if(classType.isAssignableFrom(returnType)) return true;
         }
         return false;
@@ -44,17 +44,17 @@ public class SpringBeanLookupMethodConverter extends SpringBeanMethodConverter {
   }
 
 
-  public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
-    final PsiClass[] validReturnTypes = getValidReturnTypes(context);
+  public LocalQuickFix[] getQuickFixes(ConvertContext context) {
+    PsiClass[] validReturnTypes = getValidReturnTypes(context);
     if (validReturnTypes.length == 0) return LocalQuickFix.EMPTY_ARRAY;
 
-    final DomSpringBean springBean = SpringConverterUtil.getCurrentBean(context);
-    final GenericDomValue element = (GenericDomValue)context.getInvocationElement();
-    final String elementName = element.getStringValue();
-    final PsiClass psiClass = springBean.getBeanClass();
+    DomSpringBean springBean = SpringConverterUtil.getCurrentBean(context);
+    GenericDomValue element = (GenericDomValue)context.getInvocationElement();
+    String elementName = element.getStringValue();
+    PsiClass psiClass = springBean.getBeanClass();
 
-    final List<LocalQuickFix> fixes = new ArrayList<LocalQuickFix>();
-    for (final PsiClass returnType : validReturnTypes) {
+    List<LocalQuickFix> fixes = new ArrayList<LocalQuickFix>();
+    for (PsiClass returnType : validReturnTypes) {
       if(elementName != null && elementName.length() > 0) {
         CreateMethodQuickFix fix =
           CreateMethodQuickFix.createFix(psiClass, getNewMethodSignature(elementName, returnType), getNewMethodBody());
@@ -73,15 +73,15 @@ public class SpringBeanLookupMethodConverter extends SpringBeanMethodConverter {
   }
 
   @NonNls
-  private static String getNewMethodSignature(@Nonnull final String elementName, @Nonnull final PsiClass psiClass) {
+  private static String getNewMethodSignature(@Nonnull String elementName, @Nonnull PsiClass psiClass) {
     return "public " + psiClass.getQualifiedName() + " " + elementName + "()";
   }
 
   @Nonnull
-  private static PsiClass[] getValidReturnTypes(final ConvertContext context) {
-    final LookupMethod lookupMethod = context.getInvocationElement().getParentOfType(LookupMethod.class, false);
+  private static PsiClass[] getValidReturnTypes(ConvertContext context) {
+    LookupMethod lookupMethod = context.getInvocationElement().getParentOfType(LookupMethod.class, false);
     if (lookupMethod != null) {
-      final SpringBeanPointer beanPointer = lookupMethod.getBean().getValue();
+      SpringBeanPointer beanPointer = lookupMethod.getBean().getValue();
       if (beanPointer != null) {
         return beanPointer.getEffectiveBeanType();
       }

@@ -13,15 +13,15 @@ import com.intellij.util.xml.ConvertContext;
 //public void anyMethodName(ServiceReference ref);
 public class ReferenceListenerMethodConverter extends BasicListenerMethodConverter {
 
-  protected boolean checkParameterList(final PsiMethod method, final ConvertContext context) {
+  protected boolean checkParameterList(PsiMethod method, ConvertContext context) {
     return checkProperParameters(method);
   }
 
   public static boolean checkProperParameters(PsiMethod method) {
-    final Project project = method.getProject();
-    final PsiParameter[] parameters = method.getParameterList().getParameters();
+    Project project = method.getProject();
+    PsiParameter[] parameters = method.getParameterList().getParameters();
     if (parameters.length == 2) {
-      final PsiType type2 = parameters[1].getType();
+      PsiType type2 = parameters[1].getType();
 
       return checkType(type2, CommonClassNames.JAVA_UTIL_MAP, project) || checkType(type2, CommonClassNames.JAVA_UTIL_DICTIONARY, project);
     } else if (parameters.length == 1) {

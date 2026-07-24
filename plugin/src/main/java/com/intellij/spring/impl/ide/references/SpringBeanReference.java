@@ -27,28 +27,28 @@ import java.util.List;
 public class SpringBeanReference extends PsiReferenceBase<PsiLiteralExpression> implements EmptyResolveMessageProvider {
   private final PsiClass myRequiredClass;
 
-  public SpringBeanReference(final PsiLiteralExpression element, final PsiClass requiredClass) {
+  public SpringBeanReference(PsiLiteralExpression element, PsiClass requiredClass) {
     super(element);
     myRequiredClass = requiredClass;
   }
 
-  public SpringBeanReference(final PsiLiteralExpression element) {
+  public SpringBeanReference(PsiLiteralExpression element) {
     this(element, null);
   }
 
   public PsiElement resolve() {
-    final Object value = myElement.getValue();
+    Object value = myElement.getValue();
     if (!(value instanceof String)) return null;
 
-    final SpringModel model = getSpringModel();
+    SpringModel model = getSpringModel();
     if (model == null) return null;
-    final SpringBeanPointer springBean = model.findBean((String)value);
+    SpringBeanPointer springBean = model.findBean((String)value);
 
     return springBean == null ? null : springBean.getPsiElement();
   }
 
   @Override
-  public PsiElement bindToElement(@Nonnull final PsiElement element) throws IncorrectOperationException
+  public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException
   {
     return getElement();
   }
@@ -56,7 +56,7 @@ public class SpringBeanReference extends PsiReferenceBase<PsiLiteralExpression> 
   @Nullable
   @RequiredReadAction
   private SpringModel getSpringModel() {
-    final Module module = myElement.getModule();
+    Module module = myElement.getModule();
     if (module == null) return null;
 
     return SpringManager.getInstance(module.getProject()).getModel(module);
@@ -65,14 +65,14 @@ public class SpringBeanReference extends PsiReferenceBase<PsiLiteralExpression> 
   @Override
   public Object[] getVariants() {
     List<Object> lookups = new ArrayList<Object>();
-    final SpringModel model = getSpringModel();
+    SpringModel model = getSpringModel();
     if (model != null) {
-      final Collection<? extends SpringBeanPointer> list = model.getAllCommonBeans(true);
+      Collection<? extends SpringBeanPointer> list = model.getAllCommonBeans(true);
 
       for (SpringBeanPointer bean : list) {
-        final String beanName = bean.getName();
+        String beanName = bean.getName();
         if (beanName != null && StringUtil.isNotEmpty(beanName)) {
-          final PsiClass beanClass = bean.getBeanClass();
+          PsiClass beanClass = bean.getBeanClass();
           if (myRequiredClass != null && (beanClass == null || !InheritanceUtil.isInheritorOrSelf(beanClass, myRequiredClass, true))) {
             continue;            
           }

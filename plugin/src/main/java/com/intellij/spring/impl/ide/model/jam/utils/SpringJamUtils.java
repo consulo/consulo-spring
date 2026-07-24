@@ -29,8 +29,8 @@ public class SpringJamUtils {
   private SpringJamUtils() {
   }
 
-  public static void processAllStereotypeJavaBeans(final SpringModel springModel, Consumer<CommonSpringBean> consumer) {
-    final consulo.module.Module module = springModel.getModule();
+  public static void processAllStereotypeJavaBeans(SpringModel springModel, Consumer<CommonSpringBean> consumer) {
+    consulo.module.Module module = springModel.getModule();
     if (module != null) {
       List<? extends ComponentScan> scanBeans = springModel.getComponentScans();
       if (scanBeans.size() > 0) {
@@ -45,8 +45,8 @@ public class SpringJamUtils {
     }
   }
 
-  public static void processConfigurations(final SpringModel springModel, Consumer<SpringJamElement> consumer) {
-    final consulo.module.Module module = springModel.getModule();
+  public static void processConfigurations(SpringModel springModel, Consumer<SpringJamElement> consumer) {
+    consulo.module.Module module = springModel.getModule();
     if (module == null) {
       return;
     }
@@ -68,7 +68,7 @@ public class SpringJamUtils {
                                                  List<PsiJavaPackage> psiPackages,
                                                  Consumer<CommonSpringBean> consumer) {
     for (SpringStereotypeElement component : components) {
-      final PsiClass psiClass = component.getBeanClass();
+      PsiClass psiClass = component.getBeanClass();
 
       if (isInPackage(psiPackages, psiClass)) {
         consumer.accept(component);
@@ -80,7 +80,7 @@ public class SpringJamUtils {
                                                List<PsiJavaPackage> psiPackages,
                                                Consumer<SpringJamElement> consumer) {
     for (SpringJamElement component : javaConfigurations) {
-      final PsiClass psiClass = component.getPsiClass();
+      PsiClass psiClass = component.getPsiClass();
       if (isInPackage(psiPackages, psiClass)) {
         consumer.accept(component);
       }
@@ -89,7 +89,7 @@ public class SpringJamUtils {
 
   private static boolean isInPackage(List<PsiJavaPackage> psiPackages, @Nullable PsiClass psiClass) {
     if (psiClass != null) {
-      final String qualifiedName = psiClass.getQualifiedName();
+      String qualifiedName = psiClass.getQualifiedName();
       if (qualifiedName != null) {
         for (PsiJavaPackage psiPackage : psiPackages) {
           if (StringUtil.startsWithConcatenation(qualifiedName, psiPackage.getQualifiedName(), ".")) {
@@ -101,8 +101,8 @@ public class SpringJamUtils {
     return false;
   }
 
-  private static List<PsiJavaPackage> getScannedPackages(final List<? extends ComponentScan> scanBeans) {
-    final ArrayList<PsiJavaPackage> list = new ArrayList<>(scanBeans.size());
+  private static List<PsiJavaPackage> getScannedPackages(List<? extends ComponentScan> scanBeans) {
+    ArrayList<PsiJavaPackage> list = new ArrayList<>(scanBeans.size());
     for (ComponentScan scanBean : scanBeans) {
       list.addAll(scanBean.getBasePackages());
     }
@@ -110,20 +110,20 @@ public class SpringJamUtils {
   }
 
   @Nonnull
-  public static List<SpringJavaBean> findBeanReferences(final CommonSpringBean springBean) {
+  public static List<SpringJavaBean> findBeanReferences(CommonSpringBean springBean) {
     List<SpringJavaBean> extBeans = new ArrayList<>();
-    final Set<String> strings = SpringUtils.getAllBeanNames(springBean);
+    Set<String> strings = SpringUtils.getAllBeanNames(springBean);
 
     if (strings.size() > 0) {
-      final XmlTag element = springBean.getXmlTag();
+      XmlTag element = springBean.getXmlTag();
       if (element != null) {
-        final Module module = ModuleUtilCore.findModuleForPsiElement(element);
+        Module module = ModuleUtilCore.findModuleForPsiElement(element);
 
         if (module != null) {
           for (SpringJamElement javaConfiguration : SpringJamModel.getModel(module).getConfigurations()) {
             if (javaConfiguration instanceof JavaSpringConfigurationElement) {
               for (SpringJavaBean externalBean : javaConfiguration.getBeans()) {
-                final PsiMethod psiMethod = externalBean.getPsiElement();
+                PsiMethod psiMethod = externalBean.getPsiElement();
                 if (psiMethod != null && strings.contains(psiMethod.getName())) {
                   extBeans.add(externalBean);
                 }
@@ -136,14 +136,14 @@ public class SpringJamUtils {
     return extBeans;
   }
 
-  public static boolean isBean(final PsiMethod psiMethod) {
+  public static boolean isBean(PsiMethod psiMethod) {
     return getBeanByMethod(psiMethod) != null;
   }
 
   @Nullable
   @RequiredReadAction
-  public static SpringJavaBean getBeanByMethod(final PsiMethod psiMethod) {
-    final consulo.module.Module module = psiMethod.getModule();
+  public static SpringJavaBean getBeanByMethod(PsiMethod psiMethod) {
+    consulo.module.Module module = psiMethod.getModule();
     if (module != null) {
       for (SpringJamElement javaConfiguration : SpringJamModel.getModel(module).getConfigurations()) {
         if (javaConfiguration instanceof JavaSpringConfigurationElement) {

@@ -56,14 +56,14 @@ public class SpringFactoryBeansManager {
 
   @Inject
   public SpringFactoryBeansManager() {
-    final FactoriesBean factoriesBean =
+    FactoriesBean factoriesBean =
       XmlSerializer.deserialize(SpringFactoryBeansManager.class.getResource(FACTORIES_RESOURCE_XML), FactoriesBean.class);
 
     assert factoriesBean != null;
     assert factoriesBean.getFactories() != null;
 
     for (FactoryBeanInfo factoryBeanInfo : factoriesBean.getFactories()) {
-      final String factory = factoryBeanInfo.getFactory();
+      String factory = factoryBeanInfo.getFactory();
       if (factory != null && factory.trim().length() > 0) {
         mySpringFactories.put(factory, getObjectTypeResolver(factoryBeanInfo));
       }
@@ -71,18 +71,18 @@ public class SpringFactoryBeansManager {
   }
 
   @Nullable
-  private ObjectTypeResolver getObjectTypeResolver(final FactoryBeanInfo factoryBeanInfo) {
-    final String type = factoryBeanInfo.getObjectType();
+  private ObjectTypeResolver getObjectTypeResolver(FactoryBeanInfo factoryBeanInfo) {
+    String type = factoryBeanInfo.getObjectType();
     if (!StringUtil.isEmptyOrSpaces(type)) {
       return new SingleObjectTypeResolver(type);
     }
 
-    final String delimitedNames = factoryBeanInfo.getPropertyNames();
+    String delimitedNames = factoryBeanInfo.getPropertyNames();
     if (!StringUtil.isEmptyOrSpaces(delimitedNames)) {
       return new FactoryPropertiesDependentTypeResolver(StringUtil.split(delimitedNames, PROPERTY_NAME_DELIMITER));
     }
 
-    final String factoryClass = factoryBeanInfo.getFactory();
+    String factoryClass = factoryBeanInfo.getFactory();
     for (ObjectTypeResolver customResolver : myCustomResolvers) {
       if (customResolver.accept(factoryClass)) return customResolver;
     }
@@ -91,31 +91,31 @@ public class SpringFactoryBeansManager {
   }
 
   public static boolean isBeanFactory(@Nonnull PsiClass psiClass) {
-    final Project project = psiClass.getProject();
-    final PsiClass beanFactoryClass =
+    Project project = psiClass.getProject();
+    PsiClass beanFactoryClass =
       JavaPsiFacade.getInstance(project).findClass(BEAN_FACTORY_CLASSNAME, GlobalSearchScope.allScope(project));
 
     return beanFactoryClass != null && psiClass.isInheritor(beanFactoryClass, true);
   }
 
-  public boolean isProductKnown(@Nonnull final PsiClass factoryClass, @Nonnull final CommonSpringBean context) {
+  public boolean isProductKnown(@Nonnull PsiClass factoryClass, @Nonnull CommonSpringBean context) {
     return !getProductTypeClassNames(factoryClass, context).isEmpty();
   }
 
   @Nonnull
-  public PsiClass[] getProductTypes(final PsiClass factoryClass, @Nonnull final CommonSpringBean context) {
-    final Set<String> typeClassNames = getProductTypeClassNames(factoryClass, context);
+  public PsiClass[] getProductTypes(PsiClass factoryClass, @Nonnull CommonSpringBean context) {
+    Set<String> typeClassNames = getProductTypeClassNames(factoryClass, context);
 
     if (typeClassNames.isEmpty()) {
       return PsiClass.EMPTY_ARRAY;
     }
     else {
-      final List<PsiClass> psiClasses = new ArrayList<PsiClass>(typeClassNames.size());
-      final Project project = factoryClass.getProject();
-      final PsiManager psiManager = PsiManager.getInstance(project);
-      final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-      for (final String typeClassName : typeClassNames) {
-        final PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(typeClassName, scope);
+      List<PsiClass> psiClasses = new ArrayList<PsiClass>(typeClassNames.size());
+      Project project = factoryClass.getProject();
+      PsiManager psiManager = PsiManager.getInstance(project);
+      GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+      for (String typeClassName : typeClassNames) {
+        PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(typeClassName, scope);
         if (psiClass != null) {
           psiClasses.add(psiClass);
         }
@@ -125,13 +125,13 @@ public class SpringFactoryBeansManager {
   }
 
   public boolean canProduce(@Nonnull PsiClass factory, @Nonnull PsiClass requiredClass, @Nonnull CommonSpringBean context) {
-    final Set<String> typeNames = getProductTypeClassNames(factory, context);
+    Set<String> typeNames = getProductTypeClassNames(factory, context);
     if (!typeNames.isEmpty()) {
       if (typeNames.contains(requiredClass.getQualifiedName())) return true;
 
-      final Project project = factory.getProject();
-      for (final String typeName : typeNames) {
-        final PsiClass productClass = JavaPsiFacade.getInstance(project).findClass(typeName, GlobalSearchScope.allScope(project));
+      Project project = factory.getProject();
+      for (String typeName : typeNames) {
+        PsiClass productClass = JavaPsiFacade.getInstance(project).findClass(typeName, GlobalSearchScope.allScope(project));
         if (productClass != null && productClass.isInheritor(requiredClass, true)) return true;
       }
     }
@@ -139,30 +139,30 @@ public class SpringFactoryBeansManager {
   }
 
   public boolean canProduceAny(@Nonnull PsiClass factory, @Nonnull List<PsiClass> requiredClasses, @Nonnull CommonSpringBean context) {
-    for (final PsiClass requiredClass : requiredClasses) {
+    for (PsiClass requiredClass : requiredClasses) {
       if (requiredClass != null && canProduce(factory, requiredClass, context)) return true;
     }
     return false;
   }
 
-  public boolean isFactoryRegistered(@Nonnull final PsiClass factoryClass) {
+  public boolean isFactoryRegistered(@Nonnull PsiClass factoryClass) {
     return mySpringFactories.containsKey(factoryClass.getQualifiedName());
   }
 
   @Nonnull
-  public Set<String> getProductTypeClassNames(@Nonnull final PsiClass factoryClass, @Nonnull final CommonSpringBean context) {
-    final String qualifiedName = factoryClass.getQualifiedName();
-    final ObjectTypeResolver typeResolver = mySpringFactories.get(qualifiedName);
+  public Set<String> getProductTypeClassNames(@Nonnull PsiClass factoryClass, @Nonnull CommonSpringBean context) {
+    String qualifiedName = factoryClass.getQualifiedName();
+    ObjectTypeResolver typeResolver = mySpringFactories.get(qualifiedName);
     if (typeResolver != null) {
       return typeResolver.getObjectType(context);
     }
 
-    final PsiManager psiManager = PsiManager.getInstance(factoryClass.getProject());
+    PsiManager psiManager = PsiManager.getInstance(factoryClass.getProject());
     for (String factoryClassName : mySpringFactories.keySet()) {
-      final PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject())
+      PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject())
                                              .findClass(factoryClassName, GlobalSearchScope.allScope(factoryClass.getProject()));
       if (psiClass != null && factoryClass.isInheritor(psiClass, false)) {
-        final ObjectTypeResolver resolver = mySpringFactories.get(factoryClassName);
+        ObjectTypeResolver resolver = mySpringFactories.get(factoryClassName);
         if (resolver != null) {
           return resolver.getObjectType(context);
         }
@@ -189,8 +189,8 @@ public class SpringFactoryBeansManager {
   }
 
   @Nullable
-  private static PsiMethod getProductTypeMethod(final PsiClass factoryClass) {
-    for (final PsiMethod psiMethod : factoryClass.findMethodsByName("getObjectType", true)) {
+  private static PsiMethod getProductTypeMethod(PsiClass factoryClass) {
+    for (PsiMethod psiMethod : factoryClass.findMethodsByName("getObjectType", true)) {
       if (psiMethod.getParameterList().getParameters().length == 0) {
         return psiMethod;
       }
@@ -198,31 +198,31 @@ public class SpringFactoryBeansManager {
     return null;
   }
 
-  private static Set<String> doGuessObjectType(final PsiClass factoryClass) {
-    final PsiMethod method = getProductTypeMethod(factoryClass);
+  private static Set<String> doGuessObjectType(PsiClass factoryClass) {
+    PsiMethod method = getProductTypeMethod(factoryClass);
     if (method == null) return Collections.emptySet();
 
     if (method instanceof PsiCompiledElement) {
-      final VirtualFile file = method.getContainingFile().getVirtualFile();
+      VirtualFile file = method.getContainingFile().getVirtualFile();
       if (file != null) {
-        final FactoryBeanObjectTypeReader reader = new FactoryBeanObjectTypeReader();
+        FactoryBeanObjectTypeReader reader = new FactoryBeanObjectTypeReader();
         try {
           new ClassReader(file.contentsToByteArray()).accept(reader, ClassReader.SKIP_DEBUG);
         }
         catch (IOException e) {
         }
-        final String qName = reader.getResultQName();
+        String qName = reader.getResultQName();
         if (qName != null) return Collections.singleton(qName);
       }
     }
 
-    final PsiCodeBlock body = method.getBody();
+    PsiCodeBlock body = method.getBody();
     if (body != null) {
-      final PsiStatement[] statements = body.getStatements();
+      PsiStatement[] statements = body.getStatements();
       if (statements.length == 1 && statements[0] instanceof PsiReturnStatement) {
-        final PsiExpression value = ((PsiReturnStatement)statements[0]).getReturnValue();
+        PsiExpression value = ((PsiReturnStatement)statements[0]).getReturnValue();
         if (value instanceof PsiClassObjectAccessExpression) {
-          final String s = ((PsiClassObjectAccessExpression)value).getOperand().getType().getCanonicalText();
+          String s = ((PsiClassObjectAccessExpression)value).getOperand().getType().getCanonicalText();
           if (s != null) {
             return Collections.singleton(s);
           }
@@ -255,15 +255,15 @@ public class SpringFactoryBeansManager {
       return myResultQName;
     }
 
-    public MethodVisitor visitMethod(final int access, @NonNls final String name, final String desc, final String signature,
-                                     final String[] exceptions) {
+    public MethodVisitor visitMethod(int access, @NonNls String name, String desc, String signature,
+                                     String[] exceptions) {
       if ("getObjectType".equals(name) && (signature == null || signature.startsWith("()"))) {
         return new MethodVisitor(Opcodes.API_VERSION) {
           private String qname;
           private int number = 0;
 
           @Override
-          public void visitFieldInsn(final int opcode, final String owner, final String name, final String desc) {
+          public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             if ((number == 0 || number == 7) && opcode == Opcodes.GETSTATIC || number == 5 && opcode == Opcodes.PUTSTATIC) {
               number++;
             }
@@ -271,14 +271,14 @@ public class SpringFactoryBeansManager {
           }
 
           @Override
-          public void visitJumpInsn(final int opcode, final Label label) {
+          public void visitJumpInsn(int opcode, Label label) {
             if (number == 1 && opcode == Opcodes.IFNONNULL || number == 6 && opcode == Opcodes.GOTO) {
               number++;
             }
           }
 
           @Override
-          public void visitLdcInsn(final Object cst) {
+          public void visitLdcInsn(Object cst) {
             if (number == 2 && cst instanceof String) {
               number++;
               qname = (String)cst;
@@ -290,13 +290,13 @@ public class SpringFactoryBeansManager {
           }
 
           @Override
-          public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc) {
+          public void visitMethodInsn(int opcode, String owner, String name, String desc) {
             if (number != 3 || opcode != Opcodes.INVOKESTATIC || !"class$".equals(name)) return;
             number++;
           }
 
           @Override
-          public void visitInsn(final int opcode) {
+          public void visitInsn(int opcode) {
             if (number == 4 && opcode == Opcodes.DUP) {
               number++;
             }

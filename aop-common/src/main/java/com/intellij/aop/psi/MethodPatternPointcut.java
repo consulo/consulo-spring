@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author peter
  */
 public abstract class MethodPatternPointcut extends AopElementBase implements PsiPointcutExpression {
-  public MethodPatternPointcut(@Nonnull final ASTNode node) {
+  public MethodPatternPointcut(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -52,7 +52,7 @@ public abstract class MethodPatternPointcut extends AopElementBase implements Ps
 
   @Nonnull
   public Collection<AopPsiTypePattern> getPatterns() {
-    final AopMemberReferenceExpression methodReference = getMethodReference();
+    AopMemberReferenceExpression methodReference = getMethodReference();
     if (methodReference == null) return Arrays.asList(AopPsiTypePattern.FALSE);
     return methodReference.getQualifierPatterns();
   }

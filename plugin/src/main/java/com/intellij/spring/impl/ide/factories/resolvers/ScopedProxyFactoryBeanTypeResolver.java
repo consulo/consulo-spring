@@ -24,12 +24,12 @@ public class ScopedProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResol
   @Nonnull
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     if (context instanceof SpringBean) {
-      final SpringBean springBean = (SpringBean) context;
-      final PsiClassType type = getTargetType(springBean);
+      SpringBean springBean = (SpringBean) context;
+      PsiClassType type = getTargetType(springBean);
 
       if (type != null) {
         if (isBooleanProperySetAndFalse(springBean, PROXY_CLASS_FLAG_PROPERTY_NAME)) {
-          final Set<String> targetInterfaceNames = getAllInterfaceNames(type);
+          Set<String> targetInterfaceNames = getAllInterfaceNames(type);
           if (!targetInterfaceNames.isEmpty()) {
             return targetInterfaceNames;
           }
@@ -42,9 +42,9 @@ public class ScopedProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResol
 
   @Nullable
   private static PsiClassType getTargetType(@Nonnull SpringBean context) {
-    final String targetBeanName = getPropertyValue(context, TARGET_BEAN_NAME_PROPERTY_NAME);
+    String targetBeanName = getPropertyValue(context, TARGET_BEAN_NAME_PROPERTY_NAME);
     if (targetBeanName != null) {
-      final PsiClassType fromTargetName = getTypeFromBeanName(context, targetBeanName);
+      PsiClassType fromTargetName = getTypeFromBeanName(context, targetBeanName);
       if (fromTargetName != null) {
         return fromTargetName;
       }

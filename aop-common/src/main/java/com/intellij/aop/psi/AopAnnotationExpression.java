@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author peter
  */
 public class AopAnnotationExpression extends AopElementBase implements AopAnnotationPattern{
-  public AopAnnotationExpression(@Nonnull final ASTNode node) {
+  public AopAnnotationExpression(@Nonnull ASTNode node) {
     super(node);
   }
 

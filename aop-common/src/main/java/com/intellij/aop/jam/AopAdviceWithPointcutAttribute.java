@@ -17,14 +17,14 @@ import jakarta.annotation.Nullable;
 public abstract class AopAdviceWithPointcutAttribute extends AopAdviceImpl{
   public static final JamStringAttributeMeta.Single<String> POINTCUT_ATTR = JamAttributeMeta.singleString(AopConstants.POINTCUT_PARAM);
 
-  public AopAdviceWithPointcutAttribute(final AopAdviceType type, JamAnnotationMeta annoName) {
+  public AopAdviceWithPointcutAttribute(AopAdviceType type, JamAnnotationMeta annoName) {
     super(type, annoName);
   }
 
   @Nullable
   @Override
   protected PsiAnnotationMemberValue getAnnoParam() {
-    final PsiAnnotationMemberValue value = super.getAnnoParam();
+    PsiAnnotationMemberValue value = super.getAnnoParam();
     if (value == null) {
       return myAnnoMeta.getAttribute(getPsiElement(), POINTCUT_ATTR).getPsiElement();
     }

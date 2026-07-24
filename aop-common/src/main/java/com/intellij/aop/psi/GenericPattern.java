@@ -15,7 +15,7 @@ public class GenericPattern extends AopPsiTypePattern{
   private final AopPsiTypePattern myErasure;
   private final AopPsiTypePattern[] myParameters;
 
-  public GenericPattern(final AopPsiTypePattern erasure, final AopPsiTypePattern... parameters) {
+  public GenericPattern(AopPsiTypePattern erasure, AopPsiTypePattern... parameters) {
     myErasure = erasure;
     myParameters = parameters;
   }
@@ -28,23 +28,23 @@ public class GenericPattern extends AopPsiTypePattern{
     return myParameters;
   }
 
-  public boolean accepts(@Nonnull final PsiType type) {
+  public boolean accepts(@Nonnull PsiType type) {
     return accepts(type, false);
   }
 
-  private boolean accepts(@Nonnull final PsiType type, boolean allowWildcardAssignability) {
+  private boolean accepts(@Nonnull PsiType type, boolean allowWildcardAssignability) {
     if (type instanceof PsiClassType) {
       if (!myErasure.accepts(type)) return false;
 
-      final PsiClassType classType = (PsiClassType)type;
+      PsiClassType classType = (PsiClassType)type;
       if (classType.isRaw()) return allowWildcardAssignability;
 
-      final PsiType[] parameters = classType.getParameters();
+      PsiType[] parameters = classType.getParameters();
       if (myParameters.length != parameters.length) return false;
 
       for (int i = 0; i < parameters.length; i++) {
-        final AopPsiTypePattern paramPattern = myParameters[i];
-        final PsiType parameter = parameters[i];
+        AopPsiTypePattern paramPattern = myParameters[i];
+        PsiType parameter = parameters[i];
         if (!(allowWildcardAssignability && paramPattern instanceof WildcardPattern ? paramPattern.canBeAssignableFrom(parameter) == PointcutMatchDegree.TRUE : paramPattern.accepts(parameter))) return false;
       }
 
@@ -58,8 +58,8 @@ public class GenericPattern extends AopPsiTypePattern{
   public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     if (accepts(type, true)) return PointcutMatchDegree.TRUE;
     boolean maybe = false;
-    for (final PsiType psiType : type.getSuperTypes()) {
-      final PointcutMatchDegree degree = canBeAssignableFrom(psiType);
+    for (PsiType psiType : type.getSuperTypes()) {
+      PointcutMatchDegree degree = canBeAssignableFrom(psiType);
       if (degree == PointcutMatchDegree.TRUE) return degree;
       maybe = degree == PointcutMatchDegree.MAYBE;
     }

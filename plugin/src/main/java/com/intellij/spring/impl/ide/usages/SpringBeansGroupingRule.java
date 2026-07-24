@@ -37,12 +37,12 @@ public class SpringBeansGroupingRule implements UsageGroupingRule {
         if (usage instanceof PsiElementUsage) {
             PsiElement psiElement = ((PsiElementUsage) usage).getElement();
 
-            final PsiFile psiFile = psiElement.getContainingFile();
-            final Project project = psiElement.getProject();
+            PsiFile psiFile = psiElement.getContainingFile();
+            Project project = psiElement.getProject();
             if (psiFile instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile) psiFile)) {
-                final DomElement domElement = DomUtil.getDomElement(psiElement);
+                DomElement domElement = DomUtil.getDomElement(psiElement);
                 if (domElement != null) {
-                    final DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
+                    DomSpringBean springBean = domElement.getParentOfType(DomSpringBean.class, false);
                     if (springBean != null) {
                         return new SpringBeansUsageGroup(springBean);
                     }
@@ -58,7 +58,7 @@ public class SpringBeansGroupingRule implements UsageGroupingRule {
 
         public SpringBeansUsageGroup(@Nonnull DomSpringBean bean) {
             myBean = bean;
-            final String beanName = bean.getPresentation().getElementName();
+            String beanName = bean.getPresentation().getElementName();
             myName = beanName == null ? SpringBundle.message("spring.bean.with.unknown.name") : beanName;
 
             update();
@@ -69,7 +69,7 @@ public class SpringBeansGroupingRule implements UsageGroupingRule {
         }
 
         @Override
-        public boolean equals(final Object o) {
+        public boolean equals(Object o) {
             if (this == o) {
                 return true;
             }
@@ -77,7 +77,7 @@ public class SpringBeansGroupingRule implements UsageGroupingRule {
                 return false;
             }
 
-            final SpringBeansUsageGroup that = (SpringBeansUsageGroup) o;
+            SpringBeansUsageGroup that = (SpringBeansUsageGroup) o;
 
             if (!myBean.equals(that.myBean)) {
                 return false;

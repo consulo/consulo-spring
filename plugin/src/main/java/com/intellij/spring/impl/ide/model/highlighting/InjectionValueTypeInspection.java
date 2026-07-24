@@ -51,9 +51,9 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static void checkIdRef(
-        final SpringElementsHolder elementsHolder,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType injectionType
+        SpringElementsHolder elementsHolder,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType injectionType
     ) {
         if (elementsHolder.getIdref().getXmlElement() != null) {
             checkPropertyTypeByClass(elementsHolder, String.class, holder, injectionType, elementsHolder.getIdref());
@@ -61,11 +61,11 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static void checkSpringPropertyValueType(
-        final SpringElementsHolder elementsHolder,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType propertyType
+        SpringElementsHolder elementsHolder,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType propertyType
     ) {
-        final PsiType type = elementsHolder.getValue().getType().getValue();
+        PsiType type = elementsHolder.getValue().getType().getValue();
 
         if (type == null) {
             return;
@@ -80,12 +80,12 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
 
 
     private void checkSpringPropertyListAndSet(
-        final SpringElementsHolder elementsHolder,
-        final DomElementAnnotationHolder holder,
-        @Nullable final PsiType propertyType
+        SpringElementsHolder elementsHolder,
+        DomElementAnnotationHolder holder,
+        @Nullable PsiType propertyType
     ) {
-        final ListOrSet set = elementsHolder.getSet();
-        final ListOrSet list = elementsHolder.getList();
+        ListOrSet set = elementsHolder.getSet();
+        ListOrSet list = elementsHolder.getList();
 
         if (set.getXmlElement() != null) {
             checkSpringPropertyCollection(set, holder);
@@ -102,33 +102,33 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static void checkSpringPropertyMap(
-        final SpringElementsHolder elementsHolder,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType propertyType
+        SpringElementsHolder elementsHolder,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType propertyType
     ) {
-        final SpringMap map = elementsHolder.getMap();
+        SpringMap map = elementsHolder.getMap();
         if (map.getXmlElement() != null) {
             checkPropertyTypeByClass(elementsHolder, Map.class, holder, propertyType, map);
         }
     }
 
     private static void checkSpringPropertyProps(
-        final SpringElementsHolder property,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType propertyType
+        SpringElementsHolder property,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType propertyType
     ) {
-        final Props props = property.getProps();
+        Props props = property.getProps();
         if (props.getXmlElement() != null) {
             checkPropertyTypeByClass(property, Properties.class, holder, propertyType, props);
         }
     }
 
 
-    public void checkSpringPropertyCollection(final ListOrSet collection, final DomElementAnnotationHolder holder) {
+    public void checkSpringPropertyCollection(ListOrSet collection, DomElementAnnotationHolder holder) {
         if (collection.getXmlElement() == null) {
             return;
         }
-        final PsiType psiClass = SpringBeanUtil.getRequiredType(collection);
+        PsiType psiClass = SpringBeanUtil.getRequiredType(collection);
         if (psiClass != null) {
             checkCollectionElementsType(psiClass, collection, holder);
         }
@@ -138,9 +138,9 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private void checkCollectionElementsType(
-        @Nonnull final PsiType type,
-        final CollectionElements collection,
-        final DomElementAnnotationHolder holder
+        @Nonnull PsiType type,
+        CollectionElements collection,
+        DomElementAnnotationHolder holder
     ) {
         for (SpringRef ref : collection.getRefs()) {
             checkSpringRefType(ref, type, holder);
@@ -151,7 +151,7 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
             }
         }
         if (type instanceof PsiClassType) {
-            final PsiClass psiClass = ((PsiClassType) type).resolve();
+            PsiClass psiClass = ((PsiClassType) type).resolve();
             if (psiClass != null) {
                 for (SpringBean springBean : collection.getBeans()) {
                     checkBeanClass(springBean, psiClass, springBean, holder);
@@ -161,22 +161,22 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private void checkSpringInjectionRefAttr(
-        final DomElementAnnotationHolder holder,
-        @Nullable final PsiType propertyType,
-        @Nullable final GenericDomValue<SpringBeanPointer> refAttr
+        DomElementAnnotationHolder holder,
+        @Nullable PsiType propertyType,
+        @Nullable GenericDomValue<SpringBeanPointer> refAttr
     ) {
         if (propertyType == null || refAttr == null) {
             return;
         }
 
-        final SpringBeanPointer beanPointer = refAttr.getValue();
+        SpringBeanPointer beanPointer = refAttr.getValue();
         if (beanPointer != null) {
             checkBeanClass(beanPointer, propertyType, refAttr, holder);
             checkJavaBeanVisibility(beanPointer, refAttr, holder);
         }
     }
 
-    private void checkSpringRefType(final SpringRef ref, final PsiType psiType, final DomElementAnnotationHolder holder) {
+    private void checkSpringRefType(SpringRef ref, PsiType psiType, DomElementAnnotationHolder holder) {
         if (ref.getXmlElement() == null) {
             return;
         }
@@ -188,30 +188,30 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static void checkJavaBeanVisibility(
-        final SpringBeanPointer beanPointer,
+        SpringBeanPointer beanPointer,
         DomElement annotatedElement,
-        final DomElementAnnotationHolder holder
+        DomElementAnnotationHolder holder
     ) {
         if (beanPointer == null) {
             return;
         }
-        final CommonSpringBean springBean = beanPointer.getSpringBean();
+        CommonSpringBean springBean = beanPointer.getSpringBean();
         if (springBean instanceof SpringJavaBean) {
             if (!((SpringJavaBean) springBean).isPublic()) {
-                final String message = SpringBundle.message("bean.must.be.public");
+                String message = SpringBundle.message("bean.must.be.public");
                 holder.createProblem(annotatedElement, message);
             }
         }
     }
 
     private void checkSpringPropertyInnerBean(
-        final SpringElementsHolder elementsHolder,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType injectionType
+        SpringElementsHolder elementsHolder,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType injectionType
     ) {
-        final List<CommonSpringBean> beans = SpringUtils.getChildBeans(elementsHolder, false);
+        List<CommonSpringBean> beans = SpringUtils.getChildBeans(elementsHolder, false);
         if (!beans.isEmpty()) {
-            final CommonSpringBean bean = beans.get(0);
+            CommonSpringBean bean = beans.get(0);
             checkBeanClass(
                 bean,
                 injectionType,
@@ -222,23 +222,23 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private void checkBeanClass(
-        @Nullable final CommonSpringBean springBean,
-        @Nonnull final PsiClass clazz,
-        final DomElement annotatedElement,
-        @Nonnull final DomElementAnnotationHolder holder
+        @Nullable CommonSpringBean springBean,
+        @Nonnull PsiClass clazz,
+        DomElement annotatedElement,
+        @Nonnull DomElementAnnotationHolder holder
     ) {
         if (springBean != null) {
-            final PsiClassType classType = JavaPsiFacade.getInstance(clazz.getProject()).getElementFactory().createType(clazz);
+            PsiClassType classType = JavaPsiFacade.getInstance(clazz.getProject()).getElementFactory().createType(clazz);
 
             checkBeanClass(springBean, classType, annotatedElement, holder);
         }
     }
 
     private void checkBeanClass(
-        @Nullable final SpringBeanPointer springBeanPointer,
-        @Nonnull final PsiType psiType,
-        final DomElement annotatedElement,
-        @Nonnull final DomElementAnnotationHolder holder
+        @Nullable SpringBeanPointer springBeanPointer,
+        @Nonnull PsiType psiType,
+        DomElement annotatedElement,
+        @Nonnull DomElementAnnotationHolder holder
     ) {
         if (springBeanPointer != null) {
             if (springBeanPointer.getBeanClass() == null) {
@@ -250,21 +250,21 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     protected void checkBeanClass(
-        @Nonnull final CommonSpringBean springBean,
+        @Nonnull CommonSpringBean springBean,
         @Nonnull PsiType psiType,
-        final DomElement annotatedElement,
-        @Nonnull final DomElementAnnotationHolder holder
+        DomElement annotatedElement,
+        @Nonnull DomElementAnnotationHolder holder
     ) {
 
         if (psiType instanceof PsiArrayType) {
             psiType = ((PsiArrayType) psiType).getComponentType();
         }
-        final PsiClass beanClass = springBean.getBeanClass();
+        PsiClass beanClass = springBean.getBeanClass();
         if (beanClass == null) {
             return;
         }
 
-        final Project project = annotatedElement.getManager().getProject();
+        Project project = annotatedElement.getManager().getProject();
 
         if (!SpringUtils.isEffectiveClassType(psiType, springBean)) {
             if (tryCreatingCustomProblem(springBean, psiType, annotatedElement, holder)) {
@@ -272,17 +272,17 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
             }
 
             if (SpringUtils.isCollectionType(psiType, project)) {
-                final PsiType genericType = SpringUtils.getGenericCollectonType(psiType);
+                PsiType genericType = SpringUtils.getGenericCollectonType(psiType);
                 if (genericType != null && !genericType.isAssignableFrom(JavaPsiFacade.getInstance(project)
                     .getElementFactory()
                     .createType(beanClass))) {
-                    final String message =
+                    String message =
                         SpringBundle.message("bean.must.be.of.types", psiType.getCanonicalText(), genericType.getCanonicalText());
                     holder.createProblem(annotatedElement, message);
                 }
             }
             else {
-                final String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
+                String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
                 holder.createProblem(annotatedElement, message);
             }
         }
@@ -306,12 +306,12 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
                         }
 
                         if (list.size() == 1) {
-                            final String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
+                            String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
                             holder.createProblem(annotatedElement, message);
                         }
                         else {
                             String classNames = StringUtil.join(list, psiClassType -> psiClassType.getCanonicalText(), ",");
-                            final String message = SpringBundle.message("bean.must.be.one.of.this.types", classNames);
+                            String message = SpringBundle.message("bean.must.be.one.of.this.types", classNames);
                             holder.createProblem(annotatedElement, message);
                         }
                     }
@@ -321,12 +321,12 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static boolean tryCreatingCustomProblem(
-        final CommonSpringBean springBean,
-        final PsiType psiType,
-        final DomElement annotatedElement,
-        final DomElementAnnotationHolder holder
+        CommonSpringBean springBean,
+        PsiType psiType,
+        DomElement annotatedElement,
+        DomElementAnnotationHolder holder
     ) {
-        for (final SpringBeanEffectiveTypeProvider provider : SpringBeanEffectiveTypeProvider.EP_NAME.getExtensions()) {
+        for (SpringBeanEffectiveTypeProvider provider : SpringBeanEffectiveTypeProvider.EP_NAME.getExtensions()) {
             if (provider.createCustomProblem(springBean, psiType, holder, annotatedElement)) {
                 return true;
             }
@@ -335,10 +335,10 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private static void checkPropertyTypeByClass(
-        final SpringElementsHolder injection,
-        final Class requiredClass,
-        final DomElementAnnotationHolder holder,
-        @Nonnull final PsiType propertyType,
+        SpringElementsHolder injection,
+        Class requiredClass,
+        DomElementAnnotationHolder holder,
+        @Nonnull PsiType propertyType,
         DomElement value
     ) {
 
@@ -347,11 +347,11 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
             return;
         }
 
-        final Project project = injection.getManager().getProject();
-        final PsiType requiredType = SpringConverterUtil.findType(requiredClass, project);
+        Project project = injection.getManager().getProject();
+        PsiType requiredType = SpringConverterUtil.findType(requiredClass, project);
         if (requiredType != null && !requiredType.isAssignableFrom(propertyType) &&
             !SpringConverterUtil.isConvertable(requiredType, propertyType, project)) {
-            final String message =
+            String message =
                 SpringBundle.message("bean.bad.property.type", propertyType.getCanonicalText(), requiredClass.getCanonicalName());
             holder.createProblem(value, message);
         }
@@ -359,16 +359,16 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
 
     protected void checkBean(
         DomSpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel
     ) {
         for (SpringValueHolderDefinition definition : SpringUtils.getValueHolders(springBean)) {
             if (definition instanceof ConstructorArg) {
                 continue;
             }
 
-            final PsiType propertyType = SpringBeanUtil.getRequiredType(definition);
+            PsiType propertyType = SpringBeanUtil.getRequiredType(definition);
             checkSpringInjectionRefAttr(holder, propertyType, definition.getRefElement());
             if (definition instanceof SpringElementsHolder) {
                 checkElementsHolder((SpringElementsHolder) definition, propertyType, holder);
@@ -377,9 +377,9 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
     }
 
     private void checkElementsHolder(
-        final SpringElementsHolder elementsHolder,
-        @Nullable final PsiType requiredType,
-        final DomElementAnnotationHolder holder
+        SpringElementsHolder elementsHolder,
+        @Nullable PsiType requiredType,
+        DomElementAnnotationHolder holder
     ) {
         if (requiredType != null) {
             checkSpringRefType(elementsHolder.getRef(), requiredType, holder);

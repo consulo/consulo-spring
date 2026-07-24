@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpringOsgiDomExtender extends DomExtender<Beans> {
 
-    public void registerExtensions(@NotNull final Beans element, @NotNull final DomExtensionsRegistrar registrar) {
+    public void registerExtensions(@NotNull Beans element, @NotNull DomExtensionsRegistrar registrar) {
       registrar.registerCollectionChildrenExtension(new XmlName("service", SpringOsgiConstants.OSGI_NAMESPACE), Service.class);
       registrar.registerCollectionChildrenExtension(new XmlName("reference", SpringOsgiConstants.OSGI_NAMESPACE), Reference.class);
       registrar.registerCollectionChildrenExtension(new XmlName("list", SpringOsgiConstants.OSGI_NAMESPACE), List.class);

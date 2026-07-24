@@ -44,10 +44,10 @@ public abstract class AbstractAopInspection extends XmlSuppressableInspectionToo
 
     @Override
     @Nonnull
-    public PsiElementVisitor buildVisitor(@Nonnull final ProblemsHolder holder, final boolean isOnTheFly) {
+    public PsiElementVisitor buildVisitor(@Nonnull final ProblemsHolder holder, boolean isOnTheFly) {
         return new PsiElementVisitor() {
             @Override
-            public void visitElement(final PsiElement element) {
+            public void visitElement(PsiElement element) {
                 if (element instanceof PsiLiteralExpression || element instanceof XmlAttributeValue) {
                     checkElement(element, holder);
                 }
@@ -55,7 +55,7 @@ public abstract class AbstractAopInspection extends XmlSuppressableInspectionToo
         };
     }
 
-    protected void checkElement(final PsiElement element, final ProblemsHolder holder) {
+    protected void checkElement(PsiElement element, ProblemsHolder holder) {
         InjectedLanguageManager.getInstance(element.getProject()).enumerate(element, (file, places) -> {
             if (file instanceof AopPointcutExpressionFile && file.getContext() == element) {
                 AopPointcutExpressionFile aopFile = (AopPointcutExpressionFile) file;

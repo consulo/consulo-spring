@@ -20,19 +20,19 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SpringMVCReferenceProvider extends CustomServletReferenceAdapter {
 
-  protected PsiReference[] createReferences(final @NotNull PsiElement element,
-                                            final int offset,
-                                            final String text,
-                                            final @Nullable ServletMappingInfo info,
-                                            final boolean soft) {
+  protected PsiReference[] createReferences(@NotNull PsiElement element,
+                                            int offset,
+                                            String text,
+                                            @Nullable ServletMappingInfo info,
+                                            boolean soft) {
 
-    final SpringMVCModel model = SpringMVCModel.getModel(element);
+    SpringMVCModel model = SpringMVCModel.getModel(element);
     return model == null || model.getAllModels().isEmpty() ? PsiReference.EMPTY_ARRAY : new PsiReference[] { new SpringMVCReference(element, offset, text, info, model.getWebFacet(),
                                                                                                                                     model.getSpringFacet(),
                                                                                                                                     soft)};
   }
 
-  public PathReference createWebPath(final String path, final @NotNull PsiElement element, final ServletMappingInfo info) {
+  public PathReference createWebPath(String path, @NotNull PsiElement element, ServletMappingInfo info) {
     return null;
   }
 
@@ -45,18 +45,18 @@ public class SpringMVCReferenceProvider extends CustomServletReferenceAdapter {
     private final WebFacet myWebFacet;
     private final SpringFacet mySpringFacet;
 
-    public SpringMVCReference(final PsiElement element,
-                              final int offset,
-                              final String text,
-                              @Nullable final ServletMappingInfo info,
-                              final WebFacet webFacet, final SpringFacet springFacet, final boolean soft) {
+    public SpringMVCReference(PsiElement element,
+                              int offset,
+                              String text,
+                              @Nullable ServletMappingInfo info,
+                              WebFacet webFacet, SpringFacet springFacet, boolean soft) {
 
       super(element, new TextRange(offset, offset + text.length()), soft);
       myInfo = info;
       myWebFacet = webFacet;
       mySpringFacet = springFacet;
       if (info != null) {
-        final TextRange range = info.getNameRange(text);
+        TextRange range = info.getNameRange(text);
         if (range != null) {
           setRangeInElement(range.shiftRight(offset));
         }
@@ -70,26 +70,26 @@ public class SpringMVCReferenceProvider extends CustomServletReferenceAdapter {
 
     @Nullable
     private String getUrl() {
-      final String url = getValue();
+      String url = getValue();
       return myInfo != null ? myInfo.addMapping(url) : null;
     }
 
     @Override
-    public PsiElement handleElementRename(final String newElementName) throws IncorrectOperationException {
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
       if (myInfo == null) {
         return super.handleElementRename(newElementName);
       } else {
-        final String s = myInfo.stripMapping(newElementName);
+        String s = myInfo.stripMapping(newElementName);
         return super.handleElementRename(s);
       }
     }
 
     public PsiElement resolve() {
-      final String url = getUrl();
+      String url = getUrl();
       if (url == null) {
         return null;
       }
-      final SpringMVCModel model = getModel();
+      SpringMVCModel model = getModel();
       if (model == null) {
         return null;
       }
@@ -97,7 +97,7 @@ public class SpringMVCReferenceProvider extends CustomServletReferenceAdapter {
     }
 
     public Object[] getVariants() {
-      final SpringMVCModel model = getModel();
+      SpringMVCModel model = getModel();
       if (model == null) {
         return EMPTY_ARRAY;
       }

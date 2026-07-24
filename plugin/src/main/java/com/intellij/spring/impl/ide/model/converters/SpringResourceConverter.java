@@ -13,10 +13,10 @@ import jakarta.annotation.Nullable;
 
 public class SpringResourceConverter extends Converter<PsiFile> implements CustomReferenceConverter<PsiFile> {
 
-  public PsiFile fromString(final @Nullable String s, final ConvertContext context) {
+  public PsiFile fromString(@Nullable String s, ConvertContext context) {
     if (s != null) {
-      final GenericAttributeValue<PsiFile> element = (GenericAttributeValue<PsiFile>)context.getInvocationElement();
-      final PsiReference[] references = createReferences(element, element.getXmlAttributeValue(), context);
+      GenericAttributeValue<PsiFile> element = (GenericAttributeValue<PsiFile>)context.getInvocationElement();
+      PsiReference[] references = createReferences(element, element.getXmlAttributeValue(), context);
       if (references.length > 0) {
         PsiElement result = references[references.length - 1].resolve();
         if (result instanceof PsiFile) {
@@ -27,13 +27,13 @@ public class SpringResourceConverter extends Converter<PsiFile> implements Custo
     return null;
   }
 
-  public String toString(final @Nullable PsiFile psiFile, final ConvertContext context) {
+  public String toString(@Nullable PsiFile psiFile, ConvertContext context) {
       return null;
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue<PsiFile> genericDomValue, final PsiElement element, final ConvertContext context) {
-    final String s = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue<PsiFile> genericDomValue, PsiElement element, ConvertContext context) {
+    String s = genericDomValue.getStringValue();
     if (s == null || element == null) {
       return PsiReference.EMPTY_ARRAY;
     }

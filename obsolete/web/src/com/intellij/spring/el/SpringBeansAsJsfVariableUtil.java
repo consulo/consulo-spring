@@ -24,20 +24,20 @@ public class SpringBeansAsJsfVariableUtil {
   private SpringBeansAsJsfVariableUtil() {
   }
 
-  public static void addVariables(final List<JspImplicitVariable> resultVars, final Module module) {
-    final SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
+  public static void addVariables(List<JspImplicitVariable> resultVars, Module module) {
+    SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     if (springModel == null) return;
 
     addVariables(resultVars, springModel);
   }
 
-  public static void addVariables(final List<JspImplicitVariable> resultVars, final SpringModel springModel) {
-    final Collection<? extends SpringBeanPointer> list = springModel.getAllCommonBeans(true);
+  public static void addVariables(List<JspImplicitVariable> resultVars, SpringModel springModel) {
+    Collection<? extends SpringBeanPointer> list = springModel.getAllCommonBeans(true);
 
     for (SpringBeanPointer pointer : list) {
-      final PsiFile file = pointer.getContainingFile();
+      PsiFile file = pointer.getContainingFile();
       if (file != null) {
-        final PsiClassType type = getBeanType(pointer);
+        PsiClassType type = getBeanType(pointer);
         //todo peter: beautify
         CommonSpringBean bean = pointer.getSpringBean();
         if (bean instanceof JavaSpringJavaBean) {
@@ -48,11 +48,11 @@ public class SpringBeansAsJsfVariableUtil {
           continue;
         }
 
-        final String beanName = pointer.getName();
+        String beanName = pointer.getName();
         if (beanName != null && !StringUtil.isEmptyOrSpaces(beanName)) {
-          final PsiElement element = pointer.getPsiElement();
+          PsiElement element = pointer.getPsiElement();
           if (element != null) {
-            final Set<String> beanNames = springModel.getAllBeanNames(beanName);
+            Set<String> beanNames = springModel.getAllBeanNames(beanName);
             for (String aliasName : beanNames) {
               if (!StringUtil.isEmptyOrSpaces(aliasName)) {
                 resultVars.add(createVariable(pointer, file, aliasName, element, type));
@@ -72,13 +72,13 @@ public class SpringBeansAsJsfVariableUtil {
     return new JspImplicitVariableImpl(file, beanName, type, element, JspImplicitVariableImpl.NESTED_RANGE) {
 
       @Nullable
-      public Icon getIcon(final boolean open) {
+      public Icon getIcon(boolean open) {
         return commonSpringBean.getBeanIcon();
       }
     };
   }
 
-  public static JspImplicitVariableImpl createVariable(final SpringBeanPointer commonSpringBean, String name) {
+  public static JspImplicitVariableImpl createVariable(SpringBeanPointer commonSpringBean, String name) {
     PsiClassType type = getBeanType(commonSpringBean);
     return createVariable(commonSpringBean, commonSpringBean.getContainingFile(), name, commonSpringBean.getPsiElement(), type);
   }

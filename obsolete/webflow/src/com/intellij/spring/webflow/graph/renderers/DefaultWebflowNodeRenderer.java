@@ -18,20 +18,20 @@ public class DefaultWebflowNodeRenderer extends BasicGraphNodeRenderer<WebflowNo
     super(builder, ModificationTracker.EVER_CHANGED);
   }
 
-  protected JComponent getPresenationComponent(final String text) {
+  protected JComponent getPresenationComponent(String text) {
 
     return super.getPresenationComponent(text);
   }
 
-  protected Icon getIcon(final WebflowNode node) {
+  protected Icon getIcon(WebflowNode node) {
     return node.getIcon();
   }
 
-  protected String getNodeName(final WebflowNode node) {
+  protected String getNodeName(WebflowNode node) {
     return node.getName();
   }
 
-  protected Color getBackground(final WebflowNode node) {
+  protected Color getBackground(WebflowNode node) {
     return Color.LIGHT_GRAY;
   }
 

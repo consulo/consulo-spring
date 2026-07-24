@@ -51,9 +51,9 @@ public class CustomBeanFakePsiElement extends RenameableFakePsiElement
   }
 
   @Override
-    public PsiElement setName(@NonNls @Nonnull final String name) throws IncorrectOperationException
+    public PsiElement setName(@NonNls @Nonnull String name) throws IncorrectOperationException
   {
-    final XmlAttribute idAttribute = myBean.getIdAttribute();
+    XmlAttribute idAttribute = myBean.getIdAttribute();
     if (idAttribute != null) {
       idAttribute.setValue(name);
     }
@@ -63,7 +63,7 @@ public class CustomBeanFakePsiElement extends RenameableFakePsiElement
   @Override
   public boolean isEquivalentTo(PsiElement another) {
     if (another instanceof CustomBeanFakePsiElement) {
-      final CustomBeanFakePsiElement element = (CustomBeanFakePsiElement)another;
+      CustomBeanFakePsiElement element = (CustomBeanFakePsiElement)another;
       return element.getBean().equals(getBean());
     }
     return false;

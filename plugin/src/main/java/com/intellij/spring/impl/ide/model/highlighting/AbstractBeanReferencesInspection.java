@@ -21,9 +21,9 @@ public class AbstractBeanReferencesInspection extends SpringBeanInspectionBase<O
     @Override
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel, Object state
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel, Object state
     ) {
         for (SpringValueHolderDefinition property : SpringUtils.getValueHolders(springBean)) {
             checkAbstractBeanReferences(property, holder);
@@ -42,21 +42,21 @@ public class AbstractBeanReferencesInspection extends SpringBeanInspectionBase<O
         return "AbstractBeanReferencesInspection";
     }
 
-    private static void checkAbstractBeanReferences(final SpringValueHolderDefinition definition, final DomElementAnnotationHolder holder) {
-        final GenericDomValue<SpringBeanPointer> refElement = definition.getRefElement();
+    private static void checkAbstractBeanReferences(SpringValueHolderDefinition definition, DomElementAnnotationHolder holder) {
+        GenericDomValue<SpringBeanPointer> refElement = definition.getRefElement();
         if (refElement != null) {
-            final SpringBeanPointer ref = refElement.getValue();
+            SpringBeanPointer ref = refElement.getValue();
             if (ref != null) {
                 checkNotAbstract(refElement, ref, holder);
             }
         }
 
         if (definition instanceof SpringValueHolder) {
-            final SpringValueHolder springInjection = (SpringValueHolder) definition;
+            SpringValueHolder springInjection = (SpringValueHolder) definition;
             checkSpringRefBeans(springInjection.getRef(), holder);
 
             if (DomUtil.hasXml(springInjection.getBean())) {
-                final SpringBean innerBean = springInjection.getBean();
+                SpringBean innerBean = springInjection.getBean();
                 checkNotAbstract(innerBean, SpringBeanPointer.createSpringBeanPointer(innerBean), holder);
             }
 
@@ -81,37 +81,37 @@ public class AbstractBeanReferencesInspection extends SpringBeanInspectionBase<O
         }
     }
 
-    private static void checkMapReferences(final SpringMap map, final DomElementAnnotationHolder beans) {
+    private static void checkMapReferences(SpringMap map, DomElementAnnotationHolder beans) {
         for (SpringEntry entry : map.getEntries()) {
             checkAbstractBeanReferences(entry, beans);
         }
     }
 
-    private static void checkIdrefBeans(final Idref idref, final DomElementAnnotationHolder holder) {
-        final SpringBeanPointer local = idref.getLocal().getValue();
+    private static void checkIdrefBeans(Idref idref, DomElementAnnotationHolder holder) {
+        SpringBeanPointer local = idref.getLocal().getValue();
         if (local != null) {
             checkNotAbstract(idref.getLocal(), local, holder);
         }
-        final SpringBeanPointer bean = idref.getBean().getValue();
+        SpringBeanPointer bean = idref.getBean().getValue();
         if (bean != null) {
             checkNotAbstract(idref.getBean(), bean, holder);
         }
     }
 
-    private static void checkSpringRefBeans(final SpringRef springRef, final DomElementAnnotationHolder holder) {
+    private static void checkSpringRefBeans(SpringRef springRef, DomElementAnnotationHolder holder) {
         if (DomUtil.hasXml(springRef)) {
-            final SpringBeanPointer bean = springRef.getBean().getValue();
+            SpringBeanPointer bean = springRef.getBean().getValue();
             if (bean != null) {
                 checkNotAbstract(springRef.getBean(), bean, holder);
             }
-            final SpringBeanPointer local = springRef.getLocal().getValue();
+            SpringBeanPointer local = springRef.getLocal().getValue();
             if (local != null) {
                 checkNotAbstract(springRef.getLocal(), local, holder);
             }
         }
     }
 
-    private static void checkCollectionReferences(final CollectionElements elements, final DomElementAnnotationHolder holder) {
+    private static void checkCollectionReferences(CollectionElements elements, DomElementAnnotationHolder holder) {
         for (SpringRef springRef : elements.getRefs()) {
             checkSpringRefBeans(springRef, holder);
         }

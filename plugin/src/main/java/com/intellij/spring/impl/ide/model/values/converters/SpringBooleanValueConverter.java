@@ -15,7 +15,7 @@ public class SpringBooleanValueConverter extends BooleanValueConverter {
 
   private static final String[] SORTED_VALUES = ArrayUtil.mergeArrays(VALUES_TRUE, VALUES_FALSE);
 
-  public SpringBooleanValueConverter(final boolean allowEmpty) {
+  public SpringBooleanValueConverter(boolean allowEmpty) {
     super(allowEmpty);
   }
 

@@ -62,7 +62,7 @@ public abstract class SpringJavaConfigInspectionBase extends BaseJavaLocalInspec
         };
     }
 
-    protected void checkClass(final PsiClass aClass, final ProblemsHolder holder, @Nonnull Module module) {
+    protected void checkClass(PsiClass aClass, ProblemsHolder holder, @Nonnull Module module) {
         SpringJamElement configuration = getJavaConfiguration(aClass, module);
 
         if (configuration != null) {
@@ -90,8 +90,8 @@ public abstract class SpringJavaConfigInspectionBase extends BaseJavaLocalInspec
     }
 
     protected abstract void checkJavaConfiguration(
-        final SpringJamElement javaConfiguration,
-        final Module module,
-        final ProblemsHolder holder
+        SpringJamElement javaConfiguration,
+        Module module,
+        ProblemsHolder holder
     );
 }

@@ -11,7 +11,7 @@ public abstract class FakeScopePsiVariable extends RenameableFakePsiElement {
   private final PsiElement myNavigationElement;
   private final String myVarName;
 
-  public FakeScopePsiVariable(final XmlFile psiFile, final PsiElement navigationElement, final String varName) {
+  public FakeScopePsiVariable(XmlFile psiFile, PsiElement navigationElement, String varName) {
     super(psiFile);
     myPsiFile = psiFile;
     myNavigationElement = navigationElement;
@@ -38,11 +38,11 @@ public abstract class FakeScopePsiVariable extends RenameableFakePsiElement {
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final FakeScopePsiVariable that = (FakeScopePsiVariable)o;
+    FakeScopePsiVariable that = (FakeScopePsiVariable)o;
 
     if (myNavigationElement != null ? !myNavigationElement.equals(that.myNavigationElement) : that.myNavigationElement != null)
       return false;

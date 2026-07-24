@@ -44,7 +44,7 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
                                             "@" + AopConstants.POINTCUT_ANNO + " " + "private void privatePointcut() {} " +
                                             "}");
 
-    final PsiClass contextClass = myFixture.addClass(
+    PsiClass contextClass = myFixture.addClass(
       "public class Object239 { " +
       "public class Foo {} " +
       "@" + AopConstants.POINTCUT_ANNO + " " + "public void somePointcut(" + AopConstants.JOIN_POINT + " nonArgName, int argName) {} " +
@@ -85,7 +85,7 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
     new WriteCommandAction(getProject()) {
       @Override
       protected void run(Result result) throws Throwable {
-        final FileTypeManager manager = FileTypeManager.getInstance();
+        FileTypeManager manager = FileTypeManager.getInstance();
         if (manager.getFileTypeByExtension(AopPointcutExpressionFileType.INSTANCE.getDefaultExtension()) != AopPointcutExpressionFileType.INSTANCE) {
           manager
           .registerFileType(AopPointcutExpressionFileType.INSTANCE, AopPointcutExpressionFileType.INSTANCE.getDefaultExtension());
@@ -373,15 +373,15 @@ public class AopCompletionTest extends InjectedLanguageFixtureTestCase {
     checkCompleted("execution(* *() thr|", "execution(* *() throws |");
   }
 
-  private void assertNoVariants(@NonNls final String text) throws Throwable {
+  private void assertNoVariants(@NonNls String text) throws Throwable {
     assertNoVariants(AopPointcutExpressionFileType.INSTANCE, text);
   }
 
-  private void checkCompleted(@NonNls final String text, @NonNls final String resultText) throws Throwable {
+  private void checkCompleted(@NonNls String text, @NonNls String resultText) throws Throwable {
     checkCompleted(AopPointcutExpressionFileType.INSTANCE, text, resultText);
   }
 
-  protected void tuneCompletionFile(final PsiFile file) {
+  protected void tuneCompletionFile(PsiFile file) {
     ((AopPointcutExpressionFile) file).setAopModel(myAopModel);
   }
 

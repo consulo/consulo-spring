@@ -31,12 +31,12 @@ public class RequiredBeanTypeInspection extends DomElementsInspection<Beans, Obj
             Object value = ((GenericAttributeValue) element).getValue();
 
             if (value instanceof SpringBeanPointer) {
-                final RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
+                RequiredBeanType type = element.getAnnotation(RequiredBeanType.class);
                 if (type != null) {
                     SpringBeanPointer springBeanPointer = (SpringBeanPointer) value;
 
                     PsiClass[] classes = springBeanPointer.getEffectiveBeanType();
-                    final PsiClass requiredClass = DomJavaUtil.findClass(type.value(), element);
+                    PsiClass requiredClass = DomJavaUtil.findClass(type.value(), element);
                     if (requiredClass != null) {
                         boolean isAssignable = false;
                         for (PsiClass psiClass : classes) {

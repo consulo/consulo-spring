@@ -26,7 +26,7 @@ import jakarta.annotation.Nonnull;
 public class AopAnnoParameterReference extends PsiReferenceBase<PsiAnnotationMemberValue> implements EmptyResolveMessageProvider {
   private final PsiMethod myMethod;
 
-  public AopAnnoParameterReference(final PsiLiteral element) {
+  public AopAnnoParameterReference(PsiLiteral element) {
     super(element);
     myMethod = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
   }
@@ -40,7 +40,7 @@ public class AopAnnoParameterReference extends PsiReferenceBase<PsiAnnotationMem
   @Override
   @RequiredReadAction
   public Object[] getVariants() {
-    final PsiParameter[] parameters = myMethod.getParameterList().getParameters();
+    PsiParameter[] parameters = myMethod.getParameterList().getParameters();
     return parameters.length > 0 && LocalAopModel.isJoinPointParamer(parameters[0]) ? ArrayUtil.remove(parameters, 0) : parameters;
   }
 

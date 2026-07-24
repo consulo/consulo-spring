@@ -32,10 +32,10 @@ public class LibraryDownloadInfo {
   private final String myFileNameSuffix;
   @Nullable private final String myPresentableUrl;
 
-  public LibraryDownloadInfo(final @Nonnull RemoteRepositoryInfo remoteRepository,
-                             final @Nonnull @NonNls String relativeDownloadUrl,
-                             final @Nonnull @NonNls String fileNamePrefix,
-                             final @Nonnull @NonNls String fileNameSuffix) {
+  public LibraryDownloadInfo(@Nonnull RemoteRepositoryInfo remoteRepository,
+                             @Nonnull @NonNls String relativeDownloadUrl,
+                             @Nonnull @NonNls String fileNamePrefix,
+                             @Nonnull @NonNls String fileNameSuffix) {
     myRemoteRepository = remoteRepository;
     myRelativeDownloadUrl = relativeDownloadUrl;
     myFileNamePrefix = fileNamePrefix;
@@ -43,7 +43,7 @@ public class LibraryDownloadInfo {
     myPresentableUrl = null;
   }
 
-  public LibraryDownloadInfo(final @Nonnull String downloadUrl, final @Nullable String presentableUrl,
+  public LibraryDownloadInfo(@Nonnull String downloadUrl, @Nullable String presentableUrl,
                              @Nonnull @NonNls String fileNamePrefix, @Nonnull @NonNls String fileNameSuffix) {
     myRemoteRepository = null;
     myRelativeDownloadUrl = downloadUrl;
@@ -52,12 +52,12 @@ public class LibraryDownloadInfo {
     myPresentableUrl = presentableUrl != null ? presentableUrl : downloadUrl;
   }
 
-  public LibraryDownloadInfo(final @Nonnull String downloadUrl, final @Nullable String presentableUrl,
+  public LibraryDownloadInfo(@Nonnull String downloadUrl, @Nullable String presentableUrl,
                              @Nonnull @NonNls String fileNamePrefix) {
     this(downloadUrl, presentableUrl, fileNamePrefix, ".jar");
   }
 
-  public LibraryDownloadInfo(final @Nonnull String downloadUrl, @Nonnull @NonNls String fileNamePrefix) {
+  public LibraryDownloadInfo(@Nonnull String downloadUrl, @Nonnull @NonNls String fileNamePrefix) {
     this(downloadUrl, null, fileNamePrefix);
   }
 
@@ -102,11 +102,11 @@ public class LibraryDownloadInfo {
     return myPresentableUrl != null ? myPresentableUrl : mirror;
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    final LibraryDownloadInfo that = (LibraryDownloadInfo)o;
+    LibraryDownloadInfo that = (LibraryDownloadInfo)o;
 
     if (!myFileNamePrefix.equals(that.myFileNamePrefix)) return false;
     if (!myFileNameSuffix.equals(that.myFileNameSuffix)) return false;

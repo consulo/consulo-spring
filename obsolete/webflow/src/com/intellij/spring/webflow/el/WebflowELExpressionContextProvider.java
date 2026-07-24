@@ -12,30 +12,30 @@ import java.util.Iterator;
 public class WebflowELExpressionContextProvider implements ELContextProvider {
   private final PsiElement myHost;
 
-  public WebflowELExpressionContextProvider(final PsiElement host) {
+  public WebflowELExpressionContextProvider(PsiElement host) {
     myHost = host;
   }
 
   @Nullable
-  public Iterator<? extends PsiVariable> getTopLevelElVariables(@Nullable final String nameHint) {
+  public Iterator<? extends PsiVariable> getTopLevelElVariables(@Nullable String nameHint) {
     return ELVariablesCollectorUtils.getImplicitVariables(myHost).iterator();
   }
 
-  public boolean acceptsGetMethodForLastReference(final PsiMethod getter) {
+  public boolean acceptsGetMethodForLastReference(PsiMethod getter) {
     return true;
   }
 
-  public boolean acceptsSetMethodForLastReference(final PsiMethod setter) {
+  public boolean acceptsSetMethodForLastReference(PsiMethod setter) {
     return false;
   }
 
-  public boolean acceptsNonPropertyMethodForLastReference(final PsiMethod method) {
+  public boolean acceptsNonPropertyMethodForLastReference(PsiMethod method) {
     if (isObjectClassMethod(method)) return false;
 
     return true;
   }
 
-  private static boolean isObjectClassMethod(final PsiMethod method) {
+  private static boolean isObjectClassMethod(PsiMethod method) {
     return CommonClassNames.JAVA_LANG_OBJECT.equals(method.getContainingClass().getQualifiedName());
   }
 }

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class FlowAttributeMapperBeanConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[]{  WebflowConstants.FLOW_ATTRIBUTE_MAPPER_CLASSNAME};
   }
 }

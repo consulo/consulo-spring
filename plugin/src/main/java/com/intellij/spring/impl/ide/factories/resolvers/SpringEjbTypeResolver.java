@@ -17,9 +17,9 @@ public class SpringEjbTypeResolver extends AbstractJeeSchemaTypeResolver {
   @NonNls private static final String[] myProperties = new String[]{"businessInterface"};
 
   @Nonnull
-  protected Set<String> getJeeObjectType(final CommonSpringBean context) {
+  protected Set<String> getJeeObjectType(CommonSpringBean context) {
     if (context instanceof SpringEjb) {
-      final SpringEjb springEjb = (SpringEjb)context;
+      SpringEjb springEjb = (SpringEjb)context;
       if (StringUtil.isNotEmpty(springEjb.getBusinessInterface().getStringValue())) {
         return Collections.singleton(springEjb.getBusinessInterface().getStringValue());
       }

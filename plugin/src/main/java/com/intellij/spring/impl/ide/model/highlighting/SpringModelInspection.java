@@ -29,7 +29,7 @@ import jakarta.annotation.Nonnull;
 
 @ExtensionImpl
 public class SpringModelInspection extends BasicDomElementsInspection<Beans, Object> {
-    protected boolean shouldCheckResolveProblems(final GenericDomValue value) {
+    protected boolean shouldCheckResolveProblems(GenericDomValue value) {
         return !SpringBeanScope.class.equals(DomUtil.getGenericValueParameter(value.getDomElementType()))
             && super.shouldCheckResolveProblems(value);
 
@@ -40,12 +40,12 @@ public class SpringModelInspection extends BasicDomElementsInspection<Beans, Obj
     }
 
     protected void checkDomElement(
-        final DomElement element,
-        final DomElementAnnotationHolder holder,
-        final DomHighlightingHelper helper,
+        DomElement element,
+        DomElementAnnotationHolder holder,
+        DomHighlightingHelper helper,
         Object state
     ) {
-        final int oldSize = holder.getSize();
+        int oldSize = holder.getSize();
         super.checkDomElement(element, holder, helper, state);
 
         if (oldSize == holder.getSize() && element instanceof GenericDomValue) {

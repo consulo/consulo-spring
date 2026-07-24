@@ -41,10 +41,10 @@ public abstract class JamPsiMethodSpringBean extends JamPsiMemberSpringBean<PsiM
   @Override
   @Nullable
   public PsiClass getBeanClass() {
-    final PsiMethod method = getPsiElement();
+    PsiMethod method = getPsiElement();
 
     if (method != null) {
-      final PsiType returnType = method.getReturnType();
+      PsiType returnType = method.getReturnType();
       if (returnType instanceof PsiClassType) {
         return ((PsiClassType)returnType).resolve();
       }

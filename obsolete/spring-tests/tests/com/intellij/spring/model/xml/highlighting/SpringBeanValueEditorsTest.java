@@ -13,7 +13,7 @@ public class SpringBeanValueEditorsTest extends SpringHighlightingTestCase {
   private static final String[] springJarTestNames = new String[]{"testResources", "testPlaceholderProperties", "testPlaceholderMapKeyCompletion",
     "testTypedValues", "testPlaceholderUtilsProperties", "testPlaceholderProperties_IDEADEV_20991", "testContextPlaceholder", "testPlaceholderSimpleLocations"};
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15);
 

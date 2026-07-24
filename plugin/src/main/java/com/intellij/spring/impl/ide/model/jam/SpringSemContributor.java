@@ -71,7 +71,7 @@ public class SpringSemContributor extends SemContributor {
     registrar.registerSemElementProvider(CUSTOM_COMPONENT_META_KEY, psiClassPattern, this::calcNamedWebBeanMeta);
 
     registrar.registerSemElementProvider(CUSTOM_COMPONENT_JAM_KEY, psiClassPattern, member -> {
-      final JamMemberMeta<PsiClass, CustomSpringComponent> memberMeta =
+      JamMemberMeta<PsiClass, CustomSpringComponent> memberMeta =
         mySemService.getSemElement(CUSTOM_COMPONENT_META_KEY, member);
       return memberMeta != null ? memberMeta.createJamElement(PsiElementRef.real(member)) : null;
     });
@@ -82,7 +82,7 @@ public class SpringSemContributor extends SemContributor {
   private JamMemberMeta<PsiClass, CustomSpringComponent> calcNamedWebBeanMeta(PsiClass psiClass) {
     if (psiClass.isAnnotationType()) return null;
 
-    final Module module = psiClass.getModule();
+    Module module = psiClass.getModule();
     if (module != null) {
       List<String> customComponentAnnotations = JamAnnotationTypeUtil.getUserDefinedCustomComponentAnnotations(module);
 
@@ -96,7 +96,7 @@ public class SpringSemContributor extends SemContributor {
     return null;
   }
 
-  private JamMemberMeta<PsiClass, CustomSpringComponent> createCustomSpringComponentJamMemberMeta(final String annotationFQN) {
+  private JamMemberMeta<PsiClass, CustomSpringComponent> createCustomSpringComponentJamMemberMeta(String annotationFQN) {
     JamAnnotationMeta annotationMeta = myCustomAnnotationMetas.computeIfAbsent(annotationFQN, JamAnnotationMeta::new);
 
     return new JamMemberMeta<>(null, CustomSpringComponent.class, CUSTOM_COMPONENT_JAM_KEY) {

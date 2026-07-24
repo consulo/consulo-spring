@@ -25,18 +25,18 @@ import java.util.Set;
 public class SecurityExpressionRootMethodsConverter extends Converter<String> implements CustomReferenceConverter<String> {
   private static String HAS_ROLE_METHOD_NAME = "hasRole";
 
-  public String toString(final String strings, final ConvertContext context) {
+  public String toString(String strings, ConvertContext context) {
     return strings;
   }
 
-  public String fromString(final String s, final ConvertContext context) {
+  public String fromString(String s, ConvertContext context) {
     return s;
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
 
     PsiMethod method = getExpressionRootMethod(genericDomValue);
     Module module = context.getModule();

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class RegistryRefConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[]{ Registry.FLOW_DEFINITION_REGISTRY_CLASS };
   }
 }

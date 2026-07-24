@@ -24,8 +24,8 @@ public class AopPatternsTest extends JavaCodeInsightFixtureTestCase {
   }
 
   private AopReferenceHolder parseTypeExpression(String type) throws IOException {
-    final AopPointcutExpressionFile file = (AopPointcutExpressionFile)PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, "execution(* *(" + type + "))");
-    final AopReferenceHolder type1 =
+    AopPointcutExpressionFile file = (AopPointcutExpressionFile)PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, "execution(* *(" + type + "))");
+    AopReferenceHolder type1 =
       (AopReferenceHolder)((PsiExecutionExpression)file.getPointcutExpression()).getParameterList().getParameters()[0];
     assertEquals(type, type1.getText());
     LiteFixture.setContext(file, JavaPsiFacade.getInstance(getProject()).findClass("ContextClass"));

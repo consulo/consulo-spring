@@ -15,7 +15,7 @@ public class ListOrSetExtender extends DomExtender<ListOrSet> {
     return ListOrSet.class;
   }
 
-  public void registerExtensions(@Nonnull final ListOrSet element, @Nonnull final DomExtensionsRegistrar registrar) {
+  public void registerExtensions(@Nonnull ListOrSet element, @Nonnull DomExtensionsRegistrar registrar) {
     SpringDefaultDomExtender.registerDefaultBeanExtensions(registrar);
   }
 }

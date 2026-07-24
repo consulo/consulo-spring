@@ -29,14 +29,14 @@ public abstract class SpringMVCRequestMapping<T extends PsiMember> implements Ja
 
   public List<String> getUrls() {
     return ContainerUtil.mapNotNull(getMappingUrls(), new NullableFunction<JamStringAttributeElement<String>, String>() {
-      public String fun(final JamStringAttributeElement<String> stringAnnotationGenericValue) {
+      public String fun(JamStringAttributeElement<String> stringAnnotationGenericValue) {
         return stringAnnotationGenericValue.getStringValue();
       }
     });
   }
 
   public String getName() {
-    final List<String> urls = getUrls();
+    List<String> urls = getUrls();
     return urls.isEmpty() ? "" : urls.get(0);
   }
 

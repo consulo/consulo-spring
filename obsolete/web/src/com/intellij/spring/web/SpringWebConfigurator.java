@@ -42,12 +42,12 @@ public class SpringWebConfigurator implements SpringConfigurator {
       return false;
     }
 
-    final Collection<WebFacet> webFacets = WebFacet.getInstances(module);
+    Collection<WebFacet> webFacets = WebFacet.getInstances(module);
     if (webFacets.isEmpty()) {
       return false;
     }
 
-    for (final WebFacet webFacet : webFacets) {
+    for (WebFacet webFacet : webFacets) {
       final WebApp webApp = webFacet.getRoot();
       if (webApp != null) {
         new WriteCommandAction.Simple(module.getProject(), webApp.getContainingFile()) {
@@ -61,19 +61,19 @@ public class SpringWebConfigurator implements SpringConfigurator {
     return true;
   }
 
-  private static void configure(final WebApp webApp) {
+  private static void configure(WebApp webApp) {
 
-    final PsiFile webXml = webApp.getContainingFile();
+    PsiFile webXml = webApp.getContainingFile();
     assert webXml != null;
-    final PsiDirectory webInfDir = webXml.getParent();
+    PsiDirectory webInfDir = webXml.getParent();
     assert webInfDir != null;
-    final Module module = webApp.getModule();
+    Module module = webApp.getModule();
     assert module != null;
     FileTemplate template = SpringFrameworkSupportProvider.chooseTemplate(module);
 
-    final ParamValue paramValue = DomUtil.findByName(webApp.getContextParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
+    ParamValue paramValue = DomUtil.findByName(webApp.getContextParams(), SpringWebConstants.CONTEXT_CONFIG_LOCATION);
     if (paramValue == null) {
-      final ParamValue value = webApp.addContextParam();
+      ParamValue value = webApp.addContextParam();
       value.getParamName().setValue(SpringWebConstants.CONTEXT_CONFIG_LOCATION);
       value.getParamValue().setValue(SpringWebConstants.WEB_INF + SpringWebConstants.APPLICATION_CONTEXT_XML);
 
@@ -92,7 +92,7 @@ public class SpringWebConfigurator implements SpringConfigurator {
 
     Servlet dispatcher = null;
     for (Servlet servlet: webApp.getServlets()) {
-      final String stringValue = servlet.getServletClass().getStringValue();
+      String stringValue = servlet.getServletClass().getStringValue();
       if (stringValue != null && stringValue.equals(SpringWebConstants.DISPATCHER_SERVLET_CLASS)) {
         dispatcher = servlet;
         break;
@@ -104,13 +104,13 @@ public class SpringWebConfigurator implements SpringConfigurator {
       dispatcher.getServletClass().setStringValue(SpringWebConstants.DISPATCHER_SERVLET_CLASS);
       dispatcher.getLoadOnStartup().setValue(1);
 
-      final ServletMapping mapping = webApp.addServletMapping();
+      ServletMapping mapping = webApp.addServletMapping();
       mapping.getServletName().setValue(dispatcher);
       mapping.addUrlPattern().setValue(DEFAULT_DISPATCHER_MAPPING);
     }
 
-    final String dispatcherName = dispatcher.getServletName().getValue();
-    final String dispatcherConfig = SpringWebModelProvider.getServletContextFileName(dispatcherName);
+    String dispatcherName = dispatcher.getServletName().getValue();
+    String dispatcherConfig = SpringWebModelProvider.getServletContextFileName(dispatcherName);
     if (webInfDir.findFile(dispatcherConfig) == null) {
       try {
         FileTemplateUtil.createFromTemplate(template, dispatcherConfig, null, webInfDir);

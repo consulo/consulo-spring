@@ -54,13 +54,13 @@ public class AopJavaAnnotator implements LineMarkerProvider {
   private static final Key<CachedValue<Map<AopAdvice, Integer>>> BOUND_ADVICES_KEY = Key.create("ClassBoundAdvices");
   private static final HashingStrategy<AopAspect> ASPECT_HASHING_STRATEGY = new HashingStrategy<>() {
     @Override
-    public int hashCode(final AopAspect object) {
-      final PsiElement element = object.getIdentifyingPsiElement();
+    public int hashCode(AopAspect object) {
+      PsiElement element = object.getIdentifyingPsiElement();
       return element == null ? 0 : element.hashCode();
     }
 
     @Override
-    public boolean equals(final AopAspect o1, final AopAspect o2) {
+    public boolean equals(AopAspect o1, AopAspect o2) {
       return o1.getIdentifyingPsiElement() == o2.getIdentifyingPsiElement();
     }
   };
@@ -75,7 +75,7 @@ public class AopJavaAnnotator implements LineMarkerProvider {
 
   @Override
   @RequiredReadAction
-  public LineMarkerInfo getLineMarkerInfo(final PsiElement element) {
+  public LineMarkerInfo getLineMarkerInfo(PsiElement element) {
     return null;
   }
 
@@ -87,32 +87,32 @@ public class AopJavaAnnotator implements LineMarkerProvider {
 
   @Override
   @RequiredReadAction
-  public void collectSlowLineMarkers(final List<PsiElement> elements, final Collection<LineMarkerInfo> result) {
-    for (final PsiElement element : elements) {
+  public void collectSlowLineMarkers(List<PsiElement> elements, Collection<LineMarkerInfo> result) {
+    for (PsiElement element : elements) {
       annotate(element, result);
     }
   }
 
   @RequiredReadAction
-  private static void annotate(PsiElement psiElement, final Collection<LineMarkerInfo> result) {
+  private static void annotate(PsiElement psiElement, Collection<LineMarkerInfo> result) {
     if (psiElement instanceof PsiIdentifier) {
-      final PsiElement parent = psiElement.getParent();
+      PsiElement parent = psiElement.getParent();
       if (parent instanceof PsiMethod method) {
         if (method.isConstructor()) return;
 
-        final List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiElement);
+        List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiElement);
         if (providers.isEmpty()) return;
 
-        final PsiIdentifier nameIdentifier = method.getNameIdentifier();
+        PsiIdentifier nameIdentifier = method.getNameIdentifier();
         if (nameIdentifier != psiElement) return;
 
-        final PsiClass psiClass = method.getContainingClass();
+        PsiClass psiClass = method.getContainingClass();
         Module module = method.getModule();
         if (module != null && psiClass != null) {
           if (isAcceptableAdviceMethod(psiClass, providers)) {
-            final AopAdviceImpl advice = AopModuleService.getAdvice(method);
+            AopAdviceImpl advice = AopModuleService.getAdvice(method);
             if (advice != null) {
-              final PsiPointcutExpression expression = advice.getPointcutExpression();
+              PsiPointcutExpression expression = advice.getPointcutExpression();
               if (expression != null) {
                 result.add(addNavigationToInterceptedMethods(advice,
                                                              expression.getContainingFile()
@@ -123,17 +123,17 @@ public class AopJavaAnnotator implements LineMarkerProvider {
             }
           }
 
-          final Map<AopAdvice, Integer> boundAdvices = addBoundAdvices(method, getAspects(providers, module), providers);
+          Map<AopAdvice, Integer> boundAdvices = addBoundAdvices(method, getAspects(providers, module), providers);
           if (!boundAdvices.isEmpty()) {
             result.add(addNavigationToBoundAdvices(boundAdvices).createLineMarkerInfo(nameIdentifier));
           }
         }
       }
       else if (parent instanceof PsiClass) {
-        final PsiClass psiClass = (PsiClass)parent;
+        PsiClass psiClass = (PsiClass)parent;
         if (psiClass.isAbstract()) return;
 
-        final PsiIdentifier nameIdentifier = psiClass.getNameIdentifier();
+        PsiIdentifier nameIdentifier = psiClass.getNameIdentifier();
         if (nameIdentifier != psiElement) return;
 
         List<AopIntroduction> boundIntros = getBoundIntroductions(psiClass);
@@ -142,19 +142,19 @@ public class AopJavaAnnotator implements LineMarkerProvider {
         }
       }
       else if (parent instanceof PsiField) {
-        final PsiField field = (PsiField)parent;
-        final List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiElement);
+        PsiField field = (PsiField)parent;
+        List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiElement);
         if (providers.isEmpty()) return;
 
-        final PsiIdentifier nameIdentifier = field.getNameIdentifier();
+        PsiIdentifier nameIdentifier = field.getNameIdentifier();
         if (nameIdentifier != psiElement) return;
 
-        final PsiClass psiClass = field.getContainingClass();
-        final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(field);
+        PsiClass psiClass = field.getContainingClass();
+        consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(field);
         if (module != null && psiClass != null) {
-          final AopIntroductionImpl introduction = AopModuleService.getIntroduction(field);
+          AopIntroductionImpl introduction = AopModuleService.getIntroduction(field);
           if (introduction != null) {
-            final NavigationGutterIconBuilder<PsiElement> builder = addNavigationToIntroducedClasses(introduction);
+            NavigationGutterIconBuilder<PsiElement> builder = addNavigationToIntroducedClasses(introduction);
             if (builder != null) {
               result.add(builder.createLineMarkerInfo(psiElement));
             }
@@ -175,21 +175,21 @@ public class AopJavaAnnotator implements LineMarkerProvider {
   public static NavigationGutterIconBuilder<AopAdvice> addNavigationToBoundAdvices(final Map<AopAdvice, Integer> boundAdvices) {
     List<AopAdvice> adviceList = new ArrayList<>(boundAdvices.keySet());
     Collections.sort(adviceList, (o1, o2) -> {
-      final boolean onTheWayIn = o1.getAdviceType().isOnTheWayIn();
+      boolean onTheWayIn = o1.getAdviceType().isOnTheWayIn();
       if (onTheWayIn != o2.getAdviceType().isOnTheWayIn()) {
         return onTheWayIn ? -1 : 1;
       }
 
-      final int i1 = boundAdvices.get(o1);
-      final int i2 = boundAdvices.get(o2);
-      final int diff = i2 - i1;
+      int i1 = boundAdvices.get(o1);
+      int i2 = boundAdvices.get(o2);
+      int diff = i2 - i1;
       return onTheWayIn ? -diff : diff;
     });
 
     final Map<PsiElement, AopAdvice> psi2Advice = new HashMap<>();
     return NavigationGutterIconBuilder.<AopAdvice>create(createToIcon(AopConstants.ABSTRACT_ADVICE_ICON), advice -> {
-        final PsiElement[] psiElements = JamCommonUtil.getTargetPsiElements(advice);
-        for (final PsiElement element : psiElements) {
+        PsiElement[] psiElements = JamCommonUtil.getTargetPsiElements(advice);
+        for (PsiElement element : psiElements) {
           psi2Advice.put(element, advice);
         }
         return Arrays.asList(psiElements);
@@ -200,11 +200,11 @@ public class AopJavaAnnotator implements LineMarkerProvider {
       .setAlignment(GutterIconRenderer.Alignment.LEFT)
       .setCellRenderer(new DefaultPsiElementCellRenderer() {
         @Override
-        public String getElementText(final PsiElement element) {
-          final String superText = super.getElementText(element);
-          final AopAdvice advice = psi2Advice.get(element);
+        public String getElementText(PsiElement element) {
+          String superText = super.getElementText(element);
+          AopAdvice advice = psi2Advice.get(element);
           if (advice != null && advice.isValid()) {
-            final Integer integer = boundAdvices.get(advice);
+            Integer integer = boundAdvices.get(advice);
             if (integer != null && integer < Integer.MAX_VALUE) {
               return superText + " (order=" + integer + ")";
             }
@@ -214,10 +214,10 @@ public class AopJavaAnnotator implements LineMarkerProvider {
 
         @Override
         @RequiredReadAction
-        public String getContainerText(final PsiElement element, final String name) {
-          final String superText = super.getContainerText(element, name);
+        public String getContainerText(PsiElement element, String name) {
+          String superText = super.getContainerText(element, name);
           if (StringUtil.isEmpty(superText)) {
-            final PsiFile file = element.getContainingFile();
+            PsiFile file = element.getContainingFile();
             if (file != null) {
               return "(in " + file.getName() + ")";
             }
@@ -233,19 +233,19 @@ public class AopJavaAnnotator implements LineMarkerProvider {
   }
 
   @RequiredReadAction
-  public static List<AopIntroduction> getBoundIntroductions(final PsiClass psiClass) {
+  public static List<AopIntroduction> getBoundIntroductions(PsiClass psiClass) {
     CachedValue<List<AopIntroduction>> value = psiClass.getUserData(BOUND_INTROS_KEY);
     if (value == null) {
       psiClass.putUserData(BOUND_INTROS_KEY, value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(() -> {
-        final List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiClass);
+        List<AopProvider> providers = AopLanguageInjector.getAopProviders(psiClass);
         if (!providers.isEmpty()) {
           Module module = psiClass.getModule();
           if (module != null) {
             List<AopIntroduction> boundIntros = new ArrayList<>();
-            final PsiClassType type = createPsiType(psiClass);
-            for (final AopAspect aspect : getAspects(providers, module)) {
-              for (final AopIntroduction introduction : aspect.getIntroductions()) {
-                final AopReferenceHolder value1 =
+            PsiClassType type = createPsiType(psiClass);
+            for (AopAspect aspect : getAspects(providers, module)) {
+              for (AopIntroduction introduction : aspect.getIntroductions()) {
+                AopReferenceHolder value1 =
                   introduction.getTypesMatching().getValue();
                 if (value1 != null && isAcceptable(type,
                                                    value1)) {
@@ -265,14 +265,14 @@ public class AopJavaAnnotator implements LineMarkerProvider {
   }
 
   @RequiredReadAction
-  public static Set<AopAspect> getAspects(final List<AopProvider> providers, final consulo.module.Module module) {
+  public static Set<AopAspect> getAspects(List<AopProvider> providers, consulo.module.Module module) {
     CachedValue<Set<AopAspect>> aspects = module.getUserData(ASPECTS_CACHE);
     if (aspects == null) {
       module.putUserData(ASPECTS_CACHE, aspects = CachedValuesManager.getManager(module.getProject()).createCachedValue(() -> {
         Set<AopAspect> set =
           Sets.newHashSet(ASPECT_HASHING_STRATEGY);
         collectAspects(providers, module, set);
-        for (final Module module1 : ModuleUtilCore.getAllDependentModules(module)) {
+        for (Module module1 : ModuleUtilCore.getAllDependentModules(module)) {
           collectAspects(providers, module1, set);
         }
         return CachedValueProvider.Result.create(set, PsiModificationTracker.MODIFICATION_COUNT);
@@ -282,34 +282,34 @@ public class AopJavaAnnotator implements LineMarkerProvider {
     return aspects.getValue();
   }
 
-  private static void collectAspects(final List<AopProvider> providers, final Module module, final Set<AopAspect> aspects) {
+  private static void collectAspects(List<AopProvider> providers, Module module, Set<AopAspect> aspects) {
     aspects.addAll(AopModuleService.getService(module).getModel().getAspects());
-    for (final AopProvider provider : providers) {
+    for (AopProvider provider : providers) {
       aspects.addAll(provider.getAdditionalAspects(module));
     }
   }
 
-  private static int getAdviceOrder(AopAdvice advice, final List<AopProvider> providers) {
-    for (final AopProvider provider : providers) {
-      final Integer order = provider.getAdviceOrder(advice);
+  private static int getAdviceOrder(AopAdvice advice, List<AopProvider> providers) {
+    for (AopProvider provider : providers) {
+      Integer order = provider.getAdviceOrder(advice);
       if (order != null) return order;
     }
     return Integer.MAX_VALUE;
   }
 
-  private static boolean isAcceptableAdviceMethod(final PsiClass psiClass, final List<AopProvider> providers) {
-    for (final AopProvider provider : providers) {
+  private static boolean isAcceptableAdviceMethod(PsiClass psiClass, List<AopProvider> providers) {
+    for (AopProvider provider : providers) {
       if (provider.getAdvisedElementsSearcher(psiClass) != null) return true;
     }
     return false;
   }
 
-  public static Map<AopAdvice, Integer> addBoundAdvices(final PsiMethod method,
-                                                        final Collection<? extends AopAspect> aspects,
-                                                        final List<AopProvider> providers) {
-    final Map<AopAdvice, Integer> boundAdvices = new LinkedHashMap<>();
-    for (final AopAspect aspect : aspects) {
-      for (final AopAdvice advice : aspect.getAdvices()) {
+  public static Map<AopAdvice, Integer> addBoundAdvices(PsiMethod method,
+                                                        Collection<? extends AopAspect> aspects,
+                                                        List<AopProvider> providers) {
+    Map<AopAdvice, Integer> boundAdvices = new LinkedHashMap<>();
+    for (AopAspect aspect : aspects) {
+      for (AopAdvice advice : aspect.getAdvices()) {
         ProgressManager.getInstance().checkCanceled();
         if (AopAdviceUtil.accepts(advice, method) == PointcutMatchDegree.TRUE) {
           boundAdvices.put(advice, getAdviceOrder(advice, providers));
@@ -319,12 +319,12 @@ public class AopJavaAnnotator implements LineMarkerProvider {
     return boundAdvices;
   }
 
-  private static PsiClassType createPsiType(final PsiClass psiClass) {
+  private static PsiClassType createPsiType(PsiClass psiClass) {
     return JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass);
   }
 
-  private static boolean isAcceptable(final PsiClassType type, final AopReferenceHolder value) {
-    final PsiClass psiClass = type.resolve();
+  private static boolean isAcceptable(PsiClassType type, AopReferenceHolder value) {
+    PsiClass psiClass = type.resolve();
     if (psiClass != null && psiClass.isAbstract()) return false;
 
     return value.accepts(type) == PointcutMatchDegree.TRUE && value.getContainingFile()
@@ -336,7 +336,7 @@ public class AopJavaAnnotator implements LineMarkerProvider {
 
   public static NavigationGutterIconBuilder<PsiElement> addNavigationToInterceptedMethods(final AopAdvice advice,
                                                                                           final AopAdvisedElementsSearcher searcher) {
-    final NavigationGutterIconBuilder<PsiElement> builder =
+    NavigationGutterIconBuilder<PsiElement> builder =
       NavigationGutterIconBuilder.create(createFromIcon(advice.getAdviceType().getAdviceIcon()))
                                  .setTargets(new NotNullLazyValue<Collection<? extends PsiElement>>() {
                                    @Nonnull
@@ -346,7 +346,7 @@ public class AopJavaAnnotator implements LineMarkerProvider {
                                      Set<PsiMethod> result = new HashSet<>();
                                      searcher.test(psiClass -> {
                                        if (advice.isValid()) {
-                                         for (final PsiMethod psiMethod : psiClass.getMethods()) {
+                                         for (PsiMethod psiMethod : psiClass.getMethods()) {
                                            if (AopAdviceUtil.accepts(advice,
                                                                      psiMethod) == PointcutMatchDegree.TRUE) {
                                              result.add(psiMethod);
@@ -366,7 +366,7 @@ public class AopJavaAnnotator implements LineMarkerProvider {
 
   @Nullable
   public static NavigationGutterIconBuilder<PsiElement> addNavigationToIntroducedClasses(
-    final AopIntroduction introduction) {
+    AopIntroduction introduction) {
     final AopReferenceHolder expression = introduction.getTypesMatching().getValue();
     if (expression == null) return null;
 
@@ -394,20 +394,20 @@ public class AopJavaAnnotator implements LineMarkerProvider {
   }
 
   @RequiredReadAction
-  public static Map<AopAdvice, Integer> getBoundAdvices(final PsiClass psiClass) {
+  public static Map<AopAdvice, Integer> getBoundAdvices(PsiClass psiClass) {
     CachedValue<Map<AopAdvice, Integer>> value = psiClass.getUserData(BOUND_ADVICES_KEY);
     if (value == null) {
       psiClass.putUserData(BOUND_ADVICES_KEY, value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(() -> {
-          final Module module = psiClass.getModule();
+          Module module = psiClass.getModule();
         if (module == null)
           return CachedValueProvider.Result.create(Collections.<AopAdvice, Integer>emptyMap(),
                                                    PsiModificationTracker.MODIFICATION_COUNT);
 
         Map<AopAdvice, Integer> result = new HashMap<>();
-        final List<AopProvider> providers =
+        List<AopProvider> providers =
           AopLanguageInjector.getAopProviders(psiClass);
-        final Set<AopAspect> aspects = getAspects(providers, module);
-        for (final PsiMethod method : psiClass.getMethods()) {
+        Set<AopAspect> aspects = getAspects(providers, module);
+        for (PsiMethod method : psiClass.getMethods()) {
           result.putAll(addBoundAdvices(method, aspects, providers));
         }
         return CachedValueProvider.Result.create(result, PsiModificationTracker.MODIFICATION_COUNT);

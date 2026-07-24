@@ -19,7 +19,7 @@ import jakarta.annotation.Nullable;
  */
 public class SpringLocalAopModel extends LocalAopModel {
 
-  public SpringLocalAopModel(@Nonnull final PsiElement host, @Nullable BasicAdvice advice, @Nonnull AopAdvisedElementsSearcher searcher) {
+  public SpringLocalAopModel(@Nonnull PsiElement host, @Nullable BasicAdvice advice, @Nonnull AopAdvisedElementsSearcher searcher) {
     super(host, advice == null ? null : advice.getMethod().getValue(), searcher);
   }
 

@@ -35,20 +35,20 @@ public abstract class AopNavigationTestCase extends JavaCodeInsightFixtureTestCa
     AopLiteFixture.addAopAnnotations(myFixture);
   }
 
-  public void checkNavigation(final String filePath, final boolean orderMatters, String... expected) throws Throwable {
+  public void checkNavigation(String filePath, final boolean orderMatters, String... expected) throws Throwable {
     List<Collection<String>> targets = new ArrayList<Collection<String>>();
-    for (final GutterIconRenderer renderer : myFixture.findAllGutters(filePath)) {
+    for (GutterIconRenderer renderer : myFixture.findAllGutters(filePath)) {
       processGutterIcon(orderMatters, targets, renderer);
       if (renderer instanceof LineMarkerInfo.LineMarkerGutterIconRenderer) {
-        final LineMarkerInfo.LineMarkerGutterIconRenderer iconRenderer = (LineMarkerInfo.LineMarkerGutterIconRenderer)renderer;
+        LineMarkerInfo.LineMarkerGutterIconRenderer iconRenderer = (LineMarkerInfo.LineMarkerGutterIconRenderer)renderer;
         processGutterIcon(orderMatters, targets, iconRenderer.getLineMarkerInfo().getNavigationHandler());
       }
     }
     Consumer<Collection<String>>[] checkers = ContainerUtil.map2Array(expected, Consumer.class, new Function<String, Consumer>() {
       public Consumer fun(final String s) {
         return new Consumer<Collection<String>>() {
-          public void consume(final Collection<String> o) {
-            final String[] navItems = StringUtil.isEmpty(s) ? new String[0] : s.split("\n");
+          public void consume(Collection<String> o) {
+            String[] navItems = StringUtil.isEmpty(s) ? new String[0] : s.split("\n");
             if (orderMatters) {
               UsefulTestCase.assertOrderedEquals(o, navItems);
             } else {
@@ -62,17 +62,17 @@ public abstract class AopNavigationTestCase extends JavaCodeInsightFixtureTestCa
     UsefulTestCase.assertOrderedCollection(targets, checkers);
   }
 
-  private static void processGutterIcon(final boolean orderMatters, final List<Collection<String>> targets, final Object renderer) {
+  private static void processGutterIcon(boolean orderMatters, List<Collection<String>> targets, Object renderer) {
     if (renderer instanceof NavigationGutterIconRenderer) {
-      final NavigationGutterIconRenderer navRenderer = (NavigationGutterIconRenderer)renderer;
-      final List<PsiElement> elements = navRenderer.getTargetElements();
+      NavigationGutterIconRenderer navRenderer = (NavigationGutterIconRenderer)renderer;
+      List<PsiElement> elements = navRenderer.getTargetElements();
       Collection<String> toStrings = ContainerUtil.map(elements, new Function<PsiElement, String>() {
-        public String fun(final PsiElement element) {
+        public String fun(PsiElement element) {
           if (element instanceof PsiClass) {
             return ((PsiClass)element).getQualifiedName();
           }
           if (element instanceof PsiMethod) {
-            final PsiMethod method = (PsiMethod)element;
+            PsiMethod method = (PsiMethod)element;
             return method.getContainingClass().getQualifiedName() + "#" + method.getName() + method.getParameterList().getText();
           }
           if (element instanceof XmlTag) {

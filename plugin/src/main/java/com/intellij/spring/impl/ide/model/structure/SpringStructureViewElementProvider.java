@@ -19,11 +19,11 @@ import jakarta.annotation.Nullable;
 public class SpringStructureViewElementProvider implements XmlStructureViewElementProvider {
 
   @Nullable
-  public StructureViewTreeElement createCustomXmlTagTreeElement(@Nonnull final XmlTag tag) {
-    final PsiFile psiFile = tag.getContainingFile();
-    final Project project = tag.getProject();
+  public StructureViewTreeElement createCustomXmlTagTreeElement(@Nonnull XmlTag tag) {
+    PsiFile psiFile = tag.getContainingFile();
+    Project project = tag.getProject();
     if (psiFile instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile)psiFile)) {
-      final DomElement domElement = DomManager.getDomManager(project).getDomElement(tag);
+      DomElement domElement = DomManager.getDomManager(project).getDomElement(tag);
       if (domElement instanceof Beans) {
         return new SpringModelTreeElement((XmlFile)psiFile, false);
       }

@@ -16,11 +16,11 @@ import jakarta.annotation.Nonnull;
  */
 public class AopParameterList extends AopAbstractList<PsiParameter> {
 
-  public AopParameterList(@Nonnull final ASTNode node) {
+  public AopParameterList(@Nonnull ASTNode node) {
     super(node);
   }
 
-  protected PsiType getPsiType(@Nonnull final PsiParameter psiParameter) {
+  protected PsiType getPsiType(@Nonnull PsiParameter psiParameter) {
     return psiParameter.getType();
   }
 
@@ -28,7 +28,7 @@ public class AopParameterList extends AopAbstractList<PsiParameter> {
     return "AopParameterList";
   }
 
-  public PointcutMatchDegree matches(final PointcutContext context, PsiParameterList list, final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher) {
+  public PointcutMatchDegree matches(PointcutContext context, PsiParameterList list, PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher) {
     return accepts(context, list.getParameters(), matcher);
   }
 

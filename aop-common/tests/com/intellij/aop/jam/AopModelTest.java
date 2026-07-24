@@ -42,24 +42,24 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testGetAspects() throws Throwable {
-    final PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {}\n" +
+    PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {}\n" +
                                             "@" + AopConstants.ASPECT_ANNO + "\nclass BarAspect {}");
     final PsiClass fooAspectClass = psiFile.getClasses()[0];
     final PsiClass barAspectClass = psiFile.getClasses()[1];
 
     assertUnorderedCollection(myModel.getAspects(), new Consumer<AopAspect>() {
-      public void consume(final AopAspect aopAspect) {
+      public void consume(AopAspect aopAspect) {
         assertEquals(fooAspectClass, aopAspect.getPsiClass());
       }
     }, new Consumer<AopAspect>() {
-      public void consume(final AopAspect aopAspect) {
+      public void consume(AopAspect aopAspect) {
         assertEquals(barAspectClass, aopAspect.getPsiClass());
       }
     });
   }
 
   public void testGetPointcuts() throws Throwable {
-    final PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
+    PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
                                             "@" + AopConstants.POINTCUT_ANNO + " void foo() {} }\n" +
 
                                             "@" + AopConstants.ASPECT_ANNO + "\nclass BarAspect {" +
@@ -72,19 +72,19 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
     final PsiClass barAspectClass = psiFile.getClasses()[1];
     final PsiClass notAspectClass = psiFile.getClasses()[2];
 
-    final List<AopPointcutImpl> list = myModel.getPointcuts();
+    List<AopPointcutImpl> list = myModel.getPointcuts();
     assertUnorderedCollection(list, new Consumer<AopPointcut>() {
-      public void consume(final AopPointcut aopPointcut) {
+      public void consume(AopPointcut aopPointcut) {
         assertEquals(fooAspectClass.getMethods()[0], ((AopPointcutImpl) aopPointcut).getPsiElement());
         assertEquals("FooAspect.foo", aopPointcut.getQualifiedName().getValue());
       }
     }, new Consumer<AopPointcut>() {
-      public void consume(final AopPointcut aopPointcut) {
+      public void consume(AopPointcut aopPointcut) {
         assertEquals(barAspectClass.getMethods()[0], ((AopPointcutImpl) aopPointcut).getPsiElement());
         assertEquals("BarAspect.bar", aopPointcut.getQualifiedName().getValue());
       }
     }, new Consumer<AopPointcut>() {
-      public void consume(final AopPointcut aopPointcut) {
+      public void consume(AopPointcut aopPointcut) {
         assertEquals(notAspectClass.getMethods()[0], ((AopPointcutImpl) aopPointcut).getPsiElement());
         assertEquals("NotAspect.foo", aopPointcut.getQualifiedName().getValue());
       }
@@ -92,7 +92,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testGetAdvices() throws Throwable {
-    final PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
+    PsiJavaFile psiFile = createFile( "@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
                                             "@" + AopConstants.BEFORE_ANNO + " void before() {} \n" +
                                             "@" + AopConstants.AFTER_ANNO + " void after() {} \n" +
                                             "@" + AopConstants.AFTER_RETURNING_ANNO + " void afterReturning() {} \n" +
@@ -101,15 +101,15 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
                                             "}");
 
     final PsiClass fooAspectClass = psiFile.getClasses()[0];
-    final List<? extends AopAdvice> advices = myModel.getAspects().get(0).getAdvices();
+    List<? extends AopAdvice> advices = myModel.getAspects().get(0).getAdvices();
 
     Consumer<AopAdvice>[] checkers = new Consumer[5];
     for (int i = 0; i < checkers.length; i++) {
       final int i1 = i;
       checkers[i] = new Consumer<AopAdvice>() {
-        public void consume(final AopAdvice aopAdvice) {
+        public void consume(AopAdvice aopAdvice) {
           assertEquals(fooAspectClass.getMethods()[i1], ((AopAdviceImpl) aopAdvice).getPsiElement());
-          final AopAdviceType adviceType = aopAdvice.getAdviceType();
+          AopAdviceType adviceType = aopAdvice.getAdviceType();
           assertEquals(AopAdviceType.values()[i1], adviceType);
           if (adviceType == AopAdviceType.AFTER_RETURNING) assertInstanceOf(aopAdvice, AopAfterReturningAdviceImpl.class);
           else if (adviceType == AopAdviceType.AFTER_THROWING) assertInstanceOf(aopAdvice, AopAfterThrowingAdviceImpl.class);
@@ -123,19 +123,19 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
   public void testGetIntroductions() throws Throwable {
     IdeaTestUtil.registerExtension(Extensions.getRootArea(), AopProvider.EXTENSION_POINT_NAME, new AopProvider() {
       @Nullable
-      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
         return new AllAdvisedElementsSearcher(getPsiManager());
       }
     }, getTestRootDisposable());
 
-    final PsiJavaFile psiFile = createFile("@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
+    PsiJavaFile psiFile = createFile("@" + AopConstants.ASPECT_ANNO + "\nclass FooAspect {" +
                                            "@" + AopConstants.DECLARE_PARENTS_ANNO + "(value=\"aaa.bbb.*+\",defaultImpl=\"java.lang.String\") Object before; \n" +
                                            "}");
 
     final PsiClass fooAspectClass = psiFile.getClasses()[0];
-    final AopAspectImpl aspect = myModel.getAspects().get(0);
+    AopAspectImpl aspect = myModel.getAspects().get(0);
     assertUnorderedCollection(aspect.getIntroductions(), new Consumer<AopIntroduction>() {
-      public void consume(final AopIntroduction aopIntroduction) {
+      public void consume(AopIntroduction aopIntroduction) {
         assertEquals(fooAspectClass.getFields()[0], ((AopIntroductionImpl)aopIntroduction).getPsiElement());
         assertEquals("aaa.bbb.*+", aopIntroduction.getTypesMatching().getStringValue());
         assertEquals("aaa.bbb.*+", aopIntroduction.getTypesMatching().getValue().getText());
@@ -152,9 +152,9 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
   }
 
   private PsiJavaFile createFile(final String text) {
-    final VirtualFile file = new WriteCommandAction<VirtualFile>(getProject()) {
+    VirtualFile file = new WriteCommandAction<VirtualFile>(getProject()) {
       protected void run(Result<VirtualFile> result) throws Throwable {
-        final VirtualFile file = myRoot.createChildData(this, "Aspects.java");
+        VirtualFile file = myRoot.createChildData(this, "Aspects.java");
 
         VirtualFileUtil.saveText(file, text);
         result.setResult(file);
@@ -168,7 +168,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
   public void testPointcutExpression() throws Throwable {
     final PsiMethod method = getJavaFacade().getElementFactory()
       .createMethodFromText("@" + AopConstants.POINTCUT_ANNO + "(\"xxx\")\n" + "void foo(int a) {}", null);
-    final AopPointcut pointcut = new AopPointcutImpl() {
+    AopPointcut pointcut = new AopPointcutImpl() {
       @Nonnull
       public PsiMethod getPsiElement() {
         return method;
@@ -182,7 +182,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
 
       public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
         return new AopAdvisedElementsSearcher(aClass.getManager()) {
-          public boolean process(final Processor<PsiClass> processor) {
+          public boolean process(Processor<PsiClass> processor) {
             throw new UnsupportedOperationException("Method doProcess is not yet implemented in " + getClass().getName());
           }
         };
@@ -192,7 +192,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
     final PsiMethod method = myFixture.addClass("class Foo { " +
                                                 "@" + AopConstants.AFTER_RETURNING_ANNO + "(pointcut=\"xxx\")\n" + "void foo(int a) {}" +
                                                 "}").getMethods()[0];
-    final AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
+    AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
       public PsiMethod getPsiElement() {
         return method;
       }

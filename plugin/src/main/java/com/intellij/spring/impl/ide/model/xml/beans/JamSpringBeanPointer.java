@@ -20,7 +20,7 @@ public final class JamSpringBeanPointer extends SpringBaseBeanPointer {
   @Nonnull
   private final JamPsiMemberSpringBean mySpringBean;
 
-  protected JamSpringBeanPointer(@Nonnull final JamPsiMemberSpringBean springBean) {
+  protected JamSpringBeanPointer(@Nonnull JamPsiMemberSpringBean springBean) {
     super(springBean.getBeanName());
     mySpringBean = springBean;
   }
@@ -41,21 +41,21 @@ public final class JamSpringBeanPointer extends SpringBaseBeanPointer {
 
   @Nullable
   public PsiElement getPsiElement() {
-    final JamPsiMemberSpringBean springBean = getSpringBean();
+    JamPsiMemberSpringBean springBean = getSpringBean();
 
     return springBean.getIdentifyingPsiElement();
   }
 
-  public SpringBeanPointer derive(@Nonnull final String name) {
+  public SpringBeanPointer derive(@Nonnull String name) {
     return Comparing.equal(name, getName()) ? this : new DerivedSpringBeanPointer(getBasePointer(), name);
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof JamSpringBeanPointer)) return false;
     if (!super.equals(o)) return false;
 
-    final JamSpringBeanPointer that = (JamSpringBeanPointer)o;
+    JamSpringBeanPointer that = (JamSpringBeanPointer)o;
 
     if (!mySpringBean.equals(that.mySpringBean)) return false;
 

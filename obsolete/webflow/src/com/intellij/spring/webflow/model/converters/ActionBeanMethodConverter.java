@@ -22,16 +22,16 @@ import java.util.*;
 public class ActionBeanMethodConverter extends ResolvingConverter<PsiMethod> {
 
   @NotNull
-  public Collection<? extends PsiMethod> getVariants(final ConvertContext context) {
-    final WebflowNamedAction action = context.getInvocationElement().getParentOfType(WebflowNamedAction.class, false);
+  public Collection<? extends PsiMethod> getVariants(ConvertContext context) {
+    WebflowNamedAction action = context.getInvocationElement().getParentOfType(WebflowNamedAction.class, false);
 
-    final Set<PsiMethod> variants = new HashSet<PsiMethod>();
-    final List<String> addedMethodNames = new ArrayList<String>();
+    Set<PsiMethod> variants = new HashSet<PsiMethod>();
+    List<String> addedMethodNames = new ArrayList<String>();
     for (PsiMethod method : getAllMethods(action)) {
       if (addedMethodNames.contains(method.getName())) continue;
       if (!method.hasModifierProperty(PsiModifier.PUBLIC) || method.isConstructor() || CommonClassNames.JAVA_LANG_OBJECT.equals(method.getContainingClass().getQualifiedName())) continue;
       
-      final boolean isAction = WebflowUtil.isAction(context);
+      boolean isAction = WebflowUtil.isAction(context);
       if ((isAction && isActionBeanMethod(method)) || ! isAction) {
         variants.add(method); // IDEADEV-26886
         addedMethodNames.add(method.getName());
@@ -41,18 +41,18 @@ public class ActionBeanMethodConverter extends ResolvingConverter<PsiMethod> {
     return variants;
   }
 
-  private static boolean isActionBeanMethod(final PsiMethod method) {
-    final PsiType returnType= method.getReturnType();
+  private static boolean isActionBeanMethod(PsiMethod method) {
+    PsiType returnType= method.getReturnType();
     return method.getParameterList().getParameters().length == 1 &&
            WebflowConstants.ACTION_BEAN_METHOD_PARAMETER_CLASSNAME.equals(method.getParameterList().getParameters()[0].getType().getCanonicalText()) &&
            returnType != null && WebflowConstants.ACTION_BEAN_METHOD_RETURN_TYPE_CLASSNAME.equals(returnType.getCanonicalText())  ;
   }
 
 
-  private static Collection<? extends PsiMethod> getAllMethods(final WebflowNamedAction action) {
+  private static Collection<? extends PsiMethod> getAllMethods(WebflowNamedAction action) {
     Set<PsiMethod> methods = new HashSet<PsiMethod>();
     if (action != null) {
-      final SpringBeanPointer bean = action.getBean().getValue();
+      SpringBeanPointer bean = action.getBean().getValue();
       if (bean != null && bean.getBeanClass() != null) {
         methods.addAll(Arrays.asList(bean.getBeanClass().getAllMethods()));
       }
@@ -60,10 +60,10 @@ public class ActionBeanMethodConverter extends ResolvingConverter<PsiMethod> {
     return methods;
   }
 
-  public PsiMethod fromString(@Nullable @NonNls final String s, final ConvertContext context) {
+  public PsiMethod fromString(@Nullable @NonNls String s, ConvertContext context) {
     PsiMethod resolvedMethod = null;
     if (s != null) {
-      final WebflowNamedAction action = context.getInvocationElement().getParentOfType(WebflowNamedAction.class, false);
+      WebflowNamedAction action = context.getInvocationElement().getParentOfType(WebflowNamedAction.class, false);
 
       for (PsiMethod method : getAllMethods(action)) {
         if (s.equals(method.getName())) {   // IDEADEV-26973
@@ -76,7 +76,7 @@ public class ActionBeanMethodConverter extends ResolvingConverter<PsiMethod> {
     return resolvedMethod;
   }
 
-  public String toString(@Nullable final PsiMethod psiMethod, final ConvertContext context) {
+  public String toString(@Nullable PsiMethod psiMethod, ConvertContext context) {
     return psiMethod != null ? psiMethod.getName() : null;
   }
 }

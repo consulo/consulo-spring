@@ -14,12 +14,12 @@ import java.util.Set;
 public class FactoryPropertiesDependentTypeResolver extends AbstractTypeResolver {
   private final List<String> myPropertyNames;
 
-  public FactoryPropertiesDependentTypeResolver(final List<String> propertyNames) {
+  public FactoryPropertiesDependentTypeResolver(List<String> propertyNames) {
     myPropertyNames = propertyNames;
   }
 
   @Nonnull
-  public Set<String> getObjectType(@Nonnull final CommonSpringBean context) {
+  public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     for (String propertyName : myPropertyNames) {
       String propertyValue = getPropertyValue(context, propertyName);
       if (propertyValue != null) {
@@ -29,7 +29,7 @@ public class FactoryPropertiesDependentTypeResolver extends AbstractTypeResolver
     return Collections.emptySet();
   }
 
-  public boolean accept(@Nonnull final String factoryClassName) {
+  public boolean accept(@Nonnull String factoryClassName) {
     return true;
   }
 }

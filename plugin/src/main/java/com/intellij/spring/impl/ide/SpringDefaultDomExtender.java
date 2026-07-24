@@ -25,7 +25,7 @@ public class SpringDefaultDomExtender {
   private SpringDefaultDomExtender() {
   }
 
-  public static void registerDefaultBeanExtensions(final DomExtensionsRegistrar registrar) {
+  public static void registerDefaultBeanExtensions(DomExtensionsRegistrar registrar) {
     registrar.registerCollectionChildrenExtension(new XmlName("map", SpringConstants.UTIL_NAMESPACE_KEY), UtilMap.class);
     registrar.registerCollectionChildrenExtension(new XmlName("list", SpringConstants.UTIL_NAMESPACE_KEY), UtilList.class);
     registrar.registerCollectionChildrenExtension(new XmlName("set", SpringConstants.UTIL_NAMESPACE_KEY), UtilSet.class);

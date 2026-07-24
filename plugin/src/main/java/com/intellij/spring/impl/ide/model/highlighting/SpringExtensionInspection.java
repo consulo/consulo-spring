@@ -58,11 +58,11 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
 
     @Override
     public void checkFileElement(
-        final DomFileElement<Beans> domFileElement,
-        final DomElementAnnotationHolder holder,
+        DomFileElement<Beans> domFileElement,
+        DomElementAnnotationHolder holder,
         SpringExtensionInspectionState state
     ) {
-        final consulo.module.Module module = domFileElement.getModule();
+        consulo.module.Module module = domFileElement.getModule();
         if (module == null) {
             return;
         }
@@ -70,21 +70,21 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         if (virtualFile == null) {
             return;
         }
-        final ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(module.getProject()).getFileIndex();
+        ProjectFileIndex projectFileIndex = ProjectRootManager.getInstance(module.getProject()).getFileIndex();
         if (!projectFileIndex.isInSourceContent(virtualFile) ||
             (!state.checkTestFiles && projectFileIndex.isInTestSourceContent(virtualFile))) {
             return;
         }
         final Ref<SpringModuleExtension> moduleExtensionRef = new Ref<SpringModuleExtension>();
-        final boolean notFound = ModuleUtilCore.visitMeAndDependentModules(
+        boolean notFound = ModuleUtilCore.visitMeAndDependentModules(
             module,
             new Processor<Module>() {
                 @Override
-                public boolean process(final consulo.module.Module module) {
-                    final SpringModuleExtension facet = SpringModuleExtension.getInstance(module);
+                public boolean process(consulo.module.Module module) {
+                    SpringModuleExtension facet = SpringModuleExtension.getInstance(module);
                     if (facet != null) {
                         moduleExtensionRef.set(facet);
-                        final Set<SpringFileSet> sets = SpringManager.getInstance(module.getProject()).getAllSets(facet);
+                        Set<SpringFileSet> sets = SpringManager.getInstance(module.getProject()).getAllSets(facet);
                         for (SpringFileSet fileSet : sets) {
                             if (fileSet.hasFile(virtualFile)) {
                                 return false;
@@ -98,7 +98,7 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         if (!notFound) {
             return;
         }
-        final SpringModuleExtension moduleExtension = moduleExtensionRef.get();
+        SpringModuleExtension moduleExtension = moduleExtensionRef.get();
         if (moduleExtension == null) {
             holder.createProblem(
                 domFileElement,
@@ -148,7 +148,7 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
 
         @Override
         @RequiredUIAccess
-        protected void doFix(final Project project) {
+        protected void doFix(Project project) {
             final SpringModuleExtension extension = SpringModuleExtension.getInstance(myModule);
             if (extension != null) {
                 final Set<SpringFileSet> sets = extension.getFileSets();
@@ -165,13 +165,13 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
                             }
                         };
                     list.add(newSet);
-                    final BaseListPopupStep<SpringFileSet> step =
+                    BaseListPopupStep<SpringFileSet> step =
                         new BaseListPopupStep<SpringFileSet>(SpringLocalize.chooseFileSet().get(), list) {
                             @Override
                             @RequiredUIAccess
-                            public PopupStep onChosen(final SpringFileSet selectedValue, final boolean finalChoice) {
+                            public PopupStep onChosen(SpringFileSet selectedValue, boolean finalChoice) {
                                 if (selectedValue == newSet) {
-                                    final String name = SpringFileSet.getUniqueName(SpringLocalize.defaultFilesetName().get(), sets);
+                                    String name = SpringFileSet.getUniqueName(SpringLocalize.defaultFilesetName().get(), sets);
                                     newSet.setName(name);
 
                                     editSet(myModule, sets, newSet);
@@ -212,12 +212,12 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         }
 
         @Override
-        public boolean isAvailable(@Nonnull final Project project, final Editor editor, final PsiFile file) {
+        public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
             return true;
         }
 
         @Override
-        public void invoke(@Nonnull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
+        public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
             doFix(project);
             DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
             DaemonCodeAnalyzer.getInstance(project).restart();
@@ -229,17 +229,17 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         }
 
         @Override
-        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             doFix(project);
             DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
             DaemonCodeAnalyzer.getInstance(project).restart();
         }
 
         @RequiredUIAccess
-        protected void doFix(final Project project) {
+        protected void doFix(Project project) {
             SpringModuleExtension extension = new DummySpringModuleExtension(myModule);
 
-            final Set<SpringFileSet> sets = SpringManager.getInstance(project).getAllSets(extension);
+            Set<SpringFileSet> sets = SpringManager.getInstance(project).getAllSets(extension);
             for (SpringFileSet fileSet : sets) {
                 if (fileSet.hasFile(myVirtualFile)) {
                     return;
@@ -250,7 +250,7 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
 
         @RequiredUIAccess
         protected void addNewSet(final consulo.module.Module module, final Set<SpringFileSet> sets) {
-            final SpringFileSet set = new XmlSpringFileSet(
+            SpringFileSet set = new XmlSpringFileSet(
                 SpringFileSet.getUniqueId(sets),
                 SpringFileSet.getUniqueName(SpringLocalize.defaultFilesetName().get(), sets),
                 module
@@ -264,9 +264,9 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         }
 
         @RequiredUIAccess
-        protected void editSet(final Module module, final Set<SpringFileSet> sets, final SpringFileSet set) {
+        protected void editSet(Module module, Set<SpringFileSet> sets, SpringFileSet set) {
             set.addFile(myVirtualFile);
-            final FileSetEditor editor = new FileSetEditor(myModule, set, sets);
+            FileSetEditor editor = new FileSetEditor(myModule, set, sets);
             editor.show();
             if (editor.isOK()) {
                 modifyExtensionOnce(module, it -> it.getFileSets().add(editor.getEditedFileSet().cloneTo(it)));

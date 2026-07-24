@@ -10,8 +10,8 @@ import java.util.List;
 
 public class PropsValueConverter extends PropertyValueConverter {
   @Nonnull
-  public List<? extends PsiType> getValueTypes(final GenericDomValue domValue) {
-    final PsiType type = SpringConverterUtil.findType(String.class, domValue.getManager().getProject());
+  public List<? extends PsiType> getValueTypes(GenericDomValue domValue) {
+    PsiType type = SpringConverterUtil.findType(String.class, domValue.getManager().getProject());
     return type == null ? Collections.<PsiType>emptyList() : Collections.singletonList(type);
   }
 }

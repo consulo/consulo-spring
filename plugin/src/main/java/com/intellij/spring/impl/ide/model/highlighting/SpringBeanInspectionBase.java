@@ -32,11 +32,11 @@ public abstract class SpringBeanInspectionBase<State> extends DomElementsInspect
     }
 
     @Override
-    public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, State state) {
-        final XmlFile xmlFile = domFileElement.getFile();
-        final Beans beans = domFileElement.getRootElement();
-        final SpringModel model = SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
-        final SpringModelVisitor visitor = createVisitor(holder, beans, model, state);
+    public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder, State state) {
+        XmlFile xmlFile = domFileElement.getFile();
+        Beans beans = domFileElement.getRootElement();
+        SpringModel model = SpringManager.getInstance(xmlFile.getProject()).getSpringModelByFile(xmlFile);
+        SpringModelVisitor visitor = createVisitor(holder, beans, model, state);
         SpringModelVisitor.visitBeans(visitor, beans);
     }
 
@@ -60,9 +60,9 @@ public abstract class SpringBeanInspectionBase<State> extends DomElementsInspect
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel springModel,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel springModel,
         State state
     ) {
     }

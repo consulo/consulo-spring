@@ -42,7 +42,7 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
   private static final JamStringAttributeMeta.Single<String> ARG_NAMES_META = JamAttributeMeta.singleString("argNames");
 
   public GenericValue<PsiPointcutExpression> getExpression() {
-    final JamStringAttributeMeta.Single<PsiPointcutExpression> meta =
+    JamStringAttributeMeta.Single<PsiPointcutExpression> meta =
       JamAttributeMeta.singleString("value", new JamConverter<PsiPointcutExpression>() {
         @Override
         public PsiPointcutExpression fromString(@Nullable String s, JamStringAttributeElement<PsiPointcutExpression> context) {
@@ -53,7 +53,7 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
   }
 
   public PsiElement getIdentifyingPsiElement() {
-    final PsiAnnotation annotation = getAnnotation();
+    PsiAnnotation annotation = getAnnotation();
     return annotation == null ? getPsiElement() : annotation;
   }
 
@@ -75,13 +75,13 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
   }
 
   @Nullable
-  public static PsiPointcutExpression getPsiPointcutExpression(@Nullable final PsiElement value) {
+  public static PsiPointcutExpression getPsiPointcutExpression(@Nullable PsiElement value) {
     if (value instanceof PsiBinaryExpression) {
       return getPsiPointcutExpression(((PsiBinaryExpression)value).getLOperand());
     }
 
     if (value instanceof PsiLanguageInjectionHost) {
-      final List<Pair<PsiElement, TextRange>> list = InjectedLanguageManager.getInstance(value.getProject()).getInjectedPsiFiles(value);
+      List<Pair<PsiElement, TextRange>> list = InjectedLanguageManager.getInstance(value.getProject()).getInjectedPsiFiles(value);
       if (list != null) {
         Pair<PsiElement, TextRange> pair = ContainerUtil.find(list, pair1 -> pair1.first instanceof AopPointcutExpressionFile);
         if (pair != null) {

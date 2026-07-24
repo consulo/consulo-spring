@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class WebflowDesignerFileEditorProvider extends PerspectiveFileEditorProvider {
 
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-    final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+    PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
 
     return psiFile instanceof XmlFile &&  WebflowDomModelManager.getInstance(project).isWebflow((XmlFile)psiFile);
   }

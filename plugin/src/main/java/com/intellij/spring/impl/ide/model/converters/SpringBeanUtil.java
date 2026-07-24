@@ -34,7 +34,7 @@ public class SpringBeanUtil {
 
   @Nullable
   public static PsiClass getInstantiationClass(SpringBean bean) {
-    final PsiMethod factoryMethod = bean.getFactoryMethod().getValue();
+    PsiMethod factoryMethod = bean.getFactoryMethod().getValue();
     if (factoryMethod != null) {
       return SpringBeanFactoryMethodConverter.getFactoryClass(bean);
     }
@@ -46,12 +46,12 @@ public class SpringBeanUtil {
   }
 
   @Nonnull
-  public static List<PsiMethod> getInstantiationMethods(final SpringBean springBean) {
-    final String factoryMethod = springBean.getFactoryMethod().getStringValue();
+  public static List<PsiMethod> getInstantiationMethods(SpringBean springBean) {
+    String factoryMethod = springBean.getFactoryMethod().getStringValue();
     if (factoryMethod != null) {
       return SpringBeanFactoryMethodConverter.getFactoryMethodCandidates(springBean, factoryMethod);
     }
-    final PsiClass beanClass = springBean.getBeanClass();
+    PsiClass beanClass = springBean.getBeanClass();
     if (beanClass != null) {
       return Arrays.asList(beanClass.getConstructors()); //private constructor is accepted
     }
@@ -60,13 +60,13 @@ public class SpringBeanUtil {
 
   @Nullable
   public static PsiType getRequiredType(@Nonnull TypeHolder valueHolder) {
-    final List<? extends PsiType> psiTypes = valueHolder.getRequiredTypes();
+    List<? extends PsiType> psiTypes = valueHolder.getRequiredTypes();
     return psiTypes.isEmpty() ? null : psiTypes.get(0);
   }
 
   @Nullable
   public static PsiClassType getRequiredClass(@Nonnull TypeHolder valueHolder) {
-    final PsiType injectionType = getRequiredType(valueHolder);
+    PsiType injectionType = getRequiredType(valueHolder);
     if (injectionType instanceof PsiClassType) {
       return (PsiClassType)injectionType;
     }
@@ -76,9 +76,9 @@ public class SpringBeanUtil {
   @Nullable
   public static DomSpringBean getTargetSpringBean(Editor editor) {
     if (editor != null) {
-      final PsiElement targetPsiElement = TargetElementUtil.findTargetElement(editor, TargetElementUtil.getReferenceSearchFlags());
+      PsiElement targetPsiElement = TargetElementUtil.findTargetElement(editor, TargetElementUtil.getReferenceSearchFlags());
       if (targetPsiElement instanceof XmlTag) {
-        final DomElement value = DomManager.getDomManager(targetPsiElement.getProject()).getDomElement((XmlTag)targetPsiElement);
+        DomElement value = DomManager.getDomManager(targetPsiElement.getProject()).getDomElement((XmlTag)targetPsiElement);
         if (value instanceof DomSpringBean) {
           return (DomSpringBean)value;
         }
@@ -87,10 +87,10 @@ public class SpringBeanUtil {
     return null;
   }
 
-  public static DomSpringBean getTargetSpringBean(final PsiElement element) {
+  public static DomSpringBean getTargetSpringBean(PsiElement element) {
 
     if (element instanceof XmlTag) {
-      final DomElement value = DomManager.getDomManager(element.getProject()).getDomElement((XmlTag)element);
+      DomElement value = DomManager.getDomManager(element.getProject()).getDomElement((XmlTag)element);
       if (value instanceof DomSpringBean) {
         return (DomSpringBean)value;
       }

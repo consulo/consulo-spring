@@ -18,7 +18,7 @@ import java.util.List;
  * @author peter
  */
 public class AopAnnotationHolder extends AopElementBase {
-  public AopAnnotationHolder(@Nonnull final ASTNode node) {
+  public AopAnnotationHolder(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -30,9 +30,9 @@ public class AopAnnotationHolder extends AopElementBase {
   @RequiredReadAction
   public final Collection<AopPsiTypePattern> getPatterns() {
     List<AopPsiTypePattern> result = Collections.emptyList();
-    for (final AopAnnotationPattern expression : getAnnotationPatterns()) {
+    for (AopAnnotationPattern expression : getAnnotationPatterns()) {
       List<AopPsiTypePattern> portion = new ArrayList<>();
-      for (final AopPsiTypePattern pattern : expression.getPatterns()) {
+      for (AopPsiTypePattern pattern : expression.getPatterns()) {
         if (pattern instanceof AndPsiTypePattern) {
           portion.add(new AndPsiTypePattern(ContainerUtil.map2Array(((AndPsiTypePattern)pattern).getPatterns(), AopPsiTypePattern.class,
                                                                     PsiAnnotatedTypePattern::new)));
@@ -45,7 +45,7 @@ public class AopAnnotationHolder extends AopElementBase {
         result = portion;
       }
       else {
-        final ArrayList<AopPsiTypePattern> newResult = new ArrayList<>();
+        ArrayList<AopPsiTypePattern> newResult = new ArrayList<>();
         AopBinaryExpression.conjunctPatterns(result, portion, newResult);
         result = newResult;
       }
@@ -53,11 +53,11 @@ public class AopAnnotationHolder extends AopElementBase {
     return result;
   }
 
-  public final boolean accepts(@Nonnull final PsiMethod method) {
-    for (final AopPsiTypePattern pattern : getPatterns()) {
+  public final boolean accepts(@Nonnull PsiMethod method) {
+    for (AopPsiTypePattern pattern : getPatterns()) {
       if (pattern instanceof AndPsiTypePattern) {
         boolean accepts = true;
-        for (final AopPsiTypePattern typePattern : ((AndPsiTypePattern)pattern).getPatterns()) {
+        for (AopPsiTypePattern typePattern : ((AndPsiTypePattern)pattern).getPatterns()) {
           if (!PsiAnnotatedTypePattern.acceptsAnnotationPattern(method,
                                                                 ((PsiAnnotatedTypePattern)typePattern).getAnnotationPattern(),
                                                                 false)) {

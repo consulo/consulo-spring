@@ -31,9 +31,9 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
   private final NotNullLazyValue<Boolean> myAbstract = new NotNullLazyValue<Boolean>() {
     @Nonnull
     protected Boolean compute() {
-      final CommonSpringBean bean = getSpringBean();
+      CommonSpringBean bean = getSpringBean();
       if (bean instanceof SpringBean) {
-        final Boolean value = ((SpringBean)bean).getAbstract().getValue();
+        Boolean value = ((SpringBean)bean).getAbstract().getValue();
         return value != null && value.booleanValue();
       }
       return false;
@@ -41,7 +41,7 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
   };
   private final NullableLazyValue<SpringBeanPointer> myParent = new NullableLazyValue<SpringBeanPointer>() {
     protected SpringBeanPointer compute() {
-      final CommonSpringBean parent = getSpringBean();
+      CommonSpringBean parent = getSpringBean();
       return parent instanceof SpringBean ? ((SpringBean)parent).getParentBean().getValue() : null;
     }
   };
@@ -53,11 +53,11 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
 
   private WeakReference<DomSpringBean> myCachedValue;
 
-  private DomSpringBeanPointer(@Nonnull final DomSpringBean springBean) {
+  private DomSpringBeanPointer(@Nonnull DomSpringBean springBean) {
     super(springBean.getBeanName());
     ProgressManager.getInstance().checkCanceled();
     myCachedValue = new PatchedWeakReference<>(springBean);
-    final XmlTag tag = springBean.getXmlTag();
+    XmlTag tag = springBean.getXmlTag();
     assert tag != null;
     myPointer = DomAnchorImpl.createAnchor(springBean);
   }
@@ -89,7 +89,7 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
     return PsiManager.getInstance(getContainingFile().getProject());
   }
 
-  public static DomSpringBeanPointer createDomSpringBeanPointer(final @Nonnull DomSpringBean bean) {
+  public static DomSpringBeanPointer createDomSpringBeanPointer(@Nonnull DomSpringBean bean) {
     return new DomSpringBeanPointer(bean);
   }
 
@@ -105,7 +105,7 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
     return getSpringBean().getXmlElement();
   }
 
-  public SpringBeanPointer derive(@Nonnull final String name) {
+  public SpringBeanPointer derive(@Nonnull String name) {
     return Comparing.equal(name, getName()) ? this : new DerivedSpringBeanPointer(this, name);
   }
 
@@ -118,7 +118,7 @@ public class DomSpringBeanPointer extends SpringBaseBeanPointer {
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof DomSpringBeanPointer)) return false;
 

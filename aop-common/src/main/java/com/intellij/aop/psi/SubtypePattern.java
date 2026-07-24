@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class SubtypePattern extends AopPsiTypePattern {
   private final AopPsiTypePattern myBoundPattern;
 
-  public SubtypePattern(final AopPsiTypePattern boundPattern) {
+  public SubtypePattern(AopPsiTypePattern boundPattern) {
     myBoundPattern = boundPattern;
   }
 
@@ -38,10 +38,10 @@ public class SubtypePattern extends AopPsiTypePattern {
 
   @Nonnull
   @Override
-  public final PointcutMatchDegree canBeAssignableFrom(@Nonnull final PsiType type) {
+  public final PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     if (type instanceof PsiWildcardType && !(myBoundPattern instanceof WildcardPattern)) {
       if (myBoundPattern instanceof PsiClassTypePattern) {
-        final PsiClassTypePattern pattern = (PsiClassTypePattern)myBoundPattern;
+        PsiClassTypePattern pattern = (PsiClassTypePattern)myBoundPattern;
         if (!CommonClassNames.JAVA_LANG_OBJECT.equals(pattern.getText())) {
           return PointcutMatchDegree.FALSE;
         }

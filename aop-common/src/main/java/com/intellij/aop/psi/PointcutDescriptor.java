@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NonNls;
 public abstract class PointcutDescriptor {
   private final String myTokenText;
 
-  protected PointcutDescriptor(@NonNls final String tokenText) {
+  protected PointcutDescriptor(@NonNls String tokenText) {
     myTokenText = tokenText;
   }
 
@@ -22,7 +22,7 @@ public abstract class PointcutDescriptor {
     return myTokenText;
   }
 
-  public abstract void parseToken(final PrattBuilder builder);
+  public abstract void parseToken(PrattBuilder builder);
 
-  public abstract PsiPointcutExpression createPsi(final ASTNode node);
+  public abstract PsiPointcutExpression createPsi(ASTNode node);
 }

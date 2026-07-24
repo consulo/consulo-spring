@@ -18,12 +18,12 @@ import jakarta.annotation.Nonnull;
 @ExtensionImpl
 public class AopHighlightErrorFilter extends HighlightErrorFilter {
 
-  public boolean shouldHighlightErrorElement(@Nonnull final PsiErrorElement element) {
+  public boolean shouldHighlightErrorElement(@Nonnull PsiErrorElement element) {
     return !value(element);
   }
 
-  public static boolean value(final PsiErrorElement psiErrorElement) {
-    final PsiFile file = psiErrorElement.getContainingFile();
+  public static boolean value(PsiErrorElement psiErrorElement) {
+    PsiFile file = psiErrorElement.getContainingFile();
     if (file instanceof AopPointcutExpressionFile) {
       if (((AopPointcutExpressionFile)file).getAopModel().getAdvisedElementsSearcher().shouldSuppressErrors()) return true;
     }

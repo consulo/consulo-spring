@@ -18,13 +18,13 @@ public interface QualifierAttribute {
 
   HashingStrategy<QualifierAttribute> HASHING_STRATEGY = new HashingStrategy<QualifierAttribute>() {
 
-    public int hashCode(final QualifierAttribute object) {
-      final String key = object.getAttributeKey();
-      final String value = object.getAttributeValue();
+    public int hashCode(QualifierAttribute object) {
+      String key = object.getAttributeKey();
+      String value = object.getAttributeValue();
       return (key == null ? 0 : key.hashCode()) + (value == null ? 0 : value.hashCode());
     }
 
-    public boolean equals(final QualifierAttribute o1, final QualifierAttribute o2) {
+    public boolean equals(QualifierAttribute o1, QualifierAttribute o2) {
       return Comparing.equal(o1.getAttributeKey(), o2.getAttributeKey()) && Comparing.equal(o1.getAttributeValue(), o2.getAttributeValue());
     }
   };

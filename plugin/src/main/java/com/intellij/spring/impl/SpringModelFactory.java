@@ -62,20 +62,20 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
   }*/
 
   @Override
-  protected List<DomModelImpl<Beans>> computeAllModels(@Nonnull final Module module) {
+  protected List<DomModelImpl<Beans>> computeAllModels(@Nonnull Module module) {
 
-    final SpringModuleExtension facet = SpringModuleExtension.getInstance(module);
+    SpringModuleExtension facet = SpringModuleExtension.getInstance(module);
     if (facet == null) {
       return Collections.emptyList();
     }
-    final SpringManager springManager = SpringManager.getInstance(module.getProject());
-    final Set<SpringFileSet> fileSets = springManager.getAllSets(facet);
-    final ArrayList<DomSpringModel> models = new ArrayList<>(fileSets.size());
+    SpringManager springManager = SpringManager.getInstance(module.getProject());
+    Set<SpringFileSet> fileSets = springManager.getAllSets(facet);
+    ArrayList<DomSpringModel> models = new ArrayList<>(fileSets.size());
     for (SpringFileSet set: fileSets) {
       if (set.isRemoved()) {
         continue;
       }
-      final DomSpringModelImpl2 model = createModel(set, module);
+      DomSpringModelImpl2 model = createModel(set, module);
       if (model != null) {
         models.add(model);
       }
@@ -85,17 +85,17 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
   }
 
   @Nullable
-  public DomSpringModelImpl2 createModel(final SpringFileSet set, final Module module) {
-    final PsiManager psiManager = PsiManager.getInstance(module.getProject());
+  public DomSpringModelImpl2 createModel(SpringFileSet set, Module module) {
+    PsiManager psiManager = PsiManager.getInstance(module.getProject());
     Set<XmlFile> files = new LinkedHashSet<>(set.getFiles().size());
     for (VirtualFilePointer filePointer: set.getFiles()) {
-      final VirtualFile file = filePointer.getFile();
+      VirtualFile file = filePointer.getFile();
       if (file == null) {
         continue;
       }
-      final PsiFile psiFile = psiManager.findFile(file);
+      PsiFile psiFile = psiManager.findFile(file);
       if (psiFile instanceof XmlFile) {
-        final Beans dom = getDom((XmlFile)psiFile);
+        Beans dom = getDom((XmlFile)psiFile);
         if (dom != null) {
           files.add((XmlFile)psiFile);
           addIncludes(files, dom);
@@ -103,7 +103,7 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
       }
     }
     if (files.size() > 0) {
-      final DomFileElement<Beans> element = createMergedModelRoot(files);
+      DomFileElement<Beans> element = createMergedModelRoot(files);
       if (element != null) {
         return new DomSpringModelImpl2(element, files, module, set);
       }
@@ -111,11 +111,11 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
     return null;
   }
 
-  private static void setDependencies(final List<DomSpringModel> models) {
+  private static void setDependencies(List<DomSpringModel> models) {
     for (SpringModel model : models) {
-      final List<String> dependencies = model.getFileSet().getDependencies();
+      List<String> dependencies = model.getFileSet().getDependencies();
       if (dependencies.size() > 0) {
-        final ArrayList<SpringModel> list = new ArrayList<>(dependencies.size());
+        ArrayList<SpringModel> list = new ArrayList<>(dependencies.size());
         for (Iterator<String> i = dependencies.iterator(); i.hasNext();) {
           String dependency = i.next();
           boolean valid = false;
@@ -142,9 +142,9 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
     if (model != null) {
       return model;
     }
-    final ModuleManager moduleManager = ModuleManager.getInstance(psiFile.getProject());
+    ModuleManager moduleManager = ModuleManager.getInstance(psiFile.getProject());
     if (module != null) {
-      final List<Module> dependentModules = moduleManager.getModuleDependentModules(module);
+      List<Module> dependentModules = moduleManager.getModuleDependentModules(module);
       for (Module dependentModule: dependentModules) {
         model = super.computeModel(psiFile, dependentModule);
         if (model != null) {
@@ -152,7 +152,7 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
         }
       }
     }
-    final Module[] allModules = moduleManager.getModules();
+    Module[] allModules = moduleManager.getModules();
     for (Module aModule: allModules) {
       model = super.computeModel(psiFile, aModule);
       if (model != null) {
@@ -161,9 +161,9 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
     }
 
     // no configuration found; compute model for single file...
-    final DomFileElement<Beans> beans = getDomRoot(psiFile);
+    DomFileElement<Beans> beans = getDomRoot(psiFile);
     if (beans != null) {
-      final HashSet<XmlFile> files = new HashSet<>();
+      HashSet<XmlFile> files = new HashSet<>();
       files.add(psiFile);
       addIncludes(files, beans.getRootElement());
       DomSpringModelImpl2 modelImpl2 =
@@ -181,11 +181,11 @@ public class SpringModelFactory extends DomModelFactory<Beans, DomModelImpl<Bean
     return new DomSpringModelImpl2(domFileElement, set, module, null).getDomModel();
   }
 
-  private void addIncludes(Set<XmlFile> files, final Beans dom) {
+  private void addIncludes(Set<XmlFile> files, Beans dom) {
     for (SpringImport imp: dom.getImports()) {
-      final PsiFile psiFile = imp.getResource().getValue();
+      PsiFile psiFile = imp.getResource().getValue();
       if (psiFile instanceof XmlFile && !files.contains(psiFile)) {
-        final Beans child = getDom((XmlFile)psiFile);
+        Beans child = getDom((XmlFile)psiFile);
         if (child != null) {
           files.add((XmlFile)psiFile);
           addIncludes(files, child);

@@ -31,11 +31,11 @@ import java.util.Map;
 @ExtensionImpl
 public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Object> {
     @Override
-    public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder, Object state) {
+    public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder, Object state) {
         super.checkFileElement(domFileElement, holder, state);
 
-        final Beans beans = domFileElement.getRootElement();
-        final DefaultAutowire defaultAutowire = beans.getDefaultAutowire().getValue();
+        Beans beans = domFileElement.getRootElement();
+        DefaultAutowire defaultAutowire = beans.getDefaultAutowire().getValue();
 
         if (defaultAutowire != null && !DefaultAutowire.NO.equals(defaultAutowire)) {
             holder.createProblem(
@@ -58,16 +58,16 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
                 return SpringLocalize.springBeanAutowireEscape();
             }
 
-            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+            public void applyFix(@Nonnull final Project project, @Nonnull ProblemDescriptor descriptor) {
                 if (!beans.isValid()) {
                     return;
                 }
 
                 new WriteCommandAction(project, DomUtil.getFile(beans)) {
-                    protected void run(final Result result) throws Throwable {
+                    protected void run(Result result) throws Throwable {
                         for (SpringBean bean : beans.getBeans()) {
                             if (isAutowireCandidate(bean)) {
-                                final Autowire autowire = bean.getAutowire().getValue();
+                                Autowire autowire = bean.getAutowire().getValue();
 
                                 if (autowire == null
                                     || autowire.getValue().equals(defaultAutowire.getValue())
@@ -85,9 +85,9 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel model,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel model,
         Object state
     ) {
         if (isAutowireCandidate(springBean)) {
@@ -97,15 +97,15 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         }
     }
 
-    private static boolean isAutowireCandidate(final SpringBean springBean) {
-        final Boolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
+    private static boolean isAutowireCandidate(SpringBean springBean) {
+        Boolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
 
         return autoWireCandidate == null || autoWireCandidate.booleanValue();
 
     }
 
-    private static void addAutowireEscapeWarning(final SpringBean springBean, final DomElementAnnotationHolder holder) {
-        final Autowire autowire = springBean.getAutowire().getValue();
+    private static void addAutowireEscapeWarning(SpringBean springBean, DomElementAnnotationHolder holder) {
+        Autowire autowire = springBean.getAutowire().getValue();
         if (autowire != null && !Autowire.NO.equals(autowire)) {
             holder.createProblem(
                 springBean.getAutowire(),
@@ -124,13 +124,13 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
                 return SpringLocalize.springBeanAutowireEscape();
             }
 
-            public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+            public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                 if (!springBean.isValid()) {
                     return;
                 }
 
                 new WriteCommandAction(springBean.getManager().getProject(), DomUtil.getFile(springBean)) {
-                    protected void run(final Result result) throws Throwable {
+                    protected void run(Result result) throws Throwable {
                         escapeAutowire(autowire.getValue(), springBean);
                     }
                 }.execute();
@@ -138,8 +138,8 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         };
     }
 
-    private static void escapeAutowire(@Nonnull final String autowire, final SpringBean springBean) {
-        final SpringModel springModel = SpringUtils.getSpringModel(springBean);
+    private static void escapeAutowire(@Nonnull String autowire, SpringBean springBean) {
+        SpringModel springModel = SpringUtils.getSpringModel(springBean);
 
         if (autowire.equals(Autowire.BY_TYPE.getValue())) {
             escapeByTypeAutowire(springBean, springModel);
@@ -161,11 +161,11 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         }
     }
 
-    private static void escapeConstructorAutowire(final SpringBean springBean, final SpringModel springModel) {
-        final Map<PsiType, Collection<SpringBaseBeanPointer>> map =
+    private static void escapeConstructorAutowire(SpringBean springBean, SpringModel springModel) {
+        Map<PsiType, Collection<SpringBaseBeanPointer>> map =
             SpringAutowireUtil.getConstructorAutowiredProperties(springBean, springModel);
         for (PsiType psiType : map.keySet()) {
-            final ConstructorArg arg = springBean.addConstructorArg();
+            ConstructorArg arg = springBean.addConstructorArg();
             arg.getType().setStringValue(psiType.getCanonicalText());
             arg.getRefAttr().setStringValue(chooseReferencedBeanName(map.get(psiType)));
         }
@@ -174,12 +174,12 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
 
     }
 
-    private static void escapeByNameAutowire(final SpringBean springBean) {
-        final Map<PsiMethod, SpringBaseBeanPointer> autowiredProperties = SpringAutowireUtil.getByNameAutowiredProperties(springBean);
+    private static void escapeByNameAutowire(SpringBean springBean) {
+        Map<PsiMethod, SpringBaseBeanPointer> autowiredProperties = SpringAutowireUtil.getByNameAutowiredProperties(springBean);
         for (PsiMethod psiMethod : autowiredProperties.keySet()) {
-            final SpringProperty springProperty = springBean.addProperty();
-            final SpringBaseBeanPointer autowiredBean = autowiredProperties.get(psiMethod);
-            final String refBeanName = autowiredBean != null && autowiredBean.getName() != null ? autowiredBean.getName() : "";
+            SpringProperty springProperty = springBean.addProperty();
+            SpringBaseBeanPointer autowiredBean = autowiredProperties.get(psiMethod);
+            String refBeanName = autowiredBean != null && autowiredBean.getName() != null ? autowiredBean.getName() : "";
 
             springProperty.getName().setStringValue(PropertyUtil.getPropertyNameBySetter(psiMethod));
             springProperty.getRefAttr().setStringValue(refBeanName);
@@ -188,12 +188,12 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         springBean.getAutowire().undefine();
     }
 
-    private static void escapeByTypeAutowire(final SpringBean springBean, final SpringModel springModel) {
-        final Map<PsiMethod, Collection<SpringBaseBeanPointer>> autowiredProperties =
+    private static void escapeByTypeAutowire(SpringBean springBean, SpringModel springModel) {
+        Map<PsiMethod, Collection<SpringBaseBeanPointer>> autowiredProperties =
             SpringAutowireUtil.getByTypeAutowiredProperties(springBean, springModel);
 
         for (PsiMethod psiMethod : autowiredProperties.keySet()) {
-            final SpringProperty springProperty = springBean.addProperty();
+            SpringProperty springProperty = springBean.addProperty();
             springProperty.getName().setStringValue(PropertyUtil.getPropertyNameBySetter(psiMethod));
             springProperty.getRefAttr().setStringValue(chooseReferencedBeanName(autowiredProperties.get(psiMethod)));
         }
@@ -205,7 +205,7 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
     private static String chooseReferencedBeanName(Collection<SpringBaseBeanPointer> autowiredBeans) {
         if (autowiredBeans != null) {
             for (SpringBaseBeanPointer autowiredBean : autowiredBeans) {
-                final String beanName = SpringUtils.getReferencedName(autowiredBean.getSpringBean());
+                String beanName = SpringUtils.getReferencedName(autowiredBean.getSpringBean());
                 if (beanName != null && beanName.trim().length() > 0) {
                     return beanName;
                 }

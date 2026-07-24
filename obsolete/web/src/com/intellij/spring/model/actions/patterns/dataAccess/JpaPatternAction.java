@@ -25,37 +25,37 @@ public class JpaPatternAction extends AbstractFrameworkIntegrationAction {
     return new String[]{"org.springframework.orm.jpa.LocalEntityManagerFactoryBean"};
   }
 
-  protected LibrariesInfo getLibrariesInfo(final Module module) {
-    final LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos("jpa");
+  protected LibrariesInfo getLibrariesInfo(Module module) {
+    LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos("jpa");
 
     return new LibrariesInfo(libraryInfos, module, JPA_STRING_ID);
   }
 
-  protected List<TemplateInfo> getTemplateInfos(final Module module) {
+  protected List<TemplateInfo> getTemplateInfos(Module module) {
     List<TemplateInfo> infos = new LinkedList<TemplateInfo>();
 
-    final TemplateSettings settings = TemplateSettings.getInstance();
+    TemplateSettings settings = TemplateSettings.getInstance();
 
-    final TemplateImpl template = (TemplateImpl)JpaEntityManagerBeanGenerateProvider.getTemplate(module.getProject());
+    TemplateImpl template = (TemplateImpl)JpaEntityManagerBeanGenerateProvider.getTemplate(module.getProject());
     template.setId("jpa-entity-manager-factory");
 
-    final TemplateInfo emf = new TemplateInfo(module, template,
+    TemplateInfo emf = new TemplateInfo(module, template,
                                                      SpringBundle.message("spring.patterns.data.access.jpa.entity.manager.factory"), null);
 
-    final TemplateInfo cemf = new TemplateInfo(module, settings.getTemplateById("jpa-container-entity-manager-factory"),
+    TemplateInfo cemf = new TemplateInfo(module, settings.getTemplateById("jpa-container-entity-manager-factory"),
                                                      SpringBundle.message("spring.patterns.data.access.jpa.container.entity.manager.factory"), null, false);
 
 
-    final TemplateInfo pum = new TemplateInfo(module, settings.getTemplateById("jpa-persistent-unit-manager"),
+    TemplateInfo pum = new TemplateInfo(module, settings.getTemplateById("jpa-persistent-unit-manager"),
                                                          SpringBundle.message("spring.patterns.data.access.jpa.persistence.unit.manager"),
                                                          null, false);
-    final TemplateInfo tm = new TemplateInfo(module, settings.getTemplateById("jpa-transaction-manager"), SpringBundle.message(
+    TemplateInfo tm = new TemplateInfo(module, settings.getTemplateById("jpa-transaction-manager"), SpringBundle.message(
       "spring.patterns.data.access.jpa.transaction.manager"), null);
 
-    final TemplateInfo anno = new TemplateInfo(module, settings.getTemplateById("jpa-anno-post-processor"), SpringBundle.message(
+    TemplateInfo anno = new TemplateInfo(module, settings.getTemplateById("jpa-anno-post-processor"), SpringBundle.message(
           "spring.patterns.data.access.jpa.persistence.anno.posr.processor"), null, false);
 
-    final TemplateInfo ex  = new TemplateInfo(module, settings.getTemplateById("jpa-ex-translation-post-processor"), SpringBundle.message(
+    TemplateInfo ex  = new TemplateInfo(module, settings.getTemplateById("jpa-ex-translation-post-processor"), SpringBundle.message(
           "spring.patterns.data.access.jpa.persistence.ex.translation.posr.processor"), null, false);
 
     infos.add(emf);
@@ -68,7 +68,7 @@ public class JpaPatternAction extends AbstractFrameworkIntegrationAction {
     return infos;
   }
 
-  protected void addFacet(final Module module) {
+  protected void addFacet(Module module) {
 
   }
 

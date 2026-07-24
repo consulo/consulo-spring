@@ -26,7 +26,7 @@ public abstract class SpringEntryImpl extends SpringInjectionImpl implements Spr
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
     SpringMap map = (SpringMap)getParent();
-    final List<PsiType> psiTypes = TypedCollectionImpl.getRequiredTypes(map);
+    List<PsiType> psiTypes = TypedCollectionImpl.getRequiredTypes(map);
     if (!psiTypes.isEmpty()) {
       return psiTypes;
     }
@@ -38,11 +38,11 @@ public abstract class SpringEntryImpl extends SpringInjectionImpl implements Spr
   public PsiClass getRequiredKeyClass() {
     SpringMap map = (SpringMap)getParent();
     assert map != null;
-    final PsiClass psiClass = map.getKeyType().getValue();
+    PsiClass psiClass = map.getKeyType().getValue();
     if (psiClass != null) {
       return psiClass;
     }
-    final PsiType keyType = getRequiredTypeFromGenerics(map, 0);
+    PsiType keyType = getRequiredTypeFromGenerics(map, 0);
     return keyType instanceof PsiClassType ? ((PsiClassType)keyType).resolve() : null;
   }
 
@@ -50,7 +50,7 @@ public abstract class SpringEntryImpl extends SpringInjectionImpl implements Spr
   public PsiType getRequiredKeyType() {
     SpringMap map = (SpringMap)getParent();
     assert map != null;
-    final PsiClass psiClass = map.getKeyType().getValue();
+    PsiClass psiClass = map.getKeyType().getValue();
     if (psiClass != null) {
       return JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass);
     }
@@ -59,16 +59,16 @@ public abstract class SpringEntryImpl extends SpringInjectionImpl implements Spr
 
   @Nullable
   private static PsiType getRequiredTypeFromGenerics(@Nonnull SpringMap map, int index) {
-    final DomElement parent = map.getParent();
+    DomElement parent = map.getParent();
     if (parent instanceof TypeHolder) {
-      final List<? extends PsiType> types = ((TypeHolder)parent).getRequiredTypes();
+      List<? extends PsiType> types = ((TypeHolder)parent).getRequiredTypes();
       for (PsiType type : types) {
         if (type instanceof PsiClassType) {
-          final PsiClassType.ClassResolveResult resolveResult = ((PsiClassType)type).resolveGenerics();
-          final PsiClass psiClass = resolveResult.getElement();
-          final PsiSubstitutor substitutor = resolveResult.getSubstitutor();
+          PsiClassType.ClassResolveResult resolveResult = ((PsiClassType)type).resolveGenerics();
+          PsiClass psiClass = resolveResult.getElement();
+          PsiSubstitutor substitutor = resolveResult.getSubstitutor();
           if (psiClass != null && substitutor != null) {
-            final PsiTypeParameter[] typeParameters = psiClass.getTypeParameters();
+            PsiTypeParameter[] typeParameters = psiClass.getTypeParameters();
             if (typeParameters.length == 2) {
               return substitutor.substitute(typeParameters[index]);
             }

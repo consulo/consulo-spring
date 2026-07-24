@@ -35,20 +35,20 @@ public abstract class AopAdvisedElementsSearcher implements Predicate<Predicate<
     return false;
   }
 
-  public boolean acceptsBoundMethod(@Nonnull final PsiMethod method) {
+  public boolean acceptsBoundMethod(@Nonnull PsiMethod method) {
     if (method.isConstructor() || method.isAbstract()) return false;
 
-    final PsiClass containingClass = method.getContainingClass();
+    PsiClass containingClass = method.getContainingClass();
     if (containingClass == null) return false;
 
     return !CommonClassNames.JAVA_LANG_OBJECT.equals(containingClass.getQualifiedName()) && isAcceptable(containingClass);
   }
 
-  public boolean acceptsBoundMethodHeavy(@Nonnull final PsiMethod method) {
+  public boolean acceptsBoundMethodHeavy(@Nonnull PsiMethod method) {
     return true;
   }
 
-  public boolean isAcceptable(final PsiClass psiClass) {
+  public boolean isAcceptable(PsiClass psiClass) {
     return false;
   }
 }

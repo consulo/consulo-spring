@@ -37,10 +37,10 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
     }
 
     protected void checkAnnotation(
-        final PsiParameter[] parameters,
-        final ProblemsHolder holder,
-        final ArgNamesManipulator manipulator,
-        final PsiMethod method
+        PsiParameter[] parameters,
+        ProblemsHolder holder,
+        ArgNamesManipulator manipulator,
+        PsiMethod method
     ) {
         if (manipulator.getArgNames() == null) {
             if (!canInferParameters(parameters, manipulator, method)) {
@@ -57,7 +57,7 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
             }
         }
 
-        final AopAdviceType adviceType = manipulator.getAdviceType();
+        AopAdviceType adviceType = manipulator.getAdviceType();
         if (parameters.length > 0 && adviceType != null && adviceType != AopAdviceType.AROUND) {
             if (parameters[0].getType().equalsToText(AopConstants.PROCEEDING_JOIN_POINT)) {
                 holder.newProblem(AopLocalize.errorPjpNotAllowed())
@@ -67,7 +67,7 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
         }
     }
 
-    private static boolean canInferParameters(final PsiParameter[] parameters, ArgNamesManipulator manipulator, PsiMethod method) {
+    private static boolean canInferParameters(PsiParameter[] parameters, ArgNamesManipulator manipulator, PsiMethod method) {
         if (parameters.length == 0) {
             return true;
         }
@@ -84,7 +84,7 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
             return true;
         }
 
-        final Class<PsiAtPointcutDesignator> designatorClass = PsiAtPointcutDesignator.class;
+        Class<PsiAtPointcutDesignator> designatorClass = PsiAtPointcutDesignator.class;
         List<PsiParameter> shouldBeAnnos = findParametersUsedInPointcuts(set, designatorClass);
         if (shouldBeAnnos.size() == 1 && containsOnlyOneParameter(method, set, CommonClassNames.JAVA_LANG_ANNOTATION_ANNOTATION)) {
             return true;
@@ -96,8 +96,8 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
 
         List<PsiParameter> canBePrimitive = findParametersUsedInPointcuts(set, PsiArgsExpression.class);
         if (canBePrimitive.size() == 1) {
-            final List<PsiParameter> primitives = ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-                public boolean value(final PsiParameter psiParameter) {
+            List<PsiParameter> primitives = ContainerUtil.findAll(set, new Condition<PsiParameter>() {
+                public boolean value(PsiParameter psiParameter) {
                     return psiParameter.getType() instanceof PsiPrimitiveType;
                 }
             });
@@ -125,11 +125,11 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
         return false;
     }
 
-    private static List<PsiParameter> findParametersUsedInPointcuts(final Set<PsiParameter> set, final Class<?> designatorClass) {
+    private static List<PsiParameter> findParametersUsedInPointcuts(Set<PsiParameter> set, final Class<?> designatorClass) {
         return ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-            public boolean value(final PsiParameter psiParameter) {
+            public boolean value(PsiParameter psiParameter) {
                 return !ReferencesSearch.search(psiParameter).forEach(new Processor<PsiReference>() {
-                    public boolean process(final PsiReference reference) {
+                    public boolean process(PsiReference reference) {
                         if (reference instanceof AopReferenceExpression) {
                             if (designatorClass.isInstance(PsiTreeUtil.getParentOfType(
                                 (AopReferenceExpression) reference,
@@ -145,11 +145,11 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
         });
     }
 
-    private static boolean containsOnlyOneParameter(final PsiMethod method, final Set<PsiParameter> set, final String className) {
+    private static boolean containsOnlyOneParameter(PsiMethod method, Set<PsiParameter> set, String className) {
         final PsiClassType baseType = JavaPsiFacade.getInstance(method.getManager().getProject()).getElementFactory()
             .createTypeByFQClassName(className, method.getResolveScope());
         List<PsiParameter> instanceofs = ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-            public boolean value(final PsiParameter psiParameter) {
+            public boolean value(PsiParameter psiParameter) {
                 return baseType.isAssignableFrom(psiParameter.getType());
             }
         });

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class ActionBeanConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
   @Nullable
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return WebflowUtil.isAction(context) ? new String[]{WebflowConstants.ACTION_BEAN_CLASSNAME} : null;
   }
 }

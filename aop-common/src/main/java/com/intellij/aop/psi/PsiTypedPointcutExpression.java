@@ -12,7 +12,7 @@ import jakarta.annotation.Nullable;
  * @author peter
  */
 public abstract class PsiTypedPointcutExpression extends AopElementBase implements PsiPointcutExpression {
-  public PsiTypedPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiTypedPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 

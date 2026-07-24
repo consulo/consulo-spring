@@ -11,7 +11,7 @@ import jakarta.annotation.Nullable;
 public class SpringBeanGroupRuleProvider implements FileStructureGroupRuleProvider {
 
   @Nullable
-  public UsageGroupingRule getUsageGroupingRule(final Project project) {
+  public UsageGroupingRule getUsageGroupingRule(Project project) {
     return new SpringBeansGroupingRule();
   }
 }

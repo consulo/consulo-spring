@@ -17,8 +17,8 @@ import jakarta.annotation.Nonnull;
 public class ParserUtil {
   protected static ParsingCommand sequence(final ParsingCommand... commands) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
-        for (final ParsingCommand command : commands) {
+      public boolean perform(PsiBuilder builder) {
+        for (ParsingCommand command : commands) {
           if (!command.perform(builder)) return false;
         }
         return true;
@@ -26,15 +26,15 @@ public class ParserUtil {
     };
   }
 
-  protected static PsiBuilder.Marker doAndPrecedeMarker(PsiBuilder.Marker marker, final IElementType type) {
-    final PsiBuilder.Marker preceding = marker.precede();
+  protected static PsiBuilder.Marker doAndPrecedeMarker(PsiBuilder.Marker marker, IElementType type) {
+    PsiBuilder.Marker preceding = marker.precede();
     marker.done(type);
     return preceding;
   }
 
   protected static ParsingCommand token(final String text) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         if (text.equals(builder.getTokenText())) {
           builder.advanceLexer();
           return true;
@@ -47,7 +47,7 @@ public class ParserUtil {
 
   protected static ParsingCommand token(final AopElementType tokenType, final @NonNls @Nullable String expected) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         if (tokenType.equals(builder.getTokenType())) {
           builder.advanceLexer();
           return true;
@@ -60,7 +60,7 @@ public class ParserUtil {
 
   protected static ParsingCommand token(final TokenSet set, final @NonNls String expected) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         if (set.contains(builder.getTokenType())) {
           builder.advanceLexer();
           return true;
@@ -71,37 +71,37 @@ public class ParserUtil {
     };
   }
 
-  protected static boolean dropMarker(final PsiBuilder.Marker marker) {
+  protected static boolean dropMarker(PsiBuilder.Marker marker) {
     marker.drop();
     return false;
   }
 
-  protected static boolean doMarker(ParsingCommand command, final PsiBuilder.Marker marker, IElementType type, final PsiBuilder builder) {
+  protected static boolean doMarker(ParsingCommand command, PsiBuilder.Marker marker, IElementType type, PsiBuilder builder) {
     return doMarker(command.perform(builder), marker, type);
   }
 
-  protected static boolean doMarker(final boolean result, final PsiBuilder.Marker marker, final IElementType type) {
+  protected static boolean doMarker(boolean result, PsiBuilder.Marker marker, IElementType type) {
     marker.done(type);
     return result;
   }
 
   protected static ParsingCommand condition(final IElementType type, final ParsingCommand then, final ParsingCommand elze) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         return builder.getTokenType() == type ? then.perform(builder) : elze.perform(builder);
       }
     };
   }
 
-  protected static ParsingCommand or(final ParsingCommand... commands) {
+  protected static ParsingCommand or(ParsingCommand... commands) {
     return or(commands.length - 1, commands);
   }
 
   private static ParsingCommand or(final int main, final ParsingCommand... commands) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder myBuilder) {
-        for (final ParsingCommand command : commands) {
-          final PsiBuilder.Marker marker = myBuilder.mark();
+      public boolean perform(PsiBuilder myBuilder) {
+        for (ParsingCommand command : commands) {
+          PsiBuilder.Marker marker = myBuilder.mark();
           if (command.perform(myBuilder)) {
             marker.drop();
             return true;
@@ -116,7 +116,7 @@ public class ParserUtil {
 
   protected static ParsingCommand parseList(@Nonnull final ParsingCommand member, @Nullable final ParsingCommand separator, @Nullable final IElementType endType, final boolean canBeEmpty) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         if (canBeEmpty) {
           if (!tryParse(member, builder, endType)) return true;
           if (!tryParse(separator, builder, null)) return true;
@@ -130,12 +130,12 @@ public class ParserUtil {
     };
   }
 
-  protected static boolean tryParse(@Nullable final ParsingCommand command, final PsiBuilder builder, @Nullable IElementType endType) {
+  protected static boolean tryParse(@Nullable ParsingCommand command, PsiBuilder builder, @Nullable IElementType endType) {
     if (command == null) return true;
 
     boolean canBeEnd = endType == null || builder.getTokenType() == endType;
 
-    final PsiBuilder.Marker beforeSeparator = builder.mark();
+    PsiBuilder.Marker beforeSeparator = builder.mark();
     //final int offset = builder.getCurrentOffset();
     if (!command.perform(builder) && canBeEnd) {
       beforeSeparator.rollbackTo();
@@ -145,16 +145,16 @@ public class ParserUtil {
     return true;
   }
 
-  protected static ParsingCommand optional(final ParsingCommand command) {
+  protected static ParsingCommand optional(ParsingCommand command) {
     return or(command, ParsingCommand.TRUE);
   }
 
   protected static ParsingCommand handleError(final ParsingCommand command, final String message) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
-        final int offset = builder.getCurrentOffset();
-        final PsiBuilder.Marker marker = builder.mark();
-        final boolean result = command.perform(builder);
+      public boolean perform(PsiBuilder builder) {
+        int offset = builder.getCurrentOffset();
+        PsiBuilder.Marker marker = builder.mark();
+        boolean result = command.perform(builder);
         if (offset == builder.getCurrentOffset()) {
           marker.rollbackTo();
         } else {
@@ -171,7 +171,7 @@ public class ParserUtil {
 
   protected static ParsingCommand parseBinary(final AopElementType exprType, final IElementType separatorType, final ParsingCommand lower) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         PsiBuilder.Marker expr = builder.mark();
         if (!lower.perform(builder)) return dropMarker(expr);
 
@@ -188,7 +188,7 @@ public class ParserUtil {
 
   protected static ParsingCommand wrap(final ParsingCommand inner, final IElementType type) {
     return new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         return doMarker(inner, builder.mark(), type, builder);
       }
     };
@@ -197,7 +197,7 @@ public class ParserUtil {
 
   protected static abstract class ParsingCommand {
     public static ParsingCommand TRUE = new ParsingCommand() {
-      public boolean perform(final PsiBuilder builder) {
+      public boolean perform(PsiBuilder builder) {
         return true;
       }
     };
@@ -212,7 +212,7 @@ public class ParserUtil {
       return myToString;
     }*/
 
-    public abstract boolean perform(final PsiBuilder builder);
+    public abstract boolean perform(PsiBuilder builder);
   }
   
 }

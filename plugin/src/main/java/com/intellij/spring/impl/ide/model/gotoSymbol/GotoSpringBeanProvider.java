@@ -22,7 +22,7 @@ import java.util.Set;
 @ExtensionImpl
 public class GotoSpringBeanProvider extends GoToSymbolProvider {
 
-  protected void addNames(@Nonnull final Module module, final Set<String> result) {
+  protected void addNames(@Nonnull Module module, Set<String> result) {
     SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     if(springModel != null) {
       for (SpringBaseBeanPointer pointer : springModel.getAllCommonBeans()) {
@@ -37,13 +37,13 @@ public class GotoSpringBeanProvider extends GoToSymbolProvider {
     }
   }
 
-  protected void addItems(@Nonnull final Module module, final String name, final List<NavigationItem> result) {
+  protected void addItems(@Nonnull Module module, String name, List<NavigationItem> result) {
     SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     if(springModel != null) {
       for (SpringBaseBeanPointer pointer : springModel.getAllCommonBeans()) {
-        final Set<String> beanNames = getNames(pointer);
+        Set<String> beanNames = getNames(pointer);
         if (beanNames.contains(name)) {
-          final PsiElement element = pointer.getSpringBean().getIdentifyingPsiElement();
+          PsiElement element = pointer.getSpringBean().getIdentifyingPsiElement();
 
           if (element != null) {
             result.add(createNavigationItem(element, name, pointer.getBeanIcon()));
@@ -63,7 +63,7 @@ public class GotoSpringBeanProvider extends GoToSymbolProvider {
     return names;
   }
 
-  protected boolean acceptModule(final Module module) {
+  protected boolean acceptModule(Module module) {
     return SpringModuleExtension.getInstance(module) != null;
   }
 }

@@ -18,12 +18,12 @@ public class SpringWebApplicationContextVariableResolverProvider implements Cust
   @NonNls private static final String WEB_APPLICATION_CONTEXT_VARIABLE_NAME = "webApplicationContext";
 
 
-  public boolean acceptVariableResolver(final String className) {
+  public boolean acceptVariableResolver(String className) {
     return VARIABLE_RESOLVER_CLASSNAMES.contains(className);
   }
 
-  public void addVars(final List<JspImplicitVariable> resultVars, final Module module) {
-    final Factory<List<JspImplicitVariable>> factory = new Factory<List<JspImplicitVariable>>() {
+  public void addVars(List<JspImplicitVariable> resultVars, final Module module) {
+    Factory<List<JspImplicitVariable>> factory = new Factory<List<JspImplicitVariable>>() {
       public List<JspImplicitVariable> create() {
         List<JspImplicitVariable> results = new ArrayList<JspImplicitVariable>();
 

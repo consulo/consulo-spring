@@ -53,13 +53,13 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   public void testPointcutAnnotationInjection() throws Throwable {
     registerTrueAopProvider();
-    final PsiClass psiClass = myFixture.addClass("package java.lang; class Object { @" + AopConstants.POINTCUT_ANNO +
+    PsiClass psiClass = myFixture.addClass("package java.lang; class Object { @" + AopConstants.POINTCUT_ANNO +
                                          "(\"execution(* *())\") " +
                                          "public void foo();" +//0
                                          "}");
-    final PsiAnnotationMemberValue attrValue = psiClass.getMethods()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
+    PsiAnnotationMemberValue attrValue = psiClass.getMethods()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
     checkInjection(attrValue, new AopLanguageInjector());
-    final LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
+    LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
   }
 
   private void registerTrueAopProvider() {
@@ -68,15 +68,15 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   public void testDeclareParentsAnnotationInjection() throws Throwable {
     registerTrueAopProvider();
-    final PsiClass psiClass = myFixture.addClass("package java.lang; class Object { @" + AopConstants.DECLARE_PARENTS_ANNO +
+    PsiClass psiClass = myFixture.addClass("package java.lang; class Object { @" + AopConstants.DECLARE_PARENTS_ANNO +
                                          "(\"a.b.c*+\") " +
                                          "public int foo;" +//0
                                          "}");
-    final PsiAnnotationMemberValue attrValue = psiClass.getFields()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
+    PsiAnnotationMemberValue attrValue = psiClass.getFields()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
     checkIntoInjection(new AopLanguageInjector(), attrValue);
   }
 
-  private static void checkIntoInjection(final ConcatenationAwareInjector injector, final PsiElement attrValue) {
+  private static void checkIntoInjection(ConcatenationAwareInjector injector, final PsiElement attrValue) {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
@@ -102,7 +102,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
   }
-  private static void checkIntoInjection(final MultiHostInjector injector, final PsiElement attrValue) {
+  private static void checkIntoInjection(MultiHostInjector injector, final PsiElement attrValue) {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
@@ -150,27 +150,27 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     checkAdvice(AopConstants.AROUND_ANNO);
   }
 
-  private PsiAnnotationMemberValue checkAdvice(final String anno) throws IOException {
-    final PsiClass psiClass = myFixture.addClass("package java.lang; " +
+  private PsiAnnotationMemberValue checkAdvice(String anno) throws IOException {
+    PsiClass psiClass = myFixture.addClass("package java.lang; " +
                                          "@" + AopConstants.ASPECT_ANNO + " " +
                                          "class Object { @" + anno + "(\"execution(* *())\") public void foo(org.aspectj.lang.ProceedingJoinPoint yyy);" +
                                          "}");
-    final PsiAnnotationMemberValue attrValue = psiClass.getMethods()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
+    PsiAnnotationMemberValue attrValue = psiClass.getMethods()[0].getModifierList().getAnnotations()[0].findAttributeValue("value");
     checkInjection(attrValue, new AopLanguageInjector());
     return attrValue;
   }
 
   public void testAfterReturningAdviceInJava() throws Throwable {
     registerTrueAopProvider();
-    final PsiClass psiClass = myFixture.addClass("package java.lang; " +
+    PsiClass psiClass = myFixture.addClass("package java.lang; " +
                                          "@" + AopConstants.ASPECT_ANNO + " " +
                                          "class Object { @" + AopConstants.AFTER_RETURNING_ANNO + "(value=\"execution(* *())\", returning=\"zzz\") " +
                                          "public void foo(org.aspectj.lang.ProceedingJoinPoint yyy, int zzz);" +
                                          "}");
     final PsiMethod method = psiClass.getMethods()[0];
-    final PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
-    final PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
-    final AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
+    PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+    PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
+    AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
       public PsiMethod getPsiElement() {
         return method;
       }
@@ -182,28 +182,28 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   public void testAfterThrowingAdviceInJava() throws Throwable {
     registerTrueAopProvider();
-    final PsiClass psiClass = myFixture.addClass("package java.lang; " +
+    PsiClass psiClass = myFixture.addClass("package java.lang; " +
                                          "@" + AopConstants.ASPECT_ANNO + " " +
                                          "class Object { @" + AopConstants.AFTER_THROWING_ANNO + "(value=\"execution(* *())\", throwing=\"zzz\") " +
                                          "public void foo(org.aspectj.lang.ProceedingJoinPoint yyy, int zzz);" +
                                          "}");
     final PsiMethod method = psiClass.getMethods()[0];
-    final PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
-    final PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
-    final AopAfterThrowingAdviceImpl advice = new AopAfterThrowingAdviceImpl() {
+    PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+    PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
+    AopAfterThrowingAdviceImpl advice = new AopAfterThrowingAdviceImpl() {
       public PsiMethod getPsiElement() {
         return method;
       }
     };
     checkInjection(attrValue, new AopLanguageInjector());
-    final LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
+    LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
 
     assertEquals(method.getParameterList().getParameters()[1], advice.getThrowing().getValue());
   }
 
   public void testAfterThrowingAndReturningPointcutParameterAdviceInJava() throws Throwable {
     registerTrueAopProvider();
-    final PsiClass psiClass = myFixture.addClass("package java.lang; " +
+    PsiClass psiClass = myFixture.addClass("package java.lang; " +
                                          "@" + AopConstants.ASPECT_ANNO + " " +
                                          "class Object { " +
                                          "@" + AopConstants.AFTER_THROWING_ANNO + "(pointcut=\"execution(* *())\") public void foo(org.aspectj.lang.ProceedingJoinPoint yyy); " +
@@ -219,7 +219,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   }
 
-  private static void checkInjection(final PsiElement attrValue, final ConcatenationAwareInjector injector) {
+  private static void checkInjection(final PsiElement attrValue, ConcatenationAwareInjector injector) {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
@@ -245,7 +245,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
   }
-  private static void checkInjection(final PsiElement attrValue, final MultiHostInjector injector) {
+  private static void checkInjection(final PsiElement attrValue, MultiHostInjector injector) {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
@@ -272,8 +272,8 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     assertTrue(visited.get());
   }
 
-  private XmlFile createXmlFile(final String text) throws IOException {
-    final VirtualFile file = myFixture.getTempDirFixture().createFile("a.xml");
+  private XmlFile createXmlFile(String text) throws IOException {
+    VirtualFile file = myFixture.getTempDirFixture().createFile("a.xml");
     VirtualFileUtil.saveText(file, text);
     return (XmlFile)PsiManager.getInstance(getProject()).findFile(file);
   }
@@ -290,11 +290,11 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getPointcuts().get(0).getExpression();
-    final XmlAttributeValue attrValue = expression.getXmlAttributeValue();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getPointcuts().get(0).getExpression();
+    XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     new SpringAopInjector().getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
@@ -328,16 +328,16 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final SpringAspect aspect = aopConfig.getAspects().get(0);
-    final GenericAttributeValue<AopReferenceHolder> expression = aspect.getIntroductions().get(0).getTypesMatching();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    SpringAspect aspect = aopConfig.getAspects().get(0);
+    GenericAttributeValue<AopReferenceHolder> expression = aspect.getIntroductions().get(0).getTypesMatching();
     checkIntoInjection(new SpringAopInjector(), expression.getXmlAttributeValue());
   }
 
   public void testSpringAdvice() throws Throwable {
-    final PsiClass psiClass = myFixture.addClass("package foo; public class Bar { public void foo239() {} }");
+    PsiClass psiClass = myFixture.addClass("package foo; public class Bar { public void foo239() {} }");
 
     XmlFile file = createXmlFile("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                                  "<beans xmlns=\"http://www.springframework.org/schema/beans\"\n" +
@@ -354,18 +354,18 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getBefores().get(0).getPointcut();
-    final XmlAttributeValue attrValue = expression.getXmlAttributeValue();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getBefores().get(0).getPointcut();
+    XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     checkInjection(attrValue, new SpringAopInjector());
     LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
     assertEquals(model.getPointcutMethod(), psiClass.getMethods()[0]);
   }
 
   public void testSpringAfterReturningAdvice() throws Throwable {
-    final PsiClass psiClass = myFixture.addClass("package foo; public class Bar { " +
+    PsiClass psiClass = myFixture.addClass("package foo; public class Bar { " +
                                                                       "public void foo239(org.aspectj.lang.ProceedingJoinPoint yyy) {} " +
                                                                       "}");
 
@@ -383,18 +383,18 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getAdvices().get(0).getPointcut();
-    final XmlAttributeValue attrValue = expression.getXmlAttributeValue();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getAdvices().get(0).getPointcut();
+    XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     checkInjection(attrValue, new SpringAopInjector());
     LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
     assertEquals(model.getPointcutMethod(), psiClass.getMethods()[0]);
   }
 
   public void testSpringAfterThrowingAdvice() throws Throwable {
-    final PsiClass psiClass = myFixture.addClass("package foo; public class Bar { " +
+    PsiClass psiClass = myFixture.addClass("package foo; public class Bar { " +
                                                                       "public void foo239(org.aspectj.lang.ProceedingJoinPoint yyy) {} " +
                                                                       "}");
 
@@ -412,11 +412,11 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getAdvices().get(0).getPointcut();
-    final XmlAttributeValue attrValue = expression.getXmlAttributeValue();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    GenericAttributeValue<PsiPointcutExpression> expression = aopConfig.getAspects().get(0).getAdvices().get(0).getPointcut();
+    XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     checkInjection(attrValue, new SpringAopInjector());
     LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
     assertEquals(model.getPointcutMethod(), psiClass.getMethods()[0]);
@@ -437,12 +437,12 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final Advisor advisor = aopConfig.getAdvisors().get(0);
-    final GenericAttributeValue<PsiPointcutExpression> expression = advisor.getPointcut();
-    final XmlAttributeValue attrValue = expression.getXmlAttributeValue();
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    Advisor advisor = aopConfig.getAdvisors().get(0);
+    GenericAttributeValue<PsiPointcutExpression> expression = advisor.getPointcut();
+    XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     checkInjection(attrValue, new SpringAopInjector());
     LocalAopModel model = attrValue.getUserData(AopPointcutExpressionFile.LOCAL_AOP_MODEL);
     assertNull(model.getPointcutMethod());
@@ -453,7 +453,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
   public void testPointcutRefInAdvice() throws Throwable {
     IdeaTestUtil.registerExtension(Extensions.getRootArea(), AopProvider.EXTENSION_POINT_NAME, new AopProvider() {
       @Nullable
-      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+      public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
         return new AllAdvisedElementsSearcher(getPsiManager());
       }
     }, myTestRootDisposable);
@@ -474,16 +474,16 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     final Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
     IdeaTestUtil.registerExtension(AopProvider.EXTENSION_POINT_NAME, new SpringAopProvider() {
       @Nonnull
-      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull final Module module) {
+      public Set<? extends AopAspect> getAdditionalAspects(@Nonnull Module module) {
         return addAopAspects(new THashSet<AopAspect>(), beans);
       }
     }, myTestRootDisposable);
-    final AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
-    final SpringAspect aspect = aopConfig.getAspects().get(0);
+    AopConfig aopConfig = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0);
+    SpringAspect aspect = aopConfig.getAspects().get(0);
     assertEquals(aopConfig.getPointcuts().get(0), aspect.getBefores().get(0).getPointcutRef().getValue());
     assertEquals(aopConfig.getPointcuts().get(0).getExpression().getValue(), aspect.getBefores().get(0).getPointcutExpression());
     assertEquals(aspect.getBefores().get(1).getPointcut().getValue(), aspect.getBefores().get(1).getPointcutExpression());
@@ -491,9 +491,9 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
 
   private class TrueAopProvider extends AopProvider {
     @Nullable
-    public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+    public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
       return new AopAdvisedElementsSearcher(getPsiManager()) {
-        public boolean process(final Processor<PsiClass> processor) {
+        public boolean process(Processor<PsiClass> processor) {
           throw new UnsupportedOperationException("Method doProcess is not yet implemented in " + getClass().getName());
         }
       };

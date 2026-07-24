@@ -51,7 +51,7 @@ public class SpringContextsTreeStructure extends AbstractTreeStructure {
 
     @Override
     @Nonnull
-    public NodeDescriptor createDescriptor(@Nonnull final Object element, final NodeDescriptor parentDescriptor) {
+    public NodeDescriptor createDescriptor(@Nonnull Object element, NodeDescriptor parentDescriptor) {
         return (NodeDescriptor) element;
     }
 

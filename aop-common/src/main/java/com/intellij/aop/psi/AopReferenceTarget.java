@@ -16,9 +16,9 @@ public interface AopReferenceTarget {
   @Nonnull
   String getQualifiedName();
 
-  PointcutMatchDegree canBeInstance(final PsiClass psiClass, final boolean allowPatterns);
+  PointcutMatchDegree canBeInstance(PsiClass psiClass, boolean allowPatterns);
 
-  PointcutMatchDegree accepts(final PsiType actualType);
+  PointcutMatchDegree accepts(PsiType actualType);
 
   @Nullable
   String getTypePattern();

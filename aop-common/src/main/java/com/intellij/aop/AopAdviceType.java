@@ -19,7 +19,7 @@ public enum AopAdviceType {
   private final Image myIcon;
   private final boolean myOnTheWayIn;
 
-  private AopAdviceType(final Image icon, boolean onTheWayIn) {
+  private AopAdviceType(Image icon, boolean onTheWayIn) {
     myIcon = icon;
     myOnTheWayIn = onTheWayIn;
   }

@@ -23,8 +23,8 @@ import java.util.Collection;
  */
 public class SpringJsfConfigurator implements SpringConfigurator {
 
-  private static void configure(final FacesConfig config) {
-    final GenericDomValue<PsiClass> resolver = config.getApplication().getVariableResolver();
+  private static void configure(FacesConfig config) {
+    GenericDomValue<PsiClass> resolver = config.getApplication().getVariableResolver();
     if (resolver.getStringValue() == null) {
       resolver.setStringValue("org.springframework.web.jsf.DelegatingVariableResolver");
     }
@@ -34,12 +34,12 @@ public class SpringJsfConfigurator implements SpringConfigurator {
     if (!JsfCommonUtils.isJsfFacetDefined(module)) {
       return false;
     }
-    final Collection<WebFacet> webFacets = WebFacet.getInstances(module);
+    Collection<WebFacet> webFacets = WebFacet.getInstances(module);
     if (webFacets.isEmpty()) {
       return false;
     }
 
-    for (final WebFacet webFacet : webFacets) {
+    for (WebFacet webFacet : webFacets) {
       for (FacesDomModel facesDomModel : FacesDomModelManager.getInstance(webFacet.getModule().getProject()).getAllModels(webFacet)) {
         final FacesConfig facesConfig = facesDomModel.getFacesConfig();
         new WriteCommandAction.Simple(module.getProject()) {

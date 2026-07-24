@@ -23,9 +23,9 @@ import java.util.Collections;
 public class AdviceParameterConverter extends ResolvingConverter<PsiParameter> {
   @Nonnull
   @Override
-  public Collection<? extends PsiParameter> getVariants(final ConvertContext context) {
-    final BasicAdvice advice = (BasicAdvice)context.getInvocationElement().getParent();
-    final PsiMethod method = advice.getMethod().getValue();
+  public Collection<? extends PsiParameter> getVariants(ConvertContext context) {
+    BasicAdvice advice = (BasicAdvice)context.getInvocationElement().getParent();
+    PsiMethod method = advice.getMethod().getValue();
     if (method != null) {
       return Arrays.asList(method.getParameterList().getParameters());
 
@@ -44,7 +44,7 @@ public class AdviceParameterConverter extends ResolvingConverter<PsiParameter> {
   }
 
   @Override
-  public String toString(@Nullable PsiParameter psiParameter, final ConvertContext context) {
+  public String toString(@Nullable PsiParameter psiParameter, ConvertContext context) {
     return psiParameter == null ? null : psiParameter.getName();
   }
 }

@@ -11,11 +11,11 @@ import java.util.List;
 
 public abstract class ContextImplicitVariableFactory implements Disposable {
 
-  public static ContextImplicitVariableFactory getInstance(final Module module) {
+  public static ContextImplicitVariableFactory getInstance(Module module) {
       return ModuleServiceManager.getService(module, ContextImplicitVariableFactory.class);
   }
 
   @NotNull
-  public abstract ContextImplicitVariable createContextVariable(@NotNull final String contextName,@NotNull  final Factory<List<JspImplicitVariable>> factory);
+  public abstract ContextImplicitVariable createContextVariable(@NotNull String contextName, @NotNull Factory<List<JspImplicitVariable>> factory);
 }
 

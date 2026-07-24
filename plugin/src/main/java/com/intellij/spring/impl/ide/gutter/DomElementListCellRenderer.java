@@ -25,19 +25,19 @@ public class DomElementListCellRenderer extends PsiElementListCellRenderer<XmlTa
     myUnknown = unknownElementText;
   }
 
-  public String getElementText(final XmlTag element) {
-    final DomElement domElement = getDomElement(element);
+  public String getElementText(XmlTag element) {
+    DomElement domElement = getDomElement(element);
     if (domElement == null) return element.getName();
 
-    final String elementName = domElement.getPresentation().getElementName();
+    String elementName = domElement.getPresentation().getElementName();
     return elementName == null ? myUnknown : elementName;
   }
 
-  protected String getContainerText(final XmlTag element, final String name) {
+  protected String getContainerText(XmlTag element, String name) {
     return getContainerText(element);
   }
 
-  public static String getContainerText(final PsiElement element) {
+  public static String getContainerText(PsiElement element) {
     return " (" + element.getContainingFile().getName() + ")";
   }
 
@@ -45,8 +45,8 @@ public class DomElementListCellRenderer extends PsiElementListCellRenderer<XmlTa
     return 0;
   }
 
-  protected Image getIcon(final PsiElement element) {
-    final DomElement domElement = getDomElement((XmlTag)element);
+  protected Image getIcon(PsiElement element) {
+    DomElement domElement = getDomElement((XmlTag)element);
     if (domElement != null && domElement.getPresentation().getIcon() != null) {
       return domElement.getPresentation().getIcon();
     }

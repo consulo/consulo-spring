@@ -23,22 +23,22 @@ import java.util.Collections;
  */
 public class AopPointcutConverter extends ResolvingConverter<AopPointcut> {
   @Nonnull
-  public Collection<? extends AopPointcut> getVariants(final ConvertContext context) {
-    final XmlElement element = context.getXmlElement();
+  public Collection<? extends AopPointcut> getVariants(ConvertContext context) {
+    XmlElement element = context.getXmlElement();
     if (element == null) return Collections.emptyList();
 
     return AopModuleService.getAopModel(ModuleUtilCore.findModuleForPsiElement(element)).getPointcuts();
   }
 
-  public AopPointcut fromString(@Nullable @NonNls final String s, final ConvertContext context) {
+  public AopPointcut fromString(@Nullable @NonNls final String s, ConvertContext context) {
     return s == null ? null : ContainerUtil.find(getVariants(context), new Condition<AopPointcut>() {
-      public boolean value(final AopPointcut o) {
+      public boolean value(AopPointcut o) {
         return s.equals(o.getQualifiedName().getStringValue());
       }
     });
   }
 
-  public String toString(@Nullable AopPointcut aopPointcut, final ConvertContext context) {
+  public String toString(@Nullable AopPointcut aopPointcut, ConvertContext context) {
     return aopPointcut == null ? null : aopPointcut.getQualifiedName().getStringValue();
   }
 }

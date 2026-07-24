@@ -29,20 +29,20 @@ public abstract class SpringPropertyImpl extends SpringInjectionImpl implements 
 
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final List<BeanProperty> properties = getName().getValue();
+    List<BeanProperty> properties = getName().getValue();
     if (properties == null) return Collections.emptyList();
-    final ArrayList<PsiType> list = new ArrayList<PsiType>(properties.size());
+    ArrayList<PsiType> list = new ArrayList<PsiType>(properties.size());
     for (BeanProperty property : properties) {
-      final PsiType psiType = property.getPropertyType();
+      PsiType psiType = property.getPropertyType();
 
       if (psiType instanceof PsiClassReferenceType) {
-        final DomSpringBean bean = getParentOfType(DomSpringBean.class, false);
+        DomSpringBean bean = getParentOfType(DomSpringBean.class, false);
         if (bean != null) {
-          final PsiClass derivedClass = bean.getBeanClass();
+          PsiClass derivedClass = bean.getBeanClass();
           if (derivedClass != null) {
-            final PsiClass superClass = PsiTreeUtil.getParentOfType(property.getMethod(), PsiClass.class);
+            PsiClass superClass = PsiTreeUtil.getParentOfType(property.getMethod(), PsiClass.class);
             if (superClass != null && derivedClass.isInheritor(superClass, true)) {
-              final PsiSubstitutor superClassSubstitutor =
+              PsiSubstitutor superClassSubstitutor =
                 TypeConversionUtil.getSuperClassSubstitutor(superClass, derivedClass, PsiSubstitutor.EMPTY);
 
               list.add(superClassSubstitutor.substitute(psiType));
@@ -62,11 +62,11 @@ public abstract class SpringPropertyImpl extends SpringInjectionImpl implements 
   }
 
   public int hashCode() {
-    final String name = getPropertyName();
+    String name = getPropertyName();
     return name == null ? 0 : name.hashCode();
   }
 
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     return obj instanceof SpringProperty && ComparatorUtil.equalsNullable(getPropertyName(), ((SpringProperty)obj).getPropertyName());
   }
 }

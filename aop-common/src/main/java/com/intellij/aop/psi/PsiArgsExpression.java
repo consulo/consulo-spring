@@ -19,13 +19,13 @@ import java.util.Collection;
  */
 public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpression{
   private static final TypeArgumentMatcher ARGS_MATCHER = new TypeArgumentMatcher() {
-      public PointcutMatchDegree fun(final PsiType actualType, final AopReferenceTarget target) {
+      public PointcutMatchDegree fun(PsiType actualType, AopReferenceTarget target) {
         if (super.fun(actualType, target) == PointcutMatchDegree.TRUE || target.isAssignableFrom(actualType)) {
           return PointcutMatchDegree.TRUE;
         }
 
-        final String typeText = target.getQualifiedName();
-        final PsiPrimitiveType primitiveType = PsiElementFactoryImpl.getPrimitiveType(typeText);
+        String typeText = target.getQualifiedName();
+        PsiPrimitiveType primitiveType = PsiElementFactoryImpl.getPrimitiveType(typeText);
         if (primitiveType != null && !(actualType instanceof PsiPrimitiveType)) {
           if (primitiveType == PsiPrimitiveType.getUnboxedType(actualType)) return PointcutMatchDegree.TRUE;
         }
@@ -38,7 +38,7 @@ public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpr
       }
     };
 
-  public PsiArgsExpression(@Nonnull final ASTNode node) {
+  public PsiArgsExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -52,9 +52,9 @@ public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpr
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     if (member instanceof PsiMethod) {
-      final AopParameterList parameterList = getParameterList();
+      AopParameterList parameterList = getParameterList();
       return parameterList != null ? parameterList.matches(context, ((PsiMethod)member).getParameterList(), ARGS_MATCHER) : PointcutMatchDegree.FALSE;
     }
     return PointcutMatchDegree.FALSE;

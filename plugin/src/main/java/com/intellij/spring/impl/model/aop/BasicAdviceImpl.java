@@ -25,7 +25,7 @@ public abstract class BasicAdviceImpl extends BaseImpl implements BasicAdvice {
 
   @Nullable
   public PsiPointcutExpression getPointcutExpression() {
-    final AopPointcut aopPointcut = getPointcutRef().getValue();
+    AopPointcut aopPointcut = getPointcutRef().getValue();
     return aopPointcut != null ? aopPointcut.getExpression().getValue() : getPointcut().getValue();
   }
 
@@ -39,8 +39,8 @@ public abstract class BasicAdviceImpl extends BaseImpl implements BasicAdvice {
     return AopAdviceType.valueOf(getXmlElementName().replace('-', '_').toUpperCase());
   }
 
-  public PointcutMatchDegree accepts(final PsiMethod method) {
-    final PsiPointcutExpression expression = getPointcutExpression();
+  public PointcutMatchDegree accepts(PsiMethod method) {
+    PsiPointcutExpression expression = getPointcutExpression();
     if (expression == null) return PointcutMatchDegree.FALSE;
 
     return expression.acceptsSubject(new PointcutContext(getMethod().getValue()), method);

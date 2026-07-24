@@ -20,7 +20,7 @@ import java.util.Collection;
  * @author peter
  */
 public class PsiPointcutReferenceExpression extends AopElementBase implements PsiPointcutExpression{
-  public PsiPointcutReferenceExpression(@Nonnull final ASTNode node) {
+  public PsiPointcutReferenceExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -39,12 +39,12 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     AopReferenceExpression expression = getReferenceExpression();
     if (expression != null) {
-      final AopPointcut pointcut = expression.resolvePointcut();
+      AopPointcut pointcut = expression.resolvePointcut();
       if (pointcut != null) {
-        final PsiPointcutExpression pointcutExpression = pointcut.getExpression().getValue();
+        PsiPointcutExpression pointcutExpression = pointcut.getExpression().getValue();
         if (pointcutExpression != null) {
           return pointcutExpression.acceptsSubject(createContext(context, pointcutExpression), member);
         }
@@ -57,9 +57,9 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
   public Collection<AopPsiTypePattern> getPatterns() {
     AopReferenceExpression expression = getReferenceExpression();
     if (expression != null) {
-      final AopPointcut pointcut = expression.resolvePointcut();
+      AopPointcut pointcut = expression.resolvePointcut();
       if (pointcut != null) {
-        final PsiPointcutExpression pointcutExpression = pointcut.getExpression().getValue();
+        PsiPointcutExpression pointcutExpression = pointcut.getExpression().getValue();
         if (pointcutExpression != null) {
           return pointcutExpression.getPatterns();
         }
@@ -68,18 +68,18 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
     return Arrays.asList(AopPsiTypePattern.FALSE);
   }
 
-  private PointcutContext createContext(final PointcutContext context, final PsiPointcutExpression pointcutExpression) {
-    final PsiMethod pointcutMethod = pointcutExpression.getContainingFile().getAopModel().getPointcutMethod();
-    final PointcutContext newContext = new PointcutContext(pointcutMethod);
+  private PointcutContext createContext(PointcutContext context, PsiPointcutExpression pointcutExpression) {
+    PsiMethod pointcutMethod = pointcutExpression.getContainingFile().getAopModel().getPointcutMethod();
+    PointcutContext newContext = new PointcutContext(pointcutMethod);
     if (pointcutMethod != null) {
-      final PsiParameterList javaList = pointcutMethod.getParameterList();
-      final AopParameterList aopList = getParameterList();
+      PsiParameterList javaList = pointcutMethod.getParameterList();
+      AopParameterList aopList = getParameterList();
       if (aopList != null) {
-        final PsiElement[] aopParameters = aopList.getParameters();
-        final PsiParameter[] psiParameters = javaList.getParameters();
+        PsiElement[] aopParameters = aopList.getParameters();
+        PsiParameter[] psiParameters = javaList.getParameters();
         if (javaList.getParametersCount() == aopParameters.length) {
           for (int i = 0; i < psiParameters.length; i++) {
-            final PsiElement aopParameter = aopParameters[i];
+            PsiElement aopParameter = aopParameters[i];
             if (aopParameter instanceof AopReferenceHolder) {
               newContext.addParameter(psiParameters[i].getName(), context.resolve((AopReferenceHolder)aopParameter));
             }

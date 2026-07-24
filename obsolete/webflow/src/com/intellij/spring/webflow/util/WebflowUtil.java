@@ -45,13 +45,13 @@ public class WebflowUtil {
   private WebflowUtil() {
   }
 
-  public static List<Identified> getAllIdentified(@Nullable final Flow flow) {
+  public static List<Identified> getAllIdentified(@Nullable Flow flow) {
     if (flow == null) return Collections.emptyList();
 
     return getAllIdentified(flow, true);
   }
 
-  public static List<Identified> getAllIdentified(final Flow flow, boolean withParent) {
+  public static List<Identified> getAllIdentified(Flow flow, boolean withParent) {
     List<Identified> identifiedList = new ArrayList<Identified>();
 
     addIdentified(flow, withParent, identifiedList);
@@ -59,7 +59,7 @@ public class WebflowUtil {
     return identifiedList;
   }
 
-  private static void addIdentified(final Flow flow, final boolean withParent, final List<Identified> identifiedList) {
+  private static void addIdentified(Flow flow, boolean withParent, List<Identified> identifiedList) {
     addIdentified(flow, identifiedList);
 
     if (withParent) {
@@ -69,7 +69,7 @@ public class WebflowUtil {
     }
   }
 
-  private static void addIdentified(final Flow flow, final List<Identified> identifiedList) {
+  private static void addIdentified(Flow flow, List<Identified> identifiedList) {
     identifiedList.addAll(flow.getActionStates());
     identifiedList.addAll(flow.getDecisionStates());
     identifiedList.addAll(flow.getEndStates());
@@ -77,18 +77,18 @@ public class WebflowUtil {
     identifiedList.addAll(flow.getViewStates());
   }
 
-  public static List<Flow> getAllParentFlows(final Flow flow) {
-    final List<Flow> list = new ArrayList<Flow>();
+  public static List<Flow> getAllParentFlows(Flow flow) {
+    List<Flow> list = new ArrayList<Flow>();
 
     addParents(flow, new ArrayList<Flow>(), list);
 
     return list;
   }
 
-  private static void addParents(final Flow flow, final List<Flow> visited, final List<Flow> list) {
+  private static void addParents(Flow flow, List<Flow> visited, List<Flow> list) {
     visited.add(flow);
 
-    final List<Flow> parents = flow.getParentFlow().getValue();
+    List<Flow> parents = flow.getParentFlow().getValue();
     if (parents != null) {
       for (Flow parentFlow : parents) {
         if (!visited.contains(parentFlow)) {
@@ -100,19 +100,19 @@ public class WebflowUtil {
   }
 
   @Nullable
-  public static Flow findFlowByName(@Nullable final String name, @Nullable final Module module) {
+  public static Flow findFlowByName(@Nullable String name, @Nullable Module module) {
     if (name == null || module == null) return null;
 
-    final List<WebflowModel> models = WebflowDomModelManager.getInstance(module.getProject()).getAllModels(module);
+    List<WebflowModel> models = WebflowDomModelManager.getInstance(module.getProject()).getAllModels(module);
     Set<PsiFile> configuredFiles = new HashSet<PsiFile>();
 
-    final WebflowDomModelManager manager = WebflowDomModelManager.getInstance(module.getProject());
+    WebflowDomModelManager manager = WebflowDomModelManager.getInstance(module.getProject());
     for (FlowLocation flowLocation : getFlowLocations(module)) {
-      final PsiFile psiFile = flowLocation.getPath().getValue();
+      PsiFile psiFile = flowLocation.getPath().getValue();
       if (psiFile instanceof XmlFile && manager.isWebflow((XmlFile)psiFile)) {
-        final String s = flowLocation.getId().getStringValue();
+        String s = flowLocation.getId().getStringValue();
         if (name.equals(s)) {
-          final WebflowModel model = manager.getWebflowModel((XmlFile)psiFile);
+          WebflowModel model = manager.getWebflowModel((XmlFile)psiFile);
           if (model != null) {
             return model.getFlow();
           }
@@ -127,7 +127,7 @@ public class WebflowUtil {
       for (XmlFile xmlFile : model.getConfigFiles()) {
         if (configuredFiles.contains(xmlFile)) continue;
 
-        final VirtualFile file = xmlFile.getVirtualFile();
+        VirtualFile file = xmlFile.getVirtualFile();
         if (file != null && name.equals(file.getNameWithoutExtension())) {
           return model.getFlow();
         }
@@ -137,15 +137,15 @@ public class WebflowUtil {
     return null;
   }
 
-  private static Set<FlowLocation> getFlowLocations(@Nullable final Module module) {
+  private static Set<FlowLocation> getFlowLocations(@Nullable Module module) {
     if (module != null) {
-      final PsiClass flowRegistryClass = JavaPsiFacade.getInstance(module.getProject())
+      PsiClass flowRegistryClass = JavaPsiFacade.getInstance(module.getProject())
         .findClass(FlowRegistry.FLOW_REGISTRY_CLASS, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false));
       if (flowRegistryClass != null) {
         Set<FlowLocation> locations = new HashSet<FlowLocation>();
         for (SpringModel model : SpringManager.getInstance(module.getProject()).getAllModels(module)) {
           for (SpringBaseBeanPointer beanPointer : model.findBeansByPsiClassWithInheritance(flowRegistryClass)) {
-            final CommonSpringBean springBean = beanPointer.getSpringBean();
+            CommonSpringBean springBean = beanPointer.getSpringBean();
 
             if (springBean instanceof FlowRegistry) {
               locations.addAll(((FlowRegistry)springBean).getFlowLocations());
@@ -160,7 +160,7 @@ public class WebflowUtil {
   }
 
 
-  public static List<Flow> getAllFlows(final Module module, List<PsiFile> exceptedFiles) {
+  public static List<Flow> getAllFlows(Module module, List<PsiFile> exceptedFiles) {
     List<Flow> flows = new ArrayList<Flow>();
 
     for (WebflowModel model : WebflowDomModelManager.getInstance(module.getProject()).getAllModels(module)) {
@@ -170,16 +170,16 @@ public class WebflowUtil {
   }
 
   @Nullable
-  public static PsiElement resolveFlow(@Nullable final Flow flow, @Nullable Module module) {
+  public static PsiElement resolveFlow(@Nullable Flow flow, @Nullable Module module) {
     if (flow == null) return null;
     if (module == null) module = flow.getModule();
 
-    final XmlFile xmlFile = DomUtil.getFile(flow);
+    XmlFile xmlFile = DomUtil.getFile(flow);
 
     for (FlowLocation flowLocation : getFlowLocations(module)) {
-      final PsiFile psiFile = flowLocation.getPath().getValue();
+      PsiFile psiFile = flowLocation.getPath().getValue();
       if (xmlFile.equals(psiFile)) {
-        final String id = flowLocation.getId().getStringValue();
+        String id = flowLocation.getId().getStringValue();
         if (!StringUtil.isEmptyOrSpaces(id)) {
           return flowLocation.getXmlElement();
         }
@@ -190,35 +190,35 @@ public class WebflowUtil {
   }
 
   @Nullable
-  public static String getFlowName(@Nullable final Flow flow) {
+  public static String getFlowName(@Nullable Flow flow) {
     if (flow == null) return null;
 
     return getFlowName(flow, flow.getModule());
   }
 
   @Nullable
-  public static String getFlowName(@Nullable final Flow flow, @Nullable Module module) {
+  public static String getFlowName(@Nullable Flow flow, @Nullable Module module) {
     if (flow == null) return null;
 
-    final PsiElement element = resolveFlow(flow, module);
+    PsiElement element = resolveFlow(flow, module);
     if (element instanceof XmlFile) {
-      final VirtualFile file = ((XmlFile)element).getVirtualFile();
+      VirtualFile file = ((XmlFile)element).getVirtualFile();
       return file != null ? file.getNameWithoutExtension() : null;
     }
     else if (element instanceof XmlTag) {
-      final DomElement domElement = flow.getManager().getDomElement((XmlTag)element);
+      DomElement domElement = flow.getManager().getDomElement((XmlTag)element);
       return domElement instanceof FlowLocation ? ((FlowLocation)domElement).getId().getStringValue() : null;
     }
 
     return null;
   }
 
-  public static void checkBeanOfSpecificType(final GenericAttributeValue<SpringBeanPointer> bean,
-                                             final String className,
-                                             final DomElementAnnotationHolder holder) {
-    final PsiClass beanClass = getBeanClass(bean);
+  public static void checkBeanOfSpecificType(GenericAttributeValue<SpringBeanPointer> bean,
+                                             String className,
+                                             DomElementAnnotationHolder holder) {
+    PsiClass beanClass = getBeanClass(bean);
     if (beanClass != null) {
-      final PsiClass psiClass = getClassByQualifiedName(className, beanClass.getProject());
+      PsiClass psiClass = getClassByQualifiedName(className, beanClass.getProject());
       if (psiClass != null && !InheritanceUtil.isInheritorOrSelf(beanClass, psiClass, true)) {
         holder.createProblem(bean, WebflowBundle.message("incorrect.action.bean.type", className));
       }
@@ -226,13 +226,13 @@ public class WebflowUtil {
   }
 
   @Nullable
-  public static PsiClass getClassByQualifiedName(final String className, final Project project) {
+  public static PsiClass getClassByQualifiedName(String className, Project project) {
     return JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.allScope(project));
   }
 
   @Nullable
-  public static PsiClass getBeanClass(final GenericAttributeValue<SpringBeanPointer> bean) {
-    final SpringBeanPointer springBeanPointer = bean.getValue();
+  public static PsiClass getBeanClass(GenericAttributeValue<SpringBeanPointer> bean) {
+    SpringBeanPointer springBeanPointer = bean.getValue();
     if (springBeanPointer != null) {
       return springBeanPointer.getBeanClass();
     }
@@ -240,10 +240,10 @@ public class WebflowUtil {
   }
 
 
-  public static boolean isBeanOfSpecificType(final GenericAttributeValue<SpringBeanPointer> bean, final String className) {
-    final PsiClass beanClass = getBeanClass(bean);
+  public static boolean isBeanOfSpecificType(GenericAttributeValue<SpringBeanPointer> bean, String className) {
+    PsiClass beanClass = getBeanClass(bean);
     if (beanClass != null) {
-      final PsiClass psiClass = getClassByQualifiedName(className, beanClass.getProject());
+      PsiClass psiClass = getClassByQualifiedName(className, beanClass.getProject());
 
       return psiClass != null && InheritanceUtil.isInheritorOrSelf(beanClass, psiClass, true);
     }
@@ -264,13 +264,13 @@ public class WebflowUtil {
   }
 
   public static boolean isStartState(WebflowNode webflowNode) {
-    final DomElement element = webflowNode.getIdentifyingElement();
+    DomElement element = webflowNode.getIdentifyingElement();
     if (element instanceof Identified && element.isValid()) {
-      final Flow parentOfType = element.getParentOfType(Flow.class, false);
+      Flow parentOfType = element.getParentOfType(Flow.class, false);
       if (parentOfType != null) {
-        final Object idref = parentOfType.getStartState().getIdref().getValue();
+        Object idref = parentOfType.getStartState().getIdref().getValue();
         if (idref instanceof Identified) {
-          final String value = ((Identified)element).getId().getStringValue();
+          String value = ((Identified)element).getId().getStringValue();
           if (value != null && value.equals(((Identified)idref).getId().getStringValue())) return true;
         }
       }
@@ -278,17 +278,17 @@ public class WebflowUtil {
     return false;
   }
 
-  public static boolean isAction(final ConvertContext context) {
+  public static boolean isAction(ConvertContext context) {
     return null != context.getInvocationElement().getParentOfType(Action.class, false);
   }
 
-  public static boolean isNonSingletonPrototype(final CommonSpringBean bean) {
+  public static boolean isNonSingletonPrototype(CommonSpringBean bean) {
     if (bean instanceof SpringBean) {
-      final SpringBean springBean = (SpringBean)bean;
-      final Boolean isSingleton = springBean.getSingleton().getValue();
+      SpringBean springBean = (SpringBean)bean;
+      Boolean isSingleton = springBean.getSingleton().getValue();
       if (isSingleton != null && isSingleton.booleanValue()) return false;
 
-      final SpringBeanScope scope = springBean.getScope().getValue();
+      SpringBeanScope scope = springBean.getScope().getValue();
       return scope != null && scope == SpringBeanScope.PROROTYPE_SCOPE;
     }
 

@@ -64,10 +64,10 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
     }
 
     @Nonnull
-    public PsiElementVisitor buildVisitor(@Nonnull final ProblemsHolder holder, final boolean isOnTheFly) {
+    public PsiElementVisitor buildVisitor(@Nonnull final ProblemsHolder holder, boolean isOnTheFly) {
         return new PsiElementVisitor() {
             @Override
-            public void visitElement(final PsiElement element) {
+            public void visitElement(PsiElement element) {
                 if (element instanceof PsiLiteralExpression || element instanceof XmlAttributeValue) {
                     PsiElement injectedElement =
                         InjectedLanguageManager.getInstance(holder.getProject()).findElementAtNoCommit(
@@ -75,19 +75,19 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
                             element.getTextRange().getStartOffset() + 1
                         );
 
-                    final PsiFile file = injectedElement == null ? null : injectedElement.getContainingFile();
+                    PsiFile file = injectedElement == null ? null : injectedElement.getContainingFile();
                     if (file instanceof AopPointcutExpressionFile) {
                         final IntroductionManipulator manipulator =
                             ((AopPointcutExpressionFile) file).getAopModel().getIntroductionManipulator();
                         if (manipulator == null) {
                             return;
                         }
-                        final AopIntroduction introduction = manipulator.getIntroduction();
+                        AopIntroduction introduction = manipulator.getIntroduction();
                         if (introduction == null) {
                             return;
                         }
 
-                        final PsiClass intf = introduction.getImplementInterface().getValue();
+                        PsiClass intf = introduction.getImplementInterface().getValue();
                         if (intf == null && introduction.getImplementInterface().getStringValue() != null
                             || intf != null && !intf.isInterface()) {
                             registerProblem(manipulator.getInterfaceElement(), AopLocalize.errorInterfaceExpected().get(), holder);
@@ -97,12 +97,12 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
                             return;
                         }
 
-                        final PsiClass defaultImpl = introduction.getDefaultImpl().getValue();
+                        PsiClass defaultImpl = introduction.getDefaultImpl().getValue();
                         if (defaultImpl == null) {
                             if (!(element instanceof XmlElement) && !ContainerUtil.findAll(
                                 intf.getAllMethods(),
                                 new Condition<PsiMethod>() {
-                                    public boolean value(final PsiMethod method) {
+                                    public boolean value(PsiMethod method) {
                                         return method.hasModifierProperty(PsiModifier.ABSTRACT);
                                     }
                                 }
@@ -116,7 +116,7 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
                                             return AopLocalize.quickfixNameDefineAttribute(manipulator.getDefaultImplAttributeName());
                                         }
 
-                                        public void applyFix(@Nonnull final Project project, @Nonnull final ProblemDescriptor descriptor) {
+                                        public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                                             try {
                                                 if (ReadonlyStatusHandler.getInstance(project)
                                                     .ensureFilesWritable(descriptor.getPsiElement()
@@ -138,7 +138,7 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
                             return;
                         }
                         if (defaultImpl.hasModifierProperty(PsiModifier.ABSTRACT) || !defaultImpl.isInheritor(intf, true)) {
-                            final PsiElement defaultImplElement = manipulator.getDefaultImplElement();
+                            PsiElement defaultImplElement = manipulator.getDefaultImplElement();
                             assert defaultImplElement != null;
                             registerProblem(
                                 defaultImplElement,
@@ -152,10 +152,10 @@ public class DeclareParentsInspection extends XmlSuppressableInspectionTool {
         };
     }
 
-    private static void registerProblem(final PsiElement element, final String descriptionTemplate, final ProblemsHolder holder) {
-        final int startOffset = element.getTextRange().getStartOffset();
+    private static void registerProblem(PsiElement element, String descriptionTemplate, ProblemsHolder holder) {
+        int startOffset = element.getTextRange().getStartOffset();
         int quotes = element.getText().startsWith("\"") ? 1 : 0;
-        final TextRange range = TextRange.from(quotes, Math.max(element.getTextLength() - 2 * quotes, 1));
+        TextRange range = TextRange.from(quotes, Math.max(element.getTextLength() - 2 * quotes, 1));
         holder.registerProblem(holder.getManager().createProblemDescriptor(
             element,
             range,

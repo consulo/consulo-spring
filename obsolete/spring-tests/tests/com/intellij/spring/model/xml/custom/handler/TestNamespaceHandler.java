@@ -17,13 +17,13 @@ import org.w3c.dom.NodeList;
 public class TestNamespaceHandler extends NamespaceHandlerSupport {
   public void init() {
     registerBeanDefinitionParser("stringBean", new AbstractSingleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         return String.class;
       }
 
       @Override
       protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
-        final String s = element.getAttribute("name");
+        String s = element.getAttribute("name");
         if (s.length() > 0) return s;
 
         return super.resolveId(element, definition, parserContext);
@@ -31,7 +31,7 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
     });
 
     registerBeanDefinitionParser("eternity", new AbstractSingleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         try {
           Thread.sleep(30 * 60 * 1000); // half an hour
         }
@@ -43,16 +43,16 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
     });
     
     registerBeanDefinitionParser("exception", new BeanDefinitionParser() {
-      public BeanDefinition parse(final Element element, final ParserContext parserContext) {
+      public BeanDefinition parse(Element element, ParserContext parserContext) {
         throw new UnsupportedOperationException("Method parse is not yet implemented in " + getClass().getName());
       }
     });
 
     registerBeanDefinitionParser("outer", new BeanDefinitionParser() {
-      public BeanDefinition parse(final Element element, final ParserContext parserContext) {
-        final BeanDefinitionRegistry registry = parserContext.getRegistry();
+      public BeanDefinition parse(Element element, ParserContext parserContext) {
+        BeanDefinitionRegistry registry = parserContext.getRegistry();
 
-        final AbstractBeanDefinition definition = BeanDefinitionBuilder.rootBeanDefinition(String.class).setSource(parserContext.extractSource(element)).getBeanDefinition();
+        AbstractBeanDefinition definition = BeanDefinitionBuilder.rootBeanDefinition(String.class).setSource(parserContext.extractSource(element)).getBeanDefinition();
         registry.registerBeanDefinition("outer", definition);
 
         Element inner = (Element)element.getElementsByTagName("inner").item(0);
@@ -60,9 +60,9 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
 
         registry.registerBeanDefinition("unmappedInner", BeanDefinitionBuilder.rootBeanDefinition(String.class).getBeanDefinition());
 
-        final NodeList namedInners = element.getElementsByTagNameNS(element.getNamespaceURI(), "namedInner");
+        NodeList namedInners = element.getElementsByTagNameNS(element.getNamespaceURI(), "namedInner");
         if (namedInners.getLength() > 0) {                        
-          final Element namedInner = (Element)namedInners.item(0);
+          Element namedInner = (Element)namedInners.item(0);
           registry.registerBeanDefinition(namedInner.getAttribute("name"),
                                           BeanDefinitionBuilder.rootBeanDefinition(String.class).setSource(parserContext.extractSource(namedInner)).getBeanDefinition());
         }
@@ -71,13 +71,13 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
       }
     });
     registerBeanDefinitionParser("withInfrastructure", new BeanDefinitionParser() {
-      public BeanDefinition parse(final Element element, final ParserContext parserContext) {
-        final BeanDefinitionRegistry registry = parserContext.getRegistry();
+      public BeanDefinition parse(Element element, ParserContext parserContext) {
+        BeanDefinitionRegistry registry = parserContext.getRegistry();
 
-        final AbstractBeanDefinition definition = BeanDefinitionBuilder.rootBeanDefinition(String.class).setSource(parserContext.extractSource(element)).getBeanDefinition();
+        AbstractBeanDefinition definition = BeanDefinitionBuilder.rootBeanDefinition(String.class).setSource(parserContext.extractSource(element)).getBeanDefinition();
         registry.registerBeanDefinition(element.getAttribute("id"), definition);
 
-        final AbstractBeanDefinition infraDef = BeanDefinitionBuilder.rootBeanDefinition(String.class).getBeanDefinition();
+        AbstractBeanDefinition infraDef = BeanDefinitionBuilder.rootBeanDefinition(String.class).getBeanDefinition();
         infraDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
         registry.registerBeanDefinition("noOneShouldSeeIt", infraDef);
         return definition;
@@ -85,35 +85,35 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
     });
     registerBeanDefinitionParser("onlyInfrastructure", new AbstractBeanDefinitionParser() {
       protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        final AbstractBeanDefinition infraDef = BeanDefinitionBuilder.rootBeanDefinition(String.class).getBeanDefinition();
+        AbstractBeanDefinition infraDef = BeanDefinitionBuilder.rootBeanDefinition(String.class).getBeanDefinition();
         infraDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
         return infraDef;
       }
     });
 
     registerBeanDefinitionParser("factoryBean15", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(TestFactoryBean.class);
          builder.setSource(element);
          return builder.getBeanDefinition();
       }
     });
     registerBeanDefinitionParser("genericMethod", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(GenericFactoryBean.class);
          builder.setSource(element);
          return builder.getBeanDefinition();
       }
     });
     registerBeanDefinitionParser("concreteFactoryBean", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(ConcreteFactoryBean.class);
          builder.setSource(element);
          return builder.getBeanDefinition();
       }
     });
     registerBeanDefinitionParser("factoryMethodFoo", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(TestBeanWithFactoryMethod.class, "foo");
          builder.addConstructorArg("");
          builder.setSource(element);
@@ -121,7 +121,7 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
       }
     });
     registerBeanDefinitionParser("factoryMethodBar", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(TestBeanWithFactoryMethod.class, "bar");
          builder.addConstructorArg("");
          builder.setSource(element);
@@ -129,7 +129,7 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
       }
     });
     registerBeanDefinitionParser("factoryMethodInAnotherBean", new AbstractBeanDefinitionParser() {
-      protected AbstractBeanDefinition parseInternal(final Element element, final ParserContext parserContext) {
+      protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
          BeanDefinitionBuilder builder = BeanDefinitionBuilder.rootBeanDefinition(TestBeanWithFactoryMethod.class, "foo");
          builder.addConstructorArg("");
          builder.setSource(element);
@@ -139,26 +139,26 @@ public class TestNamespaceHandler extends NamespaceHandlerSupport {
     });
 
     registerBeanDefinitionParser("annotated", new AbstractSingleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         return String.class;
       }
     });
     registerBeanDefinitionParser("recursive", new AbstractSingleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         return String.class;
       }
     });
     registerBeanDefinitionParser("hardCoded", new AbstractSimpleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         return String.class;
       }
 
-      protected String resolveId(final Element element, final AbstractBeanDefinition definition, final ParserContext parserContext) {
+      protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) {
         return "hardCoded";
       }
     });
     registerBeanDefinitionParser("stringBuffer", new AbstractSimpleBeanDefinitionParser() {
-      protected Class getBeanClass(final Element element) {
+      protected Class getBeanClass(Element element) {
         return StringBuffer.class;
       }
     });

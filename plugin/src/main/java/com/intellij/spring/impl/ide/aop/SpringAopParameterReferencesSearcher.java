@@ -28,24 +28,24 @@ import java.util.function.Supplier;
 @ExtensionImpl
 public class SpringAopParameterReferencesSearcher implements ReferencesSearchQueryExecutor {
     @Override
-    public boolean execute(final ReferencesSearch.SearchParameters queryParameters, final Predicate<? super PsiReference> consumer) {
+    public boolean execute(ReferencesSearch.SearchParameters queryParameters, Predicate<? super PsiReference> consumer) {
         //noinspection AutoUnboxing
         return ApplicationManager.getApplication().runReadAction((Supplier<Boolean>) () -> {
-            final SearchScope scope = queryParameters.getScope();
+            SearchScope scope = queryParameters.getScope();
             if (scope instanceof MyLocalSearchScope) {
                 return true; //recursive call
             }
 
-            final PsiElement element = queryParameters.getElementToSearch();
+            PsiElement element = queryParameters.getElementToSearch();
             if (element instanceof PsiParameter) {
-                final Module module = element.getModule();
+                Module module = element.getModule();
                 if (module != null) {
-                    final Set<XmlFile> visited = new HashSet<>();
-                    for (final SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
-                        for (final XmlFile xmlFile : model.getConfigFiles()) {
+                    Set<XmlFile> visited = new HashSet<>();
+                    for (SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
+                        for (XmlFile xmlFile : model.getConfigFiles()) {
                             if (!visited.contains(xmlFile)) {
                                 visited.add(xmlFile);
-                                final LocalSearchScope localScope = (LocalSearchScope) new LocalSearchScope(xmlFile).intersectWith(scope);
+                                LocalSearchScope localScope = (LocalSearchScope) new LocalSearchScope(xmlFile).intersectWith(scope);
                                 if (localScope.getScope().length > 0) {
                                     if (!ReferencesSearch.search(element, new MyLocalSearchScope(localScope), true).forEach(consumer)) {
                                         return false;
@@ -62,7 +62,7 @@ public class SpringAopParameterReferencesSearcher implements ReferencesSearchQue
     }
 
     private static class MyLocalSearchScope extends LocalSearchScope {
-        public MyLocalSearchScope(final LocalSearchScope scope) {
+        public MyLocalSearchScope(LocalSearchScope scope) {
             super(scope.getScope(), scope.getDisplayName(), scope.isIgnoreInjectedPsi());
         }
     }

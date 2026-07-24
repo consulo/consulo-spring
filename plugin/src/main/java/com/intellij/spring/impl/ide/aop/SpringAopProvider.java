@@ -53,14 +53,14 @@ public class SpringAopProvider extends AopProvider {
 
   @Nonnull
   @Override
-  public Set<? extends AopAspect> getAdditionalAspects(@Nonnull final consulo.module.Module module) {
+  public Set<? extends AopAspect> getAdditionalAspects(@Nonnull consulo.module.Module module) {
     if (SpringManager.getInstance(module.getProject()) == null) return Collections.emptySet();
 
     if (module.getUserData(CACHED_SPRING_MODELS) == null) {
       module.putUserData(CACHED_SPRING_MODELS, CachedValuesManager.getManager(module.getProject()).createCachedValue(() -> {
-        final Set<AopAspect> set = new HashSet<>();
-        for (final SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
-          for (final DomFileElement<Beans> element : model.getRoots()) {
+        Set<AopAspect> set = new HashSet<>();
+        for (SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
+          for (DomFileElement<Beans> element : model.getRoots()) {
             addAopAspects(set, element.getRootElement());
           }
         }
@@ -71,14 +71,14 @@ public class SpringAopProvider extends AopProvider {
     return module.getUserData(CACHED_SPRING_MODELS).getValue();
   }
 
-  protected static Set<AopAspect> addAopAspects(final Set<AopAspect> set, final DomElement element) {
-    for (final DomElement child : DomUtil.getDefinedChildren(element, true, false)) {
+  protected static Set<AopAspect> addAopAspects(Set<AopAspect> set, DomElement element) {
+    for (DomElement child : DomUtil.getDefinedChildren(element, true, false)) {
       if (child instanceof AopAspect) {
-        final AopAspect aspect = (AopAspect)child;
+        AopAspect aspect = (AopAspect)child;
         set.add(aspect);
       }
       else if (child instanceof AopConfig) {
-        final AopConfig config = (AopConfig)child;
+        AopConfig config = (AopConfig)child;
         set.addAll(config.getAdvisors());
         set.addAll(config.getAspects());
       }
@@ -87,7 +87,7 @@ public class SpringAopProvider extends AopProvider {
   }
 
   @Override
-  public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
+  public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull PsiClass aClass) {
     return getSearcher(aClass);
   }
 
@@ -100,7 +100,7 @@ public class SpringAopProvider extends AopProvider {
           final GlobalSearchScope scope =
             module == null ? GlobalSearchScope.EMPTY_SCOPE : GlobalSearchScope.moduleWithDependenciesScope(
               module);
-          final AopAdvisedElementsSearcher searcher =
+          AopAdvisedElementsSearcher searcher =
             new AllAdvisedElementsSearcher(aClass.getManager(), scope) {
               @Override
               public boolean shouldSuppressErrors() {
@@ -112,7 +112,7 @@ public class SpringAopProvider extends AopProvider {
                                                    ProjectRootManager.getInstance(aClass.getProject()));
         }
 
-        final AopAdvisedElementsSearcher searcher =
+        AopAdvisedElementsSearcher searcher =
           new SpringAdvisedElementsSearcher(aClass.getManager(),
                                             SpringUtils.getNonEmptySpringModels(module));
         return CachedValueProvider.Result.create(searcher,
@@ -124,22 +124,22 @@ public class SpringAopProvider extends AopProvider {
   }
 
   @RequiredReadAction
-  private static boolean hasNoSpringFacetAtAll(final consulo.module.Module module) {
+  private static boolean hasNoSpringFacetAtAll(consulo.module.Module module) {
     return ModuleUtilCore.visitMeAndDependentModules(module, module1 -> SpringModuleExtension.getInstance(module1) == null);
   }
 
   @Nullable
   @Override
-  public Pair<? extends ArgNamesManipulator, PsiMethod> getCustomArgNamesManipulator(@Nonnull final PsiElement element) {
+  public Pair<? extends ArgNamesManipulator, PsiMethod> getCustomArgNamesManipulator(@Nonnull PsiElement element) {
     if (element instanceof XmlAttributeValue &&
       element.getParent() instanceof XmlAttribute &&
       "pointcut-ref".equals(((XmlAttribute)element.getParent()).getLocalName())) {
-      final XmlTag tag = PsiTreeUtil.getParentOfType(element, XmlTag.class);
+      XmlTag tag = PsiTreeUtil.getParentOfType(element, XmlTag.class);
       if (tag != null) {
-        final DomElement domElement = DomManager.getDomManager(element.getProject()).getDomElement(tag);
+        DomElement domElement = DomManager.getDomManager(element.getProject()).getDomElement(tag);
         if (domElement instanceof BasicAdvice) {
-          final BasicAdvice advice = (BasicAdvice)domElement;
-          final PsiMethod method = advice.getMethod().getValue();
+          BasicAdvice advice = (BasicAdvice)domElement;
+          PsiMethod method = advice.getMethod().getValue();
           if (advice.getPointcut().getStringValue() == null && method != null) {
             return Pair.create(new SpringArgNamesManipulator(tag), method);
           }
@@ -151,20 +151,20 @@ public class SpringAopProvider extends AopProvider {
   }
 
   @Override
-  public Integer getAdviceOrder(final AopAdvice advice) {
+  public Integer getAdviceOrder(AopAdvice advice) {
     if (advice instanceof SpringAopAdvice) {
       return ((SpringAopAdvice)advice).getOrder().getValue();
     }
-    final PsiElement element = advice.getIdentifyingPsiElement();
+    PsiElement element = advice.getIdentifyingPsiElement();
     if (element instanceof PsiAnnotation) {
-      final PsiClass aClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
+      PsiClass aClass = PsiTreeUtil.getContextOfType(element, PsiClass.class, false);
       if (aClass == null) return null;
 
-      final PsiAnnotation annotation = aClass.getModifierList().findAnnotation("org.springframework.core.annotation.Order");
+      PsiAnnotation annotation = aClass.getModifierList().findAnnotation("org.springframework.core.annotation.Order");
       if (annotation != null) {
-        final PsiAnnotationMemberValue value = annotation.findDeclaredAttributeValue("value");
+        PsiAnnotationMemberValue value = annotation.findDeclaredAttributeValue("value");
         if (value instanceof PsiExpression) {
-          final Object o = JavaConstantExpressionEvaluator.computeConstantExpression((PsiExpression)value, false);
+          Object o = JavaConstantExpressionEvaluator.computeConstantExpression((PsiExpression)value, false);
           if (o instanceof Integer) {
             return (Integer)o;
           }
@@ -172,17 +172,17 @@ public class SpringAopProvider extends AopProvider {
         return null;
       }
 
-      final PsiClass orderedClass =
+      PsiClass orderedClass =
         JavaPsiFacade.getInstance(aClass.getProject()).findClass("org.springframework.core.Ordered", aClass.getResolveScope());
       if (orderedClass != null && aClass.isInheritor(orderedClass, true)) {
-        final PsiMethod[] methods = aClass.findMethodsByName("getOrder", true);
-        for (final PsiMethod method : methods) {
-          final PsiCodeBlock body = method.getBody();
+        PsiMethod[] methods = aClass.findMethodsByName("getOrder", true);
+        for (PsiMethod method : methods) {
+          PsiCodeBlock body = method.getBody();
           if (method.getParameterList().getParametersCount() == 0 && body != null && body.getStatements().length == 1) {
-            final PsiStatement first = body.getStatements()[0];
+            PsiStatement first = body.getStatements()[0];
             if (first instanceof PsiReturnStatement) {
-              final PsiExpression value = ((PsiReturnStatement)first).getReturnValue();
-              final Object o = JavaConstantExpressionEvaluator.computeConstantExpression(value, false);
+              PsiExpression value = ((PsiReturnStatement)first).getReturnValue();
+              Object o = JavaConstantExpressionEvaluator.computeConstantExpression(value, false);
               if (o instanceof Integer) {
                 return (Integer)o;
               }

@@ -5,12 +5,12 @@ public class ListBean {
     public ListBean() {
     }
 
-    public ListBean(final List list) {
+    public ListBean(List list) {
     }
 
-    public void setList(final List list) {
+    public void setList(List list) {
     }
 
-    public void setGenericsList(final List<String> list) {
+    public void setGenericsList(List<String> list) {
     }
 }

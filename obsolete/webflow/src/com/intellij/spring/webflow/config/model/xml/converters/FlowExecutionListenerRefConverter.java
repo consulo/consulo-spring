@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class FlowExecutionListenerRefConverter extends WebflowBeanResolveConverterForDefiniteClasses {
 
    @NotNull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
    return new String[]{  WebflowConstants.EXECUTION_LISTENER_CLASS_NAME};
   }
 }

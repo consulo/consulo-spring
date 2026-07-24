@@ -17,7 +17,7 @@ import java.util.Collections;
  * @author peter
  */
 public class AopPrimitiveTypeExpression extends AopElementBase implements AopTypeExpression{
-  public AopPrimitiveTypeExpression(@Nonnull final ASTNode node) {
+  public AopPrimitiveTypeExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -27,7 +27,7 @@ public class AopPrimitiveTypeExpression extends AopElementBase implements AopTyp
 
   @Nonnull
   public Collection<AopPsiTypePattern> getPatterns() {
-    final PsiPrimitiveType psiType = getPsiType();
+    PsiPrimitiveType psiType = getPsiType();
     return psiType == null ? Collections.<AopPsiTypePattern>emptyList() : Collections.singletonList((AopPsiTypePattern) new PsiPrimitiveTypePattern(psiType)); 
 
   }

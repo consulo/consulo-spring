@@ -20,7 +20,7 @@ import java.util.Collection;
  */
 public class PsiTargetExpression extends PsiTypedPointcutExpression {
 
-  public PsiTargetExpression(@Nonnull final ASTNode node) {
+  public PsiTargetExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -29,16 +29,16 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
-    final PsiClass psiClass = member.getContainingClass();
-    final AopReferenceHolder baseClassPattern = getTypeReference();
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+    PsiClass psiClass = member.getContainingClass();
+    AopReferenceHolder baseClassPattern = getTypeReference();
     if (baseClassPattern == null || psiClass == null) return PointcutMatchDegree.FALSE;
 
-    final PsiClass myClass = context.resolve(baseClassPattern).findClass();
+    PsiClass myClass = context.resolve(baseClassPattern).findClass();
     if (myClass == null || !InheritanceUtil.isInheritorOrSelf(myClass, psiClass, true)) return PointcutMatchDegree.FALSE;
 
     if (member instanceof PsiMethod) {
-      final PsiMethod method = (PsiMethod)member;
+      PsiMethod method = (PsiMethod)member;
       if (MethodSignatureUtil.findMethodBySuperMethod(myClass, method, true) == method) {
         return PointcutMatchDegree.TRUE;
       }
@@ -51,13 +51,13 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
     return Arrays.asList(AopPsiTypePattern.TRUE);
   }
 
-  public static PointcutMatchDegree canBeInstanceOf(final PsiClass psiClass, final boolean allowPatterns, @Nullable final AopTypeExpression typeExpression) {
+  public static PointcutMatchDegree canBeInstanceOf(PsiClass psiClass, boolean allowPatterns, @Nullable AopTypeExpression typeExpression) {
     if (typeExpression == null) return PointcutMatchDegree.FALSE;
 
     if (typeExpression instanceof AopReferenceExpression) {
-      final PsiElement psiElement = ((AopReferenceExpression)typeExpression).resolve();
+      PsiElement psiElement = ((AopReferenceExpression)typeExpression).resolve();
       if (psiElement instanceof PsiClass) {
-        final PointcutMatchDegree degree = canBeInstanceOf(allowPatterns, (PsiClass)psiElement, psiClass);
+        PointcutMatchDegree degree = canBeInstanceOf(allowPatterns, (PsiClass)psiElement, psiClass);
         if (degree != null) return degree;
       }
       if (!allowPatterns) return PointcutMatchDegree.FALSE;
@@ -65,10 +65,10 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
     if (typeExpression instanceof AopSubtypeExpression && !allowPatterns) return PointcutMatchDegree.FALSE;
 
 
-    final Collection<AopPsiTypePattern> typePatterns = typeExpression.getPatterns();
+    Collection<AopPsiTypePattern> typePatterns = typeExpression.getPatterns();
     boolean maybe = false;
-    for (final AopPsiTypePattern typePattern : typePatterns) {
-      final PointcutMatchDegree degree = typePattern.canBeAssignableFrom(
+    for (AopPsiTypePattern typePattern : typePatterns) {
+      PointcutMatchDegree degree = typePattern.canBeAssignableFrom(
         JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass));
       if (degree == PointcutMatchDegree.TRUE) return PointcutMatchDegree.TRUE;
       if (degree == PointcutMatchDegree.MAYBE) maybe = true;
@@ -77,7 +77,7 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
   }
 
   @Nullable
-  public static PointcutMatchDegree canBeInstanceOf(final boolean allowPatterns, final PsiClass superClass, final PsiClass subClass) {
+  public static PointcutMatchDegree canBeInstanceOf(boolean allowPatterns, PsiClass superClass, PsiClass subClass) {
     if (subClass.getManager().areElementsEquivalent(subClass, superClass) || !allowPatterns && subClass.isInheritor(superClass, true)) {
       return PointcutMatchDegree.TRUE;
     }

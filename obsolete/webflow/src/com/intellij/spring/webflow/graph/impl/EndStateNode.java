@@ -31,7 +31,7 @@ public class EndStateNode extends WebflowBasicNode<EndState> {
   }
 
   public List<WebflowNamedAction> getAllNodeActions() {
-    final EndState state = getIdentifyingElement();
+    EndState state = getIdentifyingElement();
     return state.isValid() ? WebflowUtil.collectActons(state.getEntryActions(), new ArrayList<WebflowNamedAction>()) : Collections.<WebflowNamedAction>emptyList();
   }
 }

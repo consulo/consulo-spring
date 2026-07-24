@@ -46,14 +46,14 @@ public class SpringUpdateSchemaIntention implements IntentionAction {
         return LocalizeValue.localizeTODO(SpringBundle.message("update.schema.intention"));
     }
 
-    public boolean isAvailable(@Nonnull final Project project, final Editor editor, final PsiFile file) {
+    public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
         if (file instanceof XmlFile && SpringManager.getInstance(project).isSpringBeans((XmlFile) file)) {
-            final int offset = editor.getCaretModel().getOffset();
-            final PsiElement psiElement = file.findElementAt(offset);
+            int offset = editor.getCaretModel().getOffset();
+            PsiElement psiElement = file.findElementAt(offset);
             if (PsiTreeUtil.getParentOfType(psiElement, XmlDoctype.class) != null) {
                 return true;
             }
-            final XmlTag tag = PsiTreeUtil.getParentOfType(psiElement, XmlTag.class);
+            XmlTag tag = PsiTreeUtil.getParentOfType(psiElement, XmlTag.class);
             if (tag != null && tag.getParentTag() == null && isUpdateNeeded((XmlFile) file)) {
                 return true;
             }
@@ -61,11 +61,11 @@ public class SpringUpdateSchemaIntention implements IntentionAction {
         return false;
     }
 
-    public void invoke(@Nonnull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
+    public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         updateSchema((XmlFile) file);
     }
 
-    public static boolean requestSchemaUpdate(final @Nonnull XmlFile file) throws IncorrectOperationException {
+    public static boolean requestSchemaUpdate(@Nonnull XmlFile file) throws IncorrectOperationException {
         if (!isUpdateNeeded(file)) {
             return true;
         }
@@ -79,39 +79,39 @@ public class SpringUpdateSchemaIntention implements IntentionAction {
         return true;
     }
 
-    public static void updateSchema(final @Nonnull XmlFile file) throws IncorrectOperationException {
+    public static void updateSchema(@Nonnull XmlFile file) throws IncorrectOperationException {
 
-        final Project project = file.getProject();
-        final XmlDocument document = file.getDocument();
+        Project project = file.getProject();
+        XmlDocument document = file.getDocument();
         assert document != null;
-        final XmlProlog prolog = document.getProlog();
-        final PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
-        final Document doc = documentManager.getDocument(file);
+        XmlProlog prolog = document.getProlog();
+        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
+        Document doc = documentManager.getDocument(file);
         assert doc != null;
         if (prolog != null) {
-            final XmlDoctype doctype = prolog.getDoctype();
+            XmlDoctype doctype = prolog.getDoctype();
             if (doctype != null) {
                 doctype.delete();
                 documentManager.doPostponedOperationsAndUnblockDocument(doc);
             }
         }
-        final DomFileElement<Beans> element = DomManager.getDomManager(project).getFileElement(file, Beans.class);
+        DomFileElement<Beans> element = DomManager.getDomManager(project).getFileElement(file, Beans.class);
         assert element != null;
-        final XmlTag tag = element.getRootTag();
+        XmlTag tag = element.getRootTag();
         assert tag != null;
-        final ASTNode node = tag.getNode();
+        ASTNode node = tag.getNode();
         assert node != null;
-        final ASTNode child = XmlChildRole.START_TAG_NAME_FINDER.findChild(node);
+        ASTNode child = XmlChildRole.START_TAG_NAME_FINDER.findChild(node);
         assert child != null;
-        final TextRange range = child.getTextRange();
+        TextRange range = child.getTextRange();
         doc.replaceString(range.getStartOffset(), range.getEndOffset(), BEANS);
         documentManager.commitDocument(doc);
         CodeStyleManager.getInstance(project).reformatRange(tag, 1, BEANS.length());
 
         SpringModelVisitor.visitBeans(new SpringModelVisitor() {
-            protected boolean visitBean(final CommonSpringBean bean) {
+            protected boolean visitBean(CommonSpringBean bean) {
                 if (bean instanceof SpringBean) {
-                    final Boolean value = ((SpringBean) bean).getSingleton().getValue();
+                    Boolean value = ((SpringBean) bean).getSingleton().getValue();
                     if (value != null) {
                         ((SpringBean) bean).getSingleton().undefine();
                         ((SpringBean) bean).getScope()
@@ -127,10 +127,10 @@ public class SpringUpdateSchemaIntention implements IntentionAction {
         return true;
     }
 
-    public static boolean isUpdateNeeded(@Nonnull final XmlFile config) {
-        final XmlDocument document = config.getDocument();
+    public static boolean isUpdateNeeded(@Nonnull XmlFile config) {
+        XmlDocument document = config.getDocument();
         assert document != null;
-        final XmlTag tag = document.getRootTag();
+        XmlTag tag = document.getRootTag();
         assert tag != null;
         return !tag.getNamespace().equals(SpringConstants.BEANS_XSD);
     }

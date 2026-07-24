@@ -21,12 +21,12 @@ public class DerivedSpringBeanPointer extends SpringBeanPointer{
   private final String myName;
   private final SpringBaseBeanPointer myBasePointer;
 
-  public DerivedSpringBeanPointer(@Nonnull final SpringBaseBeanPointer basePointer, @Nonnull final String name) {
+  public DerivedSpringBeanPointer(@Nonnull SpringBaseBeanPointer basePointer, @Nonnull String name) {
     myBasePointer = basePointer;
     myName = name;
   }
 
-  public SpringBeanPointer derive(@Nonnull final String name) {
+  public SpringBeanPointer derive(@Nonnull String name) {
     if (name.equals(myName)) return this;
     if (name.equals(myBasePointer.getName())) return myBasePointer;
     return new DerivedSpringBeanPointer(myBasePointer, name);
@@ -90,11 +90,11 @@ public class DerivedSpringBeanPointer extends SpringBeanPointer{
     return myBasePointer.isAbstract();
   }
 
-  public boolean equals(final Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof DerivedSpringBeanPointer)) return false;
 
-    final DerivedSpringBeanPointer that = (DerivedSpringBeanPointer)o;
+    DerivedSpringBeanPointer that = (DerivedSpringBeanPointer)o;
 
     if (!myBasePointer.equals(that.myBasePointer)) return false;
     if (!myName.equals(that.myName)) return false;

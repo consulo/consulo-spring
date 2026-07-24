@@ -16,23 +16,23 @@ import java.util.List;
 
 public class ServiceBeanRefConverter extends SpringBeanResolveConverterForDefiniteClasses {
 
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     List<String> classes = new ArrayList<String>();
-    final DomElement element = context.getInvocationElement();
-    final Service service = element.getParentOfType(Service.class, false);
+    DomElement element = context.getInvocationElement();
+    Service service = element.getParentOfType(Service.class, false);
     if (service != null) {
-      final PsiClass psiClass = service.getInterface().getValue();
+      PsiClass psiClass = service.getInterface().getValue();
       if (psiClass != null) {
         classes.add(psiClass.getQualifiedName());
       }
 
-      final Module module = context.getModule();
+      Module module = context.getModule();
       if (module != null) {
         for (SpringValue value : service.getInterfaces().getValues()) {
-          final String stringValue = value.getStringValue();
+          String stringValue = value.getStringValue();
           if (!StringUtil.isEmptyOrSpaces(stringValue)) {
 
-            final PsiClass aClass =
+            PsiClass aClass =
                 JavaPsiFacade.getInstance(module.getProject()).findClass(stringValue, GlobalSearchScope.allScope(module.getProject()));
             if (aClass != null) {
               classes.add(aClass.getQualifiedName());

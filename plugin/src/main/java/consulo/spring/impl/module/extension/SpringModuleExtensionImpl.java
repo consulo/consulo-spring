@@ -58,19 +58,19 @@ public class SpringModuleExtensionImpl extends ModuleExtensionBase<SpringModuleE
     super.loadStateImpl(element);
 
     for (Element setElement : element.getChildren(FILESET)) {
-      final String setName = setElement.getAttributeValue(SET_NAME);
-      final String setId = setElement.getAttributeValue(SET_ID);
-      final String removed = setElement.getAttributeValue(SET_REMOVED);
-      final String type = setElement.getAttributeValue(TYPE);
+      String setName = setElement.getAttributeValue(SET_NAME);
+      String setId = setElement.getAttributeValue(SET_ID);
+      String removed = setElement.getAttributeValue(SET_REMOVED);
+      String type = setElement.getAttributeValue(TYPE);
       if (setName != null && setId != null) {
-        final SpringFileSet fileSet = SpringFileSetFactory.create(type, setId, setName, this);
-        final List<Element> deps = setElement.getChildren(DEPENDENCY);
+        SpringFileSet fileSet = SpringFileSetFactory.create(type, setId, setName, this);
+        List<Element> deps = setElement.getChildren(DEPENDENCY);
         for (Element dep : deps) {
           fileSet.addDependency(dep.getText());
         }
-        final List<Element> files = setElement.getChildren(FILE);
+        List<Element> files = setElement.getChildren(FILE);
         for (Element fileElement : files) {
-          final String text = fileElement.getText();
+          String text = fileElement.getText();
           fileSet.addFile(text);
         }
         fileSet.setRemoved(Boolean.valueOf(removed));
@@ -88,19 +88,19 @@ public class SpringModuleExtensionImpl extends ModuleExtensionBase<SpringModuleE
         continue;
       }
 
-      final Element setElement = new Element(FILESET);
+      Element setElement = new Element(FILESET);
       setElement.setAttribute(SET_ID, fileSet.getId());
       setElement.setAttribute(SET_NAME, fileSet.getName());
       setElement.setAttribute(SET_REMOVED, Boolean.toString(fileSet.isRemoved()));
       setElement.setAttribute(TYPE, fileSet.getType());
       element.addContent(setElement);
       for (String dep : fileSet.getDependencies()) {
-        final Element depElement = new Element(DEPENDENCY);
+        Element depElement = new Element(DEPENDENCY);
         depElement.setText(dep);
         setElement.addContent(depElement);
       }
       for (VirtualFilePointer fileName : fileSet.getFiles()) {
-        final Element fileElement = new Element(FILE);
+        Element fileElement = new Element(FILE);
         fileElement.setText(fileName.getUrl());
         setElement.addContent(fileElement);
       }

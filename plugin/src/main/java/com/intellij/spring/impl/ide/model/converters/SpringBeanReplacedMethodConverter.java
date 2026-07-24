@@ -8,11 +8,11 @@ import com.intellij.java.language.psi.PsiMethod;
 
 public class SpringBeanReplacedMethodConverter extends SpringBeanMethodConverter {
 
-  protected boolean checkModifiers(final PsiMethod method) {
+  protected boolean checkModifiers(PsiMethod method) {
     return super.checkModifiers(method);
   }
 
-  protected boolean checkParameterList(final PsiMethod method) {
+  protected boolean checkParameterList(PsiMethod method) {
     return true;
   }
 

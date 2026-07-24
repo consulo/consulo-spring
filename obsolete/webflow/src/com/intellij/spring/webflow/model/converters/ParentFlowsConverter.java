@@ -26,22 +26,22 @@ public class ParentFlowsConverter extends DelimitedListConverter<Flow> {
     super(", ");
   }
 
-  protected Flow convertString(final @Nullable String string, final ConvertContext context) {
+  protected Flow convertString(@Nullable String string, ConvertContext context) {
     return WebflowUtil.findFlowByName(string, context.getModule());
   }
 
-  protected String toString(@Nullable final Flow flow) {
+  protected String toString(@Nullable Flow flow) {
     return WebflowUtil.getFlowName(flow);
   }
 
-  protected Object[] getReferenceVariants(final ConvertContext context, final GenericDomValue<List<Flow>> listGenericDomValue) {
-    final List<Flow> flows = listGenericDomValue.getValue();
+  protected Object[] getReferenceVariants(final ConvertContext context, GenericDomValue<List<Flow>> listGenericDomValue) {
+    List<Flow> flows = listGenericDomValue.getValue();
 
     if (flows != null) {
-      final Module module = context.getModule();
+      Module module = context.getModule();
 
-      final List<PsiFile> exceptedFiles = ContainerUtil.mapNotNull(flows, new Function<Flow, PsiFile>() {
-        public PsiFile fun(final Flow flow) {
+      List<PsiFile> exceptedFiles = ContainerUtil.mapNotNull(flows, new Function<Flow, PsiFile>() {
+        public PsiFile fun(Flow flow) {
           return DomUtil.getFile(flow);
         }
       });
@@ -50,8 +50,8 @@ public class ParentFlowsConverter extends DelimitedListConverter<Flow> {
       List<Flow> all = WebflowUtil.getAllFlows(module, exceptedFiles);
 
 
-      final List<String> names = ContainerUtil.mapNotNull(all, new Function<Flow, String>() {
-        public String fun(final Flow flow) {
+      List<String> names = ContainerUtil.mapNotNull(all, new Function<Flow, String>() {
+        public String fun(Flow flow) {
           return WebflowUtil.getFlowName(flow, context.getModule());
         }
       });
@@ -61,22 +61,22 @@ public class ParentFlowsConverter extends DelimitedListConverter<Flow> {
     return new Object[0];
   }
 
-  protected PsiElement resolveReference(@Nullable final Flow flow, final ConvertContext context) {
+  protected PsiElement resolveReference(@Nullable Flow flow, ConvertContext context) {
     return flow == null ? null : WebflowUtil.resolveFlow(flow, context.getModule());
   }
 
-  protected String getUnresolvedMessage(final String value) {
+  protected String getUnresolvedMessage(String value) {
     return WebflowBundle.message("cannot.find.flow", value);
   }
 
   @Override
-  protected PsiElement referenceBindToElement(final PsiReference psiReference,
-                                              final PsiElement element,
-                                              final Function<PsiElement, PsiElement> superBindToElementFunction,
-                                              final Function<String, PsiElement> superElementRenameFunction)
+  protected PsiElement referenceBindToElement(PsiReference psiReference,
+                                              PsiElement element,
+                                              Function<PsiElement, PsiElement> superBindToElementFunction,
+                                              Function<String, PsiElement> superElementRenameFunction)
       throws IncorrectOperationException {
     if (element instanceof XmlFile) {
-      final VirtualFile file = ((XmlFile)element).getVirtualFile();
+      VirtualFile file = ((XmlFile)element).getVirtualFile();
       if (file != null) {
         return referenceHandleElementRename(psiReference, file.getNameWithoutExtension(), superElementRenameFunction);
       }
@@ -85,19 +85,19 @@ public class ParentFlowsConverter extends DelimitedListConverter<Flow> {
   }
 
   @Override
-  protected PsiElement referenceHandleElementRename(final PsiReference psiReference,
-                                                    final String newName,
-                                                    final Function<String, PsiElement> superHandleElementRename)
+  protected PsiElement referenceHandleElementRename(PsiReference psiReference,
+                                                    String newName,
+                                                    Function<String, PsiElement> superHandleElementRename)
       throws IncorrectOperationException {
 
     if (psiReference.resolve() instanceof XmlFile) {
-      final String name = getNameWithoutExtension(newName);
+      String name = getNameWithoutExtension(newName);
       return superHandleElementRename.fun(name == null ? newName : name);
     }
     return superHandleElementRename.fun(newName);
   }
 
-  private static String getNameWithoutExtension(final String fileName) {
+  private static String getNameWithoutExtension(String fileName) {
     int index = fileName.lastIndexOf('.');
     if (index < 0) return fileName;
     return fileName.substring(0, index);

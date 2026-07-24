@@ -53,22 +53,22 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
         return "SpringBeanDepedencyCheckInspection";
     }
 
-    private static boolean isObjectsDependencyCheck(final DependencyCheck dependencyCheckMode) {
+    private static boolean isObjectsDependencyCheck(DependencyCheck dependencyCheckMode) {
         return dependencyCheckMode.equals(DependencyCheck.OBJECTS) || dependencyCheckMode.equals(DependencyCheck.ALL);
     }
 
-    private static boolean isSimpleDependencyCheck(final DependencyCheck dependencyCheckMode) {
+    private static boolean isSimpleDependencyCheck(DependencyCheck dependencyCheckMode) {
         return dependencyCheckMode.equals(DependencyCheck.SIMPLE) || dependencyCheckMode.equals(DependencyCheck.ALL);
     }
 
     private static void checkSimpleAndObjectsDependencies(
-        @Nonnull final SpringBean springBean,
-        @Nonnull final SpringModel springModel,
-        @Nonnull final DomElementAnnotationHolder holder,
-        final DependencyCheck dependencyCheck
+        @Nonnull SpringBean springBean,
+        @Nonnull SpringModel springModel,
+        @Nonnull DomElementAnnotationHolder holder,
+        DependencyCheck dependencyCheck
     ) {
 
-        final PsiClass beanClass = springBean.getBeanClass();
+        PsiClass beanClass = springBean.getBeanClass();
         if (beanClass == null) {
             return;
         }
@@ -98,22 +98,22 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
         }
     }
 
-    private static boolean acceptPropertyForCheck(final PsiMethod psiMethod, final DependencyCheck dependencyCheck) {
-        final PsiType psiType = psiMethod.getParameterList().getParameters()[0].getType();
-        final boolean simpleProperty = isSimpleProperty(psiType);
+    private static boolean acceptPropertyForCheck(PsiMethod psiMethod, DependencyCheck dependencyCheck) {
+        PsiType psiType = psiMethod.getParameterList().getParameters()[0].getType();
+        boolean simpleProperty = isSimpleProperty(psiType);
 
         return (simpleProperty && isSimpleDependencyCheck(dependencyCheck)) || (!simpleProperty && isObjectsDependencyCheck(dependencyCheck));
     }
 
-    private static boolean isAutowired(final SpringBean springBean, final SpringModel springModel, final PsiMethod psiMethod) {
-        final Autowire autowire = springBean.getBeanAutowire();
+    private static boolean isAutowired(SpringBean springBean, SpringModel springModel, PsiMethod psiMethod) {
+        Autowire autowire = springBean.getBeanAutowire();
         switch (autowire) {
             case BY_TYPE:
-                final PsiType psiType = psiMethod.getParameterList().getParameters()[0].getType();
+                PsiType psiType = psiMethod.getParameterList().getParameters()[0].getType();
                 if (psiType instanceof PsiClassType) {
-                    final PsiClass psiClass = ((PsiClassType) psiType).resolve();
+                    PsiClass psiClass = ((PsiClassType) psiType).resolve();
                     if (psiClass != null) {
-                        final List<SpringBaseBeanPointer> springBeans = springModel.findBeansByEffectivePsiClassWithInheritance(psiClass);
+                        List<SpringBaseBeanPointer> springBeans = springModel.findBeansByEffectivePsiClassWithInheritance(psiClass);
                         if (springBeans != null && springBeans.size() > 0) {
                             return true;
                         }
@@ -121,17 +121,17 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
                 }
                 return false;
             case BY_NAME:
-                final String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
+                String propertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
 
-                final SpringBeanPointer bean = springModel.findBean(propertyName);
+                SpringBeanPointer bean = springModel.findBean(propertyName);
 
                 return bean != null && !bean.isReferenceTo(springBean);
         }
         return false;
     }
 
-    private static boolean isPropertyInjected(final SpringBean springBean, final PsiMethod psiMethod) {
-        final String beanClassPropertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
+    private static boolean isPropertyInjected(SpringBean springBean, PsiMethod psiMethod) {
+        String beanClassPropertyName = PropertyUtil.getPropertyNameBySetter(psiMethod);
         if (beanClassPropertyName != null) {
             for (SpringPropertyDefinition springProperty : springBean.getAllProperties()) {
                 if (beanClassPropertyName.equals(springProperty.getPropertyName())) {
@@ -144,9 +144,9 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
 
     protected void checkBean(
         SpringBean springBean,
-        final Beans beans,
-        final DomElementAnnotationHolder holder,
-        final SpringModel model,
+        Beans beans,
+        DomElementAnnotationHolder holder,
+        SpringModel model,
         Object state
     ) {
 
@@ -166,9 +166,9 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
     }
 
     @Nullable
-    private static DependencyCheck getDefaultDependencyCheck(final List<DomFileElement<Beans>> roots) {
-        for (final DomFileElement<Beans> element : roots) {
-            final DependencyCheck value = DependencyCheck.fromDefault(element.getRootElement().getDefaultDependencyCheck().getValue());
+    private static DependencyCheck getDefaultDependencyCheck(List<DomFileElement<Beans>> roots) {
+        for (DomFileElement<Beans> element : roots) {
+            DependencyCheck value = DependencyCheck.fromDefault(element.getRootElement().getDefaultDependencyCheck().getValue());
             if (value != null) {
                 return value;
             }
@@ -178,19 +178,19 @@ public class SpringDependencyCheckInspection extends SpringBeanInspectionBase {
 
 
     //@see org.springframework.beans.BeanUtils.BeanUtils#isSimpleProperty
-    private static boolean isSimpleProperty(final PsiType psiType) {
-        final boolean isArrayType = psiType instanceof PsiArrayType;
+    private static boolean isSimpleProperty(PsiType psiType) {
+        boolean isArrayType = psiType instanceof PsiArrayType;
 
         return isArrayType ? isSimpleSpringType(((PsiArrayType) psiType).getComponentType()) : isSimpleSpringType(psiType);
     }
 
     //@see org.springframework.beans.BeanUtils.BeanUtils#isSimpleProperty
-    private static boolean isSimpleSpringType(final PsiType psiType) {
+    private static boolean isSimpleSpringType(PsiType psiType) {
         if (psiType instanceof PsiPrimitiveType) {
             return true;
         }
 
-        final String typeName = psiType.getCanonicalText();
+        String typeName = psiType.getCanonicalText();
         if (myWrapperClasses.contains(typeName)) {
             return true;
         }

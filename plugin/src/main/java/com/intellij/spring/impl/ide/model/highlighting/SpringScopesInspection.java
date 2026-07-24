@@ -21,7 +21,7 @@ import jakarta.annotation.Nonnull;
  */
 @ExtensionImpl
 public class SpringScopesInspection extends BasicDomElementsInspection<Beans, Object> {
-    protected void checkDomElement(final DomElement element, final DomElementAnnotationHolder holder, final DomHighlightingHelper helper) {
+    protected void checkDomElement(DomElement element, DomElementAnnotationHolder holder, DomHighlightingHelper helper) {
         if (element instanceof GenericDomValue) {
             GenericDomValue value = (GenericDomValue) element;
             if (SpringBeanScope.class.equals(DomUtil.getGenericValueParameter(value.getDomElementType()))) {

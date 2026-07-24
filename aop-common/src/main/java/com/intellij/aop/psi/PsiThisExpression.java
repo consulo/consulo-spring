@@ -21,7 +21,7 @@ import java.util.Collection;
  */
 public class PsiThisExpression extends PsiTypedPointcutExpression {
 
-  public PsiThisExpression(@Nonnull final ASTNode node) {
+  public PsiThisExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -30,23 +30,23 @@ public class PsiThisExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
-    final AopReferenceHolder reference = getTypeReference();
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+    AopReferenceHolder reference = getTypeReference();
     if (reference == null) return PointcutMatchDegree.FALSE;
 
-    final PsiClass containingClass = member.getContainingClass();
+    PsiClass containingClass = member.getContainingClass();
     if (containingClass == null) return PointcutMatchDegree.FALSE;
 
-    final AopReferenceTarget target = context.resolve(reference);
+    AopReferenceTarget target = context.resolve(reference);
 
-    final PointcutMatchDegree baseResult = target.canBeInstance(containingClass, false);
+    PointcutMatchDegree baseResult = target.canBeInstance(containingClass, false);
     if (baseResult == PointcutMatchDegree.TRUE) {
       return PointcutMatchDegree.TRUE;
     }
 
-    final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(member.getProject()).getElementFactory();
-    for (final AopIntroduction introduction : AopJavaAnnotator.getBoundIntroductions(containingClass)) {
-      final PsiClass introIntf = introduction.getImplementInterface().getValue();
+    PsiElementFactory elementFactory = JavaPsiFacade.getInstance(member.getProject()).getElementFactory();
+    for (AopIntroduction introduction : AopJavaAnnotator.getBoundIntroductions(containingClass)) {
+      PsiClass introIntf = introduction.getImplementInterface().getValue();
       if (introIntf != null && target.accepts(elementFactory.createType(introIntf)) == PointcutMatchDegree.TRUE) {
         return PointcutMatchDegree.TRUE;
       }

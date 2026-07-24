@@ -19,7 +19,7 @@ public class ChooseTemplatesDialogWrapper extends DialogWrapper {
 
     myTemplatesForm = new ChooseTemplatesForm(infos, libInfo);
     myTemplatesForm.getLibrariesValidationComponent().addValidityListener(new LibrariesValidationComponent.ValidityListener() {
-      public void valididyChanged(final boolean isValid) {
+      public void valididyChanged(boolean isValid) {
         setOKActionEnabled(isValid);
       }
     });

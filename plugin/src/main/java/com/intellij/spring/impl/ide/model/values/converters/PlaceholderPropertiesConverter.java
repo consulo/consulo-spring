@@ -17,21 +17,21 @@ import jakarta.annotation.Nullable;
 
 public class PlaceholderPropertiesConverter extends Converter<String> implements CustomReferenceConverter {
 
-  public String fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  public String fromString(@Nullable @NonNls String s, ConvertContext context) {
     return s;
   }
 
-  public String toString(@Nullable String s, final ConvertContext context) {
+  public String toString(@Nullable String s, ConvertContext context) {
     return s;
   }
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
     return PlaceholderUtils.createPlaceholderPropertiesReferences(genericDomValue);
   }
 
   public static class PlaceholderPropertiesCondition implements Condition<Pair<PsiType, GenericDomValue>> {
-    public boolean value(final Pair<PsiType, GenericDomValue> pair) {
+    public boolean value(Pair<PsiType, GenericDomValue> pair) {
       return PlaceholderUtils.isPlaceholder(pair.getSecond());
     }
   }

@@ -46,7 +46,7 @@ public class SpringJavaConfigInconsistencyInspection extends SpringJavaConfigIns
     }
 
     @Override
-    protected void checkJavaConfiguration(final SpringJamElement javaConfiguration, final Module module, final ProblemsHolder holder) {
+    protected void checkJavaConfiguration(SpringJamElement javaConfiguration, Module module, ProblemsHolder holder) {
         checkJavaConfigurationClass(javaConfiguration, holder);
 
         for (SpringJavaBean springJavaBean : javaConfiguration.getBeans()) {
@@ -54,7 +54,7 @@ public class SpringJavaConfigInconsistencyInspection extends SpringJavaConfigIns
         }
     }
 
-    private static void checkJavaConfigurationClass(final SpringJamElement configuration, final ProblemsHolder holder) {
+    private static void checkJavaConfigurationClass(SpringJamElement configuration, ProblemsHolder holder) {
         PsiClass psiClass = configuration.getPsiElement();
 
         checkConstructor(psiClass, configuration, holder);

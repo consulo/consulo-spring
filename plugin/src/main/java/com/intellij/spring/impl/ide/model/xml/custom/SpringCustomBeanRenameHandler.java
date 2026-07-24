@@ -39,14 +39,14 @@ public class SpringCustomBeanRenameHandler implements RenameHandler {
     @RequiredUIAccess
     @Override
     public void invoke(@Nonnull Project project, Editor editor, PsiFile file, DataContext dataContext) {
-        final PsiElement element = dataContext.getData(LangDataKeys.PSI_ELEMENT);
+        PsiElement element = dataContext.getData(LangDataKeys.PSI_ELEMENT);
         doInvoke(project, editor, element);
     }
 
-    private static void doInvoke(final Project project, final Editor editor, final PsiElement element) {
-        final XmlAttribute idAttribute = ((CustomBeanFakePsiElement) element).getBean().getIdAttribute();
+    private static void doInvoke(Project project, Editor editor, PsiElement element) {
+        XmlAttribute idAttribute = ((CustomBeanFakePsiElement) element).getBean().getIdAttribute();
         if (idAttribute == null) {
-            final int i = Messages
+            int i = Messages
                 .showOkCancelDialog(project,
                     SpringBundle.message("custom.bean.no.id"),
                     SpringBundle.message("custom.bean.no.id.title"),

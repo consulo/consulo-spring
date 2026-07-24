@@ -14,7 +14,7 @@ public abstract class AopJoinPoint<Subject extends PsiMember, Point extends PsiE
   private final Subject mySubject;
   private final Point myPoint;
 
-  protected AopJoinPoint(final Subject subject, final Point point) {
+  protected AopJoinPoint(Subject subject, Point point) {
     mySubject = subject;
     myPoint = point;
   }
@@ -29,49 +29,49 @@ public abstract class AopJoinPoint<Subject extends PsiMember, Point extends PsiE
 
   public static class FieldGet extends AopJoinPoint<PsiField, PsiReferenceExpression> {
 
-    protected FieldGet(final PsiField psiField, final PsiReferenceExpression psiReferenceExpression) {
+    protected FieldGet(PsiField psiField, PsiReferenceExpression psiReferenceExpression) {
       super(psiField, psiReferenceExpression);
     }
   }
   public static class FieldSet extends AopJoinPoint<PsiField, PsiAssignmentExpression> {
 
-    protected FieldSet(final PsiField psiField, final PsiAssignmentExpression assignmentExpression) {
+    protected FieldSet(PsiField psiField, PsiAssignmentExpression assignmentExpression) {
       super(psiField, assignmentExpression);
     }
   }
   public static class MethodCall extends AopJoinPoint<PsiMethod, PsiCallExpression> {
 
-    protected MethodCall(final PsiMethod method, final PsiCallExpression callExpression) {
+    protected MethodCall(PsiMethod method, PsiCallExpression callExpression) {
       super(method, callExpression);
     }
   }
   public static class MethodExecution extends AopJoinPoint<PsiMethod, PsiMethod> {
 
-    protected MethodExecution(final PsiMethod method) {
+    protected MethodExecution(PsiMethod method) {
       super(method, method);
     }
   }
   public static class ExceptionHandler extends AopJoinPoint<PsiClass, PsiCatchSection> {
 
-    protected ExceptionHandler(final PsiClass psiClass, final PsiCatchSection psiCatchSection) {
+    protected ExceptionHandler(PsiClass psiClass, PsiCatchSection psiCatchSection) {
       super(psiClass, psiCatchSection);
     }
   }
   public static class AdviceExecution extends AopJoinPoint<PsiMethod, PsiMethod> {
 
-    protected AdviceExecution(final PsiMethod method) {
+    protected AdviceExecution(PsiMethod method) {
       super(method, method);
     }
   }
   public static class InstanceInitialization extends AopJoinPoint<PsiMethod, PsiMethod> {
 
-    protected InstanceInitialization(final PsiMethod method) {
+    protected InstanceInitialization(PsiMethod method) {
       super(method, method);
     }
   }
   public static class StaticInitialization extends AopJoinPoint<PsiClass, PsiClass> {
 
-    protected StaticInitialization(final PsiClass aClass) {
+    protected StaticInitialization(PsiClass aClass) {
       super(aClass, aClass);
     }
   }

@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface AdditionalBeanProvider<T extends DomElement> {
   @Nullable
-  List<CommonSpringBean> getAdditionalBeans(@Nonnull final T t, @Nonnull Module module);
+  List<CommonSpringBean> getAdditionalBeans(@Nonnull T t, @Nonnull Module module);
 }

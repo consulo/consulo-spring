@@ -31,12 +31,12 @@ public class SpringModelTreeElement implements StructureViewTreeElement, ItemPre
   private DomElementNavigationProvider myNavigationProvider;
   private boolean myShowBeanStructure;
 
-  public SpringModelTreeElement(XmlFile xmlFile, final boolean showBeanStructure) {
+  public SpringModelTreeElement(XmlFile xmlFile, boolean showBeanStructure) {
     this(xmlFile, DomElementsNavigationManager.getManager(xmlFile.getProject()).getDomElementsNavigateProvider(
       DomElementsNavigationManager.DEFAULT_PROVIDER_NAME), showBeanStructure);
   }
 
-  public SpringModelTreeElement(XmlFile xmlFile, final DomElementNavigationProvider navigationProvider, final boolean showBeanStructure) {
+  public SpringModelTreeElement(XmlFile xmlFile, DomElementNavigationProvider navigationProvider, boolean showBeanStructure) {
     myXmlFile = xmlFile;
     myNavigationProvider = navigationProvider;
     myShowBeanStructure = showBeanStructure;
@@ -58,20 +58,20 @@ public class SpringModelTreeElement implements StructureViewTreeElement, ItemPre
     SpringModel springModel = getSpringModel();
     if (springModel != null) {
       for (SpringBaseBeanPointer pointer : springModel.getAllDomBeans()) {
-        final CommonSpringBean springBean = pointer.getSpringBean();
+        CommonSpringBean springBean = pointer.getSpringBean();
         if (pointer.isValid() && springBean.isValid() && springBean instanceof DomSpringBean) {
           treeElements
             .add(new SpringBeanTreeElement((DomSpringBean)springBean, myNavigationProvider, myShowBeanStructure));
         }
       }
     }
-    final DomManager manager = DomManager.getDomManager(myXmlFile.getProject());
-    final XmlDocument document = myXmlFile.getDocument();
+    DomManager manager = DomManager.getDomManager(myXmlFile.getProject());
+    XmlDocument document = myXmlFile.getDocument();
     if (document != null) {
-      final XmlTag rootTag = document.getRootTag();
+      XmlTag rootTag = document.getRootTag();
       if (rootTag != null) {
-        for (final XmlTag tag : rootTag.getSubTags()) {
-          final DomElement element = manager.getDomElement(tag);
+        for (XmlTag tag : rootTag.getSubTags()) {
+          DomElement element = manager.getDomElement(tag);
           if (element instanceof CustomBeanWrapper && ((CustomBeanWrapper)element).isDummy()) {
             treeElements.add(new XmlTagTreeElement(tag));
           }
@@ -88,7 +88,7 @@ public class SpringModelTreeElement implements StructureViewTreeElement, ItemPre
   }
 
   @Override
-  public void navigate(final boolean requestFocus) {
+  public void navigate(boolean requestFocus) {
   }
 
   @Override

@@ -20,7 +20,7 @@ import java.io.File;
  */
 public class SpringAopCompletionTest extends JavaCodeInsightFixtureTestCase {
   @Override
-  protected void tuneFixture(final JavaModuleFixtureBuilder moduleBuilder) {
+  protected void tuneFixture(JavaModuleFixtureBuilder moduleBuilder) {
     if ("testSpringPointcutsWithBean".equals(getName())) {
       moduleBuilder
         .addLibraryJars("spring2_5", consulo.ide.impl.idea.openapi.application.PathManager.getHomePath().replace(File.separatorChar, '/') + "/svnPlugins/spring/spring-tests/testData/", "spring2_5.jar");
@@ -29,7 +29,7 @@ public class SpringAopCompletionTest extends JavaCodeInsightFixtureTestCase {
 
   public void testAllBeanNames() throws Throwable {
     new WriteCommandAction(getProject()) {
-      protected void run(final Result result) throws Throwable {
+      protected void run(Result result) throws Throwable {
         FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, SpringFacetType.INSTANCE.getPresentableName(), null);
       }
     }.execute().throwException();

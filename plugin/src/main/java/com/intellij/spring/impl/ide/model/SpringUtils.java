@@ -76,7 +76,7 @@ public class SpringUtils {
   }
 
   public static List<String> tokenize(@Nonnull String str) {
-    final ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<String>();
     tokenize(str, list);
     return list;
   }
@@ -94,21 +94,21 @@ public class SpringUtils {
   }
 
   @Nullable
-  public static String getReferencedName(final CommonSpringBean bean) {
-    final SpringModel model = getSpringModelForBean(bean);
+  public static String getReferencedName(CommonSpringBean bean) {
+    SpringModel model = getSpringModelForBean(bean);
     return model != null ? getReferencedName(SpringBeanPointer.createSpringBeanPointer(bean), model.getAllCommonBeans(true)) : null;
   }
 
   @Nullable
-  public static String getReferencedName(final SpringBeanPointer bean, final Collection<? extends SpringBeanPointer> allBeans) {
-    final String beanName = bean.getName();
+  public static String getReferencedName(SpringBeanPointer bean, Collection<? extends SpringBeanPointer> allBeans) {
+    String beanName = bean.getName();
     if (beanName != null) return beanName;
 
     for (PsiClass psiClass : bean.getEffectiveBeanType()) {
-      final String className = psiClass.getQualifiedName();
+      String className = psiClass.getQualifiedName();
       if (className == null) continue;
 
-      final List<SpringBeanPointer> list = findBeansByClassName(allBeans, className);
+      List<SpringBeanPointer> list = findBeansByClassName(allBeans, className);
       if (list.size() == 1) {
         return className;
       }
@@ -119,22 +119,22 @@ public class SpringUtils {
 
 
   @Nonnull
-  public static List<SpringBeanPointer> findBeansByClassName(@Nonnull final Collection<? extends SpringBeanPointer> beans,
+  public static List<SpringBeanPointer> findBeansByClassName(@Nonnull Collection<? extends SpringBeanPointer> beans,
                                                              @Nonnull String className) {
     List<SpringBeanPointer> result = new ArrayList<SpringBeanPointer>();
     for (SpringBeanPointer bean : beans) {
-      final PsiClass beanClass = bean.getBeanClass();
+      PsiClass beanClass = bean.getBeanClass();
       if (beanClass != null && className.equals(beanClass.getQualifiedName())) result.add(bean);
     }
 
     return result;
   }
 
-  public static List<SpringModel> getNonEmptySpringModelsByFile(final XmlFile file) {
-    final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(file);
+  public static List<SpringModel> getNonEmptySpringModelsByFile(XmlFile file) {
+    consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(file);
     if (module == null) return Collections.singletonList(SpringManager.getInstance(file.getProject()).getSpringModelByFile(file));
 
-    final XmlFile originalFile = (XmlFile)file.getOriginalFile();
+    XmlFile originalFile = (XmlFile)file.getOriginalFile();
 
     return ContainerUtil.findAll(getNonEmptySpringModels(module), springModel -> springModel.getConfigFiles().contains(originalFile));
   }
@@ -155,7 +155,7 @@ public class SpringUtils {
   }
 
   private static List<SpringModel> computeNonEmptyModels(final Module module) {
-    final Project project = module.getProject();
+    Project project = module.getProject();
     final SpringManager manager = SpringManager.getInstance(project);
 
     final Ref<Boolean> hasModels = Ref.create(false);
@@ -163,13 +163,13 @@ public class SpringUtils {
 
     final List<SpringModel> result = new SmartList<SpringModel>();
     ModuleUtilCore.visitMeAndDependentModules(module, new Processor<Module>() {
-      public boolean process(final Module module) {
+      public boolean process(Module module) {
         if (!hasFacets.get().booleanValue()) {
           hasFacets.set(SpringModuleExtension.getInstance(module) != null);
         }
 
-        final List<SpringModel> models = manager.getAllModels(module);
-        for (final SpringModel model : models) {
+        List<SpringModel> models = manager.getAllModels(module);
+        for (SpringModel model : models) {
           hasModels.set(true);
           result.add(model);
         }
@@ -180,18 +180,18 @@ public class SpringUtils {
     if (result.isEmpty() && !hasModels.get().booleanValue() && hasFacets.get().booleanValue()) {
       List<DomFileElement<Beans>> models = new SmartList<DomFileElement<Beans>>();
       Set<XmlFile> modelFiles = new HashSet<XmlFile>();
-      final GlobalSearchScope scope =
+      GlobalSearchScope scope =
         GlobalSearchScope.moduleWithDependentsScope(module).intersectWith(GlobalSearchScope.projectScope(project));
-      final Collection<VirtualFile> files = DomService.getInstance().getDomFileCandidates(Beans.class, project, scope);
-      for (final VirtualFile virtualFile : files) {
-        final consulo.module.Module mod = ModuleUtilCore.findModuleForFile(virtualFile, project);
+      Collection<VirtualFile> files = DomService.getInstance().getDomFileCandidates(Beans.class, project, scope);
+      for (VirtualFile virtualFile : files) {
+        consulo.module.Module mod = ModuleUtilCore.findModuleForFile(virtualFile, project);
         if (mod == null || SpringModuleExtension.getInstance(mod) == null) continue;
 
-        final PsiFile file1 = PsiManager.getInstance(project).findFile(virtualFile);
+        PsiFile file1 = PsiManager.getInstance(project).findFile(virtualFile);
         if (file1 instanceof XmlFile) {
-          final XmlFile xmlFile = (XmlFile)file1;
+          XmlFile xmlFile = (XmlFile)file1;
           modelFiles.add(xmlFile);
-          final DomFileElement<Beans> element = DomManager.getDomManager(project).getFileElement(xmlFile, Beans.class);
+          DomFileElement<Beans> element = DomManager.getDomManager(project).getFileElement(xmlFile, Beans.class);
           ContainerUtil.addIfNotNull(models, element);
         }
       }
@@ -210,32 +210,32 @@ public class SpringUtils {
   }
 
   @Nonnull
-  public static SpringModel getSpringModel(final SpringModelElement modelElement) {
-    final Project project = modelElement.getManager().getProject();
+  public static SpringModel getSpringModel(SpringModelElement modelElement) {
+    Project project = modelElement.getManager().getProject();
 
-    final SpringModel model = SpringManager.getInstance(project).getSpringModelByFile(DomUtil.getFile(modelElement));
+    SpringModel model = SpringManager.getInstance(project).getSpringModelByFile(DomUtil.getFile(modelElement));
     assert model != null;
     return model;
   }
 
   @Nullable
-  private static SpringModel getSpringModelForBean(final CommonSpringBean springBean) {
+  private static SpringModel getSpringModelForBean(CommonSpringBean springBean) {
     if (springBean instanceof SpringModelElement) {
       return getSpringModel((SpringModelElement)springBean);
     }
     else {
-      final consulo.module.Module module = springBean.getModule();
+      consulo.module.Module module = springBean.getModule();
       return module == null ? null : SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     }
   }
 
   @Nullable
-  public static SpringPropertyDefinition findPropertyByName(@Nonnull final CommonSpringBean bean, @NonNls @Nonnull String propertyName) {
+  public static SpringPropertyDefinition findPropertyByName(@Nonnull CommonSpringBean bean, @NonNls @Nonnull String propertyName) {
     return findPropertyByName(bean, propertyName, true);
   }
 
   @Nullable
-  public static SpringPropertyDefinition findPropertyByName(@Nonnull final CommonSpringBean bean,
+  public static SpringPropertyDefinition findPropertyByName(@Nonnull CommonSpringBean bean,
                                                             @Nonnull final String propertyName,
                                                             boolean searchInParentBean) {
     for (SpringPropertyDefinition property : getProperties(bean)) {
@@ -257,22 +257,22 @@ public class SpringUtils {
 
   @Nullable
   public static String getStringPropertyValue(@Nonnull SpringPropertyDefinition property) {
-    final GenericDomValue<?> element = property.getValueElement();
+    GenericDomValue<?> element = property.getValueElement();
     return element == null ? null : element.getStringValue();
   }
 
   @Nonnull
   public static Collection<String> getValueVariants(@Nonnull SpringPropertyDefinition property) {
-    final GenericDomValue value = getPropertyDomValue(property);
+    GenericDomValue value = getPropertyDomValue(property);
     if (value == null) return Collections.emptyList();
     return getValueVariants(value);
   }
 
   @Nonnull
-  public static Collection<String> getValueVariants(final GenericDomValue value) {
-    final String stringValue = value.getStringValue();
+  public static Collection<String> getValueVariants(GenericDomValue value) {
+    String stringValue = value.getStringValue();
     if (StringUtil.isEmpty(stringValue)) return Collections.emptyList();
-    final Converter converter = ((PropertyValueConverter)value.getConverter()).getConverter(value);
+    Converter converter = ((PropertyValueConverter)value.getConverter()).getConverter(value);
     if (!(converter instanceof PlaceholderPropertiesConverter)) return Collections.singletonList(stringValue);
 
     return PlaceholderUtils.getExpandedVariants(value);
@@ -280,7 +280,7 @@ public class SpringUtils {
 
   @Nullable
   public static GenericDomValue<?> getPropertyDomValue(@Nonnull SpringPropertyDefinition property) {
-    final GenericDomValue<?> valueElement = property.getValueElement();
+    GenericDomValue<?> valueElement = property.getValueElement();
     return valueElement != null && valueElement.getStringValue() == null ? null : valueElement;
   }
 
@@ -290,9 +290,9 @@ public class SpringUtils {
       : Collections.<SpringValueHolderDefinition>emptyList();
   }
 
-  public static List<CommonSpringBean> getChildBeans(@Nonnull DomElement parent, final boolean includeParsedCustomBeanWrappers) {
-    final ArrayList<CommonSpringBean> result = new ArrayList<CommonSpringBean>();
-    for (final DomSpringBean bean : DomUtil.getDefinedChildrenOfType(parent, DomSpringBean.class)) {
+  public static List<CommonSpringBean> getChildBeans(@Nonnull DomElement parent, boolean includeParsedCustomBeanWrappers) {
+    ArrayList<CommonSpringBean> result = new ArrayList<CommonSpringBean>();
+    for (DomSpringBean bean : DomUtil.getDefinedChildrenOfType(parent, DomSpringBean.class)) {
       if (bean instanceof CustomBeanWrapper) {
         if (includeParsedCustomBeanWrappers || !((CustomBeanWrapper)bean).isParsed()) {
           result.add(bean);
@@ -318,11 +318,11 @@ public class SpringUtils {
 
   @Nullable
   public static Pair<String, PsiElement> getPropertyValue(@Nonnull SpringPropertyDefinition property) {
-    final GenericDomValue<?> value = getPropertyDomValue(property);
+    GenericDomValue<?> value = getPropertyDomValue(property);
     return value == null ? null : Pair.<String, PsiElement>create(value.getStringValue(), DomUtil.getValueElement(value));
   }
 
-  public static boolean isEffectiveClassType(final SpringInjection injection, final PsiType requiredType) {
+  public static boolean isEffectiveClassType(SpringInjection injection, PsiType requiredType) {
     PsiType[] types = injection.getTypesByValue();
     if (types == null) {
       return false;
@@ -330,7 +330,7 @@ public class SpringUtils {
     for (PsiType valueType : types) {
 
       if (valueType instanceof PsiClassType) {
-        final SpringBeanPointer springBean = getReferencedSpringBean(injection);
+        SpringBeanPointer springBean = getReferencedSpringBean(injection);
 
         if (springBean != null && isEffectiveClassType(requiredType, springBean.getSpringBean())) {
           return true;
@@ -341,10 +341,10 @@ public class SpringUtils {
     return false;
   }
 
-  public static boolean isEffectiveClassType(final CommonSpringBean context, final PsiType requiredType, final Module module) {
-    final PsiClass[] effectiveBeanTypes = getEffectiveBeanTypes(context);
+  public static boolean isEffectiveClassType(CommonSpringBean context, PsiType requiredType, Module module) {
+    PsiClass[] effectiveBeanTypes = getEffectiveBeanTypes(context);
 
-    final PsiClass psiClass = resolvePsiClass(requiredType, module);
+    PsiClass psiClass = resolvePsiClass(requiredType, module);
     if (psiClass != null) {
       for (PsiClass aClass : effectiveBeanTypes) {
         if (InheritanceUtil.isInheritorOrSelf(aClass, psiClass, true)) return true;
@@ -354,10 +354,10 @@ public class SpringUtils {
     return false;
   }
 
-  private static boolean isUnusualBeanFactoriesUsed(final CommonSpringBean context) {
-    final PsiClass beanClass = context.getBeanClass();
+  private static boolean isUnusualBeanFactoriesUsed(CommonSpringBean context) {
+    PsiClass beanClass = context.getBeanClass();
     if (beanClass != null && SpringFactoryBeansManager.isBeanFactory(beanClass)) {
-      final SpringFactoryBeansManager manager = SpringFactoryBeansManager.getInstance();
+      SpringFactoryBeansManager manager = SpringFactoryBeansManager.getInstance();
 
       // unregistered factory or unknown product types  (for instance, IDEADEV-30892)
       return !manager.isFactoryRegistered(beanClass) || manager.getProductTypeClassNames(beanClass, context).size() == 0;
@@ -366,21 +366,21 @@ public class SpringUtils {
     return false;
   }
 
-  public static boolean isEffectiveClassType(final PsiType psiType, @Nonnull final CommonSpringBean context) {
+  public static boolean isEffectiveClassType(PsiType psiType, @Nonnull CommonSpringBean context) {
     return isEffectiveClassType(context, psiType, context.getModule());
   }
 
   @Nullable
-  private static PsiClass resolvePsiClass(final PsiType psiType, final Module module) {
+  private static PsiClass resolvePsiClass(PsiType psiType, Module module) {
     if (psiType instanceof PsiClassType) {
       return ((PsiClassType)psiType).resolve();
     }
     if (psiType instanceof PsiPrimitiveType) {
       if (module != null) {
-        final GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false);
-        final PsiManager psiManager = PsiManager.getInstance(module.getProject());
+        GlobalSearchScope scope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false);
+        PsiManager psiManager = PsiManager.getInstance(module.getProject());
 
-        final PsiClassType boxedType = ((PsiPrimitiveType)psiType).getBoxedType(psiManager, scope);
+        PsiClassType boxedType = ((PsiPrimitiveType)psiType).getBoxedType(psiManager, scope);
         if (boxedType != null) {
           return boxedType.resolve();
         }
@@ -391,9 +391,9 @@ public class SpringUtils {
 
   @Nullable
   public static SpringBeanPointer getReferencedSpringBean(SpringPropertyDefinition definition) {
-    final GenericDomValue<SpringBeanPointer> element = definition.getRefElement();
+    GenericDomValue<SpringBeanPointer> element = definition.getRefElement();
     if (element != null) {
-      final SpringBeanPointer springBeanPointer = element.getValue();
+      SpringBeanPointer springBeanPointer = element.getValue();
       if (springBeanPointer != null) return springBeanPointer;
     }
     return definition instanceof SpringInjection ? getReferencedSpringBean((SpringInjection)definition) : null;
@@ -401,24 +401,24 @@ public class SpringUtils {
 
   @Nullable
   public static SpringBeanPointer getReferencedSpringBean(SpringInjection injection) {
-    final SpringBeanPointer refAttrPointer = injection.getRefAttr().getValue();
+    SpringBeanPointer refAttrPointer = injection.getRefAttr().getValue();
     if (refAttrPointer != null) {
       return refAttrPointer;
     }
     else if (DomUtil.hasXml(injection.getRef())) {
-      final SpringRef springRef = injection.getRef();
+      SpringRef springRef = injection.getRef();
 
-      final SpringBeanPointer beanPointer = springRef.getBean().getValue();
+      SpringBeanPointer beanPointer = springRef.getBean().getValue();
       if (beanPointer != null) {
         return beanPointer;
       }
       else {
-        final SpringBeanPointer localPointer = springRef.getLocal().getValue();
+        SpringBeanPointer localPointer = springRef.getLocal().getValue();
         if (localPointer != null) {
           return localPointer;
         }
         else {
-          final SpringBeanPointer parentPointer = springRef.getParentAttr().getValue();
+          SpringBeanPointer parentPointer = springRef.getParentAttr().getValue();
           if (parentPointer != null) {
             return parentPointer;
           }
@@ -434,24 +434,24 @@ public class SpringUtils {
 
   public static String[] suggestBeanNames(@Nullable CommonSpringBean springBean) {
     if (springBean != null) {
-      final PsiClass beanClass = springBean.getBeanClass();
+      PsiClass beanClass = springBean.getBeanClass();
       if (beanClass != null) {
-        final SpringModel model = getSpringModelForBean(springBean);
-        final JavaCodeStyleManager codeStyleManager = JavaCodeStyleManager.getInstance(beanClass.getProject());
-        final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
+        SpringModel model = getSpringModelForBean(springBean);
+        JavaCodeStyleManager codeStyleManager = JavaCodeStyleManager.getInstance(beanClass.getProject());
+        PsiElementFactory elementFactory = JavaPsiFacade.getInstance(beanClass.getProject()).getElementFactory();
 
-        final LinkedHashSet<String> initialNames = new LinkedHashSet<String>();
+        LinkedHashSet<String> initialNames = new LinkedHashSet<String>();
 
-        final PsiClass[] productClasses = getEffectiveBeanTypes(springBean);
+        PsiClass[] productClasses = getEffectiveBeanTypes(springBean);
         if (productClasses.length > 0) {
           for (PsiClass productClass : productClasses) {
-            final PsiClassType classType = elementFactory.createType(productClass);
+            PsiClassType classType = elementFactory.createType(productClass);
             SuggestedNameInfo nameInfo = codeStyleManager.suggestVariableName(VariableKind.PARAMETER, null, null, classType);
             initialNames.addAll(Arrays.asList(nameInfo.names));
           }
         }
         else {
-          final PsiClassType classType = elementFactory.createType(beanClass);
+          PsiClassType classType = elementFactory.createType(beanClass);
           SuggestedNameInfo nameInfo = codeStyleManager.suggestVariableName(VariableKind.PARAMETER, null, null, classType);
           initialNames.addAll(Arrays.asList(nameInfo.names));
         }
@@ -475,8 +475,8 @@ public class SpringUtils {
    * @return bean type or product type (for factoryBeans). Multiple values if factory product proxies multiple interfaces
    */
   @Nonnull
-  public static PsiClass[] getEffectiveBeanTypes(@Nonnull final CommonSpringBean bean) {
-    final PsiClass beanClass = bean.getBeanClass();
+  public static PsiClass[] getEffectiveBeanTypes(@Nonnull CommonSpringBean bean) {
+    PsiClass beanClass = bean.getBeanClass();
     Collection<PsiClass> effectiveTypes = new HashSet<PsiClass>();
     ContainerUtil.addIfNotNull(effectiveTypes, beanClass);
 
@@ -488,35 +488,35 @@ public class SpringUtils {
   }
 
   @Nullable
-  public static SpringBean getSpringBeanForCurrentCaretPosition(final Editor editor, final PsiFile file) {
+  public static SpringBean getSpringBeanForCurrentCaretPosition(Editor editor, PsiFile file) {
     int offset = editor.getCaretModel().getOffset();
     PsiElement element = file.findElementAt(offset);
     return findBeanFromPsiElement(element);
   }
 
   @Nullable
-  public static SpringBean findBeanFromPsiElement(final PsiElement element) {
+  public static SpringBean findBeanFromPsiElement(PsiElement element) {
     return DomUtil.findDomElement(element, SpringBean.class);
   }
 
   @Nonnull
-  public static String getPresentationBeanName(final SpringBeanPointer pointer) {
+  public static String getPresentationBeanName(SpringBeanPointer pointer) {
     String beanName = pointer.getName();
 
     if (beanName == null) {
-      final PsiClass psiClass = pointer.getBeanClass();
+      PsiClass psiClass = pointer.getBeanClass();
       if (psiClass != null) beanName = psiClass.getName();
 
-      final CommonSpringBean springBean = pointer.getSpringBean();
+      CommonSpringBean springBean = pointer.getSpringBean();
       if (springBean instanceof SpringBean) {
-        final String unresolvedClassName = ((SpringBean)springBean).getClazz().getStringValue();
+        String unresolvedClassName = ((SpringBean)springBean).getClazz().getStringValue();
         if (unresolvedClassName != null) beanName = unresolvedClassName;
       }
     }
     return beanName == null ? SpringBundle.message("spring.bean.dependency.graph.node.unknown") : beanName;
   }
 
-  public static List<SpringBeanPointer> getSetterDependencies(final CommonSpringBean springBean) {
+  public static List<SpringBeanPointer> getSetterDependencies(CommonSpringBean springBean) {
 
     List<SpringBeanPointer> dependencies = new ArrayList<SpringBeanPointer>();
     if (springBean instanceof DomSpringBean) {
@@ -529,7 +529,7 @@ public class SpringUtils {
     return dependencies;
   }
 
-  public static List<SpringBeanPointer> getConstructorDependencies(final CommonSpringBean springBean) {
+  public static List<SpringBeanPointer> getConstructorDependencies(CommonSpringBean springBean) {
     List<SpringBeanPointer> dependencies = new ArrayList<SpringBeanPointer>();
     if (springBean instanceof DomSpringBean) {
       for (ConstructorArg arg : getConstructorArgs((DomSpringBean)springBean)) {
@@ -539,21 +539,21 @@ public class SpringUtils {
     return dependencies;
   }
 
-  public static List<SpringBaseBeanPointer> getSpringValueHolderDependencies(final SpringValueHolderDefinition valueHolder) {
+  public static List<SpringBaseBeanPointer> getSpringValueHolderDependencies(SpringValueHolderDefinition valueHolder) {
     Set<SpringBaseBeanPointer> beans = new LinkedHashSet<SpringBaseBeanPointer>();
     addValueHolder(valueHolder, beans);
     return new ArrayList<SpringBaseBeanPointer>(beans);
 
   }
 
-  private static void addValueHolder(final SpringValueHolderDefinition definition, final Set<SpringBaseBeanPointer> beans) {
-    final GenericDomValue<SpringBeanPointer> element = definition.getRefElement();
+  private static void addValueHolder(SpringValueHolderDefinition definition, Set<SpringBaseBeanPointer> beans) {
+    GenericDomValue<SpringBeanPointer> element = definition.getRefElement();
     if (element != null) {
       addBasePointer(element, beans);
     }
 
     if (definition instanceof SpringValueHolder) {
-      final SpringValueHolder valueHolder = (SpringValueHolder)definition;
+      SpringValueHolder valueHolder = (SpringValueHolder)definition;
       addSpringRefBeans(valueHolder.getRef(), beans);
       addIdrefBeans(valueHolder.getIdref(), beans);
 
@@ -574,29 +574,29 @@ public class SpringUtils {
     }
   }
 
-  private static void addBasePointer(final GenericValue<SpringBeanPointer> value, final Collection<SpringBaseBeanPointer> beans) {
+  private static void addBasePointer(GenericValue<SpringBeanPointer> value, Collection<SpringBaseBeanPointer> beans) {
     ContainerUtil.addIfNotNull(beans, getBasePointer(value.getValue()));
   }
 
-  private static void addMapReferences(final SpringMap map, final Set<SpringBaseBeanPointer> beans) {
+  private static void addMapReferences(SpringMap map, Set<SpringBaseBeanPointer> beans) {
     for (SpringEntry entry : map.getEntries()) {
       addValueHolder(entry, beans);
     }
   }
 
-  private static void addIdrefBeans(final Idref idref, final Set<SpringBaseBeanPointer> beans) {
+  private static void addIdrefBeans(Idref idref, Set<SpringBaseBeanPointer> beans) {
     addBasePointer(idref.getLocal(), beans);
     addBasePointer(idref.getBean(), beans);
   }
 
-  private static void addSpringRefBeans(final SpringRef springRef, final Set<SpringBaseBeanPointer> beans) {
+  private static void addSpringRefBeans(SpringRef springRef, Set<SpringBaseBeanPointer> beans) {
     if (DomUtil.hasXml(springRef)) {
       addBasePointer(springRef.getBean(), beans);
       addBasePointer(springRef.getLocal(), beans);
     }
   }
 
-  private static void addCollectionReferences(final CollectionElements elements, final Set<SpringBaseBeanPointer> beans) {
+  private static void addCollectionReferences(CollectionElements elements, Set<SpringBaseBeanPointer> beans) {
     for (SpringRef springRef : elements.getRefs()) {
       addSpringRefBeans(springRef, beans);
     }
@@ -618,15 +618,15 @@ public class SpringUtils {
   }
 
   @Nullable
-  public static PsiFile getContainingFile(final CommonSpringBean springBean) {
+  public static PsiFile getContainingFile(CommonSpringBean springBean) {
     return springBean.getContainingFile();
   }
 
-  public static boolean isAssignable(final Project project, final PsiClassType type, final String className) {
-    final PsiClass psiClass = type.resolve();
+  public static boolean isAssignable(Project project, PsiClassType type, String className) {
+    PsiClass psiClass = type.resolve();
     if (psiClass != null) {
-      final PsiManager psiManager = PsiManager.getInstance(project);
-      final PsiClass required =
+      PsiManager psiManager = PsiManager.getInstance(project);
+      PsiClass required =
         JavaPsiFacade.getInstance(psiManager.getProject()).findClass(className, GlobalSearchScope.allScope(project));
       if (required != null && InheritanceUtil.isInheritorOrSelf(psiClass, required, true)) {
         return true;
@@ -637,13 +637,13 @@ public class SpringUtils {
   }
 
   @Nullable
-  public static SpringBeanPointer getBeanPointer(final SpringModel model, @NonNls @Nonnull String beanName) {
+  public static SpringBeanPointer getBeanPointer(SpringModel model, @NonNls @Nonnull String beanName) {
     String beanReferenceName = beanName.startsWith("&") ? beanName.substring(1) : beanName;  // IDEADEV-13855
     return findBean(model, beanReferenceName);
   }
 
   @Nullable
-  public static SpringBeanPointer findBean(final SpringModel model, String beanName) {
+  public static SpringBeanPointer findBean(SpringModel model, String beanName) {
     if (StringUtil.isEmptyOrSpaces(beanName)) return null;
 
     return model.findBean(beanName);
@@ -656,15 +656,15 @@ public class SpringUtils {
   public static void navigate(@Nullable DomElement domElement) {
     if (domElement == null) return;
 
-    final DomElementsNavigationManager navigationManager = DomElementsNavigationManager.getManager(domElement.getManager().getProject());
+    DomElementsNavigationManager navigationManager = DomElementsNavigationManager.getManager(domElement.getManager().getProject());
     navigationManager.getDomElementsNavigateProvider(DomElementsNavigationManager.DEFAULT_PROVIDER_NAME).navigate(domElement, true);
   }
 
-  public static List<SpringBaseBeanPointer> getSpringBeans(final PsiClass aClass) {
-    final List<SpringBaseBeanPointer> beans = new SmartList<SpringBaseBeanPointer>();
-    final consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(aClass);
+  public static List<SpringBaseBeanPointer> getSpringBeans(PsiClass aClass) {
+    List<SpringBaseBeanPointer> beans = new SmartList<SpringBaseBeanPointer>();
+    consulo.module.Module module = ModuleUtilCore.findModuleForPsiElement(aClass);
     if (module != null) {
-      final SpringModel springModel = SpringManager.getInstance(aClass.getProject()).getCombinedModel(module);
+      SpringModel springModel = SpringManager.getInstance(aClass.getProject()).getCombinedModel(module);
       if (springModel != null) {
         beans.addAll(springModel.findBeansByPsiClass(aClass));
       }
@@ -674,9 +674,9 @@ public class SpringUtils {
 
   public static List<PsiType> resolveGenerics(PsiClassType classType) {
     List<PsiType> generics = new ArrayList<PsiType>();
-    final PsiClassType.ClassResolveResult resolveResult = classType.resolveGenerics();
-    final PsiClass psiClass = resolveResult.getElement();
-    final PsiSubstitutor substitutor = resolveResult.getSubstitutor();
+    PsiClassType.ClassResolveResult resolveResult = classType.resolveGenerics();
+    PsiClass psiClass = resolveResult.getElement();
+    PsiSubstitutor substitutor = resolveResult.getSubstitutor();
     if (psiClass != null && substitutor != null) {
       for (PsiTypeParameter typeParameter : psiClass.getTypeParameters()) {
         generics.add(substitutor.substitute(typeParameter));
@@ -686,42 +686,42 @@ public class SpringUtils {
     return generics;
   }
 
-  public static boolean isCollectionType(final PsiType psiType, final Project project) {
-    final PsiType collectionType = SpringConverterUtil.findType(Collection.class, project);
+  public static boolean isCollectionType(PsiType psiType, Project project) {
+    PsiType collectionType = SpringConverterUtil.findType(Collection.class, project);
 
     return collectionType != null && collectionType.isAssignableFrom(psiType);
   }
 
   @Nullable
-  public static PsiType getGenericCollectonType(final PsiType psiType) {
-    final List<PsiType> psiTypes = resolveGenerics((PsiClassType)psiType);
+  public static PsiType getGenericCollectonType(PsiType psiType) {
+    List<PsiType> psiTypes = resolveGenerics((PsiClassType)psiType);
     return psiTypes.size() == 1 ? psiTypes.get(0) : null;
   }
 
   @Nullable
-  public static SpringBaseBeanPointer getBasePointer(final SpringBeanPointer springBeanPointer) {
+  public static SpringBaseBeanPointer getBasePointer(SpringBeanPointer springBeanPointer) {
     return springBeanPointer == null ? null : springBeanPointer.getBasePointer();
   }
 
   @Nonnull
   public static SpringBean getTopLevelBean(@Nonnull SpringBean bean) {
-    final DomElement parent = bean.getParent();
+    DomElement parent = bean.getParent();
     if (parent instanceof Beans) {
       return bean;
     }
     else {
       assert parent != null;
-      final SpringBean parentBean = bean.getParentOfType(SpringBean.class, true);
+      SpringBean parentBean = bean.getParentOfType(SpringBean.class, true);
       return getTopLevelBean(parentBean);
     }
   }
 
-  public static boolean visitParents(final SpringBean springBean, final boolean strict, Processor<SpringBean> processor) {
+  public static boolean visitParents(SpringBean springBean, boolean strict, Processor<SpringBean> processor) {
     SpringBeanPointer parent = springBean.getParentBean().getValue();
     if (parent == null) {
       return true;
     }
-    final HashSet<CommonSpringBean> visited = new HashSet<CommonSpringBean>();
+    HashSet<CommonSpringBean> visited = new HashSet<CommonSpringBean>();
     if (!strict) {
       visited.add(springBean);
       if (!processor.process(springBean)) {
@@ -751,10 +751,10 @@ public class SpringUtils {
     final AbstractDomChildrenDescription description = value.getChildDescription();
     final Ref<T> ref = new Ref<T>(value);
     visitParents(springBean, false, new Processor<SpringBean>() {
-      public boolean process(final SpringBean springBean) {
-        final List<? extends DomElement> list = description.getValues(springBean);
+      public boolean process(SpringBean springBean) {
+        List<? extends DomElement> list = description.getValues(springBean);
         if (list.size() == 1) {
-          final T t = (T)list.get(0);
+          T t = (T)list.get(0);
           if (DomUtil.hasXml(t)) {
             ref.set(t);
             return false;
@@ -766,8 +766,8 @@ public class SpringUtils {
     return ref.get();
   }
 
-  public static <T extends DomElement> Set<T> getMergedSet(final SpringBean springBean, final Function<SpringBean, Collection<T>> getter) {
-    final Set<T> set = new HashSet<T>(getter.apply(springBean));
+  public static <T extends DomElement> Set<T> getMergedSet(SpringBean springBean, Function<SpringBean, Collection<T>> getter) {
+    Set<T> set = new HashSet<T>(getter.apply(springBean));
     visitParents(springBean, false, springBean1 -> {
       set.addAll(getter.apply(springBean1));
       return true;
@@ -775,24 +775,24 @@ public class SpringUtils {
     return set;
   }
 
-  public static boolean compareQualifiers(SpringQualifier one, final SpringQualifier two) {
+  public static boolean compareQualifiers(SpringQualifier one, SpringQualifier two) {
     if (!Comparing.equal(one.getQualifierType(), two.getQualifierType())) return false;
     if (!Comparing.equal(one.getQualifierValue(), two.getQualifierValue())) return false;
-    final List<? extends QualifierAttribute> list1 = one.getQualifierAttributes();
-    final int size1 = list1.size();
-    final List<? extends QualifierAttribute> list2 = two.getQualifierAttributes();
-    final int size2 = list2.size();
+    List<? extends QualifierAttribute> list1 = one.getQualifierAttributes();
+    int size1 = list1.size();
+    List<? extends QualifierAttribute> list2 = two.getQualifierAttributes();
+    int size2 = list2.size();
     if (size1 != size2) return false;
     if (size1 == 0) return true;
-    final Set<QualifierAttribute> set = Sets.newHashSet(QualifierAttribute.HASHING_STRATEGY);
+    Set<QualifierAttribute> set = Sets.newHashSet(QualifierAttribute.HASHING_STRATEGY);
     set.addAll(list1);
     return set.containsAll(list2);
   }
 
   @Nonnull
-  public static List<SpringBaseBeanPointer> getBeansByType(final PsiType type, final SpringModel model) {
+  public static List<SpringBaseBeanPointer> getBeansByType(PsiType type, SpringModel model) {
     if (type instanceof PsiClassType) {
-      final PsiClass psiClass = ((PsiClassType)type).resolve();
+      PsiClass psiClass = ((PsiClassType)type).resolve();
       if (psiClass != null) {
         return model.findBeansByEffectivePsiClassWithInheritance(psiClass);
       }
@@ -800,16 +800,16 @@ public class SpringUtils {
     return Collections.emptyList();
   }
 
-  public static boolean isSpring25(@Nonnull final Module module) {
-    final String s = JarVersionDetectionUtil.detectJarVersion(SpringConstants.SPRING_VERSION_CLASS, module);
-    final boolean b = s != null && !s.startsWith("1.") && !s.startsWith("2.0") && !s.startsWith("2.1");
+  public static boolean isSpring25(@Nonnull Module module) {
+    String s = JarVersionDetectionUtil.detectJarVersion(SpringConstants.SPRING_VERSION_CLASS, module);
+    boolean b = s != null && !s.startsWith("1.") && !s.startsWith("2.0") && !s.startsWith("2.1");
     return b;
   }
 
   @Nonnull
-  public static Set<String> getListOrSetValues(@Nonnull final SpringPropertyDefinition property) {
+  public static Set<String> getListOrSetValues(@Nonnull SpringPropertyDefinition property) {
     if (property instanceof SpringProperty) {
-      final SpringProperty springProperty = (SpringProperty)property;
+      SpringProperty springProperty = (SpringProperty)property;
       if (DomUtil.hasXml(springProperty.getList())) {
         return getValues(springProperty.getList());
       }
@@ -821,8 +821,8 @@ public class SpringUtils {
   }
 
   @Nonnull
-  public static Set<String> getValues(@Nonnull final ListOrSet listOrSet) {
-    final Set<String> values = new HashSet<String>();
+  public static Set<String> getValues(@Nonnull ListOrSet listOrSet) {
+    Set<String> values = new HashSet<String>();
     for (SpringValue value : listOrSet.getValues()) {
       if (value.getValue() != null) {
         values.add(value.getStringValue());
@@ -831,26 +831,26 @@ public class SpringUtils {
     return values;
   }
 
-  public static Set<String> getAllBeanNames(final SpringBean bean) {
-    final String beanName = bean.getBeanName();
+  public static Set<String> getAllBeanNames(SpringBean bean) {
+    String beanName = bean.getBeanName();
     return beanName == null ? Collections.<String>emptySet() : getSpringModel(bean).getAllBeanNames(beanName);
   }
 
-  public static Set<String> getAllBeanNames(final CommonSpringBean bean) {
-    final String beanName = bean.getBeanName();
+  public static Set<String> getAllBeanNames(CommonSpringBean bean) {
+    String beanName = bean.getBeanName();
     if (beanName == null) {
       return Collections.emptySet();
     }
-    final SpringModel model = getSpringModelForBean(bean);
+    SpringModel model = getSpringModelForBean(bean);
     return model == null ? Collections.<String>emptySet() : model.getAllBeanNames(beanName);
   }
 
   @Nullable
-  public static SpringModel getModelByPsiElement(final PsiElement element) {
+  public static SpringModel getModelByPsiElement(PsiElement element) {
     if (element == null) {
       return null;
     }
-    final Module module = ModuleUtilCore.findModuleForPsiElement(element);
+    Module module = ModuleUtilCore.findModuleForPsiElement(element);
     return module == null ? null : SpringManager.getInstance(element.getProject()).getCombinedModel(module);
   }
 }

@@ -16,7 +16,7 @@ public class ReplacedMethodBeanConverter extends SpringBeanResolveConverterForDe
   @NonNls public final static String METHOD_REPLACER_CLASS = "org.springframework.beans.factory.support.MethodReplacer";
 
   @Nonnull
-  protected String[] getClassNames(final ConvertContext context) {
+  protected String[] getClassNames(ConvertContext context) {
     return new String[]{METHOD_REPLACER_CLASS};
   }
 }

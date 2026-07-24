@@ -21,14 +21,14 @@ public abstract class ListOrSetImpl extends TypedCollectionImpl implements ListO
 
   @Nonnull
   public List<? extends PsiType> getRequiredTypes() {
-    final List<? extends PsiType> list = super.getRequiredTypes();
+    List<? extends PsiType> list = super.getRequiredTypes();
     if (!list.isEmpty()) {
       return list;
     }
-    final PsiType fromGenerics = getRequiredTypeFromGenerics();
-    final Project project = getManager().getProject();
+    PsiType fromGenerics = getRequiredTypeFromGenerics();
+    Project project = getManager().getProject();
 
-    final PsiType type = fromGenerics != null
+    PsiType type = fromGenerics != null
                          ? fromGenerics
                          : PsiType.getJavaLangObject(PsiManager.getInstance(project), GlobalSearchScope.allScope(project));
     return Collections.singletonList(type);  
@@ -36,13 +36,13 @@ public abstract class ListOrSetImpl extends TypedCollectionImpl implements ListO
 
   @Nullable
   private PsiType getRequiredTypeFromGenerics() {
-    final DomElement parent = getParent();
+    DomElement parent = getParent();
     if (parent instanceof TypeHolder) {
-      final List<? extends PsiType> types = ((TypeHolder)parent).getRequiredTypes();
+      List<? extends PsiType> types = ((TypeHolder)parent).getRequiredTypes();
       if (types.isEmpty()) return null;
-      final PsiType type = types.get(0);
+      PsiType type = types.get(0);
       if (type instanceof PsiClassType) {
-        final List<PsiType> list = SpringUtils.resolveGenerics((PsiClassType)type);
+        List<PsiType> list = SpringUtils.resolveGenerics((PsiClassType)type);
 
         return list.size() == 1 ? list.get(0) : null;
       } else if (type instanceof PsiArrayType) {

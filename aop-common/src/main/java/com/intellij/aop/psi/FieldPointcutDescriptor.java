@@ -17,19 +17,19 @@ import static com.intellij.aop.psi.AopPrattParser.TYPE_PATTERN;
 */
 public abstract class FieldPointcutDescriptor extends PointcutDescriptor{
 
-protected FieldPointcutDescriptor(@NonNls final String tokenText) {
+protected FieldPointcutDescriptor(@NonNls String tokenText) {
   super(tokenText);
 }
 
- public void parseToken(final PrattBuilder builder) {
+ public void parseToken(PrattBuilder builder) {
    if (builder.assertToken(AOP_LEFT_PAR, AopBundle.message("error.0.expected", "("))) {
      MethodPointcutDescriptor.parseAnnotationsWithModifiers(builder);
 
-     final MutableMarker type = builder.mark();
+     MutableMarker type = builder.mark();
      builder.parseChildren(TYPE_PATTERN, AopBundle.message("error.type.name.pattern.expected"));
      type.finish(AOP_REFERENCE_HOLDER);
 
-     final MutableMarker fieldName = builder.mark();
+     MutableMarker fieldName = builder.mark();
      builder.parseChildren(TYPE_PATTERN, AopBundle.message("error.field.name.pattern.expected"));
      fieldName.finish(AOP_MEMBER_REFERENCE_EXPRESSION);
      

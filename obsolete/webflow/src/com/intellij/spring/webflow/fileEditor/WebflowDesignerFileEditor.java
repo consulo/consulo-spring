@@ -22,10 +22,10 @@ public class WebflowDesignerFileEditor extends PerspectiveFileEditor {
   private WebflowDesignerComponent myComponent;
   private final XmlFile myXmlFile;
 
-  public WebflowDesignerFileEditor(final Project project, final VirtualFile file) {
+  public WebflowDesignerFileEditor(Project project, VirtualFile file) {
     super(project, file);
 
-    final PsiFile psiFile = getPsiFile();
+    PsiFile psiFile = getPsiFile();
     assert psiFile instanceof XmlFile;
 
     myXmlFile = (XmlFile)psiFile;
@@ -34,12 +34,12 @@ public class WebflowDesignerFileEditor extends PerspectiveFileEditor {
 
   @Nullable
   protected DomElement getSelectedDomElement() {
-    final List<DomElement> selectedDomElements = getWebflowDesignerComponent().getSelectedDomElements();
+    List<DomElement> selectedDomElements = getWebflowDesignerComponent().getSelectedDomElements();
 
     return selectedDomElements.size() > 0 ? selectedDomElements.get(0) : null;
   }
 
-  protected void setSelectedDomElement(final DomElement domElement) {
+  protected void setSelectedDomElement(DomElement domElement) {
       getWebflowDesignerComponent().setSelectedDomElement(domElement);
   }
 

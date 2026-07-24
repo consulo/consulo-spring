@@ -17,12 +17,12 @@ import java.util.List;
 public class LookupMethodBeanConverter extends SpringBeanResolveConverter {
 
   @Nullable
-  public List<PsiClassType> getRequiredClasses(final ConvertContext context) {
-    final LookupMethod lookupMethod = (LookupMethod)context.getInvocationElement().getParent();
+  public List<PsiClassType> getRequiredClasses(ConvertContext context) {
+    LookupMethod lookupMethod = (LookupMethod)context.getInvocationElement().getParent();
     assert lookupMethod != null;
-    final PsiMethod psiMethod = lookupMethod.getName().getValue();
+    PsiMethod psiMethod = lookupMethod.getName().getValue();
     if (psiMethod != null) {
-      final PsiType returnType = psiMethod.getReturnType();
+      PsiType returnType = psiMethod.getReturnType();
       if (returnType instanceof PsiClassType) {
         return  Collections.singletonList((PsiClassType)returnType);
       }

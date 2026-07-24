@@ -21,16 +21,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class SecurityRoleConstructorArgConverter extends Converter<Object> implements CustomReferenceConverter {
 
-  public Object fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  public Object fromString(@Nullable @NonNls String s, ConvertContext context) {
     return s;
   }
 
-  public String toString(@Nullable Object o, final ConvertContext context) {
+  public String toString(@Nullable Object o, ConvertContext context) {
     return null;
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
     String stringValue = genericDomValue.getStringValue();
     return SpringSecurityRolePsiReferenceProvider.getSecurityRolesReferences(element, stringValue);
   }

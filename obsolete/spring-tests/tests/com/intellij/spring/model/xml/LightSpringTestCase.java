@@ -45,16 +45,16 @@ public abstract class LightSpringTestCase extends BasicSpringTestCase {
 
   @NotNull
   protected <T extends DomElement> DomFileElement<T> getFileElement(String path, Class<T> clazz, Project project) {
-    final String url = getTestDataPath() + path;
+    String url = getTestDataPath() + path;
     try {
-      final File file = new File(url);
-      final char[] chars = FileUtil.loadFileText(file);
+      File file = new File(url);
+      char[] chars = FileUtil.loadFileText(file);
       String text = new String(chars);
-      final String fileName = file.getName();
-      final FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName(fileName);
-      final PsiFile psiFile =
+      String fileName = file.getName();
+      FileType fileType = FileTypeManager.getInstance().getFileTypeByFileName(fileName);
+      PsiFile psiFile =
         PsiFileFactory.getInstance(PsiManager.getInstance(project).getProject()).createFileFromText(fileName, fileType, text);
-      final DomFileElement<T> element = DomManager.getDomManager(project).getFileElement((XmlFile)psiFile, clazz);
+      DomFileElement<T> element = DomManager.getDomManager(project).getFileElement((XmlFile)psiFile, clazz);
       assert element != null;
       return element;
     }

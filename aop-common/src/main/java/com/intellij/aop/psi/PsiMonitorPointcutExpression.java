@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author peter
  */
 public class PsiMonitorPointcutExpression extends AopElementBase implements PsiPointcutExpression{
-  public PsiMonitorPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiMonitorPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -25,7 +25,7 @@ public class PsiMonitorPointcutExpression extends AopElementBase implements PsiP
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PointcutMatchDegree.FALSE;
   }
 

@@ -18,16 +18,16 @@ import java.util.function.Consumer;
 public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
 
   public void testReferenceExpression() throws Throwable {
-    final String com = "com";
-    final String comWithin = com + ".within";
-    final String comWithinSystemArchitecture = comWithin + ".SystemArchitecture";
-    final String fullRefText = comWithinSystemArchitecture + ".businessService";
-    final String fullText = fullRefText + "()";
+    String com = "com";
+    String comWithin = com + ".within";
+    String comWithinSystemArchitecture = comWithin + ".SystemArchitecture";
+    String fullRefText = comWithinSystemArchitecture + ".businessService";
+    String fullText = fullRefText + "()";
 
-    final PsiPointcutReferenceExpression pointcutRef = assertInstanceOf(parse(fullText), PsiPointcutReferenceExpression.class);
+    PsiPointcutReferenceExpression pointcutRef = assertInstanceOf(parse(fullText), PsiPointcutReferenceExpression.class);
     assertEquals(fullText, pointcutRef.getText());
 
-    final AopReferenceExpression topRef = pointcutRef.getReferenceExpression();
+    AopReferenceExpression topRef = pointcutRef.getReferenceExpression();
     assertEquals(fullRefText, topRef.getText());
 
     AopReferenceExpression classRef = topRef.getQualifier();
@@ -43,18 +43,18 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testSmallReferenceExpression() throws Throwable {
-    final String fullRefText = "businessService";
-    final String fullText = fullRefText + "()";
+    String fullRefText = "businessService";
+    String fullText = fullRefText + "()";
 
-    final PsiPointcutReferenceExpression pointcutRef = assertInstanceOf(parse(fullText), PsiPointcutReferenceExpression.class);
+    PsiPointcutReferenceExpression pointcutRef = assertInstanceOf(parse(fullText), PsiPointcutReferenceExpression.class);
     assertEquals(fullText, pointcutRef.getText());
     assertNull(pointcutRef.getReferenceExpression().getQualifier());
   }
 
   public void testWithin() throws Throwable {
-    final String refText = "com.xyz.someapp.trading..*";
-    final String fullText = "within(" + refText + ")";
-    final PsiTypedPointcutExpression expression = assertInstanceOf(parse(fullText), PsiWithinExpression.class);
+    String refText = "com.xyz.someapp.trading..*";
+    String fullText = "within(" + refText + ")";
+    PsiTypedPointcutExpression expression = assertInstanceOf(parse(fullText), PsiWithinExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -65,9 +65,9 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testAtWithin() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "@within(" + refText + ")";
-    final PsiAtWithinExpression expression = assertInstanceOf(parse(fullText), PsiAtWithinExpression.class);
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "@within(" + refText + ")";
+    PsiAtWithinExpression expression = assertInstanceOf(parse(fullText), PsiAtWithinExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -78,10 +78,10 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testThis() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "this(" + refText + ")";
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "this(" + refText + ")";
 
-    final PsiThisExpression expression = assertInstanceOf(parse(fullText), PsiThisExpression.class);
+    PsiThisExpression expression = assertInstanceOf(parse(fullText), PsiThisExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -92,10 +92,10 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testTarget() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "target(" + refText + ")";
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "target(" + refText + ")";
 
-    final PsiTargetExpression expression = assertInstanceOf(parse(fullText), PsiTargetExpression.class);
+    PsiTargetExpression expression = assertInstanceOf(parse(fullText), PsiTargetExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -106,10 +106,10 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testAtThis() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "@this(" + refText + ")";
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "@this(" + refText + ")";
 
-    final PsiAtThisExpression expression = assertInstanceOf(parse(fullText), PsiAtThisExpression.class);
+    PsiAtThisExpression expression = assertInstanceOf(parse(fullText), PsiAtThisExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -120,10 +120,10 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testAtTarget() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "@target(" + refText + ")";
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "@target(" + refText + ")";
 
-    final PsiAtTargetExpression expression = assertInstanceOf(parse(fullText), PsiAtTargetExpression.class);
+    PsiAtTargetExpression expression = assertInstanceOf(parse(fullText), PsiAtTargetExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -134,10 +134,10 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testAtAnnotation() throws Throwable {
-    final String refText = "com.xyz.someapp.trading.Transactional";
-    final String fullText = "@annotation(" + refText + ")";
+    String refText = "com.xyz.someapp.trading.Transactional";
+    String fullText = "@annotation(" + refText + ")";
 
-    final PsiAtAnnotationExpression expression = assertInstanceOf(parse(fullText), PsiAtAnnotationExpression.class);
+    PsiAtAnnotationExpression expression = assertInstanceOf(parse(fullText), PsiAtAnnotationExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopReferenceHolder typeRef = expression.getTypeReference();
@@ -149,23 +149,23 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
 
   public void testArgs() throws Throwable {
     final String ref = "java.io..*";
-    final String fullText = "args(..,*," + ref + ")";
-    final PsiArgsExpression expression = assertInstanceOf(parse(fullText), PsiArgsExpression.class);
+    String fullText = "args(..,*," + ref + ")";
+    PsiArgsExpression expression = assertInstanceOf(parse(fullText), PsiArgsExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopAbstractList list = expression.getParameterList();
 
     assertOrderedCollection(list.getParameters(), new Consumer<PsiElement>() {
-      public void consume(final PsiElement element) {
+      public void consume(PsiElement element) {
         assertEquals("..", element.getText());
       }
     }, new Consumer<PsiElement>() {
-      public void consume(final PsiElement pattern) {
+      public void consume(PsiElement pattern) {
         assertEquals("*", pattern.getText());
         assertEquals("*", assertInstanceOf(((AopReferenceHolder)pattern).getTypeExpression(), AopReferenceExpression.class).getText());
       }
     }, new Consumer<PsiElement>() {
-      public void consume(final PsiElement pattern) {
+      public void consume(PsiElement pattern) {
         assertEquals(ref, pattern.getText());
         assertEquals(ref, assertInstanceOf(((AopReferenceHolder)pattern).getTypeExpression(), AopReferenceExpression.class).getText());
       }
@@ -174,14 +174,14 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   
   public void testAtArgs() throws Throwable {
     final String ref = "java.io.Foo";
-    final String fullText = "@args(" + ref + ")";
-    final PsiAtArgsExpression expression = assertInstanceOf(parse(fullText), PsiAtArgsExpression.class);
+    String fullText = "@args(" + ref + ")";
+    PsiAtArgsExpression expression = assertInstanceOf(parse(fullText), PsiAtArgsExpression.class);
     assertEquals(fullText, expression.getText());
 
     AopAbstractList list = expression.getParameterList();
 
     assertOrderedCollection(list.getParameters(), new Consumer<PsiElement>() {
-      public void consume(final PsiElement pattern) {
+      public void consume(PsiElement pattern) {
         assertEquals(ref, pattern.getText());
         assertEquals(ref, assertInstanceOf(((AopReferenceHolder)pattern).getTypeExpression(), AopReferenceExpression.class).getText());
       }
@@ -189,13 +189,13 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testParenthesesNotBinary() throws Throwable {
-    final String exprText = "foo()";
-    final String secondText = "bar()";
-    final String notText = "not " + secondText;
-    final String firstText = "(" + exprText + ")";
-    final String fullText = firstText + " or " + notText + "";
+    String exprText = "foo()";
+    String secondText = "bar()";
+    String notText = "not " + secondText;
+    String firstText = "(" + exprText + ")";
+    String fullText = firstText + " or " + notText + "";
 
-    final AopBinaryExpression binaryExpression = assertInstanceOf(parse(fullText), AopBinaryExpression.class);
+    AopBinaryExpression binaryExpression = assertInstanceOf(parse(fullText), AopBinaryExpression.class);
     assertEquals(fullText, binaryExpression.getText());
 
     AopParenthesizedExpression parExpr = assertInstanceOf(binaryExpression.getOperands().first, AopParenthesizedExpression.class);
@@ -203,7 +203,7 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
 
     assertEquals(exprText, assertInstanceOf(parExpr.getInnerPointcutExpression(), PsiPointcutReferenceExpression.class).getText());
 
-    final AopNotExpression notExpression = assertInstanceOf(binaryExpression.getOperands().second, AopNotExpression.class);
+    AopNotExpression notExpression = assertInstanceOf(binaryExpression.getOperands().second, AopNotExpression.class);
     assertEquals(notText, notExpression.getText());
     assertEquals(secondText, notExpression.getInnerExpression().getText());
   }
@@ -215,19 +215,19 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
     assertBinaryOp("foo() or bar()", AopBinaryExpression.AopOperation.OR);
   }
 
-  private void assertBinaryOp(final String text, final AopBinaryExpression.AopOperation expected) {
+  private void assertBinaryOp(String text, AopBinaryExpression.AopOperation expected) {
     assertEquals(expected, assertInstanceOf(parse(text), AopBinaryExpression.class).getOperation());
   }
 
   public void testExecution() throws Throwable {
-    final String modifiersText = "public not static";
-    final String qualifier = "com";
-    final String methodNamePattern = "set*A*b";
-    final String methodRefText = qualifier + ".." + methodNamePattern;
+    String modifiersText = "public not static";
+    String qualifier = "com";
+    String methodNamePattern = "set*A*b";
+    String methodRefText = qualifier + ".." + methodNamePattern;
     final String thr1Text = "com..*";
     final String thr2Text = "java.lang.*";
-    final String throwsListText = "throws " + thr1Text + ", " + thr2Text;
-    final String paramsText = "..,*";
+    String throwsListText = "throws " + thr1Text + ", " + thr2Text;
+    String paramsText = "..,*";
     String fullText = "execution(" + modifiersText + " * " + methodRefText + "(" + paramsText + ") " + throwsListText + ")";
 
     PsiExecutionExpression expression = assertInstanceOf(parse(fullText), PsiExecutionExpression.class);
@@ -244,11 +244,11 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
     AopThrowsList throwsList = expression.getThrowsList();
     assertEquals(throwsListText, throwsList.getText());
     assertOrderedCollection(throwsList.getExceptionPatterns(), new Consumer<AopReferenceHolder>() {
-      public void consume(final AopReferenceHolder item) {
+      public void consume(AopReferenceHolder item) {
         assertEquals(thr1Text, item.getText());
       }
     }, new Consumer<AopReferenceHolder>() {
-      public void consume(final AopReferenceHolder item) {
+      public void consume(AopReferenceHolder item) {
         assertEquals(thr2Text, item.getText());
       }
     });
@@ -266,30 +266,30 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
     assertResolvable("*", AopReferenceExpression.Resolvability.NONE);
   }
 
-  private void assertResolvable(final String refText, final AopReferenceExpression.Resolvability resolvable) {
+  private void assertResolvable(String refText, AopReferenceExpression.Resolvability resolvable) {
     PsiExecutionExpression expression= assertInstanceOf(parse("execution(* " + refText + ".foo())"), PsiExecutionExpression.class);
-    final AopReferenceQualifier refExpr = expression.getMethodReference().getReferenceExpression().getGeneralizedQualifier();
+    AopReferenceQualifier refExpr = expression.getMethodReference().getReferenceExpression().getGeneralizedQualifier();
     assertNotNull(refExpr);
     assertEquals(resolvable, refExpr.getResolvability());
   }
 
-  private PsiPointcutExpression parse(@NonNls final String code) {
-    final PsiFile file = PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, code);
+  private PsiPointcutExpression parse(@NonNls String code) {
+    PsiFile file = PsiFileFactory.getInstance(getProject()).createFileFromText("a.b", AopPointcutExpressionFileType.INSTANCE, code);
     return ((AopPointcutExpressionFile)file).getPointcutExpression();
   }
 
   public void testWildcards() throws Throwable {
-    final PsiElement[] parameters = ((PsiArgsExpression)parse("args(List<? extends T>, List<? super T>, List<?>)")).getParameterList().getParameters();
+    PsiElement[] parameters = ((PsiArgsExpression)parse("args(List<? extends T>, List<? super T>, List<?>)")).getParameterList().getParameters();
     assertOrderedCollection(parameters, createWildcardChecker(true, false), createWildcardChecker(false, true), createWildcardChecker(false, false));
   }
 
   private static Consumer<PsiElement> createWildcardChecker(final boolean anExtends, final boolean aSuper) {
     return new Consumer<PsiElement>() {
-      public void consume(final PsiElement element) {
-        final AopTypeExpression expression = assertInstanceOf(element, AopReferenceHolder.class).getTypeExpression();
-        final AopTypeParameterList list = assertInstanceOf(expression, AopGenericTypeExpression.class).getTypeParameterList();
-        final AopReferenceHolder holder = assertInstanceOf(assertOneElement(list.getParameters()), AopReferenceHolder.class);
-        final AopWildcardExpression wildcard = assertInstanceOf(holder.getTypeExpression(), AopWildcardExpression.class);
+      public void consume(PsiElement element) {
+        AopTypeExpression expression = assertInstanceOf(element, AopReferenceHolder.class).getTypeExpression();
+        AopTypeParameterList list = assertInstanceOf(expression, AopGenericTypeExpression.class).getTypeParameterList();
+        AopReferenceHolder holder = assertInstanceOf(assertOneElement(list.getParameters()), AopReferenceHolder.class);
+        AopWildcardExpression wildcard = assertInstanceOf(holder.getTypeExpression(), AopWildcardExpression.class);
         assertEquals(anExtends, wildcard.isExtends());
         assertEquals(aSuper, wildcard.isSuper());
         if (anExtends || aSuper) {
@@ -302,8 +302,8 @@ public class AopPsiTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testArrays() throws Throwable {
-    final PsiArgsExpression expression = (PsiArgsExpression)parse("args(int[], int...)");
-    final PsiElement[] parameters = expression.getParameterList().getParameters();
+    PsiArgsExpression expression = (PsiArgsExpression)parse("args(int[], int...)");
+    PsiElement[] parameters = expression.getParameterList().getParameters();
     AopArrayExpression array = assertInstanceOf(((AopReferenceHolder)parameters[0]).getTypeExpression(), AopArrayExpression.class);
     AopArrayExpression varargs = assertInstanceOf(((AopReferenceHolder)parameters[1]).getTypeExpression(), AopArrayExpression.class);
     assertEquals("int", array.getTypeReference().getText());

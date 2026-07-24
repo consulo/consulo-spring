@@ -19,11 +19,11 @@ import jakarta.annotation.Nonnull;
 public class SpringQualifierNameReferenceProvider extends PsiReferenceProvider {
 
   @Nonnull
-  public PsiReference[] getReferencesByElement(@Nonnull PsiElement element, @Nonnull final ProcessingContext context) {
+  public PsiReference[] getReferencesByElement(@Nonnull PsiElement element, @Nonnull ProcessingContext context) {
     if (element instanceof PsiLiteralExpression) {
-      final PsiLiteralExpression literalExpression = (PsiLiteralExpression)element;
+      PsiLiteralExpression literalExpression = (PsiLiteralExpression)element;
       if (literalExpression.getValue() instanceof String) {
-        final PsiModifierListOwner psiModifierListOwner = PsiTreeUtil.getParentOfType(element, PsiModifierListOwner.class);
+        PsiModifierListOwner psiModifierListOwner = PsiTreeUtil.getParentOfType(element, PsiModifierListOwner.class);
         if (psiModifierListOwner instanceof PsiClass) {
           // stereotype components (@Service, @Component, @Repository, etc.)
           final PsiAnnotation qualifierAnnotation = PsiTreeUtil.getParentOfType(element, PsiAnnotation.class);

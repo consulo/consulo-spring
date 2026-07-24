@@ -76,17 +76,17 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
                                  "</aop:config>\n" +
                                  "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final SpringAspect aspect = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0).getAspects().get(0);
-    final List<BasicAdvice> list = aspect.getAdvices();
+    SpringAspect aspect = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0).getAspects().get(0);
+    List<BasicAdvice> list = aspect.getAdvices();
     assertEquals(5, list.size());
     for (int i = 0; i < list.size(); i++) {
       assertEquals(AopAdviceType.values()[i], list.get(i).getAdviceType());
     }
   }
 
-  private XmlFile createXmlFile(final String text) {
+  private XmlFile createXmlFile(String text) {
     return (XmlFile)PsiFileFactory.getInstance(getProject()).createFileFromText("a.xml", text);
   }
 
@@ -123,33 +123,33 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
                                                    "<aop:aspectj-autoproxy>" +
                                                    "</beans>");
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     Beans beans = domManager.getFileElement(file, Beans.class).getRootElement();
-    final SpringAspect aspect = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0).getAspects().get(0);
-    final List<AfterReturningAdvice> list = aspect.getAfterReturnings();
+    SpringAspect aspect = DomUtil.getChildrenOfType(beans, AopConfig.class).get(0).getAspects().get(0);
+    List<AfterReturningAdvice> list = aspect.getAfterReturnings();
     assertOrderedCollection(list, new Consumer<AfterReturningAdvice>() {
-      public void consume(final AfterReturningAdvice advice) {
+      public void consume(AfterReturningAdvice advice) {
         assertNull(advice.getMethod().getValue());
         assertNull(advice.getReturning().getValue());
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, objMethod));
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, strMethod));
       }
     }, new Consumer<AfterReturningAdvice>() {
-      public void consume(final AfterReturningAdvice advice) {
+      public void consume(AfterReturningAdvice advice) {
         assertEquals(advice1, advice.getMethod().getValue());
         assertNull(advice.getReturning().getValue());
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, objMethod));
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, strMethod));
       }
     }, new Consumer<AfterReturningAdvice>() {
-      public void consume(final AfterReturningAdvice advice) {
+      public void consume(AfterReturningAdvice advice) {
         assertEquals(advice2, advice.getMethod().getValue());
         assertEquals(advice2.getParameterList().getParameters()[0], advice.getReturning().getValue());
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, objMethod));
         assertEquals(PointcutMatchDegree.TRUE, AopAdviceUtil.accepts(advice, strMethod));
       }
     }, new Consumer<AfterReturningAdvice>() {
-      public void consume(final AfterReturningAdvice advice) {
+      public void consume(AfterReturningAdvice advice) {
         assertEquals(advice3, advice.getMethod().getValue());
         assertEquals(advice3.getParameterList().getParameters()[0], advice.getReturning().getValue());
         assertEquals(PointcutMatchDegree.FALSE, AopAdviceUtil.accepts(advice, objMethod));
@@ -161,7 +161,7 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
 
   public void testSearcherMethodFiltering() throws Throwable {
     SpringAdvisedElementsSearcher searcher = new SpringAdvisedElementsSearcher(getPsiManager(), Collections.<SpringModel>emptyList()) {
-      public boolean isAcceptable(final PsiClass psiClass) {
+      public boolean isAcceptable(PsiClass psiClass) {
         return true;
       }
     };
@@ -174,12 +174,12 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
     assertFalse(searcher.acceptsBoundMethod(parseMethod("final void foo() {}")));
   }
 
-  public PsiMethod parseMethod(@NonNls final String text) throws IncorrectOperationException {
+  public PsiMethod parseMethod(@NonNls String text) throws IncorrectOperationException {
     return JavaPsiFacade.getInstance(getProject()).getElementFactory().createClassFromText(text, null).getMethods()[0];
   }
 
   public void testAtAspectJEnableConditions() throws Throwable {
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
     domManager.registerFileDescription(new SpringDomFileDescription(), getTestRootDisposable());
     DomFileElementImpl<Beans> fileElement = domManager.getFileElement(createXmlFile(
         "<beans xmlns=\"http://www.springframework.org/schema/beans\"\n" +
@@ -200,7 +200,7 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
   public void testSearcherProcessClasses() throws Throwable {
     SpringAdvisedElementsSearcher searcher = new SpringAdvisedElementsSearcher(getPsiManager(), Collections.<SpringModel>emptyList());
     assertTrue(searcher.process(new Processor<PsiClass>() {
-      public boolean process(final PsiClass psiClass) {
+      public boolean process(PsiClass psiClass) {
         throw new UnsupportedOperationException("Method process is not yet implemented in " + getClass().getName());
       }
     }));
@@ -215,7 +215,7 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
     PsiClass d = myFixture.addClass("package d; public class Bean {}");
     PsiClass e = myFixture.addClass("package e; @" + AopConstants.ASPECT_ANNO + " public class Bean {}");
     PsiClass f = myFixture.addClass("package f; public class Bean {}");
-    final PsiClass with_pointcut = myFixture.addClass("public class Foo { @" + AopConstants.POINTCUT_ANNO + " void foo(); }");
+    PsiClass with_pointcut = myFixture.addClass("public class Foo { @" + AopConstants.POINTCUT_ANNO + " void foo(); }");
 
     /*registerExtension(ExtensionPointName.create("com.intellij.annotatedMembersSearch"), new QueryExecutor<PsiMember, AnnotatedMembersSearch.Parameters>(){
       public boolean execute(final AnnotatedMembersSearch.Parameters queryParameters, final Processor<PsiMember> consumer) {
@@ -240,9 +240,9 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
                                  "</beans>");
 
 
-    final DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
-    final DomFileElement<Beans> fileElement = domManager.getFileElement(file, Beans.class);
-    final Beans beans = fileElement.getRootElement();
+    DomManagerImpl domManager = DomManagerImpl.getDomManager(getProject());
+    DomFileElement<Beans> fileElement = domManager.getFileElement(file, Beans.class);
+    Beans beans = fileElement.getRootElement();
     /*getProject().registerService(SpringManager.class, new SpringManagerImpl(domManager){
       @Nullable
       public SpringModel getSpringModelByFile(@NotNull final XmlFile file) {
@@ -252,7 +252,7 @@ public class SpringAopTest extends JavaCodeInsightFixtureTestCase {
     */
 
     searcher = new SpringAdvisedElementsSearcher(getPsiManager(), SpringUtils.getNonEmptySpringModelsByFile(fileElement.getFile()));
-    final CommonProcessors.CollectProcessor<PsiClass> processor = new CommonProcessors.CollectProcessor<PsiClass>();
+    CommonProcessors.CollectProcessor<PsiClass> processor = new CommonProcessors.CollectProcessor<PsiClass>();
     searcher.process(processor);
     assertSameElements(processor.getResults(), a, c, a.getSuperClass(), c.getSuperClass());
 

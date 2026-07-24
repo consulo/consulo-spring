@@ -23,19 +23,19 @@ import java.util.List;
  */
 public class BeanPropertyConverter extends Converter<List<BeanProperty>> implements CustomReferenceConverter<List<BeanProperty>> {
 
-  public List<BeanProperty> fromString(final @Nullable String s, final ConvertContext context) {
+  public List<BeanProperty> fromString(@Nullable String s, ConvertContext context) {
     if (s == null) {
       return null;
     }
-    final GenericAttributeValue<List<BeanProperty>> value = (GenericAttributeValue<List<BeanProperty>>)context.getInvocationElement();
-    final PropertyReference[] references = createReferences(value, value.getXmlAttributeValue(), context);
+    GenericAttributeValue<List<BeanProperty>> value = (GenericAttributeValue<List<BeanProperty>>)context.getInvocationElement();
+    PropertyReference[] references = createReferences(value, value.getXmlAttributeValue(), context);
     if (references.length > 0) {
-      final ResolveResult[] results = references[references.length - 1].multiResolve(false);
-      final ArrayList<BeanProperty> list = new ArrayList<BeanProperty>(results.length);
+      ResolveResult[] results = references[references.length - 1].multiResolve(false);
+      ArrayList<BeanProperty> list = new ArrayList<BeanProperty>(results.length);
       for (ResolveResult result : results) {
-        final PsiMethod method = (PsiMethod) result.getElement();
+        PsiMethod method = (PsiMethod) result.getElement();
          if (method != null) {
-           final BeanProperty beanProperty = BeanProperty.createBeanProperty(method);
+           BeanProperty beanProperty = BeanProperty.createBeanProperty(method);
            if (beanProperty != null) {
              list.add(beanProperty);
            }
@@ -46,13 +46,13 @@ public class BeanPropertyConverter extends Converter<List<BeanProperty>> impleme
     return null;
   }
 
-  public String toString(final @Nullable List<BeanProperty> beanProperty, final ConvertContext context) {
+  public String toString(@Nullable List<BeanProperty> beanProperty, ConvertContext context) {
     return null;
   }
 
   @Nonnull
-  public PropertyReference[] createReferences(final GenericDomValue<List<BeanProperty>> genericDomValue, final PsiElement element, final ConvertContext context) {
-    final CommonSpringBean springBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
+  public PropertyReference[] createReferences(GenericDomValue<List<BeanProperty>> genericDomValue, PsiElement element, ConvertContext context) {
+    CommonSpringBean springBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
     if (springBean != null) {
       return new PropertyReferenceSet(element, springBean.getBeanClass(), genericDomValue, context, springBean).getPsiReferences();
     }

@@ -32,18 +32,18 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testPointcutsInitialization() throws Throwable {
-    final String javaFile = "PointcutsInitialization.java";
+    String javaFile = "PointcutsInitialization.java";
     myFixture.copyFileToProject(javaFile, "foo/bar/testcase/Classes.java");
-    final String xmlFile = "pointcuts-initialization.xml";
+    String xmlFile = "pointcuts-initialization.xml";
 
     checkNavigation(xmlFile, false, "aop:after", "foo.bar.testcase.Target#foo()");
     checkNavigation("foo/bar/testcase/Classes.java", false, "aop:after");
   }
 
   public void testThisAwareOfDeclareParents() throws Throwable {
-    final String javaFile = "ThisAwareOfDeclareParents.java";
+    String javaFile = "ThisAwareOfDeclareParents.java";
     myFixture.copyFileToProject(javaFile, "foo/bar/aop/Classes.java");
-    final String xmlFile = "this-aware-of-declare-parents.xml";
+    String xmlFile = "this-aware-of-declare-parents.xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "aop:around",
@@ -64,7 +64,7 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
 
   public void testDefaultProxyType() throws Throwable {
     myFixture.copyFileToProject("ProxyTypeBeans.java", "foo/PTB.java");
-    final String xmlFile = "default-proxy-type.xml";
+    String xmlFile = "default-proxy-type.xml";
     myFixture.copyFileToProject(xmlFile);
     checkNavigation(xmlFile, false, "aop:around", "aop:around", "foo.TargetClassNoInterface#classMethod()\n" +
                               "foo.TargetClassWithInterface#interfaceMethod()");
@@ -72,7 +72,7 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
 
   public void testCglibProxyType() throws Throwable {
     myFixture.copyFileToProject("ProxyTypeBeans.java", "foo/PTB.java");
-    final String xmlFile = "cglib-proxy-type.xml";
+    String xmlFile = "cglib-proxy-type.xml";
     myFixture.copyFileToProject(xmlFile);
     checkNavigation(xmlFile, false, "aop:around", "aop:around", "foo.TargetClassWithInterface#interfaceMethod()\n" +
                        "foo.TargetClassWithInterface#classMethod()\n" +
@@ -80,9 +80,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testAdviceAppliedToInnerBeans() throws Throwable {
-    final String javaFile = "AdviceAppliedToInnerBeans.java";
+    String javaFile = "AdviceAppliedToInnerBeans.java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = "advice-applied-to-inner-beans.xml";
+    String xmlFile = "advice-applied-to-inner-beans.xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "aop:before", "aop:before",
@@ -92,9 +92,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testCircularInheritance() throws Throwable {
-    final String javaFile = "CircularInheritance.java";
+    String javaFile = "CircularInheritance.java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = "circular-inheritance.xml";
+    String xmlFile = "circular-inheritance.xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "a.b.C#foo()", "aop:before");
@@ -102,9 +102,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testBeanPointcut() throws Throwable {
-    final String javaFile = "BeanPointcut.java";
+    String javaFile = "BeanPointcut.java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = "BeanPointcut.xml";
+    String xmlFile = "BeanPointcut.xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, false, "aop:before", "aop:before");
@@ -115,9 +115,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   public void testComponentScan() throws Throwable {
     myFixture.addClass("package org.springframework.stereotype; public @interface Component { String value(); }");
 
-    final String javaFile = "foo/bar/classes.java";
+    String javaFile = "foo/bar/classes.java";
     myFixture.copyFileToProject(getTestName(false) + ".java", javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, false, "aop:before");
@@ -127,9 +127,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   public void testComponentScanAspectBean() throws Throwable {
     myFixture.addClass("package org.springframework.stereotype; public @interface Component { String value(); }");
 
-    final String javaFile = "foo/bar/classes.java";
+    String javaFile = "foo/bar/classes.java";
     myFixture.copyFileToProject(getTestName(false) + ".java", javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, false, "aop:after\naop:before");
@@ -141,9 +141,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
     myFixture.addClass("package org.springframework.core.annotation; public @interface Order(int value();}");
     myFixture.addClass("package org.springframework.transaction.annotation; public @interface Transactional{}");
 
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, true, "tx:annotation-driven\n" +
@@ -162,9 +162,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testAfterReturningAdviceOrder() throws Throwable {
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, true,
@@ -176,9 +176,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testTargetInheritedMethods() throws Throwable {
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "aop:before", "Bean#bar()\n" +
@@ -187,9 +187,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testHonorDeclareParentsWithParameter() throws Throwable {
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "aop:before", "aop:declare-parents", "Bean", "Bean#bar()");
@@ -197,9 +197,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   }
 
   public void testExactReturnType() throws Throwable {
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "aop:after\naop:before", "Bean#xFoo()\nBean#yFoo()", "Bean#xFoo()\nBean#xBar()\nBean#yFoo()\nBean#yBar()");
@@ -209,9 +209,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   public void testAnnotationDrivenPrivateMethods() throws Throwable {
     myFixture.addClass("package org.springframework.transaction.annotation; public @interface Transactional{}");
 
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(xmlFile, false, "tx:annotation-driven", "Bean#foo()");
@@ -221,9 +221,9 @@ public class SpringAopNavigationTest extends AopNavigationTestCase {
   public void testAnnotationDrivenSuperMethods() throws Throwable {
     myFixture.addClass("package org.springframework.transaction.annotation; public @interface Transactional{}");
 
-    final String javaFile = getTestName(false) + ".java";
+    String javaFile = getTestName(false) + ".java";
     myFixture.copyFileToProject(javaFile);
-    final String xmlFile = getTestName(false) + ".xml";
+    String xmlFile = getTestName(false) + ".xml";
     myFixture.copyFileToProject(xmlFile);
 
     checkNavigation(javaFile, false, "tx:annotation-driven", "tx:annotation-driven", "tx:annotation-driven");

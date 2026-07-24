@@ -182,7 +182,7 @@ public class SpringManagerImpl extends SpringManager {
   @Override
   @Nullable
   public SpringModel getLocalSpringModel(@Nonnull XmlFile file) {
-    final DomFileElement<Beans> beans = myModelFactory.getDomRoot(file);
+    DomFileElement<Beans> beans = myModelFactory.getDomRoot(file);
     return beans == null ? null : new DomSpringModelImpl2(beans,
                                                           Collections.singleton(file),
                                                           ModuleUtilCore.findModuleForPsiElement(file),
@@ -203,9 +203,9 @@ public class SpringManagerImpl extends SpringManager {
 
   @Override
   @Nonnull
-  public Set<SpringFileSet> getAllSets(final @Nonnull SpringModuleExtension extension) {
-    final Set<SpringFileSet> fileSets = new HashSet<SpringFileSet>(extension.getFileSets());
-    final List<SpringFileSet> providedModels = getProvidedModels(extension);
+  public Set<SpringFileSet> getAllSets(@Nonnull SpringModuleExtension extension) {
+    Set<SpringFileSet> fileSets = new HashSet<SpringFileSet>(extension.getFileSets());
+    List<SpringFileSet> providedModels = getProvidedModels(extension);
     fileSets.addAll(providedModels);
     return fileSets;
   }

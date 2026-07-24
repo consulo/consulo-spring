@@ -36,24 +36,24 @@ public class SpringPropertiesUtil {
 
   @Nullable
   public static BeanProperty getBeanProperty(DataContext dataContext) {
-    final Editor editor = dataContext.getData(PlatformDataKeys.EDITOR);
-    final PsiFile file = dataContext.getData(LangDataKeys.PSI_FILE);
+    Editor editor = dataContext.getData(PlatformDataKeys.EDITOR);
+    PsiFile file = dataContext.getData(LangDataKeys.PSI_FILE);
 
     return getBeanProperty(editor, file);
   }
 
   @Nullable
-  public static BeanProperty getBeanProperty(final Editor editor, final PsiFile file) {
+  public static BeanProperty getBeanProperty(Editor editor, PsiFile file) {
     if (editor != null && file instanceof XmlFile) {
-      final int offset = editor.getCaretModel().getOffset();
-      final DomElement value = DomUtil.getContextElement(editor);
-      final SpringPropertyDefinition property = DomUtil.getParentOfType(value, SpringPropertyDefinition.class, false);
+      int offset = editor.getCaretModel().getOffset();
+      DomElement value = DomUtil.getContextElement(editor);
+      SpringPropertyDefinition property = DomUtil.getParentOfType(value, SpringPropertyDefinition.class, false);
 
       if (property == null || isJavaBeanReference(file, offset)) return null;
 
-      final PsiReference reference = TargetElementUtil.findReference(editor, offset);
+      PsiReference reference = TargetElementUtil.findReference(editor, offset);
       if (reference != null) {
-        final PsiElement psiElement = reference.resolve();
+        PsiElement psiElement = reference.resolve();
         if (psiElement instanceof PsiMethod) {
           return BeanProperty.createBeanProperty((PsiMethod)psiElement);
         }
@@ -66,14 +66,14 @@ public class SpringPropertiesUtil {
   public static BeanProperty getBeanProperty(PsiElement element) {
     PsiFile file = element.getContainingFile();
     if (file instanceof XmlFile) {
-      final DomElement value = DomUtil.getDomElement(element);
-      final SpringPropertyDefinition property = DomUtil.getParentOfType(value, SpringPropertyDefinition.class, false);
+      DomElement value = DomUtil.getDomElement(element);
+      SpringPropertyDefinition property = DomUtil.getParentOfType(value, SpringPropertyDefinition.class, false);
 
       if (property == null || isJavaBeanReference(file, element)) return null;
 
-      final PsiReference reference = file.findReferenceAt(element.getTextOffset());
+      PsiReference reference = file.findReferenceAt(element.getTextOffset());
       if (reference != null) {
-        final PsiElement psiElement = reference.resolve();
+        PsiElement psiElement = reference.resolve();
         if (psiElement instanceof PsiMethod) {
           return BeanProperty.createBeanProperty((PsiMethod)psiElement);
         }
@@ -82,13 +82,13 @@ public class SpringPropertiesUtil {
     return null;
   }
 
-  static boolean isJavaBeanReference(final PsiFile file, PsiElement element) {
-    final XmlAttribute xmlAttribute = PsiTreeUtil.getParentOfType(element, XmlAttribute.class);
+  static boolean isJavaBeanReference(PsiFile file, PsiElement element) {
+    XmlAttribute xmlAttribute = PsiTreeUtil.getParentOfType(element, XmlAttribute.class);
 
     if (xmlAttribute != null) {
-      final DomElement value = DomManager.getDomManager(file.getProject()).getDomElement(xmlAttribute);
+      DomElement value = DomManager.getDomManager(file.getProject()).getDomElement(xmlAttribute);
       if (value instanceof GenericAttributeValue) {
-        final Object attributeValue = ((GenericAttributeValue) value).getValue();
+        Object attributeValue = ((GenericAttributeValue) value).getValue();
         if (attributeValue instanceof SpringBeanPointer) {
           return ((SpringBeanPointer) attributeValue).getSpringBean() instanceof SpringJavaBean;
         }
@@ -98,13 +98,13 @@ public class SpringPropertiesUtil {
     return false;
   }
 
-  static boolean isJavaBeanReference(final PsiFile file, final int offset) {
-    final XmlAttribute xmlAttribute = PsiTreeUtil.getParentOfType(file.findElementAt(offset), XmlAttribute.class);
+  static boolean isJavaBeanReference(PsiFile file, int offset) {
+    XmlAttribute xmlAttribute = PsiTreeUtil.getParentOfType(file.findElementAt(offset), XmlAttribute.class);
 
     if (xmlAttribute != null) {
-      final DomElement value = DomManager.getDomManager(file.getProject()).getDomElement(xmlAttribute);
+      DomElement value = DomManager.getDomManager(file.getProject()).getDomElement(xmlAttribute);
       if (value instanceof GenericAttributeValue) {
-        final Object attributeValue = ((GenericAttributeValue)value).getValue();
+        Object attributeValue = ((GenericAttributeValue)value).getValue();
         if (attributeValue instanceof SpringBeanPointer) {
           return ((SpringBeanPointer)attributeValue).getSpringBean() instanceof SpringJavaBean;
         }

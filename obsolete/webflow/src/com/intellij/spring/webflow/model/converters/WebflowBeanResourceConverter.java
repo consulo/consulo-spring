@@ -10,11 +10,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class WebflowBeanResourceConverter extends Converter<XmlFile> implements CustomReferenceConverter {
 
-  public XmlFile fromString(final @Nullable String s, final ConvertContext context) {
+  public XmlFile fromString(@Nullable String s, ConvertContext context) {
     if (s != null) {
-      final GenericAttributeValue<XmlFile> element = (GenericAttributeValue<XmlFile>)context.getInvocationElement();
+      GenericAttributeValue<XmlFile> element = (GenericAttributeValue<XmlFile>)context.getInvocationElement();
 
-        final PsiReference[] references = createReferences(element, element.getXmlAttributeValue(), context);
+        PsiReference[] references = createReferences(element, element.getXmlAttributeValue(), context);
         if (references.length > 0) {
           PsiElement result = references[references.length - 1].resolve();
           if (result instanceof XmlFile) {
@@ -25,13 +25,13 @@ public class WebflowBeanResourceConverter extends Converter<XmlFile> implements 
     return null;
   }
 
-  public String toString(final @Nullable XmlFile psiFile, final ConvertContext context) {
+  public String toString(@Nullable XmlFile psiFile, ConvertContext context) {
     return psiFile == null ? null : psiFile.getName();
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
-    final String s = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
+    String s = genericDomValue.getStringValue();
     if (s == null || element == null) {
       return PsiReference.EMPTY_ARRAY;
     }

@@ -15,7 +15,7 @@ import java.util.Collections;
  * @author peter
  */
 public class PsiIfPointcutExpression extends AopElementBase implements PsiPointcutExpression{
-  public PsiIfPointcutExpression(@Nonnull final ASTNode node) {
+  public PsiIfPointcutExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -24,7 +24,7 @@ public class PsiIfPointcutExpression extends AopElementBase implements PsiPointc
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     return PointcutMatchDegree.FALSE;
   }
 

@@ -31,16 +31,16 @@ public class SpringDependentModuleTest extends SpringHighlightingTestCase {
   }
 
   public void testClassGutter() throws Throwable {
-    final SpringFileSet fileSet = configureFileSet();
+    SpringFileSet fileSet = configureFileSet();
     addFileToSet(fileSet, "main/gutter.xml");
-    final SpringFileSet dependency = configureFileSet("dependent", myDependency);
+    SpringFileSet dependency = configureFileSet("dependent", myDependency);
     addFileToSet(dependency, "dependent/include.xml");
-    final GutterIconRenderer iconRenderer = myFixture.findGutter("dependent/Bean.java");
+    GutterIconRenderer iconRenderer = myFixture.findGutter("dependent/Bean.java");
     assert iconRenderer != null;
   }
 
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     addSpring_2_5_Library(moduleBuilder);
   }
 
@@ -58,11 +58,11 @@ public class SpringDependentModuleTest extends SpringHighlightingTestCase {
         catch (IOException e) {
           throw new RuntimeException(e);
         }
-        final ModifiableRootModel rootModel = ModuleRootManager.getInstance(myModule).getModifiableModel();
-        final VirtualFile root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(path + "/main"));
+        ModifiableRootModel rootModel = ModuleRootManager.getInstance(myModule).getModifiableModel();
+        VirtualFile root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(path + "/main"));
         assert root != null;
 
-        final ContentEntry contentEntry = rootModel.addContentEntry(root);
+        ContentEntry contentEntry = rootModel.addContentEntry(root);
         contentEntry.addSourceFolder(root, false);
 
         // export spring library
@@ -86,25 +86,25 @@ public class SpringDependentModuleTest extends SpringHighlightingTestCase {
     super.tearDown();
   }
 
-  private void configureDependentModule(final Module module, final String path) {
+  private void configureDependentModule(Module module, String path) {
     try {
       myFixture.copyFileToProject("/dependent/default.iml");
     }
     catch (IOException e) {
       throw new RuntimeException(e);
     }
-    final ModifiableModuleModel moduleModel = ModuleManager.getInstance(module.getProject()).getModifiableModel();
+    ModifiableModuleModel moduleModel = ModuleManager.getInstance(module.getProject()).getModifiableModel();
     myDependency = moduleModel.newModule(path + "/dependent/default.iml", StdModuleTypes.JAVA);
     moduleModel.commit();
-    final ModifiableRootModel rootModel = ModuleRootManager.getInstance(myDependency).getModifiableModel();
-    final VirtualFile root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(path + "/dependent"));
+    ModifiableRootModel rootModel = ModuleRootManager.getInstance(myDependency).getModifiableModel();
+    VirtualFile root = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(path + "/dependent"));
     assert root != null;
 
-    final ContentEntry contentEntry = rootModel.addContentEntry(root);
+    ContentEntry contentEntry = rootModel.addContentEntry(root);
     contentEntry.addSourceFolder(root, false);
     rootModel.commit();
 
-    final ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
+    ModifiableRootModel model = ModuleRootManager.getInstance(module).getModifiableModel();
     model.addModuleOrderEntry(myDependency);
     model.commit();
   }

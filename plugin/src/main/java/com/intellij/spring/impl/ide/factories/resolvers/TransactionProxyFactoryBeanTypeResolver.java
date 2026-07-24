@@ -40,20 +40,20 @@ public class TransactionProxyFactoryBeanTypeResolver extends AbstractProxiedType
   @Nonnull
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     if (context instanceof SpringBean) {
-      final SpringBean springBean = (SpringBean) context;
-      final PsiClassType type = getTargetType(springBean);
+      SpringBean springBean = (SpringBean) context;
+      PsiClassType type = getTargetType(springBean);
 
       if (isCglibExplicitlyEnabled(springBean) && type != null) {
         return Collections.singleton(type.getCanonicalText());
       }
 
-      final Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(springBean, PROXY_INTERFACES_PROPERTY_NAME);
+      Set<String> proxyInterfaceNames = getTypesFromClassArrayProperty(springBean, PROXY_INTERFACES_PROPERTY_NAME);
       if (!proxyInterfaceNames.isEmpty()) {
         return proxyInterfaceNames;
       }
 
       if (type != null) {
-        final Set<String> targetInterfaceNames = getAllInterfaceNames(type);
+        Set<String> targetInterfaceNames = getAllInterfaceNames(type);
         if (!targetInterfaceNames.isEmpty()) {
           return targetInterfaceNames;
         } else {

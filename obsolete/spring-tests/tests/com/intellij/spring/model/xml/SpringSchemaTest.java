@@ -17,7 +17,7 @@ import java.io.File;
  */
 public class SpringSchemaTest extends SpringHighlightingTestCase<JavaModuleFixtureBuilder> {
 
-  protected void configureModule(final JavaModuleFixtureBuilder moduleBuilder) throws Exception {
+  protected void configureModule(JavaModuleFixtureBuilder moduleBuilder) throws Exception {
     super.configureModule(moduleBuilder);
     moduleBuilder.addLibraryJars("spring", PathManager.getHomePath().replace(File.separatorChar, '/') + super.getBasePath(), "spring-2.0.6.jar");
     moduleBuilder.addLibraryJars("spring", PathManager.getHomePath().replace(File.separatorChar, '/') + super.getBasePath(), "spring-modules-cache.jar");
@@ -28,14 +28,14 @@ public class SpringSchemaTest extends SpringHighlightingTestCase<JavaModuleFixtu
   }
 
   public void testXsdInLibrary() throws Throwable {
-    final VirtualFile file = JarFileSystem.getInstance().findFileByPath(PathManager.getHomePath().replace(File.separatorChar, '/') +
+    VirtualFile file = JarFileSystem.getInstance().findFileByPath(PathManager.getHomePath().replace(File.separatorChar, '/') +
                                                                         super.getBasePath() +
                                                                         "spring-modules-cache.jar!/org/springmodules/cache/config/springmodules-cache.xsd");
     myFixture.testHighlighting(true, true, true, file);
   }
 
   public void testXsdInLibraryWithImport() throws Throwable {
-    final VirtualFile file = JarFileSystem.getInstance().findFileByPath(PathManager.getHomePath().replace(File.separatorChar, '/') +
+    VirtualFile file = JarFileSystem.getInstance().findFileByPath(PathManager.getHomePath().replace(File.separatorChar, '/') +
                                                                         super.getBasePath() +
                                                                         "spring-modules-cache.jar!/org/springmodules/cache/config/ehcache/springmodules-ehcache.xsd");
     myFixture.testHighlighting(true, true, true, file);

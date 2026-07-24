@@ -15,7 +15,7 @@ import java.util.Set;
 public class SpringJavaBeanReferencesFindUsagesHandler extends FindUsagesHandler {
   private final DomSpringBean mySpringBean;
 
-  public SpringJavaBeanReferencesFindUsagesHandler(final DomSpringBean springBean) {
+  public SpringJavaBeanReferencesFindUsagesHandler(DomSpringBean springBean) {
     super(springBean.getIdentifyingPsiElement());
     mySpringBean = springBean;
   }
@@ -23,12 +23,12 @@ public class SpringJavaBeanReferencesFindUsagesHandler extends FindUsagesHandler
   @Override
   @Nonnull
   public PsiElement[] getSecondaryElements() {
-    final List<SpringJavaBean> list = SpringJamUtils.findBeanReferences(mySpringBean);
+    List<SpringJavaBean> list = SpringJamUtils.findBeanReferences(mySpringBean);
 
     Set<PsiElement> psiElements = new HashSet<PsiElement>();
 
     for (SpringJavaBean externalBean : list) {
-      final PsiMethod method = externalBean.getPsiElement();
+      PsiMethod method = externalBean.getPsiElement();
       if (method != null) {
          psiElements.add(method);
       }

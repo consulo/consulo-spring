@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class WebflowDomExtender extends DomExtender<Beans> {
 
-  public void registerExtensions(@NotNull final Beans element, @NotNull final DomExtensionsRegistrar registrar) {
+  public void registerExtensions(@NotNull Beans element, @NotNull DomExtensionsRegistrar registrar) {
     // version 2
     registrar.registerCollectionChildrenExtension(new XmlName("flow-registry", WebflowConstants.WEBFLOW_CONFIG_NAMESPACE_KEY), FlowRegistry.class);
     registrar.registerCollectionChildrenExtension(new XmlName("flow-executor", WebflowConstants.WEBFLOW_CONFIG_NAMESPACE_KEY), FlowExecutor.class);

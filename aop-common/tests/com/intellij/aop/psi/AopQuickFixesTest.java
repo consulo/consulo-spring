@@ -49,15 +49,15 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   public void testReturningReference() throws Throwable {
-    final PsiClass psiClass =
+    PsiClass psiClass =
       parseClass("@" + ASPECT_ANNO +
                  " class A { @" + AFTER_RETURNING_ANNO + "(value=\"\", returning=\"argName\") " +
                  "public void a(" + PROCEEDING_JOIN_POINT + " pjp, int argName, boolean b, short s) {}");
 
-    final PsiMethod method = psiClass.getMethods()[0];
-    final PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
-    final JavaArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
-    final PsiReference reference = manipulator.getReturningReference();
+    PsiMethod method = psiClass.getMethods()[0];
+    PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+    JavaArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
+    PsiReference reference = manipulator.getReturningReference();
     assertInstanceOf(reference, EmptyResolveMessageProvider.class);
     assertEquals("argName", reference.getCanonicalText());
     assertEquals(annotation.findAttributeValue(RETURNING_PARAM), reference.getElement());
@@ -95,11 +95,11 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
                    "@" + BEFORE_ANNO + "(value=\"\" )");
   }
 
-  private void checkDefineFix(final String textBefore, final String textAfter) {
-    final String classText = "@" + ASPECT_ANNO + " class A{" + textBefore + "}";
-    final PsiFile file = PsiFileFactory.getInstance(myFixture.getProject()).createFileFromText("a.java", StdLanguages.JAVA, classText, true, false);
+  private void checkDefineFix(String textBefore, String textAfter) {
+    String classText = "@" + ASPECT_ANNO + " class A{" + textBefore + "}";
+    PsiFile file = PsiFileFactory.getInstance(myFixture.getProject()).createFileFromText("a.java", StdLanguages.JAVA, classText, true, false);
     final PsiMethod method = ((PsiJavaFile)file).getClasses()[0].getMethods()[0];
-    final PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+    PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
     final ArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
     new WriteCommandAction(getProject()) {
       protected void run(Result result) throws Throwable {
@@ -110,15 +110,15 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(textAfter, annotation.getText());
   }
 
-  private void checkRemoveFix(final String textBefore, final String textAfter) {
-    final PsiMethod method = parseClass("@" + ASPECT_ANNO + " class A{" + textBefore + "}").getMethods()[0];
-    final PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
-    final ArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
+  private void checkRemoveFix(String textBefore, String textAfter) {
+    PsiMethod method = parseClass("@" + ASPECT_ANNO + " class A{" + textBefore + "}").getMethods()[0];
+    PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
+    ArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
     new SetArgNamesQuickFix("", false, manipulator, method).applyFix(myFixture.getProject(), new MockProblemDescriptor(manipulator.getArgNamesProblemElement(), "", null));
     assertEquals(textAfter, annotation.getText());
   }
 
-  protected PsiClass parseClass(@NonNls final String text) {
+  protected PsiClass parseClass(@NonNls String text) {
     return ((PsiJavaFile) PsiFileFactory.getInstance(myFixture.getProject()).createFileFromText("a.java", text)).getClasses()[0];
   }
 
@@ -131,7 +131,7 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     XmlFile file = (XmlFile)myFixture.getFile();
     final ArgNamesManipulator manipulator = getManipulator(file);
 
-    final XmlTag pointcutTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0];
+    XmlTag pointcutTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0];
     assertEquals(pointcutTag.getAttribute("arg-names").getValueElement(), manipulator.getArgNamesProblemElement());
 
     new WriteCommandAction(getProject()) {
@@ -152,30 +152,30 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
   }
 
   @Nonnull
-  private ArgNamesManipulator getManipulator(final XmlFile file) {
+  private ArgNamesManipulator getManipulator(XmlFile file) {
     AopPointcutExpressionFile aopFile = (AopPointcutExpressionFile) consulo.language.inject.impl.internal.InjectedLanguageUtil.findElementAtNoCommit(file, myFixture.getEditor().getCaretModel().getOffset()).getContainingFile();
     return aopFile.getAopModel().getArgNamesManipulator();
   }
 
-  private XmlFile createXmlFile(final String text) {
+  private XmlFile createXmlFile(String text) {
     return (XmlFile) PsiFileFactory.getInstance(myFixture.getProject()).createFileFromText("a.xml", text);
   }
 
   public void testSpringArgNamesManipulator_Returning() throws Throwable {
     myFixture.configureByFile(getTestName(false) + ".xml");
     XmlFile file = (XmlFile) myFixture.getFile();
-    final ArgNamesManipulator manipulator = getManipulator(file);
+    ArgNamesManipulator manipulator = getManipulator(file);
 
-    final XmlTag adviceTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0].getSubTags()[0];
+    XmlTag adviceTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0].getSubTags()[0];
     assertEquals(adviceTag.getAttribute(RETURNING_PARAM).getValueElement().getReferences()[0], manipulator.getReturningReference());
   }
 
   public void testSpringArgNamesManipulator_Throwing() throws Throwable {
     myFixture.configureByFile(getTestName(false) + ".xml");
     XmlFile file = (XmlFile) myFixture.getFile();
-    final ArgNamesManipulator manipulator = getManipulator(file);
+    ArgNamesManipulator manipulator = getManipulator(file);
 
-    final XmlTag adviceTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0].getSubTags()[0];
+    XmlTag adviceTag = file.getDocument().getRootTag().getSubTags()[0].getSubTags()[0].getSubTags()[0];
     assertEquals(adviceTag.getAttribute(THROWING_PARAM).getValueElement().getReferences()[0], manipulator.getThrowingReference());
   }
 
@@ -188,8 +188,8 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     myFixture.configureByFiles("AddAspectjAutoproxyQuickFix.java", getTestName(false) + ".xml");
     new WriteCommandAction(getProject()) {
       protected void run(Result result) throws Throwable {
-        final SpringFacet facet = FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, "s", null);
-        final SpringFileSet fileSet = new SpringFileSet("a", "a", facet.getConfiguration());
+        SpringFacet facet = FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, "s", null);
+        SpringFileSet fileSet = new SpringFileSet("a", "a", facet.getConfiguration());
         facet.getConfiguration().getFileSets().add(fileSet);
         fileSet.addFile(myFixture.getTempDirFixture().getFile(getTestName(false) + ".xml"));
       }

@@ -32,29 +32,29 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
     super(SpringBundle.message("spring.generate.properties"), SpringProperty.class);
   }
 
-  protected DomElement getParentDomElement(final Project project, final Editor editor, final PsiFile file) {
+  protected DomElement getParentDomElement(Project project, Editor editor, PsiFile file) {
     return SpringUtils.getSpringBeanForCurrentCaretPosition(editor, file);
   }
 
-  public SpringProperty generate(@Nullable final DomElement parent, final Editor editor) {
+  public SpringProperty generate(@Nullable DomElement parent, Editor editor) {
     if (parent instanceof SpringBean) {
-      final SpringBean springBean = (SpringBean)parent;
+      SpringBean springBean = (SpringBean)parent;
 
       Collection<PsiMethod> setters = getNonInjectedPropertySetters(springBean);
 
       PsiMethodMember[] psiMethodMembers = getPsiMethodMembers(setters);
 
-      final Project project = parent.getManager().getProject();
+      Project project = parent.getManager().getProject();
       MemberChooser<PsiMethodMember> chooser = new MemberChooser<PsiMethodMember>(psiMethodMembers, false, true, project);
       chooser.setTitle(SpringBundle.message("spring.bean.properties.chooser.title"));
       chooser.setCopyJavadocVisible(false);
       chooser.show();
 
       if (chooser.getExitCode() == MemberChooser.OK_EXIT_CODE) {
-        final PsiMethodMember[] members = chooser.getSelectedElements(new PsiMethodMember[0]);
+        PsiMethodMember[] members = chooser.getSelectedElements(new PsiMethodMember[0]);
         if (members != null && members.length > 0) {
 
-          final PsiMethod[] methods = new PsiMethod[members.length];
+          PsiMethod[] methods = new PsiMethod[members.length];
           for (int i = 0; i < members.length; i++) {
             methods[i] = members[i].getElement();
           }
@@ -66,9 +66,9 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
     return null;
   }
 
-  public static void doGenerate(final Editor editor, final SpringBean springBean, final Project project, final PsiMethod... methods) {
-    final SpringTemplateBuilder builder = new SpringTemplateBuilder(project);
-    final SpringModel model = SpringUtils.getSpringModel(springBean);
+  public static void doGenerate(Editor editor, SpringBean springBean, Project project, PsiMethod... methods) {
+    SpringTemplateBuilder builder = new SpringTemplateBuilder(project);
+    SpringModel model = SpringUtils.getSpringModel(springBean);
     for (PsiMethod method : methods) {
       createProperty(method, model, builder);
     }
@@ -76,11 +76,11 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
     builder.startTemplate(editor);
   }
 
-  private static PsiMethodMember[] getPsiMethodMembers(final Collection<PsiMethod> setters) {
+  private static PsiMethodMember[] getPsiMethodMembers(Collection<PsiMethod> setters) {
     List<PsiMethodMember> psiMethodMembers = new ArrayList<PsiMethodMember>();
     for (final PsiMethod psiMethod : setters) {
       psiMethodMembers.add(new PsiMethodMember(psiMethod) {
-        public void renderTreeNode(final SimpleColoredComponent component, final JTree tree) {
+        public void renderTreeNode(SimpleColoredComponent component, JTree tree) {
           component.append(PropertyUtil.getPropertyNameBySetter(psiMethod), getTextAttributes(tree));
           component.append(": ", getTextAttributes(tree));
           component
@@ -97,7 +97,7 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
     return psiMethodMembers.toArray(new PsiMethodMember[psiMethodMembers.size()]);
   }
 
-  public static Collection<PsiMethod> getNonInjectedPropertySetters(final SpringBean springBean) {
+  public static Collection<PsiMethod> getNonInjectedPropertySetters(SpringBean springBean) {
     Map<MethodSignature, PsiMethod> map = new LinkedHashMap<MethodSignature, PsiMethod>();
 
     PsiClass psiClass = springBean.getBeanClass();
@@ -106,7 +106,7 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
         if (PropertyUtil.isSimplePropertySetter(method) && method.hasModifierProperty(PsiModifier.PUBLIC) &&
             !method.hasModifierProperty(PsiModifier.STATIC) &&
             SpringUtils.findPropertyByName(springBean, PropertyUtil.getPropertyNameBySetter(method)) == null) {
-          final MethodSignature key = method.getSignature(PsiSubstitutor.UNKNOWN);
+          MethodSignature key = method.getSignature(PsiSubstitutor.UNKNOWN);
 
           if (!map.containsKey(key)) map.put(key, method);
         }
@@ -116,18 +116,18 @@ public class SpringPropertiesGenerateProvider extends AbstractDomGenerateProvide
     return map.values();
   }
 
-  private static void createProperty(@Nonnull final PsiMethod method, final SpringModel model, final SpringTemplateBuilder builder) {
-    final PsiType type = method.getParameterList().getParameters()[0].getType();
-    @NonNls final String name = PropertyUtil.getPropertyName(method);
+  private static void createProperty(@Nonnull PsiMethod method, SpringModel model, SpringTemplateBuilder builder) {
+    PsiType type = method.getParameterList().getParameters()[0].getType();
+    @NonNls String name = PropertyUtil.getPropertyName(method);
     builder.addTextSegment("<property name=\"" + name + "\"");
     builder.createValueAndClose(type, model, "property");
   }
 
-  public boolean isAvailableForElement(@Nonnull final DomElement contextElement) {
-    final SpringBean springBean = DomUtil.getParentOfType(contextElement, SpringBean.class, false);
+  public boolean isAvailableForElement(@Nonnull DomElement contextElement) {
+    SpringBean springBean = DomUtil.getParentOfType(contextElement, SpringBean.class, false);
     return springBean != null && getNonInjectedPropertySetters(springBean).size() > 0;
   }
 
-  protected void doNavigate(final DomElementNavigationProvider navigateProvider, final DomElement element) {
+  protected void doNavigate(DomElementNavigationProvider navigateProvider, DomElement element) {
   }
 }

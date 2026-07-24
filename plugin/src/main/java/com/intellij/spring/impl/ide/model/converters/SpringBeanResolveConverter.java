@@ -41,20 +41,20 @@ import java.util.List;
  * @since 2006-11-10
  */
 public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPointer> {
-    public SpringBeanPointer fromString(final @Nullable String s, final ConvertContext context) {
+    public SpringBeanPointer fromString(@Nullable String s, ConvertContext context) {
         if (s == null) {
             return null;
         }
-        final SpringModel model = getSpringModel(context);
+        SpringModel model = getSpringModel(context);
         return model == null ? null : SpringUtils.getBeanPointer(model, s);
     }
 
-    public String toString(final @Nullable SpringBeanPointer springBeanPointer, final ConvertContext context) {
+    public String toString(@Nullable SpringBeanPointer springBeanPointer, ConvertContext context) {
         return springBeanPointer == null ? null : springBeanPointer.getName();
     }
 
     @Nonnull
-    public Collection<SpringBeanPointer> getVariants(final ConvertContext context) {
+    public Collection<SpringBeanPointer> getVariants(ConvertContext context) {
         return getVariants(context, false);
     }
 
@@ -63,35 +63,35 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
         return createCompletionVariant(springBeanPointer);
     }
 
-    protected Collection<SpringBeanPointer> getVariants(final ConvertContext context, boolean parentBeans) {
-        final SpringModel model = getSpringModel(context);
+    protected Collection<SpringBeanPointer> getVariants(ConvertContext context, boolean parentBeans) {
+        SpringModel model = getSpringModel(context);
         if (model == null) {
             return Collections.emptyList();
         }
 
-        final List<SpringBeanPointer> variants = new ArrayList<SpringBeanPointer>();
-        final CommonSpringBean currentBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
+        List<SpringBeanPointer> variants = new ArrayList<SpringBeanPointer>();
+        CommonSpringBean currentBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
         processBeans(model, variants, parentBeans ? model.getAllParentBeans() : model.getAllCommonBeans(), parentBeans, currentBean);
         return variants;
     }
 
-    public Collection<SpringBeanPointer> getSmartVariants(final ConvertContext context) {
-        final SpringModel model = getSpringModel(context);
+    public Collection<SpringBeanPointer> getSmartVariants(ConvertContext context) {
+        SpringModel model = getSpringModel(context);
         if (model == null) {
             return Collections.emptyList();
         }
 
-        final List<SpringBeanPointer> variants = new ArrayList<SpringBeanPointer>();
+        List<SpringBeanPointer> variants = new ArrayList<SpringBeanPointer>();
 
-        final CommonSpringBean currentBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
-        final List<PsiClassType> requiredClasses = getRequiredClasses(context);
+        CommonSpringBean currentBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
+        List<PsiClassType> requiredClasses = getRequiredClasses(context);
         if (requiredClasses != null) {
-            for (final PsiClassType requiredClass : requiredClasses) {
-                final PsiClass psiClass = PsiUtil.resolveClassInType(requiredClass);
+            for (PsiClassType requiredClass : requiredClasses) {
+                PsiClass psiClass = PsiUtil.resolveClassInType(requiredClass);
                 if (psiClass != null) {
                     processBeans(model, variants, model.findBeansByEffectivePsiClassWithInheritance(psiClass), false, currentBean);
                 }
-                final PsiClass componentClass = PsiUtil.resolveClassInType(PsiUtil.extractIterableTypeParameter(requiredClass, false));
+                PsiClass componentClass = PsiUtil.resolveClassInType(PsiUtil.extractIterableTypeParameter(requiredClass, false));
                 if (componentClass != null) {
                     processBeans(model, variants, model.findBeansByEffectivePsiClassWithInheritance(componentClass), false, currentBean);
                 }
@@ -115,7 +115,7 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
                 continue;
             }
 
-            final String beanName = bean.getName();
+            String beanName = bean.getName();
             if (beanName != null) {
                 for (String string : model.getAllBeanNames(beanName)) {
                     if (StringUtil.isNotEmpty(string)) {
@@ -133,10 +133,10 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
                 List<LocalQuickFix> result = new SmartList<LocalQuickFix>();
                 ContainerUtil.addIfNotNull(result, getQuickFix(value));
 
-                final String id = value.getStringValue();
+                String id = value.getStringValue();
                 if (StringUtil.isNotEmpty(id)) {
-                    final List<SpringModel> models = SpringUtils.getNonEmptySpringModelsByFile(DomUtil.getFile(value));
-                    final Collection<XmlTag> tags = ContainerUtil.concat(models, model -> model.getCustomBeanCandidates(id));
+                    List<SpringModel> models = SpringUtils.getNonEmptySpringModelsByFile(DomUtil.getFile(value));
+                    Collection<XmlTag> tags = ContainerUtil.concat(models, model -> model.getCustomBeanCandidates(id));
                     if (!tags.isEmpty()) {
                         result.add(new TryParsingCustomBeansFix(tags));
                     }
@@ -145,15 +145,15 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
                 return result.toArray(new LocalQuickFix[result.size()]);
             }
 
-            protected void apply(final String elementName, final GenericDomValue<SpringBeanPointer> genericDomValue) {
+            protected void apply(String elementName, GenericDomValue<SpringBeanPointer> genericDomValue) {
                 Beans beans = getBeans(genericDomValue);
                 if (beans != null) {
-                    final SpringBean springBean = beans.addBean();
+                    SpringBean springBean = beans.addBean();
                     springBean.setName(elementName);
                     // setting correct class...
-                    final DomElement parent = genericDomValue.getParent();
+                    DomElement parent = genericDomValue.getParent();
                     if (parent instanceof SpringInjection) {
-                        final PsiClassType classType = SpringBeanUtil.getRequiredClass((SpringInjection) parent);
+                        PsiClassType classType = SpringBeanUtil.getRequiredClass((SpringInjection) parent);
                         if (classType != null) {
                             springBean.getClazz().setStringValue(classType.getCanonicalText());
                         }
@@ -169,16 +169,16 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
         };
 
     @Nullable
-    protected Beans getBeans(final GenericDomValue<SpringBeanPointer> genericDomValue) {
+    protected Beans getBeans(GenericDomValue<SpringBeanPointer> genericDomValue) {
         return genericDomValue.getParentOfType(Beans.class, false);
     }
 
-    public String getErrorMessage(final String s, final ConvertContext context) {
+    public String getErrorMessage(String s, ConvertContext context) {
         return SpringLocalize.modelBeanErrorMessage(s).get();
     }
 
     @Nullable
-    protected SpringModel getSpringModel(final ConvertContext context) {
+    protected SpringModel getSpringModel(ConvertContext context) {
         return SpringManager.getInstance(context.getFile().getProject()).getSpringModelByFile(context.getFile());
     }
 
@@ -201,25 +201,25 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
         return resolvedValue.getPsiElement();
     }
 
-    public LocalQuickFix[] getQuickFixes(final ConvertContext context) {
+    public LocalQuickFix[] getQuickFixes(ConvertContext context) {
         return myQuickFixProvider.getQuickFixes((GenericDomValue) context.getInvocationElement());
     }
 
     @Nullable
     private static List<PsiClassType> getValueClasses(ConvertContext context) {
-        final TypeHolder valueHolder = context.getInvocationElement().getParentOfType(TypeHolder.class, false);
+        TypeHolder valueHolder = context.getInvocationElement().getParentOfType(TypeHolder.class, false);
         assert valueHolder != null;
         if (valueHolder instanceof ConstructorArg) {
             return getClassesForArg((ConstructorArg) valueHolder);
         }
         else {
-            final PsiClassType classType = SpringBeanUtil.getRequiredClass(valueHolder);
+            PsiClassType classType = SpringBeanUtil.getRequiredClass(valueHolder);
             return classType == null ? null : Collections.singletonList(classType);
         }
     }
 
     @Nullable
-    private static List<PsiClassType> getClassesForArg(final ConstructorArg arg) {
+    private static List<PsiClassType> getClassesForArg(ConstructorArg arg) {
         PsiType type = arg.getType().getValue();
         if (type == null) {
             Integer integer = arg.getIndex().getValue();
@@ -227,11 +227,11 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
             if (integer != null) {
                 index = integer.intValue();
             }
-            final ArrayList<PsiClassType> classes = new ArrayList<PsiClassType>();
-            final SpringBean springBean = (SpringBean) arg.getParent();
-            final List<PsiMethod> psiMethods = SpringBeanUtil.getInstantiationMethods(springBean);
+            ArrayList<PsiClassType> classes = new ArrayList<PsiClassType>();
+            SpringBean springBean = (SpringBean) arg.getParent();
+            List<PsiMethod> psiMethods = SpringBeanUtil.getInstantiationMethods(springBean);
             for (PsiMethod method : psiMethods) {
-                final PsiParameterList parameterList = method.getParameterList();
+                PsiParameterList parameterList = method.getParameterList();
                 if (parameterList.getParametersCount() > 0) {
                     if (index >= 0) {
                         if (index < parameterList.getParametersCount()) {
@@ -279,7 +279,7 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
 
     public static class Local extends SpringBeanResolveConverter {
         @Nullable
-        protected SpringModel getSpringModel(final ConvertContext context) {
+        protected SpringModel getSpringModel(ConvertContext context) {
             return SpringManager.getInstance(context.getFile().getProject()).getLocalSpringModel(context.getFile());
         }
     }
@@ -298,12 +298,12 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
         }
 
         public void bindReference(
-            final GenericDomValue<SpringBeanPointer> genericValue,
-            final ConvertContext context,
-            final PsiElement newTarget
+            GenericDomValue<SpringBeanPointer> genericValue,
+            ConvertContext context,
+            PsiElement newTarget
         ) {
             if (newTarget.getContainingFile() != context.getFile()) {
-                final RefBase ref = (RefBase) genericValue.getParent();
+                RefBase ref = (RefBase) genericValue.getParent();
                 assert ref != null;
                 ref.getBean().setStringValue(genericValue.getStringValue());
                 genericValue.undefine();
@@ -319,7 +319,7 @@ public class SpringBeanResolveConverter extends ResolvingConverter<SpringBeanPoi
         public List<PsiClassType> getRequiredClasses(ConvertContext context) {
             SpringEntry entry = (SpringEntry) context.getInvocationElement().getParent();
             assert entry != null;
-            final PsiClass keyClass = entry.getRequiredKeyClass();
+            PsiClass keyClass = entry.getRequiredKeyClass();
             return keyClass == null
                 ? null
                 : Collections.singletonList(JavaPsiFacade.getInstance(keyClass.getProject()).getElementFactory().createType(keyClass));

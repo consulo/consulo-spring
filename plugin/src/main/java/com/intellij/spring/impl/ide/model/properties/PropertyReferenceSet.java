@@ -42,7 +42,7 @@ public class PropertyReferenceSet extends ReferenceSetBase<PropertyReference>
   }
 
   @Nonnull
-  protected PropertyReference createReference(final TextRange range, final int index) {
+  protected PropertyReference createReference(TextRange range, int index) {
     return new PropertyReference(this, range, index);
   }
 

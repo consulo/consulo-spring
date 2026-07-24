@@ -15,10 +15,10 @@ public class JndiObjectFactoryBeanTypeResolver extends AbstractJeeSchemaTypeReso
   @NonNls private static final String[] myProperties = new String[] {"proxyInterface","expectedType"};
   
   @Nonnull
-  protected Set<String> getJeeObjectType(final CommonSpringBean context) {
+  protected Set<String> getJeeObjectType(CommonSpringBean context) {
     Set<String> result = new HashSet<String>();
     if (context instanceof SpringJeeElement) {
-      final JndiLookup jndiLookup = (JndiLookup)context;
+      JndiLookup jndiLookup = (JndiLookup)context;
       if (StringUtil.isNotEmpty(jndiLookup.getProxyInterface().getStringValue())) {
         result.add(jndiLookup.getProxyInterface().getStringValue());
       } else if (StringUtil.isNotEmpty(jndiLookup.getExpectedType().getStringValue())) {

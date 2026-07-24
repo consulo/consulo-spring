@@ -30,24 +30,24 @@ import java.util.HashSet;
 
 public class ResourceValueConverter extends Converter<Object> implements CustomReferenceConverter {
 
-  public Object fromString(@Nullable @NonNls String s, final ConvertContext context) {
-    final GenericDomValue domValue = (GenericDomValue)context.getInvocationElement();
+  public Object fromString(@Nullable @NonNls String s, ConvertContext context) {
+    GenericDomValue domValue = (GenericDomValue)context.getInvocationElement();
     return StringUtil.isEmpty(s)
            ? Collections.emptySet()
            : ResourceResolverUtils.addResourceFilesFrom(domValue, s, new HashSet<PsiFileSystemItem>(), Condition.TRUE);
   }
 
-  public String toString(@Nullable Object o, final ConvertContext context) {
+  public String toString(@Nullable Object o, ConvertContext context) {
     return null;
   }
 
 
   @Nonnull
-  public PsiReference[] createReferences(final GenericDomValue genericDomValue, final PsiElement element, final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue genericDomValue, final PsiElement element, ConvertContext context) {
     final ArrayList<PsiReference> result = new ArrayList<PsiReference>();
     final int startInElement = ElementManipulators.getOffsetInElement(element);
     ResourceResolverUtils.processSeparatedString(genericDomValue.getStringValue(), ",", new PairProcessor<String, Integer>() {
-      public boolean process(final String s, final Integer offset) {
+      public boolean process(String s, Integer offset) {
         result.addAll(Arrays.asList(ResourceResolverUtils.getReferences(element, s, true, false, offset + startInElement, true)));
         return true;
       }

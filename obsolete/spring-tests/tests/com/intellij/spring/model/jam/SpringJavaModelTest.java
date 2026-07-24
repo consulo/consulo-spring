@@ -21,7 +21,7 @@ public class SpringJavaModelTest extends IdeaTestCase {
   private VirtualFile myRoot;
   private SpringJamModel myModel;
 
-  public static void addSpringLibraryToRoots(final Module module) {
+  public static void addSpringLibraryToRoots(Module module) {
     PsiTestUtil.addLibrary(module, "Spring", PathManager.getHomePath() + "/svnPlugins/spring/spring-tests/testData/", "spring2.jar");
     PsiTestUtil.addLibrary(module, "SpringJavaConfig", PathManager.getHomePath() + "/svnPlugins/spring/spring-tests/testData/", "spring-javaconfig-annotations.jar");
   }
@@ -40,24 +40,24 @@ public class SpringJavaModelTest extends IdeaTestCase {
   }
 
   public void testGetConfigurations() throws Throwable {
-    final PsiJavaFile psiFile = createFile( "@" + SpringAnnotationsConstants.JAVA_CONFIG_CONFIGURATION_ANNOTATION + "\nclass FooJavaConfig {}\n" +
+    PsiJavaFile psiFile = createFile( "@" + SpringAnnotationsConstants.JAVA_CONFIG_CONFIGURATION_ANNOTATION + "\nclass FooJavaConfig {}\n" +
                                             "@" + SpringAnnotationsConstants.JAVA_CONFIG_CONFIGURATION_ANNOTATION + "\nclass FooJavaConfig2 {}\n" );
     final PsiClass fooJavaConfig = psiFile.getClasses()[0];
     final PsiClass fooJavaConfig2  = psiFile.getClasses()[1];
 
     assertUnorderedCollection(myModel.getConfigurations(), new Consumer<SpringJavaConfiguration>() {
-      public void consume(final SpringJavaConfiguration configuration) {
+      public void consume(SpringJavaConfiguration configuration) {
         assertEquals(fooJavaConfig, configuration.getPsiClass());
       }
     }, new Consumer<SpringJavaConfiguration>() {
-      public void consume(final SpringJavaConfiguration configuration) {
+      public void consume(SpringJavaConfiguration configuration) {
         assertEquals(fooJavaConfig2, configuration.getPsiClass());
       }
     });
   }
 
   public void testGetJavaSpringBeans() throws Throwable {
-    final PsiJavaFile psiFile = createFile( "@" + SpringAnnotationsConstants
+    PsiJavaFile psiFile = createFile( "@" + SpringAnnotationsConstants
         .JAVA_CONFIG_CONFIGURATION_ANNOTATION + "\nclass FooJavaConfig {" +
                                             "@" + SpringAnnotationsConstants.JAVA_CONFIG_BEAN_ANNOTATION + "(aliases = {\"alias_1\", \"alias_2\"})\n java.lang.String fooBean() {} \n" +
                                             " void notBean() {} \n" +
@@ -65,17 +65,17 @@ public class SpringJavaModelTest extends IdeaTestCase {
 
 
     final PsiClass fooJavaConfig = psiFile.getClasses()[0];
-    final List<? extends SpringJavaBean> javaBeans = myModel.getConfigurations().get(0).getBeans();
+    List<? extends SpringJavaBean> javaBeans = myModel.getConfigurations().get(0).getBeans();
 
    assertUnorderedCollection(javaBeans, new Consumer<SpringJavaBean>() {
-      public void consume(final SpringJavaBean javaBean) {
+      public void consume(SpringJavaBean javaBean) {
         assertEquals(fooJavaConfig.findMethodsByName("fooBean", false)[0],  javaBean.getPsiElement());
         assertEquals(javaBean.getBeanName(), "fooBean");
         assertEquals(javaBean.getBeanClass().getQualifiedName(), "java.lang.String");
         assertEquals(javaBean.getAliases().length, 2);
       }
     }, new Consumer<SpringJavaBean>() {
-      public void consume(final SpringJavaBean javaBean) {
+      public void consume(SpringJavaBean javaBean) {
         assertEquals(fooJavaConfig.findMethodsByName("fooBean2", false)[0], javaBean.getPsiElement());
         assertEquals(javaBean.getBeanName(), "fooBean2");
         assertEquals(javaBean.getBeanClass().getQualifiedName(), "java.lang.Integer");
@@ -84,9 +84,9 @@ public class SpringJavaModelTest extends IdeaTestCase {
   }
 
   private PsiJavaFile createFile(final String text) {
-    final VirtualFile file = new WriteCommandAction<VirtualFile>(getProject()) {
+    VirtualFile file = new WriteCommandAction<VirtualFile>(getProject()) {
       protected void run(Result<VirtualFile> result) throws Throwable {
-        final VirtualFile file = myRoot.createChildData(this, "FooJavaConfig.java");
+        VirtualFile file = myRoot.createChildData(this, "FooJavaConfig.java");
 
         VirtualFileUtil.saveText(file, text);
         result.setResult(file);

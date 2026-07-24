@@ -11,11 +11,11 @@ import consulo.xml.util.xml.ui.actions.generate.GenerateDomElementProvider;
 
 public class GenerateSpringDomElementAction extends GenerateDomElementAction {
 
-  public GenerateSpringDomElementAction(final GenerateDomElementProvider provider) {
+  public GenerateSpringDomElementAction(GenerateDomElementProvider provider) {
     super(provider);
   }
   
-  public GenerateSpringDomElementAction(final GenerateDomElementProvider provider, Image icon) {
+  public GenerateSpringDomElementAction(GenerateDomElementProvider provider, Image icon) {
     super(provider);
     getTemplatePresentation().setIcon(icon);
   }

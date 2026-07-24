@@ -52,12 +52,12 @@ public class SpringSecurityFiltersConfiguredInspection extends SpringBeanInspect
   public SpringSecurityFiltersConfiguredInspection() {
   }
 
-  public void checkFileElement(final DomFileElement<Beans> domFileElement, final DomElementAnnotationHolder holder) {
-    final Module module = domFileElement.getModule();
+  public void checkFileElement(DomFileElement<Beans> domFileElement, DomElementAnnotationHolder holder) {
+    Module module = domFileElement.getModule();
     if (module == null) {
       return;
     }
-    final VirtualFile virtualFile = domFileElement.getFile().getVirtualFile();
+    VirtualFile virtualFile = domFileElement.getFile().getVirtualFile();
     if (virtualFile == null) {
       return;
     }
@@ -112,11 +112,11 @@ public class SpringSecurityFiltersConfiguredInspection extends SpringBeanInspect
       return SpringBundle.message("model.bean.quickfix.family");
     }
 
-    public boolean isAvailable(@NotNull final Project project, final Editor editor, final PsiFile file) {
+    public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
       return true;
     }
 
-    public void invoke(@NotNull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
+    public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
       doFix(project);
       DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
       DaemonCodeAnalyzer.getInstance(project).restart();
@@ -126,7 +126,7 @@ public class SpringSecurityFiltersConfiguredInspection extends SpringBeanInspect
       return false;
     }
 
-    public void applyFix(@NotNull final Project project, @NotNull final ProblemDescriptor descriptor) {
+    public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
       doFix(project);
       DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
       DaemonCodeAnalyzer.getInstance(project).restart();
@@ -158,7 +158,7 @@ public class SpringSecurityFiltersConfiguredInspection extends SpringBeanInspect
                   return filter.getFilterName().getStringValue();
                 }
               });
-              final String suggestedName = "filterChainProxy";
+              String suggestedName = "filterChainProxy";
               String resultName = suggestedName;
               int index = 0;
               while (names.contains(resultName)) {
@@ -183,7 +183,7 @@ public class SpringSecurityFiltersConfiguredInspection extends SpringBeanInspect
       else {
         final ArrayList<WebFacet> list = new ArrayList<WebFacet>(webFacets);
 
-        final BaseListPopupStep<WebFacet> step = new BaseListPopupStep<WebFacet>(SpringSecurityBundle.message("choose.web.set"), list) {
+        BaseListPopupStep<WebFacet> step = new BaseListPopupStep<WebFacet>(SpringSecurityBundle.message("choose.web.set"), list) {
           @Override
           public PopupStep onChosen(WebFacet selectedValue, boolean finalChoice) {
             processor.process(selectedValue.getRoot());

@@ -52,8 +52,8 @@ public class JsfVariableResolverTest extends SpringHighlightingTestCase<WebModul
   }
 
   private void createFileSet() throws Throwable {
-    final String path = myFixture.getTempDirPath() + File.separatorChar + "spring-beans.xml";
-    final String url = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, path);
+    String path = myFixture.getTempDirPath() + File.separatorChar + "spring-beans.xml";
+    String url = VirtualFileManager.constructUrl(LocalFileSystem.PROTOCOL, path);
     configureFileSet().addFile(url);
   }
 
@@ -155,7 +155,7 @@ public class JsfVariableResolverTest extends SpringHighlightingTestCase<WebModul
 
     new WriteCommandAction.Simple(myFixture.getProject()) {
       protected void run() throws Throwable {
-        final FacesConfig facesConfig = getFacesConfig();
+        FacesConfig facesConfig = getFacesConfig();
         facesConfig.getApplication().getVariableResolver().setStringValue(s);
       }
     }.execute();
@@ -167,7 +167,7 @@ public class JsfVariableResolverTest extends SpringHighlightingTestCase<WebModul
 
     new WriteCommandAction.Simple(myFixture.getProject()) {
       protected void run() throws Throwable {
-        final FacesConfig facesConfig = getFacesConfig();
+        FacesConfig facesConfig = getFacesConfig();
         facesConfig.getApplication().getElResolver().setStringValue(s);
       }
     }.execute();
@@ -198,9 +198,9 @@ public class JsfVariableResolverTest extends SpringHighlightingTestCase<WebModul
   }
 
   private FacesConfig getFacesConfig() {
-    final VirtualFile file = getFile(myFixture.getTempDirPath() + "/WEB-INF/faces-config.xml");
+    VirtualFile file = getFile(myFixture.getTempDirPath() + "/WEB-INF/faces-config.xml");
 
-    final Collection<WebFacet> webFacets = WebFacet.getInstances(myFixture.getModule());
+    Collection<WebFacet> webFacets = WebFacet.getInstances(myFixture.getModule());
     for (WebFacet webFacet : webFacets) {
 
       for (FacesDomModel model : FacesDomModelManager.getInstance(myFixture.getProject()).getAllModels(webFacet)) {

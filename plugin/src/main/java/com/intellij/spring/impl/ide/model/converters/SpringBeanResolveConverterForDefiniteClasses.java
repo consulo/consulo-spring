@@ -14,18 +14,18 @@ import java.util.List;
 public abstract class SpringBeanResolveConverterForDefiniteClasses extends SpringBeanResolveConverter {
 
   @Nullable
-  protected abstract String[] getClassNames(final ConvertContext context) ;
+  protected abstract String[] getClassNames(ConvertContext context) ;
 
   @Nullable
-  public List<PsiClassType> getRequiredClasses(final ConvertContext context) {
-    final List<PsiClassType> required = new ArrayList<PsiClassType>();
-    final PsiManager psiManager = context.getPsiManager();
-    final String[] strings = getClassNames(context);
+  public List<PsiClassType> getRequiredClasses(ConvertContext context) {
+    List<PsiClassType> required = new ArrayList<PsiClassType>();
+    PsiManager psiManager = context.getPsiManager();
+    String[] strings = getClassNames(context);
 
     if (strings == null || strings.length == 0) return null;
 
     for (String className : strings) {
-      final PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject())
+      PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject())
                                              .findClass(className, GlobalSearchScope.allScope(psiManager.getProject()));
 
       if (psiClass != null) {

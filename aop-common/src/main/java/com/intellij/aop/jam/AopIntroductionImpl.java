@@ -71,7 +71,7 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   public GenericValue<PsiClass> getImplementInterface() {
     return new ReadOnlyGenericValue<PsiClass>() {
       public PsiClass getValue() {
-        final PsiType type = getPsiElement().getType();
+        PsiType type = getPsiElement().getType();
         return type instanceof PsiClassType ? ((PsiClassType)type).resolve() : null;
       }
 
@@ -87,8 +87,8 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   }
 
   @Nullable
-  public static AopReferenceHolder getTypesMatchingPattern(@Nullable final PsiElement value) {
-    final PsiPointcutExpression expression = AopPointcutImpl.getPsiPointcutExpression(value);
+  public static AopReferenceHolder getTypesMatchingPattern(@Nullable PsiElement value) {
+    PsiPointcutExpression expression = AopPointcutImpl.getPsiPointcutExpression(value);
     return expression instanceof PsiTargetExpression ? ((PsiTargetExpression)expression).getTypeReference() : null;
   }
 

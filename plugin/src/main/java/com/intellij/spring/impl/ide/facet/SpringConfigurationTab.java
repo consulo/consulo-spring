@@ -61,7 +61,7 @@ public class SpringConfigurationTab implements Disposable {
       List<SimpleNode> nodes = new ArrayList<SimpleNode>(myBuffer.size());
       for (SpringFileSet entry : myBuffer) {
         if (!entry.isRemoved()) {
-          final FileSetNode setNode = new FileSetNode(entry);
+          FileSetNode setNode = new FileSetNode(entry);
           nodes.add(setNode);
         }
       }
@@ -80,7 +80,7 @@ public class SpringConfigurationTab implements Disposable {
     myModuleExtension = configuration;
     mySearcher = new SpringConfigsSearcher(configuration.getModule());
 
-    final SimpleTreeStructure structure = new SimpleTreeStructure() {
+    SimpleTreeStructure structure = new SimpleTreeStructure() {
       @Override
       public Object getRootElement() {
         return myRoot;
@@ -94,7 +94,7 @@ public class SpringConfigurationTab implements Disposable {
     myTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
       @Override
       public void valueChanged(TreeSelectionEvent e) {
-        final SpringFileSet fileSet = getCurrentFileSet();
+        SpringFileSet fileSet = getCurrentFileSet();
         myEditButton.setEnabled(fileSet != null);
         myRemoveButton.setEnabled(fileSet != null);
       }
@@ -103,7 +103,7 @@ public class SpringConfigurationTab implements Disposable {
     myAddSetButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        final SpringFileSet fileSet = new XmlSpringFileSet(SpringFileSet.getUniqueId(myBuffer),
+        SpringFileSet fileSet = new XmlSpringFileSet(SpringFileSet.getUniqueId(myBuffer),
             SpringFileSet.getUniqueName(SpringBundle.message("default.fileset.name"), myBuffer),
             myModuleExtension) {
           @Override
@@ -112,7 +112,7 @@ public class SpringConfigurationTab implements Disposable {
           }
         };
 
-        final FileSetEditor editor = new FileSetEditor(myMainPanel, fileSet, myBuffer, mySearcher, myModuleExtension.getProject());
+        FileSetEditor editor = new FileSetEditor(myMainPanel, fileSet, myBuffer, mySearcher, myModuleExtension.getProject());
         editor.show();
         if (editor.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
           SpringFileSet editedFileSet = editor.getEditedFileSet();
@@ -135,14 +135,14 @@ public class SpringConfigurationTab implements Disposable {
 
     myEditButton.addActionListener(new ActionListener() {
       @Override
-      public void actionPerformed(final ActionEvent e) {
-        final SpringFileSet fileSet = getCurrentFileSet();
+      public void actionPerformed(ActionEvent e) {
+        SpringFileSet fileSet = getCurrentFileSet();
         if (fileSet != null) {
-          final FileSetEditor editor = new FileSetEditor(myMainPanel, fileSet, myBuffer, mySearcher, myModuleExtension.getProject());
+          FileSetEditor editor = new FileSetEditor(myMainPanel, fileSet, myBuffer, mySearcher, myModuleExtension.getProject());
           editor.show();
           if (editor.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
             myBuffer.remove(fileSet);
-            final SpringFileSet edited = editor.getEditedFileSet();
+            SpringFileSet edited = editor.getEditedFileSet();
             Disposer.register(configuration, edited);
             myBuffer.add(edited);
             edited.setAutodetected(false);
@@ -159,16 +159,16 @@ public class SpringConfigurationTab implements Disposable {
   }
 
   private void remove() {
-    final SimpleNode[] nodes = myTree.getSelectedNodesIfUniform();
+    SimpleNode[] nodes = myTree.getSelectedNodesIfUniform();
     for (SimpleNode node : nodes) {
 
       if (node instanceof DependencyNode) {
-        final SpringFileSet fileSet = ((FileSetNode) node.getParent()).mySet;
+        SpringFileSet fileSet = ((FileSetNode) node.getParent()).mySet;
         fileSet.removeDependency(((DependencyNode) node).myFileSet.getId());
       }
       else if (node instanceof FileSetNode) {
-        final SpringFileSet fileSet = ((FileSetNode) node).mySet;
-        final int result = Messages.showYesNoDialog(myMainPanel,
+        SpringFileSet fileSet = ((FileSetNode) node).mySet;
+        int result = Messages.showYesNoDialog(myMainPanel,
             SpringBundle.message("config.remove.button.message", fileSet.getName()),
             SpringBundle.message("config.remove.button.title"),
             Messages.getQuestionIcon());
@@ -186,8 +186,8 @@ public class SpringConfigurationTab implements Disposable {
         }
       }
       else if (node instanceof ConfigFileNode) {
-        final VirtualFilePointer filePointer = ((ConfigFileNode) node).myFilePointer;
-        final SpringFileSet fileSet = ((FileSetNode) node.getParent()).mySet;
+        VirtualFilePointer filePointer = ((ConfigFileNode) node).myFilePointer;
+        SpringFileSet fileSet = ((FileSetNode) node.getParent()).mySet;
         fileSet.removeFile(filePointer);
       }
     }
@@ -199,13 +199,13 @@ public class SpringConfigurationTab implements Disposable {
 
   @Nullable
   private SpringFileSet getCurrentFileSet() {
-    final FileSetNode currentFileSetNode = getCurrentFileSetNode();
+    FileSetNode currentFileSetNode = getCurrentFileSetNode();
     return currentFileSetNode == null ? null : currentFileSetNode.mySet;
   }
 
   @Nullable
   private FileSetNode getCurrentFileSetNode() {
-    final SimpleNode selectedNode = myTree.getSelectedNode();
+    SimpleNode selectedNode = myTree.getSelectedNode();
     if (selectedNode == null) {
       return null;
     }
@@ -216,7 +216,7 @@ public class SpringConfigurationTab implements Disposable {
       return (FileSetNode) selectedNode.getParent();
     }
     else {
-      final SimpleNode parent = selectedNode.getParent();
+      SimpleNode parent = selectedNode.getParent();
       if (parent != null && parent.getParent() instanceof FileSetNode) {
         return (FileSetNode) selectedNode.getParent().getParent();
       }
@@ -229,7 +229,7 @@ public class SpringConfigurationTab implements Disposable {
   }
 
   public void apply() {
-    final Set<SpringFileSet> fileSets = myModuleExtension.getFileSets();
+    Set<SpringFileSet> fileSets = myModuleExtension.getFileSets();
     fileSets.clear();
     for (SpringFileSet fileSet : myBuffer) {
       if (!fileSet.isAutodetected() || fileSet.isRemoved()) {
@@ -240,9 +240,9 @@ public class SpringConfigurationTab implements Disposable {
 
   public void reset() {
     myBuffer.clear();
-    final Module module = myModuleExtension.getModule();
-    final SpringModuleExtension springFacet = myModuleExtension;
-    final Set<SpringFileSet> sets = SpringManager.getInstance(module.getProject()).getAllSets(springFacet);
+    Module module = myModuleExtension.getModule();
+    SpringModuleExtension springFacet = myModuleExtension;
+    Set<SpringFileSet> sets = SpringManager.getInstance(module.getProject()).getAllSets(springFacet);
     for (SpringFileSet fileSet : sets) {
       myBuffer.add(fileSet.cloneTo(this));
     }
@@ -252,7 +252,7 @@ public class SpringConfigurationTab implements Disposable {
     myTree.setSelectionRow(0);
   }
 
-  private void selectFileSet(final SpringFileSet fileSet) {
+  private void selectFileSet(SpringFileSet fileSet) {
     myTree.select(myBuilder, simpleNode -> {
       if (simpleNode instanceof FileSetNode) {
         if (((FileSetNode) simpleNode).mySet.equals(fileSet)) {
@@ -274,26 +274,26 @@ public class SpringConfigurationTab implements Disposable {
     FileSetNode(SpringFileSet fileSet) {
       mySet = fileSet;
 
-      final String name = mySet.getName();
+      String name = mySet.getName();
       setPlainText(mySet.isAutodetected() ? name + " " + SpringBundle.message("config.fileset.autodetected") : name);
       setIcon(fileSet.getIcon());
     }
 
     @Override
     public SimpleNode[] getChildren() {
-      final ArrayList<SimpleNode> nodes = new ArrayList<SimpleNode>();
+      ArrayList<SimpleNode> nodes = new ArrayList<SimpleNode>();
       deps:
       for (String dep : mySet.getDependencies()) {
-        final consulo.module.Module module = myModuleExtension.getModule();
+        consulo.module.Module module = myModuleExtension.getModule();
         for (SpringFileSet fileSet : myBuffer) {
           if (fileSet.getId().equals(dep)) {
             nodes.add(new DependencyNode(fileSet, this));
             continue deps;
           }
         }
-        final SpringModuleExtension springFacet = SpringModuleExtension.getInstance(module);
+        SpringModuleExtension springFacet = SpringModuleExtension.getInstance(module);
         assert springFacet != null;
-        final List<SpringFileSet> models = SpringManager.getInstance(module.getProject()).getProvidedModels(springFacet);
+        List<SpringFileSet> models = SpringManager.getInstance(module.getProject()).getProvidedModels(springFacet);
         for (SpringFileSet fileSet : models) {
           if (fileSet.getId().equals(dep)) {
             nodes.add(new DependencyNode(fileSet, this));
@@ -346,10 +346,10 @@ public class SpringConfigurationTab implements Disposable {
 
     @Override
     protected void doUpdate() {
-      final VirtualFile file = myFilePointer.getFile();
+      VirtualFile file = myFilePointer.getFile();
       if (file != null) {
-        final Project project = myModuleExtension.getProject();
-        final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+        Project project = myModuleExtension.getProject();
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
         if (!(psiFile instanceof XmlFile) || !SpringManager.getInstance(project).isSpringBeans((XmlFile) psiFile)) {
           renderFile(SimpleTextAttributes.ERROR_ATTRIBUTES,
               SimpleTextAttributes.ERROR_ATTRIBUTES,

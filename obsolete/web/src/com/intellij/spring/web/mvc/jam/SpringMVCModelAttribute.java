@@ -23,13 +23,13 @@ public abstract class SpringMVCModelAttribute implements JamElement {
 
   @Nullable
   public String getName() {
-    final String value = MODEL_ATTRIBUTE_META.getAttribute(getPsiElement(), VALUE_META).getStringValue();
+    String value = MODEL_ATTRIBUTE_META.getAttribute(getPsiElement(), VALUE_META).getStringValue();
     if (value != null) {
       return value;
     }
-    final PsiType psiType = getType();
+    PsiType psiType = getType();
     if (psiType instanceof PsiClassType) {
-      final PsiClass psiClass = ((PsiClassType)psiType).resolve();
+      PsiClass psiClass = ((PsiClassType)psiType).resolve();
       if (psiClass != null) {
         return StringUtil.decapitalize(psiClass.getName());
       }
@@ -39,7 +39,7 @@ public abstract class SpringMVCModelAttribute implements JamElement {
 
   @Nullable
   public PsiType getType() {
-    final PsiModifierListOwner psi = getPsiElement();
+    PsiModifierListOwner psi = getPsiElement();
     if (psi instanceof PsiMethod) {
       return ((PsiMethod)psi).getReturnType();
     }

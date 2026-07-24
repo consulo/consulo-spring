@@ -17,12 +17,12 @@ import jakarta.annotation.Nonnull;
 public class SpringStereotypesReferenceProvider extends PsiReferenceProvider {
 
   @Nonnull
-  public PsiReference[] getReferencesByElement(@Nonnull PsiElement element, @Nonnull final ProcessingContext context) {
+  public PsiReference[] getReferencesByElement(@Nonnull PsiElement element, @Nonnull ProcessingContext context) {
     if (element instanceof PsiLiteralExpression) {
-      final PsiLiteralExpression literalExpression = (PsiLiteralExpression)element;
+      PsiLiteralExpression literalExpression = (PsiLiteralExpression)element;
       if (literalExpression.getValue() instanceof String) {
 
-        final PsiAnnotation psiAnnotation = PsiTreeUtil.getParentOfType(element, PsiAnnotation.class);
+        PsiAnnotation psiAnnotation = PsiTreeUtil.getParentOfType(element, PsiAnnotation.class);
 
         if (psiAnnotation != null) {
           return new PsiReference[]{PsiReferenceBase.createSelfReference(element, psiAnnotation)};

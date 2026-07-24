@@ -41,7 +41,7 @@ public class SpringAopRenameTest extends JavaCodeInsightFixtureTestCase {
 
     myFixture.testRename(getTestName(false) + ".java", getTestName(false) + "_after.java", "newName");
 
-    final PsiElement atCaret = myFixture.getFile().findElementAt(myFixture.getEditor().getCaretModel().getOffset()).getParent();
+    PsiElement atCaret = myFixture.getFile().findElementAt(myFixture.getEditor().getCaretModel().getOffset()).getParent();
     assertInstanceOf(atCaret, PsiParameter.class);
     assertTrue(JavaRefactoringSupportProvider.mayRenameInplace(atCaret, atCaret));
   }

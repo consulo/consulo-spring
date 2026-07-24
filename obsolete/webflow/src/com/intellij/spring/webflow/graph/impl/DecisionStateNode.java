@@ -31,7 +31,7 @@ public class DecisionStateNode extends WebflowBasicNode<DecisionState> {
 
   public List<WebflowNamedAction> getAllNodeActions() {
     List<WebflowNamedAction> actions = new ArrayList<WebflowNamedAction>();
-    final DecisionState state = getIdentifyingElement();
+    DecisionState state = getIdentifyingElement();
     if (state.isValid()) {
       WebflowUtil.collectActons(state.getEntryActions(), actions);
       WebflowUtil.collectActons(state.getExitActions(), actions);

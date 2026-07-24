@@ -45,13 +45,13 @@ public class ParseCustomBeanIntention implements IntentionAction {
         return SpringLocalize.parseCustomBeanIntention();
     }
 
-    public boolean isAvailable(@Nonnull final Project project, final Editor editor, final PsiFile file) {
+    public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
         return DomUtil.findDomElement(file.findElementAt(editor.getCaretModel().getOffset()), DomSpringBean.class)
             instanceof CustomBeanWrapper;
     }
 
-    public void invoke(@Nonnull final Project project, final Editor editor, final PsiFile file) throws IncorrectOperationException {
-        final CustomBeanWrapper wrapper =
+    public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+        CustomBeanWrapper wrapper =
             DomUtil.findDomElement(file.findElementAt(editor.getCaretModel().getOffset()), CustomBeanWrapper.class);
         assert wrapper != null;
         invokeCustomBeanParsers(project, Arrays.asList(wrapper.getXmlTag()));
@@ -82,15 +82,15 @@ public class ParseCustomBeanIntention implements IntentionAction {
             return; //the rest deals only with pretty feedback to user
         }
 
-        final CustomBeanRegistry.ParseResult result = ref.get();
+        CustomBeanRegistry.ParseResult result = ref.get();
 
-        final String message = result.getErrorMessage();
+        String message = result.getErrorMessage();
         if (message != null) {
             Messages.showErrorDialog(project, message, SpringLocalize.parseCustomBeanError().get());
             return;
         }
 
-        final String trace = result.getStackTrace();
+        String trace = result.getStackTrace();
         if (trace != null) {
             String shortTrace = trace;
             int i = 0;
@@ -103,7 +103,7 @@ public class ParseCustomBeanIntention implements IntentionAction {
                 shortTrace = trace.substring(0, i) + "\n\t...";
             }
 
-            final int exitCode = Messages.showDialog(
+            int exitCode = Messages.showDialog(
                 project,
                 shortTrace,
                 SpringLocalize.parseCustomBeanError().get(),
@@ -118,16 +118,16 @@ public class ParseCustomBeanIntention implements IntentionAction {
             return;
         }
 
-        final List<CustomBeanInfo> infos = result.getBeans();
+        List<CustomBeanInfo> infos = result.getBeans();
         assert infos != null;
-        final String beansText = StringUtil.join(infos, it -> "  id = " + it.beanName + "; class = " + it.beanClassName, "\n");
+        String beansText = StringUtil.join(infos, it -> "  id = " + it.beanName + "; class = " + it.beanClassName, "\n");
 
         if (infos.size() == 1 && tags.size() == 1) {
-            final String idAttr = infos.get(0).idAttribute;
+            String idAttr = infos.get(0).idAttribute;
             if (idAttr != null) {
-                final XmlTag tag = tags.iterator().next();
-                final String ns = tag.getNamespace();
-                final String localName = tag.getLocalName();
+                XmlTag tag = tags.iterator().next();
+                String ns = tag.getNamespace();
+                String localName = tag.getLocalName();
                 LocalizeValue inductMessage = SpringLocalize.parseTheseBeansInduct(beansText, ns, localName, idAttr);
                 if (Messages.showDialog(
                     project,
@@ -137,7 +137,7 @@ public class ParseCustomBeanIntention implements IntentionAction {
                     1,
                     UIUtil.getInformationIcon()
                 ) == 0) {
-                    final CustomBeanInfo beanInfo = new CustomBeanInfo(infos.get(0));
+                    CustomBeanInfo beanInfo = new CustomBeanInfo(infos.get(0));
                     beanInfo.beanName = null;
                     CustomBeanRegistry.getInstance(project).addBeanPolicy(ns, localName, beanInfo);
                 }

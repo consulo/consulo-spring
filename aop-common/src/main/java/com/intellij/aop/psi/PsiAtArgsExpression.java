@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class PsiAtArgsExpression extends AopElementBase implements PsiPointcutExpression, PsiAtPointcutDesignator{
 
-  public PsiAtArgsExpression(@Nonnull final ASTNode node) {
+  public PsiAtArgsExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
@@ -34,16 +34,16 @@ public class PsiAtArgsExpression extends AopElementBase implements PsiPointcutEx
   }
 
   @Nonnull
-  public PointcutMatchDegree acceptsSubject(final PointcutContext context, final PsiMember member) {
+  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     if (!(member instanceof PsiMethod)) return PointcutMatchDegree.FALSE;
 
-    final AopParameterList list = getParameterList();
+    AopParameterList list = getParameterList();
     if (list == null) return PointcutMatchDegree.FALSE;
 
 
 
     return list.matches(context, ((PsiMethod)member).getParameterList(), new PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree>() {
-      public PointcutMatchDegree fun(final PsiType actualType, final AopReferenceTarget holder) {
+      public PointcutMatchDegree fun(PsiType actualType, AopReferenceTarget holder) {
         return actualType instanceof PsiClassType
                ? canHaveAnnotation(((PsiClassType)actualType).resolve(), holder, PointcutMatchDegree.TRUE, PointcutMatchDegree.MAYBE)
                : PointcutMatchDegree.FALSE;
@@ -57,24 +57,24 @@ public class PsiAtArgsExpression extends AopElementBase implements PsiPointcutEx
   }
 
 
-  public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nullable final AopReferenceHolder holder, final PointcutContext context,
-                                                      final PointcutMatchDegree maybeTrue, final PointcutMatchDegree maybeFalse) {
+  public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nullable AopReferenceHolder holder, PointcutContext context,
+                                                      PointcutMatchDegree maybeTrue, PointcutMatchDegree maybeFalse) {
     if (holder == null) return PointcutMatchDegree.FALSE;
     return canHaveAnnotation(psiClass, context.resolve(holder), maybeTrue, maybeFalse);
   }
 
-  public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nonnull final AopReferenceTarget holder,
-                                                      final PointcutMatchDegree maybeTrue, final PointcutMatchDegree maybeFalse) {
+  public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nonnull AopReferenceTarget holder,
+                                                      PointcutMatchDegree maybeTrue, PointcutMatchDegree maybeFalse) {
     if (psiClass == null) return PointcutMatchDegree.FALSE;
 
     PsiModifierList modifierList = psiClass.getModifierList();
     if (modifierList == null) return PointcutMatchDegree.FALSE;
 
-    final String annoName = holder.getQualifiedName();
-    final PsiClass annoClass = holder.findClass();
+    String annoName = holder.getQualifiedName();
+    PsiClass annoClass = holder.findClass();
     if (annoClass == null || !annoClass.isAnnotationType()) return PointcutMatchDegree.FALSE;
 
-    final PsiModifierList annoModifierList = annoClass.getModifierList();
+    PsiModifierList annoModifierList = annoClass.getModifierList();
     boolean isInheritedAnno = annoModifierList != null && annoModifierList.findAnnotation(CommonClassNames.JAVA_LANG_ANNOTATION_INHERITED) != null;
     boolean isFinal = modifierList.hasModifierProperty(PsiModifier.FINAL);
     boolean hasAnno = modifierList.findAnnotation(annoName) != null;

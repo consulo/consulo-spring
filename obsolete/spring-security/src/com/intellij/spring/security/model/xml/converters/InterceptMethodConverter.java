@@ -33,24 +33,24 @@ public class InterceptMethodConverter extends Converter<String> implements Custo
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue,
-                                         final PsiElement element,
-                                         final ConvertContext context) {
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
+                                         PsiElement element,
+                                         ConvertContext context) {
     return createReferences(genericDomValue, element);
   }
 
   @NotNull
-  public PsiReference[] createReferences(final GenericDomValue<String> genericDomValue, final PsiElement element) {
-    final String stringValue = genericDomValue.getStringValue();
+  public PsiReference[] createReferences(GenericDomValue<String> genericDomValue, PsiElement element) {
+    String stringValue = genericDomValue.getStringValue();
     if (stringValue == null) {
       return PsiReference.EMPTY_ARRAY;
     }
 
-    final PsiReference[] javaClassReferences = getJavaClassReferences(element);
+    PsiReference[] javaClassReferences = getJavaClassReferences(element);
     Set<PsiReference> resolved = new HashSet<PsiReference>();
     PsiClass psiClass = null;
     for (PsiReference reference : javaClassReferences) {
-      final PsiElement psiElement = reference.resolve();
+      PsiElement psiElement = reference.resolve();
       if (psiElement == null) break;
       resolved.add(reference);
 
@@ -67,16 +67,16 @@ public class InterceptMethodConverter extends Converter<String> implements Custo
   }
 
   private PsiReference[] getJavaClassReferences(PsiElement element) {
-    final JavaClassReferenceProvider provider = new JavaClassReferenceProvider(element.getProject());
+    JavaClassReferenceProvider provider = new JavaClassReferenceProvider(element.getProject());
     provider.setSoft(true);
     return provider.getReferencesByElement(element);
   }
 
   private PsiReference createMethodReference(final PsiClass psiClass,
                                              final PsiElement element,
-                                             final String stringValue,
-                                             final GenericDomValue<String> genericDomValue) {
-    final String className = psiClass.getName();
+                                             String stringValue,
+                                             GenericDomValue<String> genericDomValue) {
+    String className = psiClass.getName();
     final String methodName = stringValue.substring(stringValue.indexOf(className) + className.length() + 1).trim();
 
     final TextRange textRange = methodName.length() == 0
@@ -97,7 +97,7 @@ public class InterceptMethodConverter extends Converter<String> implements Custo
 
       public Object[] getVariants() {
         List<PsiMethod> methods = new ArrayList<PsiMethod>();
-        final PsiMethod[] psiMethods = psiClass.getAllMethods();
+        PsiMethod[] psiMethods = psiClass.getAllMethods();
         for (PsiMethod method : psiMethods) {
           PsiClass containingClass = method.getContainingClass();
           if (method.hasModifierProperty(PsiModifier.PUBLIC) &&
@@ -112,11 +112,11 @@ public class InterceptMethodConverter extends Converter<String> implements Custo
     };
   }
 
-  public String fromString(@Nullable @NonNls String s, final ConvertContext context) {
+  public String fromString(@Nullable @NonNls String s, ConvertContext context) {
     return s;
   }
 
-  public String toString(@Nullable String s, final ConvertContext context) {
+  public String toString(@Nullable String s, ConvertContext context) {
     return s;
   }
 

@@ -18,7 +18,7 @@ import java.util.List;
 public class AopModelImpl implements AopModel {
   private final Module myModule;
 
-  public AopModelImpl(@Nonnull final consulo.module.Module module) {
+  public AopModelImpl(@Nonnull consulo.module.Module module) {
     myModule = module;
   }
 

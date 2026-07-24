@@ -31,7 +31,7 @@ public class WebflowDomFileDescription extends DomFileDescription<Flow> {
     registerSpringBeansExtensions(SpringDomFileDescription.getInstance());
   }
 
-  private void registerSpringBeansExtensions(final SpringDomFileDescription springDomFileDescription) {
+  private void registerSpringBeansExtensions(SpringDomFileDescription springDomFileDescription) {
     springDomFileDescription.registerNamespacePolicy(WebflowConstants.WEBFLOW_CONFIG_NAMESPACE_KEY, WebflowConstants.WEBFLOW_CONFIG_NAMESPACE);
     // version 2
     registerImplementation(FlowRegistry.class, FlowRegistryImpl.class);

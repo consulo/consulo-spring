@@ -35,7 +35,7 @@ public class SpringAdviceLocalAopModel extends SpringLocalAopModel {
   @Nullable
   private final BasicAdvice myAdvice;
 
-  public SpringAdviceLocalAopModel(final PsiElement host, @Nullable final BasicAdvice basicAdvice, final SpringAdvisedElementsSearcher searcher) {
+  public SpringAdviceLocalAopModel(PsiElement host, @Nullable BasicAdvice basicAdvice, SpringAdvisedElementsSearcher searcher) {
     super(host, basicAdvice, searcher);
     myAdvice = basicAdvice;
     myTag = PsiTreeUtil.getParentOfType(host, XmlTag.class);
@@ -47,19 +47,19 @@ public class SpringAdviceLocalAopModel extends SpringLocalAopModel {
     if (!"pointcut".equals(myTag.getLocalName())) return super.resolveParameters(name);
 
     final List<PsiParameter> result = new SmartList<PsiParameter>();
-    final GlobalSearchScope scope =
+    GlobalSearchScope scope =
       GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.projectScope(myTag.getProject()), XmlFileType.INSTANCE);
     ReferencesSearch.search(myTag, scope).forEach(new Processor<PsiReference>() {
-      public boolean process(final PsiReference reference) {
-        final PsiElement psiElement = reference.getElement();
-        final XmlTag xmlTag = PsiTreeUtil.getParentOfType(psiElement, XmlTag.class);
+      public boolean process(PsiReference reference) {
+        PsiElement psiElement = reference.getElement();
+        XmlTag xmlTag = PsiTreeUtil.getParentOfType(psiElement, XmlTag.class);
         if (xmlTag != null) {
-          final DomElement domElement = DomManager.getDomManager(psiElement.getProject()).getDomElement(xmlTag);
+          DomElement domElement = DomManager.getDomManager(psiElement.getProject()).getDomElement(xmlTag);
           if (domElement instanceof BasicAdvice) {
-            final BasicAdvice advice = (BasicAdvice)domElement;
-            final PsiMethod method = advice.getMethod().getValue();
+            BasicAdvice advice = (BasicAdvice)domElement;
+            PsiMethod method = advice.getMethod().getValue();
             if (method != null) {
-              final PsiParameter element = findParameter(name, method);
+              PsiParameter element = findParameter(name, method);
               result.add(element);
             }
           }
@@ -72,9 +72,9 @@ public class SpringAdviceLocalAopModel extends SpringLocalAopModel {
   }
 
   public List<AopIntroduction> getIntroductions() {
-    final List<AopIntroduction> introductions = super.getIntroductions();
+    List<AopIntroduction> introductions = super.getIntroductions();
     if (myAdvice != null) {
-      for (final SpringAspect aspect : ((AopConfig)myAdvice.getParent().getParent()).getAspects()) {
+      for (SpringAspect aspect : ((AopConfig)myAdvice.getParent().getParent()).getAspects()) {
         introductions.addAll(aspect.getIntroductions());
       }
     }

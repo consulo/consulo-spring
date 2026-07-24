@@ -34,7 +34,7 @@ public class StandardBeansDocLinksManager implements Disposable {
   private static final String DOC_LINKS_RESOURCE_XML = "/resources/frameworks/docLinks.xml";
 
   public StandardBeansDocLinksManager() {
-    final StandardBeansDocLinks docLinks =
+    StandardBeansDocLinks docLinks =
       XmlSerializer.deserialize(StandardBeansDocLinksManager.class.getResource(DOC_LINKS_RESOURCE_XML), StandardBeansDocLinks.class);
 
     assert docLinks != null;
@@ -46,15 +46,15 @@ public class StandardBeansDocLinksManager implements Disposable {
   }
 
   @Nullable
-  public String getApiLink(final String beanId) {
-    final Pair<String, String> pair = myDocLinks.get(beanId);
+  public String getApiLink(String beanId) {
+    Pair<String, String> pair = myDocLinks.get(beanId);
 
     return pair == null ? null : pair.getFirst();
   }
 
   @Nullable
-  public String getReferenceLink(final String beanId) {
-    final Pair<String, String> pair = myDocLinks.get(beanId);
+  public String getReferenceLink(String beanId) {
+    Pair<String, String> pair = myDocLinks.get(beanId);
 
     return pair == null ? null : pair.getSecond();
   }
