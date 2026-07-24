@@ -58,7 +58,6 @@ public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("conversation-service"),
             SpringLocalize.springPatternsWebflowServicesConversionService(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -66,7 +65,6 @@ public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("expression-parser"),
             SpringLocalize.springPatternsWebflowServicesExpressionParser(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -74,7 +72,6 @@ public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("factory-creator"),
             SpringLocalize.springPatternsWebflowServicesViewFactoryCreator(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -82,7 +79,6 @@ public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("formatter-registry"),
             SpringLocalize.springPatternsWebflowServicesViewFormatterRegistry(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -90,7 +86,6 @@ public class AddWebflowAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("flow-execution-listener"),
             SpringLocalize.springPatternsWebflowExecutionListener(),
-            null,
             false
         );
 

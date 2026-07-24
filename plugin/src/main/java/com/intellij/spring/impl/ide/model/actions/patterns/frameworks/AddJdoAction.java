@@ -43,7 +43,6 @@ public class AddJdoAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("datasource"),
             SpringLocalize.springPatternsDataAccessDataSource(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -57,7 +56,6 @@ public class AddJdoAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("jpox-pmf"),
             SpringLocalize.springPatternsDataAccessJdoJpoxPersistenceManager(),
-            LocalizeValue.empty(),
             false
         );
 

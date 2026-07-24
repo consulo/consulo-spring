@@ -14,11 +14,15 @@ public class TemplateInfo {
   private boolean myAccepted;
 
   public TemplateInfo(Module module, Template template, LocalizeValue name) {
-     this(module, template, name, LocalizeValue.empty());
+     this(module, template, name, true);
   }
 
   public TemplateInfo(Module module, Template template, LocalizeValue name, LocalizeValue description) {
      this(module, template, name, description, true);
+  }
+
+  public TemplateInfo(Module module, Template template, LocalizeValue name, boolean isAccepted) {
+     this(module, template, name, LocalizeValue.empty(), isAccepted);
   }
 
   public TemplateInfo(Module module, Template template, LocalizeValue name, LocalizeValue description, boolean isAccepted) {
@@ -43,12 +47,12 @@ public class TemplateInfo {
     myAccepted = accepted;
   }
 
-  public String getName() {
-    return myName.get();
+  public LocalizeValue getName() {
+    return myName;
   }
 
-  public String getDescription() {
-    return myDescription.get();
+  public LocalizeValue getDescription() {
+    return myDescription;
   }
 
   public String getReferenceLink() {

@@ -105,7 +105,8 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
     template.setToReformat(true);
 
     TemplateManager.getInstance(project).startTemplate(editor, template, new TemplateEditingAdapter() {
-      public void templateFinished(Template template) {
+      @Override
+      public void templateFinished(Template template, boolean brokenOff) {
         if (index + 1 < templates.size()) {
           Application.get().invokeLater(() -> new WriteCommandAction(project) {
             @Override

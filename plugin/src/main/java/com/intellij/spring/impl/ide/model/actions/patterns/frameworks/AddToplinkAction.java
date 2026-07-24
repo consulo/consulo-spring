@@ -42,7 +42,6 @@ public class AddToplinkAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("datasource"),
             SpringLocalize.springPatternsDataAccessDataSource(),
-            LocalizeValue.empty(),
             false
         );
 
@@ -56,7 +55,6 @@ public class AddToplinkAction extends AbstractFrameworkIntegrationAction {
             module,
             settings.getTemplateById("toplink-session-adapter"),
             SpringLocalize.springPatternsDataAccessToplinkTransactionAwareSessionAdapter(),
-            LocalizeValue.empty(),
             false
         );
 

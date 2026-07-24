@@ -52,7 +52,6 @@ public class AddOpenSymphonyTimerAction extends AbstractFrameworkIntegrationActi
             module,
             settings.getTemplateById("quartz-cron-trigger"),
             SpringLocalize.springPatternsIntegrationOpensymphonyCronTrigger(),
-            LocalizeValue.empty(),
             false
         );
 
