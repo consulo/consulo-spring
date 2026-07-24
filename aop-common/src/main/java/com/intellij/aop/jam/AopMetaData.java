@@ -15,24 +15,27 @@ import org.jetbrains.annotations.NonNls;
 public class AopMetaData implements PsiMetaData {
   private PsiAnnotation myAnnotation;
 
+  @Override
   public PsiElement getDeclaration() {
     return myAnnotation;
   }
 
-  @NonNls
+  @Override
   public String getName(PsiElement context) {
     return getName();
   }
 
-  @NonNls
+  @Override
   public final String getName() {
     return ((PsiMethod)myAnnotation.getParent().getParent()).getName();
   }
 
+  @Override
   public void init(PsiElement element) {
     myAnnotation = (PsiAnnotation) element;
   }
 
+  @Override
   public Object[] getDependences() {
     return new Object[]{myAnnotation};
   }

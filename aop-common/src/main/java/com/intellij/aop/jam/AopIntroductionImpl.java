@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.jam;
 
 import com.intellij.aop.AopIntroduction;
@@ -20,6 +19,7 @@ import com.intellij.jam.reflect.JamAnnotationMeta;
 import com.intellij.jam.reflect.JamAttributeMeta;
 import com.intellij.jam.reflect.JamStringAttributeMeta;
 import com.intellij.java.language.psi.*;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
@@ -49,32 +49,40 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   @Nonnull
   @JamAnnotation(AopConstants.DECLARE_PARENTS_ANNO)
   @JamAttribute(AopConstants.DEFAULT_IMPL_PARAM)
+  @Override
   public abstract JamClassAttributeElement getDefaultImpl();
 
+  @Override
   public XmlTag getXmlTag() {
     return null;
   }
 
+  @Override
   public Module getModule() {
     return null;
   }
 
+  @Override
   public PsiAnnotation getIdentifyingPsiElement() {
     return DECLARE_PARENTS_META.getAnnotation(getPsiElement());
   }
 
+  @Override
   public PsiFile getContainingFile() {
     return getPsiElement().getContainingFile();
   }
 
   @Nonnull
+  @Override
   public GenericValue<PsiClass> getImplementInterface() {
-    return new ReadOnlyGenericValue<PsiClass>() {
+    return new ReadOnlyGenericValue<>() {
+      @Override
       public PsiClass getValue() {
         PsiType type = getPsiElement().getType();
         return type instanceof PsiClassType ? ((PsiClassType)type).resolve() : null;
       }
 
+      @Override
       public String getStringValue() {
         return getPsiElement().getType().getCanonicalText();
       }
@@ -82,6 +90,7 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   }
 
   @Nonnull
+  @Override
   public GenericValue<AopReferenceHolder> getTypesMatching() {
     return DECLARE_PARENTS_META.getAttribute(getPsiElement(), VALUE_META);
   }
@@ -89,9 +98,10 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   @Nullable
   public static AopReferenceHolder getTypesMatchingPattern(@Nullable PsiElement value) {
     PsiPointcutExpression expression = AopPointcutImpl.getPsiPointcutExpression(value);
-    return expression instanceof PsiTargetExpression ? ((PsiTargetExpression)expression).getTypeReference() : null;
+    return expression instanceof PsiTargetExpression target ? target.getTypeReference() : null;
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return getPsiElement().getManager();
   }
@@ -100,6 +110,8 @@ public abstract class AopIntroductionImpl implements AopIntroduction, JamElement
   @JamPsiConnector
   public abstract PsiField getPsiElement();
 
+  @Override
+  @RequiredReadAction
   public boolean isValid() {
     return getPsiElement().isValid();
   }

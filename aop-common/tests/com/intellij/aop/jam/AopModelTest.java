@@ -33,6 +33,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
     super.setUp();
     myRoot = myFixture.getTempDirFixture().getFile("");
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         PsiTestUtil.addSourceRoot(myModule, myRoot);
       }
@@ -153,6 +154,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
 
   private PsiJavaFile createFile(final String text) {
     VirtualFile file = new WriteCommandAction<VirtualFile>(getProject()) {
+      @Override
       protected void run(Result<VirtualFile> result) throws Throwable {
         VirtualFile file = myRoot.createChildData(this, "Aspects.java");
 
@@ -170,6 +172,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
       .createMethodFromText("@" + AopConstants.POINTCUT_ANNO + "(\"xxx\")\n" + "void foo(int a) {}", null);
     AopPointcut pointcut = new AopPointcutImpl() {
       @Nonnull
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }
@@ -193,6 +196,7 @@ public class AopModelTest extends JavaCodeInsightFixtureTestCase {
                                                 "@" + AopConstants.AFTER_RETURNING_ANNO + "(pointcut=\"xxx\")\n" + "void foo(int a) {}" +
                                                 "}").getMethods()[0];
     AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }

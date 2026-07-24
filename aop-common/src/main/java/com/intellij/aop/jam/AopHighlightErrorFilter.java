@@ -17,17 +17,18 @@ import jakarta.annotation.Nonnull;
  */
 @ExtensionImpl
 public class AopHighlightErrorFilter extends HighlightErrorFilter {
-
-  public boolean shouldHighlightErrorElement(@Nonnull PsiErrorElement element) {
-    return !value(element);
-  }
-
-  public static boolean value(PsiErrorElement psiErrorElement) {
-    PsiFile file = psiErrorElement.getContainingFile();
-    if (file instanceof AopPointcutExpressionFile) {
-      if (((AopPointcutExpressionFile)file).getAopModel().getAdvisedElementsSearcher().shouldSuppressErrors()) return true;
+    @Override
+    public boolean shouldHighlightErrorElement(@Nonnull PsiErrorElement element) {
+        return !value(element);
     }
 
-    return false;
-  }
+    public static boolean value(PsiErrorElement psiErrorElement) {
+        if (psiErrorElement.getContainingFile() instanceof AopPointcutExpressionFile pointcutExpressionFile) {
+            if (pointcutExpressionFile.getAopModel().getAdvisedElementsSearcher().shouldSuppressErrors()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

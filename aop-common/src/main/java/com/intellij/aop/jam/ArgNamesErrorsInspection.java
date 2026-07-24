@@ -10,7 +10,6 @@ import com.intellij.java.language.psi.*;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.aop.localize.AopLocalize;
-import consulo.application.util.function.Processor;
 import consulo.document.util.TextRange;
 import consulo.language.editor.inspection.ProblemHighlightType;
 import consulo.language.editor.inspection.ProblemsHolder;
@@ -35,14 +34,14 @@ import java.util.List;
 @ExtensionImpl
 public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
     @Nonnull
+    @Override
     public HighlightDisplayLevel getDefaultLevel() {
         return HighlightDisplayLevel.ERROR;
     }
 
-    protected void checkAnnotation(
-        PsiParameter[] parameters, ProblemsHolder holder,
-        ArgNamesManipulator manipulator, PsiMethod method
-    ) {
+    @Override
+    @RequiredReadAction
+    protected void checkAnnotation(PsiParameter[] parameters, ProblemsHolder holder, ArgNamesManipulator manipulator, PsiMethod method) {
         String names = manipulator.getArgNames();
         if (names != null) {
             String[] strings = names.trim().split(",");
@@ -102,11 +101,8 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
 
         for (PsiParameter parameter : parameters) {
             if (!LocalAopModel.isJoinPointParamer(parameter)) {
-                boolean hasRef = !ReferencesSearch.search(parameter).forEach(new Processor<PsiReference>() {
-                    public boolean process(PsiReference reference) {
-                        return !(reference.getElement().getContainingFile() instanceof AopPointcutExpressionFile);
-                    }
-                });
+                boolean hasRef = !ReferencesSearch.search(parameter)
+                    .forEach(reference -> !(reference.getElement().getContainingFile() instanceof AopPointcutExpressionFile));
                 if (!hasRef && !parameter.equals(manipulator.getReturningParameter()) && !parameter.equals(manipulator.getThrowingParameter())) {
                     holder.newProblem(AopLocalize.unboundPointcutParameter(parameter.getName()))
                         .range(manipulator.getArgNamesProblemElement())
@@ -127,13 +123,12 @@ public class ArgNamesErrorsInspection extends AbstractArgNamesInspection {
         LocalizeValue message = ProblemsHolder.unresolvedReferenceMessage(returningReference);
         ProblemHighlightType highlightType = emptyRange || !(element instanceof PsiLiteralExpression || element instanceof XmlElement)
             ? ProblemHighlightType.GENERIC_ERROR_OR_WARNING : ProblemHighlightType.LIKE_UNKNOWN_SYMBOL;
-        holder.registerProblem(InspectionManager.getInstance(element.getProject()).createProblemDescriptor(element, range, message.get(),
-            highlightType
-        ));
+        holder.registerProblem(InspectionManager.getInstance(element.getProject())
+            .createProblemDescriptor(element, range, message.get(), highlightType));
     }
 
     public static List<String> getGeneralArgumentNames(PsiParameter[] parameters) {
-        List<String> actualNames = new ArrayList<String>();
+        List<String> actualNames = new ArrayList<>();
         for (PsiParameter parameter : parameters) {
             actualNames.add(parameter.getName());
         }

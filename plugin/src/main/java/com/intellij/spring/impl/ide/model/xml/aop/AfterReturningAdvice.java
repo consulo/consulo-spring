@@ -47,7 +47,6 @@ public interface AfterReturningAdvice extends DomElement, BasicAdvice, AopAfterR
     @Override
     GenericAttributeValue<PsiPointcutExpression> getPointcut();
 
-
     /**
      * Returns the value of the pointcut-ref child.
      * <pre>
@@ -73,9 +72,9 @@ public interface AfterReturningAdvice extends DomElement, BasicAdvice, AopAfterR
      * @return the value of the method child.
      */
     @Nonnull
+    @Override
     @Required
     GenericAttributeValue<PsiMethod> getMethod();
-
 
     /**
      * Returns the value of the arg-names child.

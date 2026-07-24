@@ -16,8 +16,8 @@ public class AopConstructorReferenceExpression extends AopMemberReferenceExpress
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopConstructorReferenceExpression";
   }
-
 }

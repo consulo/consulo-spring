@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
 
@@ -21,21 +21,26 @@ public class AopGenericTypeExpression extends AopElementBase implements AopTypeE
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopParameterizedTypeExpression";
   }
 
   @Nonnull
+  @RequiredReadAction
   public AopTypeExpression getRawTypeReference() {
     return findNotNullChildByClass(AopTypeExpression.class);
   }
 
   @Nonnull
+  @RequiredReadAction
   public AopTypeParameterList getTypeParameterList() {
     return findNotNullChildByClass(AopTypeParameterList.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     Collection<AopPsiTypePattern> erasurePatterns = getRawTypeReference().getPatterns();
     PsiElement[] parameters = getTypeParameterList().getParameters();
@@ -46,7 +51,7 @@ public class AopGenericTypeExpression extends AopElementBase implements AopTypeE
       Collection<AopPsiTypePattern> patterns = expression.getPatterns();
       parameterPatterns[i] = patterns.toArray(new AopPsiTypePattern[patterns.size()]);
     }
-    Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
+    Set<AopPsiTypePattern> result = new HashSet<>();
     for (AopPsiTypePattern erasurePattern : erasurePatterns) {
       int[] indices = new int[parameterPatterns.length];
       while (true) {
@@ -66,9 +71,8 @@ public class AopGenericTypeExpression extends AopElementBase implements AopTypeE
     return result;
   }
 
+  @Override
   public String getTypePattern() {
     return "'_";
   }
-
-
 }

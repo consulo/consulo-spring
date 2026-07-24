@@ -34,10 +34,12 @@ import java.util.List;
 public class AopModuleService implements Disposable {
   private final NotNullLazyValue<AopModelImpl> myModel;
   private static final AopModel EMPTY_AOP_MODEL = new AopModel() {
+    @Override
     public List<? extends AopAspect> getAspects() {
       return Collections.emptyList();
     }
 
+    @Override
     public List<? extends AopPointcut> getPointcuts() {
       return Collections.emptyList();
     }
@@ -55,8 +57,9 @@ public class AopModuleService implements Disposable {
 
   @Inject
   public AopModuleService(final @Nonnull Module module) {
-    myModel = new NotNullLazyValue<AopModelImpl>() {
+    myModel = new NotNullLazyValue<>() {
       @Nonnull
+      @Override
       protected AopModelImpl compute() {
         return new AopModelImpl(module);
       }
@@ -88,6 +91,7 @@ public class AopModuleService implements Disposable {
     return myModel.getValue();
   }
 
+  @Override
   public void dispose() {
   }
 }

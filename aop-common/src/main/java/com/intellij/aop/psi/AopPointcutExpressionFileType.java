@@ -6,8 +6,6 @@ package com.intellij.aop.psi;
 import consulo.language.file.LanguageFileType;
 import consulo.localize.LocalizeValue;
 import consulo.ui.image.Image;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -22,23 +20,25 @@ public class AopPointcutExpressionFileType extends LanguageFileType {
   }
 
   @Nonnull
-  @NonNls
-  public String getId() {
+  public   @Override
+  String getId() {
     return "Pointcut Expression";
   }
 
   @Nonnull
+  @Override
   public LocalizeValue getDescription() {
     return LocalizeValue.localizeTODO("Pointcut Expression");
   }
 
   @Nonnull
-  @NonNls
+  @Override
   public String getDefaultExtension() {
     return "pointcutExpression";
   }
 
   @Nullable
+  @Override
   public Image getIcon() {
     return null;
   }

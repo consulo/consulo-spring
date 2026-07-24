@@ -6,6 +6,7 @@ package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiClassType;
 import com.intellij.java.language.psi.PsiReferenceList;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.lang.StringUtil;
 
@@ -19,14 +20,17 @@ public class AopThrowsList extends AopElementBase {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopThrowsList";
   }
 
+  @RequiredReadAction
   public AopReferenceHolder[] getExceptionPatterns() {
     return findChildrenByClass(AopReferenceHolder.class);
   }
 
+  @RequiredReadAction
   public boolean matches(PsiReferenceList list) {
     if (StringUtil.isEmpty(list.getText())) return false;
 

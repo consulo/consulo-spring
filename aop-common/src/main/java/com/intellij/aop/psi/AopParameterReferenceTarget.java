@@ -22,10 +22,12 @@ public class AopParameterReferenceTarget implements AopReferenceTarget {
   }
 
   @Nonnull
+  @Override
   public String getQualifiedName() {
     return myParameter.getType().getCanonicalText();
   }
 
+  @Override
   public PointcutMatchDegree canBeInstance(PsiClass psiClass, boolean allowPatterns) {
     PsiType type = myParameter.getType();
     if (type instanceof PsiClassType) {
@@ -40,20 +42,24 @@ public class AopParameterReferenceTarget implements AopReferenceTarget {
     return PointcutMatchDegree.FALSE;
   }
 
+  @Override
   public PointcutMatchDegree accepts(PsiType actualType) {
     return PointcutMatchDegree.valueOf(actualType.equals(myParameter.getType()));
   }
 
+  @Override
   public String getTypePattern() {
     throw new UnsupportedOperationException("Method getTypePattern is not yet implemented in " + getClass().getName());
   }
 
   @Nullable
+  @Override
   public PsiClass findClass() {
     PsiType type = myParameter.getType();
     return type instanceof PsiClassType ? ((PsiClassType)type).resolve() : null;
   }
 
+  @Override
   public boolean isAssignableFrom(PsiType type) {
     return myParameter.getType().isAssignableFrom(type);
   }
