@@ -18,6 +18,7 @@ import jakarta.annotation.Nonnull;
 
 @ExtensionImpl
 public class AbstractBeanReferencesInspection extends SpringBeanInspectionBase<Object> {
+    @Override
     protected void checkBean(
         SpringBean springBean,
         final Beans beans,
@@ -74,13 +75,9 @@ public class AbstractBeanReferencesInspection extends SpringBeanInspectionBase<O
         }
     }
 
-    private static void checkNotAbstract(
-        final DomElement annotated,
-        final SpringBeanPointer springBean,
-        final DomElementAnnotationHolder holder
-    ) {
+    private static void checkNotAbstract(DomElement annotated, SpringBeanPointer springBean, DomElementAnnotationHolder holder) {
         if (springBean.isAbstract()) {
-            holder.createProblem(annotated, SpringBundle.message("spring.bean.referenced.by.abstract.bean"));
+            holder.createProblem(annotated, SpringLocalize.springBeanReferencedByAbstractBean().get());
         }
     }
 

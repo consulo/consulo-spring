@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.jam;
 
 import com.intellij.aop.AopAdvice;
@@ -18,6 +17,7 @@ import com.intellij.java.language.psi.PsiAnnotation;
 import com.intellij.java.language.psi.PsiAnnotationMemberValue;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
 import consulo.module.Module;
@@ -33,7 +33,6 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
   private final AopAdviceType myType;
   protected final JamAnnotationMeta myAnnoMeta;
 
-
   public AopAdviceImpl(final AopAdviceType type, JamAnnotationMeta annoMeta) {
     myAnnoMeta = annoMeta;
     myType = type;
@@ -44,44 +43,52 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
     return myAnnoMeta.getAttribute(getPsiElement(), AopAdviceMetas.VALUE_ATTR).getPsiElement();
   }
 
+  @Override
   public JamStringAttributeElement<String> getArgNames() {
     return myAnnoMeta.getAttribute(getPsiElement(), AopAdviceMetas.ARG_NAMES_ATTR);
   }
 
   @Nullable
+  @Override
   public PsiPointcutExpression getPointcutExpression() {
     final PsiAnnotationMemberValue param = getAnnoParam();
     return AopPointcutImpl.getPsiPointcutExpression(param);
   }
 
   @Nonnull
+  @Override
   public AopAdviceType getAdviceType() {
     return myType;
   }
 
+  @Override
   public AopAdvisedElementsSearcher getSearcher() {
     final PsiPointcutExpression expression = getPointcutExpression();
     return expression == null ? null : expression.getContainingFile().getAopModel().getAdvisedElementsSearcher();
   }
 
+  @Override
   public PointcutMatchDegree accepts(final PsiMethod method) {
     final PsiPointcutExpression expression = getPointcutExpression();
-    return expression == null ? PointcutMatchDegree.FALSE : expression
-      .acceptsSubject(new PointcutContext(expression), method);
+    return expression == null ? PointcutMatchDegree.FALSE : expression.acceptsSubject(new PointcutContext(expression), method);
   }
 
+  @Override
   public XmlTag getXmlTag() {
     return null;
   }
 
+  @Override
   public Module getModule() {
     return null;
   }
 
+  @Override
   public PsiAnnotation getIdentifyingPsiElement() {
     return myAnnoMeta.getAnnotation(getPsiElement());
   }
 
+  @Override
   public PsiFile getContainingFile() {
     return getPsiElement().getContainingFile();
   }
@@ -98,19 +105,24 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
   }
 
   @Nullable
+  @Override
   public PsiAnnotation getAnnotation() {
     return getIdentifyingPsiElement();
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return getPsiElement().getManager();
   }
 
+  @Override
+  @RequiredReadAction
   public boolean isValid() {
     return getPsiElement().isValid();
   }
 
   @JamPsiConnector
+  @Override
   public abstract PsiMethod getPsiElement();
 
   public abstract static class Before extends AopAdviceImpl {
@@ -128,5 +140,4 @@ public abstract class AopAdviceImpl implements JamChief, AopAdvice, PointcutCont
       super(AopAdviceType.AROUND, AopAdviceMetas.AROUND_META);
     }
   }
-
 }

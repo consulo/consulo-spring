@@ -8,7 +8,6 @@ import com.intellij.aop.jam.AopConstants;
 import com.intellij.java.language.psi.JavaPsiFacade;
 import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiJavaPackage;
-import consulo.application.util.function.Processor;
 import consulo.language.psi.PsiManager;
 import consulo.language.psi.scope.GlobalSearchScope;
 import consulo.logging.Logger;
@@ -18,6 +17,7 @@ import org.jetbrains.annotations.TestOnly;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author peter
@@ -37,10 +37,10 @@ public class AllAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     myScope = scope;
   }
 
-  public boolean process(final Processor<PsiClass> processor) {
+  @Override
+  public boolean test(Predicate<PsiClass> processor) {
     final PsiJavaPackage psiPackage = JavaPsiFacade.getInstance(getManager().getProject()).findPackage("");
-    return psiPackage == null || processPackage(processor, psiPackage, new ArrayList<PsiJavaPackage>());
-
+    return psiPackage == null || processPackage(processor, psiPackage, new ArrayList<>());
   }
 
   @Override
@@ -48,7 +48,7 @@ public class AllAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     return true;
   }
 
-  private boolean processPackage(final Processor<PsiClass> processor, final PsiJavaPackage psiPackage, final List<PsiJavaPackage> visited) {
+  private boolean processPackage(Predicate<PsiClass> processor, PsiJavaPackage psiPackage, List<PsiJavaPackage> visited) {
     if (visited.contains(psiPackage)) {
       LOG.error("Circular package structure:\n" + StringUtil.join(visited,
                                                                   psiPackage1 -> psiPackage1.getQualifiedName() + " === " + StringUtil.join(
@@ -57,17 +57,15 @@ public class AllAdvisedElementsSearcher extends AopAdvisedElementsSearcher {
     }
 
     visited.add(psiPackage);
-    if (!ContainerUtil.process(psiPackage.getClasses(myScope), new Processor<PsiClass>() {
-      public boolean process(final PsiClass psiClass) {
-        return psiClass.getModifierList().findAnnotation(AopConstants.ASPECT_ANNO) != null || processor.process(psiClass);
-      }
-    })) {
+    if (!ContainerUtil.process(
+        psiPackage.getClasses(myScope),
+        psiClass -> psiClass.getModifierList().findAnnotation(AopConstants.ASPECT_ANNO) != null || processor.test(psiClass)
+    )) {
       return false;
     }
     for (final PsiJavaPackage aPackage : psiPackage.getSubPackages(myScope)) {
-      if (!processPackage(processor, aPackage, new ArrayList<PsiJavaPackage>(visited))) return false;
+      if (!processPackage(processor, aPackage, new ArrayList<>(visited))) return false;
     }
     return true;
   }
-
 }

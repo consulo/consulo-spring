@@ -6,13 +6,13 @@ package com.intellij.aop.psi;
 import com.intellij.java.language.psi.PsiJavaPackage;
 import com.intellij.java.language.psi.PsiType;
 import consulo.application.util.function.CommonProcessors;
-import consulo.application.util.function.Processor;
 import consulo.language.psi.PsiManager;
-import consulo.util.lang.ref.Ref;
-
+import consulo.util.lang.ref.SimpleReference;
 import jakarta.annotation.Nonnull;
+
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * @author peter
@@ -28,6 +28,7 @@ public class AndPsiTypePattern extends AopPsiTypePattern {
     return myPatterns;
   }
 
+  @Override
   public boolean accepts(@Nonnull final PsiType type) {
     for (final AopPsiTypePattern typePattern : myPatterns) {
       if (!typePattern.accepts(type)) return false;
@@ -35,24 +36,23 @@ public class AndPsiTypePattern extends AopPsiTypePattern {
     return true;
   }
 
-  public boolean processPackages(final PsiManager manager, final Processor<PsiJavaPackage> processor) {
-    final Ref<Set<PsiJavaPackage>> set = Ref.create(new HashSet<PsiJavaPackage>());
-    myPatterns[0].processPackages(manager, new CommonProcessors.CollectProcessor<PsiJavaPackage>(set.get()));
+  @Override
+  public boolean processPackages(PsiManager manager, Predicate<PsiJavaPackage> processor) {
+    SimpleReference<Set<PsiJavaPackage>> set = SimpleReference.create(new HashSet<PsiJavaPackage>());
+    myPatterns[0].processPackages(manager, new CommonProcessors.CollectProcessor<>(set.get()));
     for (int i = 1; i < myPatterns.length; i++) {
       AopPsiTypePattern pattern = myPatterns[i];
-      final Set<PsiJavaPackage> all = set.get();
-      set.set(new HashSet<PsiJavaPackage>());
-      pattern.processPackages(manager, new Processor<PsiJavaPackage>() {
-        public boolean process(final PsiJavaPackage psiPackage) {
-          if (all.contains(psiPackage)) {
-            set.get().add(psiPackage);
-          }
-          return true;
+      Set<PsiJavaPackage> all = set.get();
+      set.set(new HashSet<>());
+      pattern.processPackages(manager, psiPackage -> {
+        if (all.contains(psiPackage)) {
+          set.get().add(psiPackage);
         }
+        return true;
       });
     }
     for (final PsiJavaPackage psiPackage : set.get()) {
-      if (!processor.process(psiPackage)) return false;
+      if (!processor.test(psiPackage)) return false;
     }
     return true;
   }

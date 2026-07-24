@@ -4,13 +4,15 @@
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiType;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.NotNullLazyValue;
 import consulo.language.ast.ASTNode;
 import consulo.language.ast.TokenSet;
 import consulo.language.psi.PsiElement;
-import consulo.util.lang.function.PairFunction;
 
 import jakarta.annotation.Nonnull;
+
+import java.util.function.BiFunction;
 
 /**
  * @author peter
@@ -21,8 +23,10 @@ public abstract class AopAbstractList<T> extends AopElementBase {
 
   public AopAbstractList(@Nonnull final ASTNode node) {
     super(node);
-    myMatcher = new NotNullLazyValue<ArrayTailCondition<T>>() {
+    myMatcher = new NotNullLazyValue<>() {
       @Nonnull
+      @Override
+      @RequiredReadAction
       protected ArrayTailCondition<T> compute() {
         return createMatcher(getParameters(), 0);
       }
@@ -31,66 +35,47 @@ public abstract class AopAbstractList<T> extends AopElementBase {
 
   protected abstract PsiType getPsiType(@Nonnull T t);
 
+  @RequiredReadAction
   public final PsiElement[] getParameters() {
     return findChildrenByType(LIST_ELEMENT_TYPES, PsiElement.class);
   }
 
-  public final PointcutMatchDegree accepts(final PointcutContext context,
-                                           T[] list,
-                                           final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher) {
+  public final PointcutMatchDegree accepts(
+    PointcutContext context,
+    T[] list,
+    BiFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher
+  ) {
     return myMatcher.getValue().value(context, matcher, list, 0);
   }
 
   private ArrayTailCondition<T> createMatcher(final PsiElement[] aopParameters, final int matchStart) {
-    if (matchStart >= aopParameters.length) return new ArrayTailCondition<T>() {
-      public PointcutMatchDegree value(final PointcutContext context,
-                                       final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher,
-                                       final T[] array,
-                                       final int start) {
-        return PointcutMatchDegree.valueOf(start >= array.length);
-      }
-    };
+    if (matchStart >= aopParameters.length) return (context, matcher, array, start) -> PointcutMatchDegree.valueOf(start >= array.length);
     final PsiElement psiElement = aopParameters[matchStart];
     final ArrayTailCondition<T> tail = createMatcher(aopParameters, matchStart + 1);
-    if (psiElement instanceof AopReferenceHolder) {
-      final AopReferenceHolder pattern = (AopReferenceHolder)psiElement;
-      return new ArrayTailCondition<T>() {
-        public PointcutMatchDegree value(final PointcutContext context,
-                                         final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher, final T[] array,
-                                         final int start) {
-          if (start >= array.length) return PointcutMatchDegree.FALSE;
-          return PointcutMatchDegree.and(matcher.fun(getPsiType(array[start]), context.resolve(pattern)),
-                                         tail.value(context, matcher, array, start + 1));
-        }
+    if (psiElement instanceof AopReferenceHolder pattern) {
+      return (context, matcher, array, start) -> {
+        if (start >= array.length) return PointcutMatchDegree.FALSE;
+        return PointcutMatchDegree.and(matcher.apply(getPsiType(array[start]), context.resolve(pattern)),
+                                       tail.value(context, matcher, array, start + 1));
       };
     }
-    return new ArrayTailCondition<T>() {
-      public PointcutMatchDegree value(final PointcutContext context,
-                                       final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher,
-                                       final T[] array,
-                                       final int start) {
-        PointcutMatchDegree result = PointcutMatchDegree.FALSE;
-        for (int i = start; i < array.length; i++) {
-          result = PointcutMatchDegree.or(result, tail.value(context, matcher, array, i));
-        }
-        return PointcutMatchDegree.or(result, PointcutMatchDegree.valueOf(matchStart == aopParameters.length - 1));
+    return (context, matcher, array, start) -> {
+      PointcutMatchDegree result = PointcutMatchDegree.FALSE;
+      for (int i = start; i < array.length; i++) {
+        result = PointcutMatchDegree.or(result, tail.value(context, matcher, array, i));
       }
+      return PointcutMatchDegree.or(result, PointcutMatchDegree.valueOf(matchStart == aopParameters.length - 1));
     };
   }
 
   private interface ArrayTailCondition<T> {
-    ArrayTailCondition TRUE = new ArrayTailCondition<Object>() {
-      public PointcutMatchDegree value(final PointcutContext context,
-                                       final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher, final Object[] array,
-                                       final int start) {
-        return PointcutMatchDegree.TRUE;
-      }
-    };
+    ArrayTailCondition TRUE = (context, matcher, array, start) -> PointcutMatchDegree.TRUE;
 
-    PointcutMatchDegree value(final PointcutContext context,
-                              final PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher,
-                              T[] array,
-                              int start);
+    PointcutMatchDegree value(
+      PointcutContext context,
+      BiFunction<PsiType, AopReferenceTarget, PointcutMatchDegree> matcher,
+      T[] array,
+      int start
+    );
   }
-
 }

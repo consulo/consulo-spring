@@ -1,70 +1,92 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import jakarta.annotation.Nullable;
-
-import consulo.language.editor.template.TemplateSettings;
-import org.jetbrains.annotations.NonNls;
-import consulo.java.ex.facet.LibraryInfo;
-import consulo.module.Module;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.model.actions.patterns.PatternIcons;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.LibrariesInfo;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.TemplateInfo;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.util.LibrariesConfigurationManager;
+import consulo.java.ex.facet.LibraryInfo;
+import consulo.language.editor.template.TemplateSettings;
+import consulo.localize.LocalizeValue;
+import consulo.module.Module;
+import consulo.spring.localize.SpringLocalize;
 import consulo.ui.image.Image;
+import jakarta.annotation.Nullable;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class AddJdoAction extends AbstractFrameworkIntegrationAction {
-  @NonNls private static final String JDO_STRING_ID = "jdo";
+    private static final String JDO_STRING_ID = "jdo";
 
-  protected String[] getBeansClassNames() {
-    return new String[]{"org.springframework.orm.jdo.LocalPersistenceManagerFactoryBean",
-      "org.jpox.PersistenceManagerFactoryImpl"};
-  }
+    @Override
+    protected String[] getBeansClassNames() {
+        return new String[]{
+            "org.springframework.orm.jdo.LocalPersistenceManagerFactoryBean",
+            "org.jpox.PersistenceManagerFactoryImpl"
+        };
+    }
 
-   protected LibrariesInfo getLibrariesInfo(final consulo.module.Module module) {
-    final LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos("jdo");
+    @Override
+    protected LibrariesInfo getLibrariesInfo(consulo.module.Module module) {
+        LibraryInfo[] libraryInfos = LibrariesConfigurationManager.getInstance(module.getProject()).getLibraryInfos("jdo");
 
-    return new LibrariesInfo(libraryInfos, module, JDO_STRING_ID);
-  }
+        return new LibrariesInfo(libraryInfos, module, JDO_STRING_ID);
+    }
 
-  protected List<TemplateInfo> getTemplateInfos(final Module module) {
-    List<TemplateInfo> infos = new LinkedList<TemplateInfo>();
+    @Override
+    protected List<TemplateInfo> getTemplateInfos(Module module) {
+        List<TemplateInfo> infos = new LinkedList<>();
 
-    final TemplateSettings settings = TemplateSettings.getInstance();
+        TemplateSettings settings = TemplateSettings.getInstance();
 
-    final TemplateInfo datasource = new TemplateInfo(module, settings.getTemplateById("datasource"),
-                                                     SpringBundle.message("spring.patterns.data.access.data.source"), null, false);
+        TemplateInfo datasource = new TemplateInfo(
+            module,
+            settings.getTemplateById("datasource"),
+            SpringLocalize.springPatternsDataAccessDataSource(),
+            false
+        );
 
-    final TemplateInfo jpm = new TemplateInfo(module, settings.getTemplateById("jdo-persistance-manager"),
-                                                     SpringBundle.message("spring.patterns.data.access.jdo.persistence.manager"), null);
+        TemplateInfo jpm = new TemplateInfo(
+            module,
+            settings.getTemplateById("jdo-persistance-manager"),
+            SpringLocalize.springPatternsDataAccessJdoPersistenceManager()
+        );
 
-    final TemplateInfo jpox = new TemplateInfo(module, settings.getTemplateById("jpox-pmf"),
-                                                     SpringBundle.message("spring.patterns.data.access.jdo.jpox.persistence.manager"), null, false);
+        TemplateInfo jpox = new TemplateInfo(
+            module,
+            settings.getTemplateById("jpox-pmf"),
+            SpringLocalize.springPatternsDataAccessJdoJpoxPersistenceManager(),
+            false
+        );
 
-    final TemplateInfo pmp = new TemplateInfo(module, settings.getTemplateById("jdo-persistance-manager-proxy"),
-                                                         SpringBundle.message("spring.patterns.data.access.jdo.persistence.manager.proxy"),
-                                                         null);
-    final TemplateInfo transctionManager = new TemplateInfo(module, settings.getTemplateById("jdo-transaction-manager"), SpringBundle.message(
-      "spring.patterns.data.access.jdo.transaction.manager"), null);
+        TemplateInfo pmp = new TemplateInfo(
+            module,
+            settings.getTemplateById("jdo-persistance-manager-proxy"),
+            SpringLocalize.springPatternsDataAccessJdoPersistenceManagerProxy()
+        );
+        TemplateInfo transactionManager = new TemplateInfo(
+            module,
+            settings.getTemplateById("jdo-transaction-manager"),
+            SpringLocalize.springPatternsDataAccessJdoTransactionManager()
+        );
 
-    infos.add(jpm);
-    infos.add(datasource);
-    infos.add(jpox);
-    infos.add(pmp);
-    infos.add(transctionManager);
+        infos.add(jpm);
+        infos.add(datasource);
+        infos.add(jpox);
+        infos.add(pmp);
+        infos.add(transactionManager);
 
-    return infos;
-  }
+        return infos;
+    }
 
-  protected String getDescription() {
-    return SpringBundle.message("spring.patterns.jdo");
-  }
+    @Override
+    protected LocalizeValue getDescription() {
+        return SpringLocalize.springPatternsJdo();
+    }
 
-  @Nullable
-  protected Image getIcon() {
-    return PatternIcons.JDO_ICON;
-  }
+    @Nullable
+    @Override
+    protected Image getIcon() {
+        return PatternIcons.JDO_ICON;
+    }
 }

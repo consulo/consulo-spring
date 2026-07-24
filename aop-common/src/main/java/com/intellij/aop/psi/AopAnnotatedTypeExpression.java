@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 
 import jakarta.annotation.Nonnull;
@@ -21,37 +21,44 @@ public class AopAnnotatedTypeExpression extends AopElementBase implements AopTyp
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopAnnotatedTypeExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public AopTypeExpression getTypeExpression() {
     return findChildByClass(AopTypeExpression.class);
   }
 
   @Nullable
+  @RequiredReadAction
   public AopAnnotationHolder getAnnotationHolder() {
     return findChildByClass(AopAnnotationHolder.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     return getPatterns(getTypeExpression());
   }
 
+  @Override
   public String getTypePattern() {
     return "'_";
   }
 
   @Nonnull
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getQualifierPatterns() {
-    final AopTypeExpression expression = getTypeExpression();
-    if (!(expression instanceof AopReferenceExpression)) return Collections.emptyList();
+    if (!(getTypeExpression() instanceof AopReferenceExpression refExpr)) return Collections.emptyList();
 
-    return getPatterns(((AopReferenceExpression)expression).getGeneralizedQualifier());
+    return getPatterns(refExpr.getGeneralizedQualifier());
   }
 
+  @RequiredReadAction
   private Collection<AopPsiTypePattern> getPatterns(final AopTypeExpression typeExpression) {
     if (typeExpression == null) return Collections.emptyList();
 
@@ -60,9 +67,8 @@ public class AopAnnotatedTypeExpression extends AopElementBase implements AopTyp
 
     final Collection<AopPsiTypePattern> typePatterns = typeExpression.getPatterns();
     final Collection<AopPsiTypePattern> annoPatterns = annotationHolder.getPatterns();
-    final Set<AopPsiTypePattern> result = new HashSet<AopPsiTypePattern>();
+    final Set<AopPsiTypePattern> result = new HashSet<>();
     AopBinaryExpression.conjunctPatterns(typePatterns, annoPatterns, result);
     return result;
   }
-
 }

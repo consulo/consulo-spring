@@ -15,20 +15,17 @@ import consulo.language.editor.rawHighlight.HighlightDisplayLevel;
 import consulo.language.inject.InjectedLanguageManager;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiElementVisitor;
-import consulo.language.psi.PsiFile;
-import consulo.language.psi.PsiLanguageInjectionHost;
 import consulo.localize.LocalizeValue;
 import consulo.xml.editor.XmlSuppressableInspectionTool;
 import consulo.xml.language.psi.XmlAttributeValue;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
-import java.util.List;
-
 /**
  * @author peter
  */
 public abstract class AbstractAopInspection extends XmlSuppressableInspectionTool {
+    @Override
     public boolean isEnabledByDefault() {
         return true;
     }
@@ -45,6 +42,7 @@ public abstract class AbstractAopInspection extends XmlSuppressableInspectionToo
         return AopPointcutExpressionLanguage.getInstance();
     }
 
+    @Override
     @Nonnull
     public PsiElementVisitor buildVisitor(@Nonnull final ProblemsHolder holder, final boolean isOnTheFly) {
         return new PsiElementVisitor() {
@@ -58,23 +56,23 @@ public abstract class AbstractAopInspection extends XmlSuppressableInspectionToo
     }
 
     protected void checkElement(final PsiElement element, final ProblemsHolder holder) {
-        InjectedLanguageManager.getInstance(element.getProject()).enumerate(element, new PsiLanguageInjectionHost.InjectedPsiVisitor() {
-            public void visit(@Nonnull PsiFile file, @Nonnull List<PsiLanguageInjectionHost.Shred> places) {
-                if (file instanceof AopPointcutExpressionFile && file.getContext() == element) {
-                    final AopPointcutExpressionFile aopFile = (AopPointcutExpressionFile) file;
-                    final LocalAopModel model = aopFile.getAopModel();
-                    final PsiMethod method = model.getPointcutMethod();
-                    if (method != null) {
-                        checkAopMethod(method, model, holder, aopFile);
-                    }
+        InjectedLanguageManager.getInstance(element.getProject()).enumerate(element, (file, places) -> {
+            if (file instanceof AopPointcutExpressionFile && file.getContext() == element) {
+                AopPointcutExpressionFile aopFile = (AopPointcutExpressionFile) file;
+                LocalAopModel model = aopFile.getAopModel();
+                PsiMethod method = model.getPointcutMethod();
+                if (method != null) {
+                    checkAopMethod(method, model, holder, aopFile);
                 }
             }
         });
     }
 
     protected abstract void checkAopMethod(
-        final PsiMethod pointcutMethod, final LocalAopModel model, final ProblemsHolder holder,
-        final AopPointcutExpressionFile aopFile
+        PsiMethod pointcutMethod,
+        LocalAopModel model,
+        ProblemsHolder holder,
+        AopPointcutExpressionFile aopFile
     );
 
     @Nonnull

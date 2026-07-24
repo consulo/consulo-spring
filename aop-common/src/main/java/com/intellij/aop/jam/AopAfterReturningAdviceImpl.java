@@ -13,17 +13,19 @@ import com.intellij.java.language.psi.PsiType;
 
 /**
  * @author peter
-*/
+ */
 public abstract class AopAfterReturningAdviceImpl extends AopAdviceWithPointcutAttribute implements AopAfterReturningAdvice {
 
   public AopAfterReturningAdviceImpl() {
     super(AopAdviceType.AFTER_RETURNING, AopAdviceMetas.AFTER_RETURNING_META);
   }
 
+  @Override
   public JamStringAttributeElement<PsiParameter> getReturning() {
     return myAnnoMeta.getAttribute(getPsiElement(), AopAdviceMetas.RETURNING_META);
   }
 
+  @Override
   public PointcutMatchDegree accepts(final PsiMethod method) {
     final PsiParameter parameter = getReturning().getValue();
     if (parameter != null) {
@@ -32,5 +34,4 @@ public abstract class AopAfterReturningAdviceImpl extends AopAdviceWithPointcutA
     }
     return super.accepts(method);
   }
-
 }

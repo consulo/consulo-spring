@@ -1,24 +1,34 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui;
 
 import consulo.language.editor.template.Template;
+import consulo.localize.LocalizeValue;
 import consulo.module.Module;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.util.StandardBeansDocLinksManager;
 
 public class TemplateInfo {
   private Template myTemplate;
-  private String myName;
+  private LocalizeValue myName;
   private String myReferenceLink;
   private String myApiLink;
-  private String myDescription;
+  private LocalizeValue myDescription;
   private boolean myAccepted;
 
-  public TemplateInfo(final Module module, final Template template, String name, String description) {
-     this(module,  template, name, description, true);
+  public TemplateInfo(Module module, Template template, LocalizeValue name) {
+     this(module, template, name, true);
   }
-  public TemplateInfo(final Module module, final Template template, String name, String description, boolean isAccepted) {
+
+  public TemplateInfo(Module module, Template template, LocalizeValue name, LocalizeValue description) {
+     this(module, template, name, description, true);
+  }
+
+  public TemplateInfo(Module module, Template template, LocalizeValue name, boolean isAccepted) {
+     this(module, template, name, LocalizeValue.empty(), isAccepted);
+  }
+
+  public TemplateInfo(Module module, Template template, LocalizeValue name, LocalizeValue description, boolean isAccepted) {
     myTemplate = template;
     myName = name;
-    final StandardBeansDocLinksManager linksManager = StandardBeansDocLinksManager.getInstance(module.getProject());
+    StandardBeansDocLinksManager linksManager = StandardBeansDocLinksManager.getInstance(module.getProject());
     myReferenceLink = linksManager.getReferenceLink(template.getId());
     myApiLink = linksManager.getApiLink(template.getId());
     myDescription = description;
@@ -33,23 +43,23 @@ public class TemplateInfo {
     return myAccepted;
   }
 
-  public void setAccepted(final boolean accepted) {
+  public void setAccepted(boolean accepted) {
     myAccepted = accepted;
   }
 
-  public String getName() {
+  public LocalizeValue getName() {
     return myName;
   }
 
-  public String getDescription() {
-    return myDescription == null ? "" : myDescription;
+  public LocalizeValue getDescription() {
+    return myDescription;
   }
 
   public String getReferenceLink() {
     return myReferenceLink;
   }
 
-  public void setReferenceLink(final String referenceLink) {
+  public void setReferenceLink(String referenceLink) {
     myReferenceLink = referenceLink;
   }
 
@@ -57,7 +67,7 @@ public class TemplateInfo {
     return myApiLink;
   }
 
-  public void setApiLink(final String apiLink) {
+  public void setApiLink(String apiLink) {
     myApiLink = apiLink;
   }
 }

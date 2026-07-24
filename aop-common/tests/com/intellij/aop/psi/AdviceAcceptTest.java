@@ -143,6 +143,7 @@ public class AdviceAcceptTest extends LightCodeInsightFixtureTestCase {
 
     final PsiMethod adviceMethod = beanClass.getMethods()[3];
     final AopAdvice advice = new AopAfterReturningAdviceImpl() {
+      @Override
       public PsiMethod getPsiElement() {
         return adviceMethod;
       }

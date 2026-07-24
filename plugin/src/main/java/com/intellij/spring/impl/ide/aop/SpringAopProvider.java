@@ -14,6 +14,7 @@ import com.intellij.spring.impl.ide.model.xml.aop.AopConfig;
 import com.intellij.spring.impl.ide.model.xml.aop.BasicAdvice;
 import com.intellij.spring.impl.ide.model.xml.aop.SpringAopAdvice;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.application.util.CachedValue;
 import consulo.application.util.CachedValueProvider;
@@ -51,19 +52,19 @@ public class SpringAopProvider extends AopProvider {
   private static final Key<CachedValue<AopAdvisedElementsSearcher>> CACHED_SEARCHER = Key.create("CACHED_SEARCHER");
 
   @Nonnull
+  @Override
   public Set<? extends AopAspect> getAdditionalAspects(@Nonnull final consulo.module.Module module) {
     if (SpringManager.getInstance(module.getProject()) == null) return Collections.emptySet();
 
     if (module.getUserData(CACHED_SPRING_MODELS) == null) {
       module.putUserData(CACHED_SPRING_MODELS, CachedValuesManager.getManager(module.getProject()).createCachedValue(() -> {
-        final Set<AopAspect> set = new HashSet<AopAspect>();
+        final Set<AopAspect> set = new HashSet<>();
         for (final SpringModel model : SpringUtils.getNonEmptySpringModels(module)) {
           for (final DomFileElement<Beans> element : model.getRoots()) {
             addAopAspects(set, element.getRootElement());
           }
         }
-        return new CachedValueProvider.Result<Set<? extends AopAspect>>(set,
-                                                                        PsiModificationTracker.MODIFICATION_COUNT);
+        return new CachedValueProvider.Result<>(set, PsiModificationTracker.MODIFICATION_COUNT);
       }, false));
     }
 
@@ -85,6 +86,7 @@ public class SpringAopProvider extends AopProvider {
     return set;
   }
 
+  @Override
   public AopAdvisedElementsSearcher getAdvisedElementsSearcher(@Nonnull final PsiClass aClass) {
     return getSearcher(aClass);
   }
@@ -93,13 +95,14 @@ public class SpringAopProvider extends AopProvider {
     CachedValue<AopAdvisedElementsSearcher> value = aClass.getUserData(CACHED_SEARCHER);
     if (value == null) {
       aClass.putUserData(CACHED_SEARCHER, value = CachedValuesManager.getManager(aClass.getProject()).createCachedValue(() -> {
-        final Module module = ModuleUtilCore.findModuleForPsiElement(aClass);
+        Module module = aClass.getModule();
         if (module == null || hasNoSpringFacetAtAll(module)) {
           final GlobalSearchScope scope =
             module == null ? GlobalSearchScope.EMPTY_SCOPE : GlobalSearchScope.moduleWithDependenciesScope(
               module);
           final AopAdvisedElementsSearcher searcher =
             new AllAdvisedElementsSearcher(aClass.getManager(), scope) {
+              @Override
               public boolean shouldSuppressErrors() {
                 return true;
               }
@@ -120,11 +123,13 @@ public class SpringAopProvider extends AopProvider {
     return value.getValue();
   }
 
+  @RequiredReadAction
   private static boolean hasNoSpringFacetAtAll(final consulo.module.Module module) {
     return ModuleUtilCore.visitMeAndDependentModules(module, module1 -> SpringModuleExtension.getInstance(module1) == null);
   }
 
   @Nullable
+  @Override
   public Pair<? extends ArgNamesManipulator, PsiMethod> getCustomArgNamesManipulator(@Nonnull final PsiElement element) {
     if (element instanceof XmlAttributeValue &&
       element.getParent() instanceof XmlAttribute &&

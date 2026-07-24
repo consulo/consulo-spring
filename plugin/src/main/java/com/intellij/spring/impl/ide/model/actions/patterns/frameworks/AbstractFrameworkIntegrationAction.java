@@ -5,7 +5,8 @@ import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.ChooseT
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.LibrariesInfo;
 import com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui.TemplateInfo;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBean;
-import consulo.application.ApplicationManager;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.application.Application;
 import consulo.application.Result;
 import consulo.codeEditor.Editor;
 import consulo.codeEditor.ScrollType;
@@ -16,20 +17,21 @@ import consulo.language.editor.template.TemplateManager;
 import consulo.language.editor.template.event.TemplateEditingAdapter;
 import consulo.module.Module;
 import consulo.project.Project;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.awt.DialogWrapper;
 import consulo.util.lang.StringUtil;
 import consulo.virtualFileSystem.ReadonlyStatusHandler;
-
 import consulo.xml.language.psi.XmlFile;
 import jakarta.annotation.Nullable;
+
 import java.util.List;
 
 public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegrationAction {
-
+  @Override
+  @RequiredUIAccess
   protected void generateSpringBeans(final consulo.module.Module module, final Editor editor, final XmlFile xmlFile) {
-
     final ChooseTemplatesDialogWrapper dialogWrapper =
-      new ChooseTemplatesDialogWrapper(module.getProject(), getTemplateInfos(module), getLibrariesInfo(module), getDescription());
+      new ChooseTemplatesDialogWrapper(module.getProject(), getTemplateInfos(module), getLibrariesInfo(module), getDescription().get());
 
     dialogWrapper.show();
 
@@ -38,6 +40,7 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
       if (status.hasReadonlyFiles()) return;
 
       new WriteCommandAction(module.getProject()) {
+        @Override
         protected void run(Result result) throws Throwable {
           addFacet(module);
           dialogWrapper.getTemplatesForm().getLibrariesValidationComponent().setupLibraries();
@@ -55,7 +58,6 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
 
     final String facetId = getFacetId();
     if (!StringUtil.isEmptyOrSpaces(facetId)) {
-
       /*
       TODO [VISTALL]
       final FacetManager facetManager = FacetManager.getInstance(module);
@@ -103,20 +105,17 @@ public abstract class AbstractFrameworkIntegrationAction extends FrameworkIntegr
     template.setToReformat(true);
 
     TemplateManager.getInstance(project).startTemplate(editor, template, new TemplateEditingAdapter() {
-      public void templateFinished(Template template) {
+      @Override
+      public void templateFinished(Template template, boolean brokenOff) {
         if (index + 1 < templates.size()) {
-          ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-              new WriteCommandAction(project) {
-                protected void run(Result result) throws Throwable {
-                  runTemplates(project, editor, templates, index + 1);
-                }
-              }.execute();
+          Application.get().invokeLater(() -> new WriteCommandAction(project) {
+            @Override
+            protected void run(Result result) throws Throwable {
+              runTemplates(project, editor, templates, index + 1);
             }
-          });
+          }.execute());
         }
       }
     });
   }
-
 }

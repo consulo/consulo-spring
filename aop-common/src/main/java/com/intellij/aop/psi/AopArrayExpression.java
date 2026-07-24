@@ -3,6 +3,7 @@
  */
 package com.intellij.aop.psi;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.collection.ContainerUtil;
 
@@ -17,26 +18,33 @@ public class AopArrayExpression extends AopElementBase implements AopTypeExpress
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopArrayExpression";
   }
 
   @Nonnull
+  @RequiredReadAction
   public AopTypeExpression getTypeReference() {
     return findNotNullChildByClass(AopTypeExpression.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     final boolean varargs = isVarargs();
     return ContainerUtil.map2List(getTypeReference().getPatterns(), aopPsiTypePattern -> new ArrayPattern(aopPsiTypePattern, varargs));
   }
 
+  @Override
+  @RequiredReadAction
   public String getTypePattern() {
     final String pattern = getTypeReference().getTypePattern();
     return pattern == null ? null : isVarargs() ? pattern + "..." : pattern + "[]";
   }
 
+  @RequiredReadAction
   public boolean isVarargs() {
     return findChildByType(AopElementTypes.AOP_VARARGS) != null;
   }

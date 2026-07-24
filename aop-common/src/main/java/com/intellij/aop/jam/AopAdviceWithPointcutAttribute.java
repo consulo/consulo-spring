@@ -22,6 +22,7 @@ public abstract class AopAdviceWithPointcutAttribute extends AopAdviceImpl{
   }
 
   @Nullable
+  @Override
   protected PsiAnnotationMemberValue getAnnoParam() {
     final PsiAnnotationMemberValue value = super.getAnnoParam();
     if (value == null) {

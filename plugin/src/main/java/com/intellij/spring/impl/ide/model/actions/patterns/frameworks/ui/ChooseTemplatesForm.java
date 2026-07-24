@@ -1,17 +1,12 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui;
 
+import consulo.disposer.Disposable;
 import consulo.java.ex.facet.LibrariesValidationComponent;
 import consulo.platform.Platform;
 import consulo.ui.ex.awt.HyperlinkLabel;
-import consulo.disposer.Disposable;
-import org.jetbrains.annotations.NonNls;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class ChooseTemplatesForm implements Disposable
@@ -22,8 +17,8 @@ public class ChooseTemplatesForm implements Disposable
   private final List<TemplateInfo> myTemplateInfos;
   private final LibrariesInfo myLibInfo;
   private LibrariesValidationComponent myLibrariesValidationComponent;
-  @NonNls private static final String JAVADOC = "Javadoc";
-  @NonNls private static final String DETAILS = "Details";
+  private static final String JAVADOC = "Javadoc";
+  private static final String DETAILS = "Details";
 
   public ChooseTemplatesForm(List<TemplateInfo> templates, LibrariesInfo libInfo) {
     myLibInfo = libInfo;
@@ -34,13 +29,9 @@ public class ChooseTemplatesForm implements Disposable
     for (final TemplateInfo template : myTemplateInfos) {
       final JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-      final JCheckBox checkBox = new JCheckBox(template.getName());
+      final JCheckBox checkBox = new JCheckBox(template.getName().get());
       checkBox.setSelected(template.isAccepted());
-      checkBox.addActionListener(new ActionListener() {
-        public void actionPerformed(final ActionEvent e) {
-          template.setAccepted(checkBox.isSelected());
-        }
-      });
+      checkBox.addActionListener(e -> template.setAccepted(checkBox.isSelected()));
 
       checkBoxPanel.add(checkBox);
       if (template.getApiLink() != null || template.getReferenceLink() != null) {
@@ -68,10 +59,7 @@ public class ChooseTemplatesForm implements Disposable
 
       myLibrariesValidationComponent = null; //facetEditorsFactory.createLibrariesValidationComponent(myLibInfo.getLibs(), myLibInfo.getModule(), myLibInfo.getName());
       myLibsPanel.add(myLibrariesValidationComponent.getComponent(), BorderLayout.CENTER);
-      myLibrariesValidationComponent.addValidityListener(new LibrariesValidationComponent.ValidityListener() {
-        public void valididyChanged(final boolean isValid) {
-
-        }
+      myLibrariesValidationComponent.addValidityListener(isValid -> {
       });
       myLibrariesValidationComponent.validate();
     }
@@ -84,11 +72,7 @@ public class ChooseTemplatesForm implements Disposable
 
     reduceHyperlinkFontSize(hyperlinkLabel);
 
-    hyperlinkLabel.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        Platform.current().openInBrowser(template.getApiLink());
-      }
-    });
+    hyperlinkLabel.addHyperlinkListener(e -> Platform.current().openInBrowser(template.getApiLink()));
     return hyperlinkLabel;
   }
 
@@ -104,14 +88,11 @@ public class ChooseTemplatesForm implements Disposable
 
     reduceHyperlinkFontSize(hyperlinkLabel);
 
-    hyperlinkLabel.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        Platform.current().openInBrowser(template.getReferenceLink());
-      }
-    });
+    hyperlinkLabel.addHyperlinkListener(e -> Platform.current().openInBrowser(template.getReferenceLink()));
     return hyperlinkLabel;
   }
 
+  @Override
   public void dispose() {
   }
 
