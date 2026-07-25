@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.converters;
 
 import com.intellij.java.language.psi.JavaPsiFacade;
@@ -15,6 +14,7 @@ import com.intellij.spring.impl.ide.model.xml.CustomBeanWrapper;
 import com.intellij.spring.impl.ide.model.xml.DomSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringValueHolderDefinition;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiReference;
 import consulo.language.psi.PsiReferenceBase;
@@ -32,34 +32,38 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-
 public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
-
   private static final FieldRetrievingFactoryBeanConverter.FactoryClassCondition CONDITION = new FieldRetrievingFactoryBeanConverter.FactoryClassCondition();
   private static final FieldRetrievingFactoryBeanConverter CONVERTER = new FieldRetrievingFactoryBeanConverter(true);
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
                                          PsiElement element,
                                          ConvertContext context) {
     if (genericDomValue.getParent() instanceof CustomBeanWrapper) return PsiReference.EMPTY_ARRAY;
-    if (CONDITION.value((GenericDomValue)context.getInvocationElement())) {
+    if (CONDITION.test((GenericDomValue)context.getInvocationElement())) {
       return CONVERTER.createReferences(genericDomValue, element, context);
     }
     return createDefaultReferences(genericDomValue, element);
   }
 
   private static PsiReference[] createDefaultReferences(final GenericDomValue<String> genericDomValue, final PsiElement element) {
-    return new PsiReference[]{new PsiReferenceBase<PsiElement>(element) {
-
+    return new PsiReference[]{new PsiReferenceBase<>(element) {
+      @Override
+      @RequiredReadAction
       public PsiElement resolve() {
         return getElement().getParent().getParent();
       }
 
+      @Override
       public boolean isSoft() {
         return true;
       }
 
+      @Override
+      @RequiredReadAction
       public Object[] getVariants() {
         DomSpringBean springBean = genericDomValue.getParentOfType(DomSpringBean.class, false);
 
@@ -70,6 +74,7 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
         return ArrayUtil.toStringArray(names);
       }
 
+      @Override
       public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
         return element;
       }
@@ -83,7 +88,7 @@ public class SpringBeanIdConverter implements CustomReferenceConverter<String> {
     SpringModel model = SpringUtils.getSpringModel(springBean);
     Collection<? extends SpringBeanPointer> list = model.getAllCommonBeans(true);
 
-    List<String> unusedReferences = new ArrayList<String>();
+    List<String> unusedReferences = new ArrayList<>();
 
     for (SpringBeanPointer pointer : list) {
       CommonSpringBean bean = pointer.getSpringBean();
