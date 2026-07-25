@@ -372,6 +372,7 @@ public class CustomBeanRegistry implements PersistentStateComponent<CustomBeanRe
   }
 
   @Nonnull
+  @RequiredReadAction
   private static ParseResult invokeParser(PrintWriter writer, final ProcessHandler handler, XmlTag tag, int timeout) {
     final SimpleReference<ParseResult> result = SimpleReference.create(null);
     final Semaphore semaphore = new Semaphore();

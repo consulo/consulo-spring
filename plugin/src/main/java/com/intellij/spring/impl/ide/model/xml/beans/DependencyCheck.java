@@ -34,7 +34,6 @@ public enum DependencyCheck implements NamedEnum {
             case NONE -> NONE;
             case OBJECTS -> OBJECTS;
             case SIMPLE -> SIMPLE;
-            default -> DEFAULT;
         };
     }
 }
