@@ -5,10 +5,10 @@
 package com.intellij.aop.jam;
 
 import com.intellij.aop.AopAdviceType;
-import com.intellij.aop.AopBundle;
 import com.intellij.aop.LocalAopModel;
 import com.intellij.aop.psi.AopPointcutExpressionFile;
 import com.intellij.java.language.psi.*;
+import consulo.annotation.access.RequiredWriteAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.aop.localize.AopLocalize;
 import consulo.language.editor.inspection.LocalQuickFix;
@@ -18,7 +18,6 @@ import consulo.language.util.IncorrectOperationException;
 import consulo.localize.LocalizeValue;
 import consulo.logging.Logger;
 import consulo.project.Project;
-
 import jakarta.annotation.Nonnull;
 
 /**
@@ -28,6 +27,7 @@ import jakarta.annotation.Nonnull;
 public class AroundAdviceStyleInspection extends AbstractAopInspection {
     private static final Logger LOG = Logger.getInstance(AroundAdviceStyleInspection.class);
 
+    @Override
     protected void checkAopMethod(
         final PsiMethod pointcutMethod,
         LocalAopModel model,
@@ -44,14 +44,15 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
             holder.newProblem(AopLocalize.aroundAdviceShouldReturnSomething())
                 .range(model.getArgNamesManipulator().getCommonProblemElement())
                 .withFix(new LocalQuickFix() {
+                    @Override
+                    @RequiredWriteAction
                     public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                         if (!pointcutMethod.isValid()) {
                             return;
                         }
 
                         try {
-                            PsiClassType object =
-                                PsiType.getJavaLangObject(pointcutMethod.getManager(), pointcutMethod.getResolveScope());
+                            PsiClassType object = PsiType.getJavaLangObject(pointcutMethod.getManager(), pointcutMethod.getResolveScope());
                             pointcutMethod.getReturnTypeElement().replace(factory.createTypeElement(object));
                         }
                         catch (IncorrectOperationException e) {
@@ -75,10 +76,13 @@ public class AroundAdviceStyleInspection extends AbstractAopInspection {
                 .range(model.getArgNamesManipulator().getCommonProblemElement())
                 .withFix(new LocalQuickFix() {
                     @Nonnull
+                    @Override
                     public LocalizeValue getName() {
                         return AopLocalize.addPjpParameter();
                     }
 
+                    @Override
+                    @RequiredWriteAction
                     public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                         if (!pointcutMethod.isValid()) {
                             return;

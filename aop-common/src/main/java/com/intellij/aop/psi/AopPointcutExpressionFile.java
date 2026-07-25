@@ -8,6 +8,7 @@ import com.intellij.java.language.psi.JavaPsiFacade;
 import com.intellij.java.language.psi.PsiJavaPackage;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.file.FileViewProvider;
 import consulo.language.impl.psi.PsiFileBase;
 import consulo.language.impl.psi.PsiFileImpl;
@@ -33,6 +34,7 @@ public final class AopPointcutExpressionFile extends PsiFileBase {
     super(fileView, AopPointcutExpressionLanguage.getInstance());
   }
 
+  @Override
   public boolean processDeclarations(@Nonnull PsiScopeProcessor processor,
                                      @Nonnull ResolveState state,
                                      PsiElement lastParent,
@@ -57,25 +59,32 @@ public final class AopPointcutExpressionFile extends PsiFileBase {
     return super.processDeclarations(processor, state, lastParent, place);
   }
 
+  @Override
+  @RequiredReadAction
   public String toString() {
     return "AopPointcutExpressionFile:" + getName();
   }
 
   @Nonnull
+  @Override
   public FileType getFileType() {
     return AopPointcutExpressionFileType.INSTANCE;
   }
 
+  @Override
   public void accept(@Nonnull PsiElementVisitor visitor) {
     visitor.visitFile(this);
   }
 
   @Nullable
+  @RequiredReadAction
   public PsiPointcutExpression getPointcutExpression() {
     return findChildByClass(PsiPointcutExpression.class);
   }
 
+  @Override
   @SuppressWarnings({"CloneDoesntDeclareCloneNotSupportedException", "CloneDoesntCallSuperClone"})
+  @RequiredReadAction
   protected PsiFileImpl clone() {
     PsiFileImpl file = super.clone();
     file.putUserData(LOCAL_AOP_MODEL, getUserData(LOCAL_AOP_MODEL));

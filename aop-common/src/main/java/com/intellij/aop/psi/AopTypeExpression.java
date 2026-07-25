@@ -5,16 +5,13 @@ package com.intellij.aop.psi;
 
 import jakarta.annotation.Nullable;
 
-import org.jetbrains.annotations.NonNls;
-
 /**
  * @author peter
  */
 public interface AopTypeExpression extends AopPatternContainer {
+    @Override
+    AopPointcutExpressionFile getContainingFile();
 
-  AopPointcutExpressionFile getContainingFile();
-
-  @Nullable
-  @NonNls 
-  String getTypePattern();
+    @Nullable
+    String getTypePattern();
 }

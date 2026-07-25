@@ -38,7 +38,6 @@ import java.util.Arrays;
  * @author peter
  */
 public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
-
   protected void setUp() throws Exception {
     super.setUp();
 
@@ -102,6 +101,7 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
     final ArgNamesManipulator manipulator = new JavaArgNamesManipulator(getAdvice(method));
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         new SetArgNamesQuickFix("", true, manipulator, method)
           .applyFix(myFixture.getProject(), new MockProblemDescriptor(manipulator.getArgNamesProblemElement(), "", null));
@@ -135,6 +135,7 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(pointcutTag.getAttribute("arg-names").getValueElement(), manipulator.getArgNamesProblemElement());
 
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         manipulator.setArgNames("a,b,c");
       }
@@ -143,6 +144,7 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(pointcutTag.getAttribute("arg-names").getValueElement(), manipulator.getArgNamesProblemElement());
 
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         manipulator.setArgNames(null);
       }
@@ -187,6 +189,7 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     myFixture.enableInspections(new SpringApplicationComponent());
     myFixture.configureByFiles("AddAspectjAutoproxyQuickFix.java", getTestName(false) + ".xml");
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         SpringFacet facet = FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, "s", null);
         SpringFileSet fileSet = new SpringFileSet("a", "a", facet.getConfiguration());
@@ -213,5 +216,4 @@ public class AopQuickFixesTest extends JavaCodeInsightFixtureTestCase {
     myFixture.launchAction(myFixture.findSingleIntention("Create Interface foo.Intf"));
     myFixture.checkResultByFile("foo/Intf.java", getTestName(false) + "_after.java", true);
   }
-
 }

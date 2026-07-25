@@ -19,6 +19,7 @@ import com.intellij.java.language.psi.PsiAnnotation;
 import com.intellij.java.language.psi.PsiAnnotationMemberValue;
 import com.intellij.java.language.psi.PsiBinaryExpression;
 import com.intellij.java.language.psi.PsiMethod;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.document.util.TextRange;
 import consulo.language.inject.InjectedLanguageManager;
 import consulo.language.psi.PsiElement;
@@ -37,10 +38,12 @@ import java.util.List;
  */
 public abstract class AopPointcutImpl implements JamElement, AopPointcut, PointcutContainer {
   private static final JamAnnotationMeta POINTCUT_META = new JamAnnotationMeta(AopConstants.POINTCUT_ANNO);
-  public static final JamMethodMeta<AopPointcutImpl> POINTCUT_METHOD_META = new JamMethodMeta<AopPointcutImpl>(AopPointcutImpl.class);
+  public static final JamMethodMeta<AopPointcutImpl> POINTCUT_METHOD_META = new JamMethodMeta<>(AopPointcutImpl.class);
 
   private static final JamStringAttributeMeta.Single<String> ARG_NAMES_META = JamAttributeMeta.singleString("argNames");
 
+  @Override
+  @RequiredReadAction
   public GenericValue<PsiPointcutExpression> getExpression() {
     JamStringAttributeMeta.Single<PsiPointcutExpression> meta =
       JamAttributeMeta.singleString("value", new JamConverter<PsiPointcutExpression>() {
@@ -52,32 +55,38 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
     return POINTCUT_META.getAttribute(getPsiElement(), meta);
   }
 
+  @Override
   public PsiElement getIdentifyingPsiElement() {
     PsiAnnotation annotation = getAnnotation();
     return annotation == null ? getPsiElement() : annotation;
   }
 
+  @Override
   public JamStringAttributeElement<String> getArgNames() {
     return POINTCUT_META.getAttribute(getPsiElement(), ARG_NAMES_META);
   }
 
+  @Override
   public GenericValue<String> getQualifiedName() {
     return ReadOnlyGenericValue.getInstance(getPsiElement().getContainingClass().getQualifiedName() + "." + getPsiElement().getName());
   }
 
+  @Override
   public int getParameterCount() {
     return getPsiElement().getParameterList().getParametersCount();
   }
 
   @Nullable
+  @RequiredReadAction
   protected PsiPointcutExpression getPointcutExpression(@Nullable PsiAnnotationMemberValue value) {
     return getPsiPointcutExpression(value);
   }
 
   @Nullable
+  @RequiredReadAction
   public static PsiPointcutExpression getPsiPointcutExpression(@Nullable PsiElement value) {
-    if (value instanceof PsiBinaryExpression) {
-      return getPsiPointcutExpression(((PsiBinaryExpression)value).getLOperand());
+    if (value instanceof PsiBinaryExpression binaryExpr) {
+      return getPsiPointcutExpression(binaryExpr.getLOperand());
     }
 
     if (value instanceof PsiLanguageInjectionHost) {
@@ -93,6 +102,7 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
   }
 
   @Nullable
+  @Override
   public PsiAnnotation getAnnotation() {
     return POINTCUT_META.getAnnotation(getPsiElement());
   }
@@ -105,6 +115,7 @@ public abstract class AopPointcutImpl implements JamElement, AopPointcut, Pointc
   @JamPsiConnector
   public abstract PsiMethod getPsiElement();
 
+  @RequiredReadAction
   public boolean isValid() {
     return getPsiElement().isValid();
   }

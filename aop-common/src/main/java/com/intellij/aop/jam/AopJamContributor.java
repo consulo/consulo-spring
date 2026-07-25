@@ -15,6 +15,7 @@ import static com.intellij.java.language.patterns.PsiJavaPatterns.*;
  */
 @ExtensionImpl
 public class AopJamContributor extends SemContributor {
+  @Override
   public void registerSemProviders(SemRegistrar registrar) {
     AopAspectImpl.ASPECT_META.register(registrar, psiClass().withAnnotation(AopConstants.ASPECT_ANNO).andNot(psiElement().compiled()));
 

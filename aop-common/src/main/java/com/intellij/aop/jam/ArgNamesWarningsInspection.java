@@ -6,20 +6,17 @@ package com.intellij.aop.jam;
 import com.intellij.aop.AopAdviceType;
 import com.intellij.aop.ArgNamesManipulator;
 import com.intellij.aop.LocalAopModel;
-import com.intellij.aop.psi.PsiThisExpression;
 import com.intellij.aop.psi.*;
+import com.intellij.aop.psi.PsiThisExpression;
 import com.intellij.java.language.psi.*;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.aop.localize.AopLocalize;
-import consulo.application.util.function.Processor;
 import consulo.language.editor.inspection.ProblemsHolder;
 import consulo.language.editor.rawHighlight.HighlightDisplayLevel;
-import consulo.language.psi.PsiReference;
 import consulo.language.psi.search.ReferencesSearch;
 import consulo.language.psi.util.PsiTreeUtil;
 import consulo.localize.LocalizeValue;
 import consulo.util.collection.ContainerUtil;
-import consulo.util.lang.function.Condition;
 import jakarta.annotation.Nonnull;
 
 import java.util.HashSet;
@@ -32,10 +29,12 @@ import java.util.Set;
 @ExtensionImpl
 public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
     @Nonnull
+    @Override
     public HighlightDisplayLevel getDefaultLevel() {
         return HighlightDisplayLevel.WARNING;
     }
 
+    @Override
     protected void checkAnnotation(
         PsiParameter[] parameters,
         ProblemsHolder holder,
@@ -96,11 +95,8 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
 
         List<PsiParameter> canBePrimitive = findParametersUsedInPointcuts(set, PsiArgsExpression.class);
         if (canBePrimitive.size() == 1) {
-            List<PsiParameter> primitives = ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-                public boolean value(PsiParameter psiParameter) {
-                    return psiParameter.getType() instanceof PsiPrimitiveType;
-                }
-            });
+            List<PsiParameter> primitives =
+                ContainerUtil.findAll(set, psiParameter -> psiParameter.getType() instanceof PsiPrimitiveType);
             if (primitives.size() == 1) {
                 set.removeAll(primitives);
 
@@ -125,34 +121,20 @@ public class ArgNamesWarningsInspection extends AbstractArgNamesInspection {
         return false;
     }
 
-    private static List<PsiParameter> findParametersUsedInPointcuts(Set<PsiParameter> set, final Class<?> designatorClass) {
-        return ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-            public boolean value(PsiParameter psiParameter) {
-                return !ReferencesSearch.search(psiParameter).forEach(new Processor<PsiReference>() {
-                    public boolean process(PsiReference reference) {
-                        if (reference instanceof AopReferenceExpression) {
-                            if (designatorClass.isInstance(PsiTreeUtil.getParentOfType(
-                                (AopReferenceExpression) reference,
-                                PsiPointcutExpression.class
-                            ))) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                });
-            }
-        });
+    private static List<PsiParameter> findParametersUsedInPointcuts(Set<PsiParameter> set, Class<?> designatorClass) {
+        return ContainerUtil.findAll(
+            set,
+            psiParameter -> !ReferencesSearch.search(psiParameter).forEach(
+                reference -> !(reference instanceof AopReferenceExpression refExpr)
+                    || !designatorClass.isInstance(PsiTreeUtil.getParentOfType(refExpr, PsiPointcutExpression.class))
+            )
+        );
     }
 
     private static boolean containsOnlyOneParameter(PsiMethod method, Set<PsiParameter> set, String className) {
-        final PsiClassType baseType = JavaPsiFacade.getInstance(method.getManager().getProject()).getElementFactory()
+        PsiClassType baseType = JavaPsiFacade.getInstance(method.getManager().getProject()).getElementFactory()
             .createTypeByFQClassName(className, method.getResolveScope());
-        List<PsiParameter> instanceofs = ContainerUtil.findAll(set, new Condition<PsiParameter>() {
-            public boolean value(PsiParameter psiParameter) {
-                return baseType.isAssignableFrom(psiParameter.getType());
-            }
-        });
+        List<PsiParameter> instanceofs = ContainerUtil.findAll(set, psiParameter -> baseType.isAssignableFrom(psiParameter.getType()));
         if (instanceofs.size() == 1) {
             set.removeAll(instanceofs);
             if (set.isEmpty()) {

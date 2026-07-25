@@ -1,19 +1,17 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.lexer;
 
 import com.intellij.aop.psi.AopElementType;
 import com.intellij.aop.psi.AopElementTypes;
 import com.intellij.aop.psi.AopPointcutTypes;
-import consulo.language.ast.TokenSet;
-import consulo.language.lexer.LexerPosition;
 import consulo.language.ast.IElementType;
+import consulo.language.ast.TokenSet;
 import consulo.language.lexer.DelegateLexer;
 import consulo.language.lexer.FlexAdapter;
+import consulo.language.lexer.LexerPosition;
 import consulo.language.lexer.MergingLexerAdapter;
-import org.jetbrains.annotations.NonNls;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +20,8 @@ import java.util.Map;
  * @author peter
  */
 public class AopLexer extends DelegateLexer implements AopElementTypes {
-  @NonNls public static final Map<String,AopElementType> PRIMITIVE_TYPES = new HashMap<String, AopElementType>();
-  @NonNls public static final Map<String,AopElementType> LOGICAL_OP_TYPES = new HashMap<String, AopElementType>();
+  public static final Map<String,AopElementType> PRIMITIVE_TYPES = new HashMap<>();
+  public static final Map<String,AopElementType> LOGICAL_OP_TYPES = new HashMap<>();
 
   static {
     PRIMITIVE_TYPES.put("int", AOP_INT);
@@ -48,6 +46,7 @@ public class AopLexer extends DelegateLexer implements AopElementTypes {
     super(new MergingLexerAdapter(new FlexAdapter(new _AopLexer()), TokenSet.EMPTY));
   }
 
+  @Override
   public IElementType getTokenType() {
     IElementType tokenType = super.getTokenType();
     if (tokenType == null) return tokenType;
@@ -68,7 +67,7 @@ public class AopLexer extends DelegateLexer implements AopElementTypes {
     }
 
     if (AOP_IDENTIFIER == tokenType) {
-      @NonNls String text = getTokenText();
+      String text = getTokenText();
       AopElementType primType = PRIMITIVE_TYPES.get(text);
       if (primType != null) return primType;
 

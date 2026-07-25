@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiMember;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 
 import jakarta.annotation.Nonnull;
@@ -20,27 +20,34 @@ public class AopParenthesizedExpression extends AopElementBase implements PsiPoi
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopParenthesizedExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public PsiPointcutExpression getInnerPointcutExpression() {
     return findChildByClass(PsiPointcutExpression.class);
   }
 
   @Nullable
+  @RequiredReadAction
   public AopTypeExpression getInnerTypeExpression() {
     return findChildByClass(AopTypeExpression.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     PsiPointcutExpression pointcutExpression = getInnerPointcutExpression();
     return pointcutExpression != null ? pointcutExpression.acceptsSubject(context, member) : PointcutMatchDegree.FALSE;
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     AopTypeExpression typeExpression = getInnerTypeExpression();
     if (typeExpression != null) return typeExpression.getPatterns();
@@ -49,6 +56,8 @@ public class AopParenthesizedExpression extends AopElementBase implements PsiPoi
     return Collections.emptyList();
   }
 
+  @Override
+  @RequiredReadAction
   public String getTypePattern() {
     AopTypeExpression expression = getInnerTypeExpression();
     if (expression != null) {
@@ -60,6 +69,7 @@ public class AopParenthesizedExpression extends AopElementBase implements PsiPoi
     return null;
   }
 
+  @Override
   public AopReferenceExpression.Resolvability getResolvability() {
     return AopReferenceExpression.Resolvability.NONE;
   }

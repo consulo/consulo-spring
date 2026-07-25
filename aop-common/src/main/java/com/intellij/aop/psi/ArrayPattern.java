@@ -25,8 +25,10 @@ public class ArrayPattern extends AopPsiTypePattern{
     return myVarargs;
   }
 
+  @Override
   public boolean accepts(@Nonnull PsiType type) {
-    return type instanceof PsiArrayType && myVarargs == type instanceof PsiEllipsisType &&
-           myComponentPattern.accepts(((PsiArrayType)type).getComponentType());
+    return type instanceof PsiArrayType arrayType
+        && myVarargs == type instanceof PsiEllipsisType
+        && myComponentPattern.accepts(arrayType.getComponentType());
   }
 }

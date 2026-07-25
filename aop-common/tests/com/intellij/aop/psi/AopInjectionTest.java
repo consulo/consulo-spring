@@ -12,6 +12,7 @@ import com.intellij.aop.jam.AopAfterThrowingAdviceImpl;
 import com.intellij.aop.jam.AopConstants;
 import com.intellij.aop.jam.AopLanguageInjector;
 import com.intellij.testFramework.IdeaTestUtil;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.Language;
 import consulo.language.inject.ConcatenationAwareInjector;
 import consulo.language.inject.MultiHostInjector;
@@ -80,14 +81,16 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
+      @Override
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
         assertEquals(AopPointcutExpressionLanguage.getInstance(), language);
         return this;
       }
 
       @Nonnull
-      public /*this*/ MultiHostRegistrar addPlace(@NonNls @Nullable String prefix, @NonNls @Nullable String suffix,
-																		  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
+      @Override
+      public /*this*/ MultiHostRegistrar addPlace(@Nullable String prefix, @Nullable String suffix,
+												  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
         assertFalse(visited.get());
         visited.set(true);
         assertEquals(TextRange.from(1, attrValue.getTextLength() - 2), rangeInsideHost);
@@ -96,8 +99,8 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
         return this;
       }
 
+      @Override
       public void doneInjecting() {
-
       }
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
@@ -106,14 +109,17 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
+      @Override
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
         assertEquals(AopPointcutExpressionLanguage.getInstance(), language);
         return this;
       }
 
       @Nonnull
-      public /*this*/ MultiHostRegistrar addPlace(@NonNls @Nullable String prefix, @NonNls @Nullable String suffix,
-																		  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
+      @Override
+      @RequiredReadAction
+      public /*this*/ MultiHostRegistrar addPlace(@Nullable String prefix, @Nullable String suffix,
+												  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
         assertFalse(visited.get());
         visited.set(true);
         assertEquals(TextRange.from(1, attrValue.getTextLength() - 2), rangeInsideHost);
@@ -122,8 +128,8 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
         return this;
       }
 
+      @Override
       public void doneInjecting() {
-
       }
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
@@ -171,6 +177,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
     PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
     AopAfterReturningAdviceImpl advice = new AopAfterReturningAdviceImpl() {
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }
@@ -191,6 +198,7 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     PsiAnnotation annotation = method.getModifierList().getAnnotations()[0];
     PsiAnnotationMemberValue attrValue = annotation.findAttributeValue("value");
     AopAfterThrowingAdviceImpl advice = new AopAfterThrowingAdviceImpl() {
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }
@@ -223,14 +231,17 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
+      @Override
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
         assertEquals(AopPointcutExpressionLanguage.getInstance(), language);
         return this;
       }
 
       @Nonnull
-      public /*this*/ MultiHostRegistrar addPlace(@NonNls @Nullable String prefix, @NonNls @Nullable String suffix,
-																		  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
+      @Override
+      @RequiredReadAction
+      public /*this*/ MultiHostRegistrar addPlace(@Nullable String prefix, @Nullable String suffix,
+												  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
         assertFalse(visited.get());
         visited.set(true);
         assertEquals(TextRange.from(1, attrValue.getTextLength() - 2), rangeInsideHost);
@@ -239,8 +250,8 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
         return this;
       }
 
+      @Override
       public void doneInjecting() {
-
       }
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
@@ -249,14 +260,17 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     final Ref<Boolean> visited = Ref.create(false);
     injector.getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
+      @Override
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
         assertEquals(AopPointcutExpressionLanguage.getInstance(), language);
         return this;
       }
 
       @Nonnull
-      public /*this*/ MultiHostRegistrar addPlace(@NonNls @Nullable String prefix, @NonNls @Nullable String suffix,
-																		  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
+      @Override
+      @RequiredReadAction
+      public /*this*/ MultiHostRegistrar addPlace(@Nullable String prefix, @Nullable String suffix,
+												  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
         assertFalse(visited.get());
         visited.set(true);
         assertEquals(TextRange.from(1, attrValue.getTextLength() - 2), rangeInsideHost);
@@ -265,8 +279,8 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
         return this;
       }
 
+      @Override
       public void doneInjecting() {
-
       }
     }, (PsiLanguageInjectionHost)attrValue);
     assertTrue(visited.get());
@@ -297,20 +311,22 @@ public class AopInjectionTest extends JavaCodeInsightFixtureTestCase {
     XmlAttributeValue attrValue = expression.getXmlAttributeValue();
     new SpringAopInjector().getLanguagesToInject(new MultiHostRegistrar() {
       @Nonnull
+      @Override
       public /*this*/ MultiHostRegistrar startInjecting(@Nonnull Language language) {
         fail();
         return null;
       }
 
       @Nonnull
-      public /*this*/ MultiHostRegistrar addPlace(@NonNls @Nullable String prefix, @NonNls @Nullable String suffix,
-																		  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
+      @Override
+      public /*this*/ MultiHostRegistrar addPlace(@Nullable String prefix, @Nullable String suffix,
+												  @Nonnull PsiLanguageInjectionHost host, @Nonnull TextRange rangeInsideHost) {
 
         return null;
       }
 
+      @Override
       public void doneInjecting() {
-
       }
     }, (PsiLanguageInjectionHost)attrValue);
   }

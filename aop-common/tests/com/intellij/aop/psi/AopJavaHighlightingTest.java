@@ -29,6 +29,7 @@ public class AopJavaHighlightingTest extends JavaCodeInsightFixtureTestCase {
 
   private void doTest(LocalInspectionTool... tools) throws Throwable {
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, SpringFacetType.INSTANCE.getPresentableName(), null);
       }

@@ -11,6 +11,7 @@ import com.intellij.spring.impl.ide.constants.SpringConstants;
  * @author peter
  */
 public abstract class AspectjAutoproxyImpl extends DomSpringBeanImpl implements AspectjAutoproxy {
+  @Override
   public String getClassName() {
     return SpringConstants.ASPECTJ_AUTOPROXY_BEAN_CLASS;
   }

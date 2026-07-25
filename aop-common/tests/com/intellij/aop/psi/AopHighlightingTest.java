@@ -44,6 +44,7 @@ public class AopHighlightingTest extends JavaCodeInsightFixtureTestCase {
     final PsiMethod method = contextClass.findMethodsByName("pointcut", false)[0];
     final AopPointcutImpl pointcut = new AopPointcutImpl() {
       @Nonnull
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }

@@ -28,7 +28,7 @@ public class AopSyntaxHighlighter extends SyntaxHighlighterBase implements AopEl
   private static final Map<IElementType,TextAttributesKey> ourMap;
 
   static {
-    ourMap = new HashMap<IElementType, TextAttributesKey>();
+    ourMap = new HashMap<>();
     fillMap(ourMap, AOP_KEYWORD, AOP_THROWS);
     fillMap(ourMap, AOP_KEYWORD, AOP_NEW);
     fillMap(ourMap, AOP_KEYWORD, AOP_MODIFIER);
@@ -45,11 +45,13 @@ public class AopSyntaxHighlighter extends SyntaxHighlighterBase implements AopEl
   }
 
   @Nonnull
+  @Override
   public Lexer getHighlightingLexer() {
     return new AopLexer();
   }
 
   @Nonnull
+  @Override
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType instanceof AopPointcutDesignatorTokenType) {
       return new TextAttributesKey[]{AOP_KEYWORD};

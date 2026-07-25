@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.collection.ContainerUtil;
 
@@ -21,25 +21,26 @@ public class AopMemberReferenceExpression extends AopElementBase {
   }
 
   @Nullable
+  @RequiredReadAction
   public AopReferenceExpression getReferenceExpression() {
     AopTypeExpression aopTypeExpression = getTypeExpression();
-    if (aopTypeExpression instanceof AopReferenceExpression) {
-      return (AopReferenceExpression)aopTypeExpression;
+    if (aopTypeExpression instanceof AopReferenceExpression refExpr) {
+      return refExpr;
     }
-    if (aopTypeExpression instanceof AopAnnotatedTypeExpression) {
-      AopTypeExpression expression1 = ((AopAnnotatedTypeExpression)aopTypeExpression).getTypeExpression();
-      if (expression1 instanceof AopReferenceExpression) {
-        return (AopReferenceExpression)expression1;
-      }
+    if (aopTypeExpression instanceof AopAnnotatedTypeExpression annotatedTypeExpr
+        && annotatedTypeExpr.getTypeExpression() instanceof AopReferenceExpression refExpr) {
+      return refExpr;
     }
     return null;
   }
 
   @Nullable
+  @RequiredReadAction
   public AopTypeExpression getTypeExpression() {
     return findChildByClass(AopTypeExpression.class);
   }
 
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getQualifierPatterns() {
     AopReferenceExpression expression = getReferenceExpression();
     if (expression == null) return Arrays.asList(AopPsiTypePattern.TRUE);
@@ -49,10 +50,11 @@ public class AopMemberReferenceExpression extends AopElementBase {
 
     AopTypeExpression typeExpression = getTypeExpression();
 
-    return typeExpression instanceof AopAnnotatedTypeExpression ? ((AopAnnotatedTypeExpression)typeExpression).getQualifierPatterns() : qualifier
+    return typeExpression instanceof AopAnnotatedTypeExpression annotatedTypeExpr ? annotatedTypeExpr.getQualifierPatterns() : qualifier
       .getPatterns();
   }
 
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     AopReferenceExpression expression = getReferenceExpression();
     Collection<AopPsiTypePattern> patterns = getQualifierPatterns();
@@ -62,8 +64,8 @@ public class AopMemberReferenceExpression extends AopElementBase {
     return patterns;
   }
 
+  @Override
   public String toString() {
     return "AopMemberReferenceExpression";
   }
-
 }

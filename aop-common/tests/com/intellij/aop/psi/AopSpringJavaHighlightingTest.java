@@ -60,6 +60,7 @@ public class AopSpringJavaHighlightingTest extends JavaCodeInsightFixtureTestCas
 
   public void testAddAspectJAutoproxy() throws Throwable {
     new WriteCommandAction(getProject()) {
+      @Override
       protected void run(Result result) throws Throwable {
         FacetManager.getInstance(myModule).addFacet(SpringFacetType.INSTANCE, "z", null);
       }

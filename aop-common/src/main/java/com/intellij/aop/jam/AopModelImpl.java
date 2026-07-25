@@ -22,12 +22,13 @@ public class AopModelImpl implements AopModel {
     myModule = module;
   }
 
+  @Override
   public List<AopAspectImpl> getAspects() {
     return JamService.getJamService(myModule.getProject()).getJamClassElements(AopAspectImpl.ASPECT_META, AopConstants.ASPECT_ANNO, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule));
   }
 
+  @Override
   public List<AopPointcutImpl> getPointcuts() {
     return JamService.getJamService(myModule.getProject()).getJamMethodElements(AopPointcutImpl.POINTCUT_METHOD_META, AopConstants.POINTCUT_ANNO, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(myModule));
   }
-
 }

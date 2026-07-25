@@ -237,25 +237,27 @@ public class AopReferencesTest extends JavaCodeInsightFixtureTestCase {
       @Nullable
       public PsiMetaData getMetaData() {
         return new PsiMetaData() {
-
+          @Override
           public PsiElement getDeclaration() {
             throw new UnsupportedOperationException("Method getDeclaration is not yet implemented in " + getClass().getName());
           }
 
-          @NonNls
+          @Override
           public String getName(PsiElement context) {
             return "fubar.xxx";
           }
 
-          @NonNls
+          @Override
           public String getName() {
             throw new UnsupportedOperationException("Method getName is not yet implemented in " + getClass().getName());
           }
 
+          @Override
           public void init(PsiElement element) {
             throw new UnsupportedOperationException("Method init is not yet implemented in " + getClass().getName());
           }
 
+          @Override
           public Object[] getDependences() {
             throw new UnsupportedOperationException("Method getDependences is not yet implemented in " + getClass().getName());
           }

@@ -4,6 +4,7 @@
 package com.intellij.aop.psi;
 
 import com.intellij.aop.lexer.AopLexer;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.language.Language;
 import consulo.language.ast.ASTNode;
@@ -34,36 +35,44 @@ public class AopPointcutExpressionParserDefinition implements ParserDefinition, 
   }
 
   @Nonnull
+  @Override
   public Lexer createLexer(@Nonnull LanguageVersion languageVersion) {
     return new AopLexer();
   }
 
   @Nonnull
+  @Override
   public IFileElementType getFileNodeType() {
     return AOP_POINTCUT_EXPRESSION_FILE;
   }
 
   @Nonnull
+  @Override
   public TokenSet getWhitespaceTokens(@Nonnull LanguageVersion languageVersion) {
     return WHITE_SPACES;
   }
 
   @Nonnull
+  @Override
   public TokenSet getCommentTokens(@Nonnull LanguageVersion languageVersion) {
     return TokenSet.EMPTY;
   }
 
   @Nonnull
+  @Override
   public TokenSet getStringLiteralElements(@Nonnull LanguageVersion languageVersion) {
     return TokenSet.EMPTY;
   }
 
   @Nonnull
+  @Override
   public PsiParser createParser(@Nonnull LanguageVersion languageVersion) {
     return new AopPrattParser();
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PsiElement createElement(ASTNode node) {
     IElementType elementType = node.getElementType();
     if (elementType == AOP_ANNOTATION_EXPRESSION) return new AopAnnotationExpression(node);
@@ -106,13 +115,14 @@ public class AopPointcutExpressionParserDefinition implements ParserDefinition, 
   }
 
   @Nonnull
+  @Override
   public PsiFile createFile(@Nonnull FileViewProvider viewProvider) {
     return new AopPointcutExpressionFile(viewProvider);
   }
 
   @Nonnull
+  @Override
   public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
     return ParserDefinition.SpaceRequirements.MAY;
   }
-
 }

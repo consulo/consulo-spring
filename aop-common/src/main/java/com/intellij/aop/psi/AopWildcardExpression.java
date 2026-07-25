@@ -1,9 +1,9 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.collection.ContainerUtil;
 
@@ -20,16 +20,20 @@ public class AopWildcardExpression extends AopElementBase implements AopTypeExpr
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopWildcardExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public AopTypeExpression getBound() {
     return findChildByClass(AopTypeExpression.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     AopTypeExpression bound = getBound();
     boolean isSuper = isSuper();
@@ -38,14 +42,17 @@ public class AopWildcardExpression extends AopElementBase implements AopTypeExpr
     return ContainerUtil.map2List(bound.getPatterns(), aopPsiTypePattern -> new WildcardPattern(aopPsiTypePattern, isSuper));
   }
 
+  @Override
   public String getTypePattern() {
     return "'_";
   }
 
+  @RequiredReadAction
   public boolean isExtends() {
     return findChildByType(AopElementTypes.AOP_EXTENDS) != null;
   }
 
+  @RequiredReadAction
   public boolean isSuper() {
     return findChildByType(AopElementTypes.AOP_SUPER) != null;
   }

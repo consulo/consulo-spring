@@ -3,10 +3,9 @@
  */
 package com.intellij.aop.psi;
 
-import jakarta.annotation.Nonnull;
-
-import consulo.language.impl.psi.ASTWrapperPsiElement;
 import consulo.language.ast.ASTNode;
+import consulo.language.impl.psi.ASTWrapperPsiElement;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author peter
@@ -17,6 +16,7 @@ public class AopElementBase extends ASTWrapperPsiElement {
   }
 
   @Nonnull
+  @Override
   public AopPointcutExpressionFile getContainingFile() {
     return (AopPointcutExpressionFile)super.getContainingFile();
   }

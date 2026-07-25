@@ -16,6 +16,7 @@ import consulo.language.psi.util.PsiTreeUtil;
  */
 @ExtensionImpl
 public class AopImplicitUsageProvider implements ImplicitUsageProvider {
+  @Override
   public boolean isImplicitUsage(PsiElement element) {
     if (element instanceof PsiParameter) {
       PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
@@ -26,10 +27,12 @@ public class AopImplicitUsageProvider implements ImplicitUsageProvider {
     return false;
   }
 
+  @Override
   public boolean isImplicitRead(PsiElement element) {
     return false;
   }
 
+  @Override
   public boolean isImplicitWrite(PsiElement element) {
     return false;
   }

@@ -5,6 +5,7 @@
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiMember;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
 import consulo.util.collection.ContainerUtil;
@@ -22,28 +23,35 @@ public class AopNotExpression extends AopElementBase implements PsiPointcutExpre
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopNotExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public AopPatternContainer getInnerExpression() {
     return findChildByClass(AopPatternContainer.class);
   }
 
   @Nonnull
+  @RequiredReadAction
   public PsiElement getNotToken() {
     return findChildByType(AopElementTypes.AOP_NOT);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     AopPatternContainer expression = getInnerExpression();
-    return expression instanceof PsiPointcutExpression ? PointcutMatchDegree.not(((PsiPointcutExpression)expression).acceptsSubject(context,
-                                                                                                                                    member)) : PointcutMatchDegree.FALSE;
+    return expression instanceof PsiPointcutExpression pointcutExpr
+        ? PointcutMatchDegree.not(pointcutExpr.acceptsSubject(context, member))
+        : PointcutMatchDegree.FALSE;
   }
 
   @Nonnull
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getInnerPatterns() {
     AopPatternContainer typeExpression = getInnerExpression();
     if (typeExpression != null) return typeExpression.getPatterns();
@@ -51,14 +59,17 @@ public class AopNotExpression extends AopElementBase implements PsiPointcutExpre
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     return ContainerUtil.map2List(getInnerPatterns(), NotPattern::new);
   }
 
+  @Override
+  @RequiredReadAction
   public String getTypePattern() {
-    AopPatternContainer expression = getInnerExpression();
-    if (expression instanceof AopTypeExpression) {
-      String pattern = ((AopTypeExpression)expression).getTypePattern();
+    if (getInnerExpression() instanceof AopTypeExpression typeExpr) {
+      String pattern = typeExpr.getTypePattern();
       if (pattern == null) return null;
 
       return "'_:[!is(\"" + pattern + "\")]";

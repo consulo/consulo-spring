@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.intellij.aop.psi;
 
 import consulo.language.ast.*;
@@ -136,9 +135,9 @@ public interface AopElementTypes extends StandardTokenTypes {
     }
 
     @Nonnull
+    @Override
     public ASTNode createLeafNode(CharSequence leafText) {
       return new PsiWhiteSpaceImpl(leafText);
     }
   }
-
 }

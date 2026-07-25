@@ -1,6 +1,5 @@
 // Generated on Thu Nov 09 17:15:14 MSK 2006
 // DTD/Schema  :    http://www.springframework.org/schema/aop
-
 package com.intellij.spring.impl.ide.model.xml.aop;
 
 import consulo.xml.dom.GenericAttributeValue;
@@ -13,7 +12,6 @@ import java.util.List;
  * http://www.springframework.org/schema/aop:configElemType interface.
  */
 public interface AopConfig extends SpringAopElement, AopModel {
-
 	/**
 	 * Returns the value of the proxy-target-class child.
 	 * <pre>
@@ -27,7 +25,6 @@ public interface AopConfig extends SpringAopElement, AopModel {
 	@Nonnull
 	GenericAttributeValue<Boolean> getProxyTargetClass();
 
-
 	/**
 	 * Returns the list of pointcut children.
 	 * <pre>
@@ -38,13 +35,14 @@ public interface AopConfig extends SpringAopElement, AopModel {
 	 * @return the list of pointcut children.
 	 */
 	@Nonnull
+    @Override
 	List<SpringPointcut> getPointcuts();
+
 	/**
 	 * Adds new child to the list of pointcut children.
 	 * @return created child
 	 */
 	SpringPointcut addPointcut();
-
 
 	/**
 	 * Returns the list of advisor children.
@@ -57,12 +55,12 @@ public interface AopConfig extends SpringAopElement, AopModel {
 	 */
 	@Nonnull
 	List<Advisor> getAdvisors();
+
 	/**
 	 * Adds new child to the list of advisor children.
 	 * @return created child
 	 */
 	Advisor addAdvisor();
-
 
 	/**
 	 * Returns the list of aspect children.
@@ -74,12 +72,12 @@ public interface AopConfig extends SpringAopElement, AopModel {
 	 * @return the list of aspect children.
 	 */
 	@Nonnull
+    @Override
 	List<SpringAspect> getAspects();
+
 	/**
 	 * Adds new child to the list of aspect children.
 	 * @return created child
 	 */
 	SpringAspect addAspect();
-
-
 }

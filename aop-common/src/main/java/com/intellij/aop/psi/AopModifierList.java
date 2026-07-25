@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.PsiModifierListOwner;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 
 import jakarta.annotation.Nonnull;
@@ -13,15 +13,16 @@ import jakarta.annotation.Nonnull;
  * @author peter
  */
 public class AopModifierList extends AopElementBase {
-
   public AopModifierList(@Nonnull ASTNode node) {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "AopModifierList";
   }
 
+  @RequiredReadAction
   public boolean accepts(PsiModifierListOwner owner) {
     for (ASTNode node : getNode().getChildren(null)) {
       if (node.getElementType() == AopElementTypes.AOP_MODIFIER &&  !owner.hasModifierProperty(node.getText())) return false;

@@ -5,7 +5,7 @@ package com.intellij.spring.impl.ide.model.xml.aop;
 
 import com.intellij.aop.AopPointcut;
 import com.intellij.aop.jam.AopModuleService;
-import consulo.language.util.ModuleUtilCore;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.lang.function.Condition;
 import consulo.xml.language.psi.XmlElement;
@@ -23,21 +23,22 @@ import java.util.Collections;
  */
 public class AopPointcutConverter extends ResolvingConverter<AopPointcut> {
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<? extends AopPointcut> getVariants(ConvertContext context) {
     XmlElement element = context.getXmlElement();
     if (element == null) return Collections.emptyList();
 
-    return AopModuleService.getAopModel(ModuleUtilCore.findModuleForPsiElement(element)).getPointcuts();
+    return AopModuleService.getAopModel(element.getModule()).getPointcuts();
   }
 
-  public AopPointcut fromString(@Nullable @NonNls final String s, ConvertContext context) {
-    return s == null ? null : ContainerUtil.find(getVariants(context), new Condition<AopPointcut>() {
-      public boolean value(AopPointcut o) {
-        return s.equals(o.getQualifiedName().getStringValue());
-      }
-    });
+  @Override
+  @RequiredReadAction
+  public AopPointcut fromString(@Nullable String s, ConvertContext context) {
+    return s == null ? null : ContainerUtil.find(getVariants(context), o -> s.equals(o.getQualifiedName().getStringValue()));
   }
 
+  @Override
   public String toString(@Nullable AopPointcut aopPointcut, ConvertContext context) {
     return aopPointcut == null ? null : aopPointcut.getQualifiedName().getStringValue();
   }

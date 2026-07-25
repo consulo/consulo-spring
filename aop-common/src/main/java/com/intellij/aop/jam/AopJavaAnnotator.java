@@ -338,8 +338,9 @@ public class AopJavaAnnotator implements LineMarkerProvider {
                                                                                           final AopAdvisedElementsSearcher searcher) {
     NavigationGutterIconBuilder<PsiElement> builder =
       NavigationGutterIconBuilder.create(createFromIcon(advice.getAdviceType().getAdviceIcon()))
-                                 .setTargets(new NotNullLazyValue<Collection<? extends PsiElement>>() {
+                                 .setTargets(new NotNullLazyValue<>() {
                                    @Nonnull
+                                   @Override
                                    public Collection<? extends PsiElement> compute() {
                                      if (!advice.isValid()) return Collections.emptyList();
 
@@ -398,7 +399,7 @@ public class AopJavaAnnotator implements LineMarkerProvider {
     CachedValue<Map<AopAdvice, Integer>> value = psiClass.getUserData(BOUND_ADVICES_KEY);
     if (value == null) {
       psiClass.putUserData(BOUND_ADVICES_KEY, value = CachedValuesManager.getManager(psiClass.getProject()).createCachedValue(() -> {
-          Module module = psiClass.getModule();
+        Module module = psiClass.getModule();
         if (module == null)
           return CachedValueProvider.Result.create(Collections.<AopAdvice, Integer>emptyMap(),
                                                    PsiModificationTracker.MODIFICATION_COUNT);
