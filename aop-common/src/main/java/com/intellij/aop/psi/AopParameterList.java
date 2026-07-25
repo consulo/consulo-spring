@@ -7,8 +7,6 @@ import com.intellij.java.language.psi.PsiParameter;
 import com.intellij.java.language.psi.PsiParameterList;
 import com.intellij.java.language.psi.PsiType;
 import consulo.language.ast.ASTNode;
-import consulo.util.lang.function.PairFunction;
-
 import jakarta.annotation.Nonnull;
 
 import java.util.function.BiFunction;

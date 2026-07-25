@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
  * @author peter
  */
 public class AopReferenceExpression extends AbstractQualifiedReference<AopReferenceExpression> implements AopReferenceQualifier {
-
   public AopReferenceExpression(@Nonnull ASTNode node) {
     super(node);
   }
@@ -57,10 +56,10 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
   }
 
   @Nullable
+  @RequiredReadAction
   public AopReferenceQualifier getGeneralizedQualifier() {
     return findChildByClass(AopReferenceQualifier.class);
   }
-
 
   @Nonnull
   @Override
@@ -71,7 +70,9 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
     AopReferenceQualifier qualifier = getGeneralizedQualifier();
     if (qualifier != null && qualifier.getResolvability() != Resolvability.PLAIN) return Resolvability.NONE;
 
-    return findChildByType(AopElementTypes.AOP_ASTERISK) != null ? (qualifier == null ? Resolvability.NONE : Resolvability.POLYVARIANT) : Resolvability.PLAIN;
+    return findChildByType(AopElementTypes.AOP_ASTERISK) != null
+      ? (qualifier == null ? Resolvability.NONE : Resolvability.POLYVARIANT)
+      : Resolvability.PLAIN;
   }
 
   @RequiredReadAction
@@ -249,15 +250,15 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
         }
       });
       for (AopPointcut pointcut : model.getPointcuts()) {
-        PsiElement element = pointcut.getIdentifyingPsiElement();
-        if ((element instanceof PsiAnnotation)) {
-          PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+        if (pointcut.getIdentifyingPsiElement() instanceof PsiAnnotation annotation) {
+          PsiMethod method = PsiTreeUtil.getParentOfType(annotation, PsiMethod.class);
           assert method != null;
-          if (method != pointcutMethod && PsiUtilBase.getOriginalElement(method,
-                                                                         PsiMethod.class) != pointcutMethod && isAccessible(method)) {
-            String qname = pointcut.getQualifiedName().getStringValue();
-            if (qname != null && qname.startsWith(prefix) && !qNames.contains(qname)) {
-              list.add(LookupElementBuilder.create(qname)
+          if (method != pointcutMethod
+            && PsiUtilBase.getOriginalElement(method, PsiMethod.class) != pointcutMethod
+            && isAccessible(method)) {
+            String qName = pointcut.getQualifiedName().getStringValue();
+            if (qName != null && qName.startsWith(prefix) && !qNames.contains(qName)) {
+              list.add(LookupElementBuilder.create(qName)
                 .withIcon(AopConstants.POINTCUT_ICON)
                 .withInsertHandler(new MethodParenthesesHandler(method, false)));
             }
@@ -275,12 +276,12 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
             String name = namedElement.getName();
             assert name != null;
             LookupElementBuilder item = LookupElementBuilder.create(namedElement, name);
-            if (element instanceof PsiMethod) {
-              if (!signatures.add(((PsiMethod)element).getSignature(state.get(PsiSubstitutor.KEY)))) {
+            if (element instanceof PsiMethod method) {
+              if (!signatures.add(method.getSignature(state.get(PsiSubstitutor.KEY)))) {
                 return true;
               }
 
-              item = item.setInsertHandler(new MethodParenthesesHandler((PsiMethod)element, true));
+              item = item.setInsertHandler(new MethodParenthesesHandler(method, true));
             }
             if (element instanceof PsiPackage) {
               list.add(TailTypeDecorator.withTail(item, TailType.DOT));
@@ -330,8 +331,8 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
       if (patterns.size() == 1) {
         AopPsiTypePattern pattern = patterns.iterator().next();
         String prefix;
-        if (pattern instanceof PsiClassTypePattern) {
-          prefix = ((PsiClassTypePattern)pattern).getText();
+        if (pattern instanceof PsiClassTypePattern classTypePattern) {
+          prefix = classTypePattern.getText();
         }
         else if (pattern == AopPsiTypePattern.TRUE) {
           prefix = "*";
@@ -344,7 +345,6 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
         }
       }
 
-
       AopPsiTypePattern rightPattern = "*".equals(ownText) ? PsiClassTypePattern.TRUE : new PsiClassTypePattern(ownText);
       return ContainerUtil.map2List(
         patterns,
@@ -355,13 +355,14 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
     else if (resolve() instanceof PsiClass psiClass) {
       String qualifiedName = psiClass.getQualifiedName();
       if (qualifiedName != null) {
-          return Arrays.asList((AopPsiTypePattern) new PsiClassTypePattern(qualifiedName));
+        return Arrays.asList((AopPsiTypePattern) new PsiClassTypePattern(qualifiedName));
       }
     }
     return Arrays.asList((AopPsiTypePattern)new PsiClassTypePattern(text));
   }
 
   @Override
+  @RequiredReadAction
   public String getTypePattern() {
     if (getGeneralizedQualifier() == null && resolve() instanceof PsiClass psiClass) {
       String qualifiedName = psiClass.getQualifiedName();
@@ -379,6 +380,7 @@ public class AopReferenceExpression extends AbstractQualifiedReference<AopRefere
     return "'_:[regex(" + regex + ")]";
   }
 
+  @RequiredReadAction
   public Pattern getRegex() {
     return Pattern.compile(getOwnText().replaceAll("\\*", ".*"));
   }

@@ -20,8 +20,8 @@ public class AopPointcutExpressionFileType extends LanguageFileType {
   }
 
   @Nonnull
-  public   @Override
-  String getId() {
+  @Override
+  public String getId() {
     return "Pointcut Expression";
   }
 

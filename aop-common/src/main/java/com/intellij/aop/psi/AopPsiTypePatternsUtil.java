@@ -5,7 +5,6 @@ package com.intellij.aop.psi;
 
 import consulo.util.lang.Couple;
 import consulo.util.lang.Pair;
-import consulo.util.lang.function.PairFunction;
 
 import java.util.*;
 import java.util.function.BiFunction;
