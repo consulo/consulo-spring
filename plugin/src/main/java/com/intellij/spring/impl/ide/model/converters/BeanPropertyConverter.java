@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.converters;
 
 import com.intellij.java.impl.psi.impl.beanProperties.BeanProperty;
@@ -22,7 +21,7 @@ import java.util.List;
  * @author Dmitry Avdeev
  */
 public class BeanPropertyConverter extends Converter<List<BeanProperty>> implements CustomReferenceConverter<List<BeanProperty>> {
-
+  @Override
   public List<BeanProperty> fromString(@Nullable String s, ConvertContext context) {
     if (s == null) {
       return null;
@@ -31,26 +30,28 @@ public class BeanPropertyConverter extends Converter<List<BeanProperty>> impleme
     PropertyReference[] references = createReferences(value, value.getXmlAttributeValue(), context);
     if (references.length > 0) {
       ResolveResult[] results = references[references.length - 1].multiResolve(false);
-      ArrayList<BeanProperty> list = new ArrayList<BeanProperty>(results.length);
+      List<BeanProperty> list = new ArrayList<>(results.length);
       for (ResolveResult result : results) {
         PsiMethod method = (PsiMethod) result.getElement();
-         if (method != null) {
-           BeanProperty beanProperty = BeanProperty.createBeanProperty(method);
-           if (beanProperty != null) {
-             list.add(beanProperty);
-           }
-         }
+        if (method != null) {
+          BeanProperty beanProperty = BeanProperty.createBeanProperty(method);
+          if (beanProperty != null) {
+            list.add(beanProperty);
+          }
+        }
       }
       return list;
     }
     return null;
   }
 
+  @Override
   public String toString(@Nullable List<BeanProperty> beanProperty, ConvertContext context) {
     return null;
   }
 
   @Nonnull
+  @Override
   public PropertyReference[] createReferences(GenericDomValue<List<BeanProperty>> genericDomValue, PsiElement element, ConvertContext context) {
     CommonSpringBean springBean = SpringConverterUtil.getCurrentBeanCustomAware(context);
     if (springBean != null) {

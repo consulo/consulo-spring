@@ -26,86 +26,97 @@ public class DerivedSpringBeanPointer extends SpringBeanPointer{
     myName = name;
   }
 
+  @Override
   public SpringBeanPointer derive(@Nonnull String name) {
     if (name.equals(myName)) return this;
     if (name.equals(myBasePointer.getName())) return myBasePointer;
     return new DerivedSpringBeanPointer(myBasePointer, name);
   }
 
+  @Override
   public String[] getAliases() {
     return myBasePointer.getAliases();
   }
 
   @Nonnull
+  @Override
   public SpringBaseBeanPointer getBasePointer() {
     return myBasePointer;
   }
 
+  @Override
   public boolean isValid() {
     return myBasePointer.isValid();
   }
 
   @Nullable
+  @Override
   public PsiClass getBeanClass() {
     return myBasePointer.getBeanClass();
   }
 
+  @Override
   public Image getBeanIcon() {
     return myBasePointer.getBeanIcon();
   }
 
+  @Override
   public PsiFile getContainingFile() {
     return myBasePointer.getContainingFile();
   }
 
+  @Override
   public PsiClass[] getEffectiveBeanType() {
     return myBasePointer.getEffectiveBeanType();
   }
 
   @Nullable
+  @Override
   public String getName() {
     return myName;
   }
 
   @Nullable
+  @Override
   public SpringBeanPointer getParentPointer() {
     return myBasePointer.getParentPointer();
   }
 
   @Nullable
+  @Override
   public PsiElement getPsiElement() {
     return myBasePointer.getPsiElement();
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return myBasePointer.getPsiManager();
   }
 
   @Nonnull
+  @Override
   public CommonSpringBean getSpringBean() {
     return myBasePointer.getSpringBean();
   }
 
+  @Override
   public boolean isAbstract() {
     return myBasePointer.isAbstract();
   }
 
-  public boolean equals(Object o) {
+  @Override
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (!(o instanceof DerivedSpringBeanPointer)) return false;
 
     DerivedSpringBeanPointer that = (DerivedSpringBeanPointer)o;
 
-    if (!myBasePointer.equals(that.myBasePointer)) return false;
-    if (!myName.equals(that.myName)) return false;
-
-    return true;
+    return myBasePointer.equals(that.myBasePointer)
+      && myName.equals(that.myName);
   }
 
+  @Override
   public int hashCode() {
-    int result;
-    result = myName.hashCode();
-    result = 31 * result + myBasePointer.hashCode();
-    return result;
+    return 31 * myName.hashCode() + myBasePointer.hashCode();
   }
 }

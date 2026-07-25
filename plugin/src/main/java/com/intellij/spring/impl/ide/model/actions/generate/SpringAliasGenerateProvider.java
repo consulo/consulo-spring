@@ -1,5 +1,6 @@
 package com.intellij.spring.impl.ide.model.actions.generate;
 
+import consulo.localize.LocalizeValue;
 import jakarta.annotation.Nullable;
 
 import consulo.codeEditor.Editor;
@@ -9,9 +10,10 @@ import consulo.xml.dom.DomElementNavigationProvider;
 
 public class SpringAliasGenerateProvider extends BasicSpringDomGenerateProvider<Alias> {
   public SpringAliasGenerateProvider() {
-    super(getDescription(Alias.class), Alias.class);
+    super(LocalizeValue.of(getDescription(Alias.class)), Alias.class);
   }
 
+  @Override
   public Alias generate(@Nullable DomElement parent, Editor editor) {
     Alias alias = super.generate(parent, editor);
 
@@ -23,10 +25,12 @@ public class SpringAliasGenerateProvider extends BasicSpringDomGenerateProvider<
     return alias;
   }
 
+  @Override
   protected DomElement getElementToNavigate(Alias alias) {
     return alias.getAliasedBean();
   }
 
+  @Override
   protected void doNavigate(DomElementNavigationProvider navigateProvider, DomElement element) {
     navigateProvider.navigate(((Alias)element).getAliasedBean(), true);
   }

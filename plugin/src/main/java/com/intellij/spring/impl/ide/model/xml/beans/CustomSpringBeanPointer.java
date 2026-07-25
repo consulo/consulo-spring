@@ -15,6 +15,7 @@ import consulo.util.lang.Comparing;
 
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author peter
@@ -30,22 +31,23 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
   }
 
   @Nonnull
+  @Override
   public CustomBean getSpringBean() {
     return ((CustomBeanWrapper)myBasePointer.getSpringBean()).getCustomBeans().get(myIndex);
   }
 
+  @Override
   public boolean isValid() {
     if (!myBasePointer.isValid()) return false;
 
     DomSpringBean baseBean = myBasePointer.getSpringBean();
-    if (!(baseBean instanceof CustomBeanWrapper)) return false;
+    if (!(baseBean instanceof CustomBeanWrapper customBeanWrapper)) return false;
 
-    List<CustomBean> beans = ((CustomBeanWrapper)baseBean).getCustomBeans();
-    if (beans.size() <= myIndex) return false;
-
-    return true;
+    List<CustomBean> beans = customBeanWrapper.getCustomBeans();
+    return beans.size() > myIndex;
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return myBasePointer.getPsiManager();
   }
@@ -57,26 +59,32 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
     return new CustomSpringBeanPointer(wrapper, bean, index);
   }
 
+  @Override
   public boolean isAbstract() {
     return false;
   }
 
+  @Override
   public SpringBeanPointer getParentPointer() {
     return null;
   }
 
+  @Override
   public PsiElement getPsiElement() {
     return getSpringBean().getIdentifyingPsiElement();
   }
 
+  @Override
   public SpringBeanPointer derive(@Nonnull String name) {
     return Comparing.equal(name, getName()) ? this : new DerivedSpringBeanPointer(this, name);
   }
 
+  @Override
   public PsiClass getBeanClass() {
     return getSpringBean().getBeanClass();
   }
 
+  @Override
   public PsiFile getContainingFile() {
     return myBasePointer.getContainingFile();
   }
@@ -89,17 +97,13 @@ public class CustomSpringBeanPointer extends SpringBaseBeanPointer {
 
     CustomSpringBeanPointer that = (CustomSpringBeanPointer)o;
 
-    if (myIndex != that.myIndex) return false;
-    if (myBasePointer != null ? !myBasePointer.equals(that.myBasePointer) : that.myBasePointer != null) return false;
-
-    return true;
+    return myIndex == that.myIndex
+      && Objects.equals(myBasePointer, that.myBasePointer);
   }
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (myBasePointer != null ? myBasePointer.hashCode() : 0);
-    result = 31 * result + myIndex;
-    return result;
+    int result = 31 * super.hashCode() + Objects.hashCode(myBasePointer);
+    return 31 * result + myIndex;
   }
 }

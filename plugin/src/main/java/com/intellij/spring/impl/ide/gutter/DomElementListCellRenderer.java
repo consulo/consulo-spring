@@ -1,30 +1,28 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.gutter;
 
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.editor.ui.PsiElementListCellRenderer;
 import consulo.language.psi.PsiElement;
 import consulo.ui.image.Image;
-import consulo.xml.language.psi.XmlTag;
 import consulo.xml.dom.DomElement;
 import consulo.xml.dom.DomManager;
-import org.jetbrains.annotations.Nls;
-
+import consulo.xml.language.psi.XmlTag;
 import jakarta.annotation.Nullable;
 
 /**
  * @author Dmitry Avdeev
  */
 public class DomElementListCellRenderer extends PsiElementListCellRenderer<XmlTag> {
-
   protected final String myUnknown;
 
-  public DomElementListCellRenderer(@Nls String unknownElementText) {
+  public DomElementListCellRenderer(String unknownElementText) {
     myUnknown = unknownElementText;
   }
 
+  @Override
   public String getElementText(XmlTag element) {
     DomElement domElement = getDomElement(element);
     if (domElement == null) return element.getName();
@@ -33,18 +31,23 @@ public class DomElementListCellRenderer extends PsiElementListCellRenderer<XmlTa
     return elementName == null ? myUnknown : elementName;
   }
 
+  @Override
+  @RequiredReadAction
   protected String getContainerText(XmlTag element, String name) {
     return getContainerText(element);
   }
 
+  @RequiredReadAction
   public static String getContainerText(PsiElement element) {
     return " (" + element.getContainingFile().getName() + ")";
   }
 
+  @Override
   protected int getIconFlags() {
     return 0;
   }
 
+  @Override
   protected Image getIcon(PsiElement element) {
     DomElement domElement = getDomElement((XmlTag)element);
     if (domElement != null && domElement.getPresentation().getIcon() != null) {

@@ -1,10 +1,8 @@
 // Generated on Thu Nov 09 17:15:14 MSK 2006
 // DTD/Schema  :    http://www.springframework.org/schema/beans
-
 package com.intellij.spring.impl.ide.model.xml.beans;
 
 import consulo.xml.dom.NamedEnum;
-import org.jetbrains.annotations.NonNls;
 import jakarta.annotation.Nullable;
 
 /**
@@ -20,8 +18,9 @@ public enum Autowire implements NamedEnum {
 
   private final String value;
 
-  private Autowire(@NonNls String value) { this.value = value; }
+  private Autowire(String value) { this.value = value; }
 
+  @Override
   public String getValue() { return value; }
 
   public boolean isAutowired() { return !equals(DEFAULT) && !equals(NO); }

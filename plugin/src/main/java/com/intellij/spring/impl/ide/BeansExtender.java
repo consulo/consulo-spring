@@ -19,6 +19,7 @@ public class BeansExtender extends DomExtender<Beans> {
     return Beans.class;
   }
 
+  @Override
   public void registerExtensions(@Nonnull Beans element, @Nonnull DomExtensionsRegistrar registrar) {
     SpringDefaultDomExtender.registerDefaultBeanExtensions(registrar);
 

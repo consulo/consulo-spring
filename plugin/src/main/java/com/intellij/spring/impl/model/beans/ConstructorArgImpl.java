@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.model.beans;
 
 import com.intellij.java.language.psi.*;
@@ -17,16 +16,19 @@ import consulo.util.lang.ComparatorUtil;
 import consulo.xml.dom.GenericAttributeValue;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Dmitry Avdeev
  */
 @SuppressWarnings({"AbstractClassNeverImplemented"})
 public abstract class ConstructorArgImpl extends SpringInjectionImpl implements ConstructorArg {
-
   @Nonnull
+  @Override
   public List<? extends PsiType> getRequiredTypes() {
     PsiType type = getType().getValue();
     if (type != null) {
@@ -50,27 +52,27 @@ public abstract class ConstructorArgImpl extends SpringInjectionImpl implements 
     return Collections.emptyList();
   }
 
+  @Override
   public boolean isAssignable(@Nonnull PsiType to) {
     PsiType[] types = getTypesByValue();
     if (types == null) {
       return true;
     }
     for (PsiType typeByValue : types) {
-      if (to instanceof PsiClassType && typeByValue instanceof PsiClassType) {
-        PsiClass psiClass = ((PsiClassType)typeByValue).resolve();
+      if (to instanceof PsiClassType toClassType && typeByValue instanceof PsiClassType classTypeByValue) {
+        PsiClass psiClass = classTypeByValue.resolve();
         if (psiClass != null && SpringFactoryBeansManager.isBeanFactory(psiClass)) {
           SpringBean springBean = (SpringBean)getParent();
           assert springBean != null;
-          PsiClass requiredClass = ((PsiClassType)to).resolve();
+          PsiClass requiredClass = toClassType.resolve();
           SpringBeanPointer factoryBean = SpringUtils.getReferencedSpringBean(this);
           if (requiredClass != null && factoryBean != null) {
             return SpringFactoryBeansManager.getInstance().canProduce(psiClass, requiredClass, factoryBean.getSpringBean());
           }
         }
       }
-      if (
-             typeByValue.equals(SpringConverterUtil.findType(String.class, getManager().getProject())) ||
-             SpringConverterUtil.isConvertable(typeByValue, to, getManager().getProject())) {
+      if (typeByValue.equals(SpringConverterUtil.findType(String.class, getManager().getProject()))
+          || SpringConverterUtil.isConvertable(typeByValue, to, getManager().getProject())) {
         return true;
       }
 
@@ -78,18 +80,18 @@ public abstract class ConstructorArgImpl extends SpringInjectionImpl implements 
     return false;
   }
 
+  @Override
   public int hashCode() {
-    Integer value = getIndex().getValue();
-    return value == null ? 0 : value.hashCode();
+    return Objects.hashCode(getIndex().getValue());
   }
 
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ConstructorArg)) return false;
+  @Override
+  public boolean equals(@Nullable Object obj) {
+    if (!(obj instanceof ConstructorArg that)) return false;
 
-    ConstructorArg that = (ConstructorArg)obj;
     if (getXmlTag().equals(that.getXmlTag())) return true;
     
-    Integer indec = getIndex().getValue();
-    return indec != null && ComparatorUtil.equalsNullable(indec, that.getIndex().getValue());
+    Integer index = getIndex().getValue();
+    return index != null && ComparatorUtil.equalsNullable(index, that.getIndex().getValue());
   }
 }

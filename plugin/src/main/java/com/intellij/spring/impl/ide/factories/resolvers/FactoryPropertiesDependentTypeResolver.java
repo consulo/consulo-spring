@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.factories.resolvers;
 
 import com.intellij.spring.impl.ide.model.xml.CommonSpringBean;
@@ -19,6 +18,7 @@ public class FactoryPropertiesDependentTypeResolver extends AbstractTypeResolver
   }
 
   @Nonnull
+  @Override
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
     for (String propertyName : myPropertyNames) {
       String propertyValue = getPropertyValue(context, propertyName);
@@ -29,6 +29,7 @@ public class FactoryPropertiesDependentTypeResolver extends AbstractTypeResolver
     return Collections.emptySet();
   }
 
+  @Override
   public boolean accept(@Nonnull String factoryClassName) {
     return true;
   }

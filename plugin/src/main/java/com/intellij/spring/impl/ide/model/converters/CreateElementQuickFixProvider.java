@@ -31,10 +31,12 @@ public abstract class CreateElementQuickFixProvider<T> {
 
         return new LocalQuickFix() {
             @Nonnull
+            @Override
             public LocalizeValue getName() {
                 return getFixName(elementName);
             }
 
+            @Override
             public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                 apply(elementName, copy);
             }

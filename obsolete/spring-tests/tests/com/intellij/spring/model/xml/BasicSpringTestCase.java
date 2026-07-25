@@ -26,14 +26,11 @@ import java.io.File;
 public abstract class BasicSpringTestCase extends UsefulTestCase {
   
   @Nullable
-  protected static VirtualFile getFile(final String path) {
-
-    final Ref<VirtualFile> result = new Ref<VirtualFile>(null);
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      public void run() {
-        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
-        result.set(file);
-      }
+  protected static VirtualFile getFile(String path) {
+    Ref<VirtualFile> result = new Ref<VirtualFile>(null);
+    ApplicationManager.getApplication().runWriteAction((Runnable) () -> {
+      VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+      result.set(file);
     });
     return result.get();
   }

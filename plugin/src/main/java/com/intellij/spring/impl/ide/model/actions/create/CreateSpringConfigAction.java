@@ -1,34 +1,38 @@
 package com.intellij.spring.impl.ide.model.actions.create;
 
 import com.intellij.java.language.psi.JavaPsiFacade;
-import com.intellij.spring.impl.ide.SpringBundle;
-import com.intellij.spring.impl.ide.SpringIcons;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.dataContext.DataContext;
 import consulo.fileTemplate.FileTemplate;
 import consulo.fileTemplate.FileTemplateUtil;
-import consulo.ide.IdeBundle;
 import consulo.ide.action.CreateFileAction;
+import consulo.ide.localize.IdeLocalize;
 import consulo.language.editor.LangDataKeys;
 import consulo.language.psi.PsiDirectory;
 import consulo.language.psi.PsiElement;
-import consulo.language.util.ModuleUtilCore;
 import consulo.module.Module;
 import consulo.project.Project;
+import consulo.spring.impl.icon.SpringImplIconGroup;
+import consulo.spring.localize.SpringLocalize;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.awt.Messages;
+import consulo.ui.ex.awt.UIUtil;
 import consulo.util.io.FileUtil;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.Map;
 
 public class CreateSpringConfigAction extends CreateFileAction {
-
   public CreateSpringConfigAction() {
-    super(SpringBundle.message("config.new.file"),
-        SpringBundle.message("create.new.spring.configuration.file"),
-        SpringIcons.CONFIG_FILE);
+    super(
+      SpringLocalize.configNewFile(),
+      SpringLocalize.createNewSpringConfigurationFile(),
+      SpringImplIconGroup.springconfig()
+    );
   }
 
+  @Override
+  @RequiredReadAction
   protected boolean isAvailable(DataContext dataContext) {
     if (!super.isAvailable(dataContext)) {
       return false;
@@ -38,18 +42,26 @@ public class CreateSpringConfigAction extends CreateFileAction {
   }
 
   @Nonnull
+  @RequiredUIAccess
   protected PsiElement[] invokeDialog(Project project, PsiDirectory directory) {
     MyInputValidator validator = new MyInputValidator(project, directory);
-    Messages.showInputDialog(project, IdeBundle.message("prompt.enter.new.file.name"),
-        IdeBundle.message("title.new.file"), Messages.getQuestionIcon(), null, validator);
+    Messages.showInputDialog(
+      project,
+      IdeLocalize.promptEnterNewFileName().get(),
+      IdeLocalize.titleNewFile().get(),
+      UIUtil.getQuestionIcon(),
+      null,
+      validator
+    );
     return validator.getCreatedElements();
   }
 
   @Nonnull
+  @RequiredUIAccess
   protected PsiElement[] create(String newName, PsiDirectory directory) throws Exception {
-    Module module = ModuleUtilCore.findModuleForPsiElement(directory);
+    Module module = directory.getModule();
     FileTemplate template = null;///SpringFrameworkSupportProvider.chooseTemplate(module);
-    @NonNls String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
+    String fileName = FileUtil.getExtension(newName).length() == 0 ? newName + ".xml" : newName;
     PsiElement psiElement = FileTemplateUtil.createFromTemplate(template, fileName, (Map<String, Object>) null, directory);
     return new PsiElement[]{psiElement};
   }

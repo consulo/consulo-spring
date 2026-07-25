@@ -6,7 +6,6 @@ package com.intellij.spring.impl.ide.model.highlighting;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiType;
 import com.intellij.java.language.psi.util.PropertyUtil;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.beans.*;
@@ -20,6 +19,7 @@ import consulo.language.editor.rawHighlight.HighlightDisplayLevel;
 import consulo.localize.LocalizeValue;
 import consulo.project.Project;
 import consulo.spring.localize.SpringLocalize;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.xml.dom.DomFileElement;
 import consulo.xml.dom.DomUtil;
 import consulo.xml.dom.editor.DomElementAnnotationHolder;
@@ -58,12 +58,15 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
                 return SpringLocalize.springBeanAutowireEscape();
             }
 
+            @Override
+            @RequiredUIAccess
             public void applyFix(@Nonnull final Project project, @Nonnull ProblemDescriptor descriptor) {
                 if (!beans.isValid()) {
                     return;
                 }
 
                 new WriteCommandAction(project, DomUtil.getFile(beans)) {
+                    @Override
                     protected void run(Result result) throws Throwable {
                         for (SpringBean bean : beans.getBeans()) {
                             if (isAutowireCandidate(bean)) {
@@ -83,6 +86,7 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         };
     }
 
+    @Override
     protected void checkBean(
         SpringBean springBean,
         Beans beans,
@@ -100,8 +104,7 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
     private static boolean isAutowireCandidate(SpringBean springBean) {
         Boolean autoWireCandidate = springBean.getAutowireCandidate().getValue();
 
-        return autoWireCandidate == null || autoWireCandidate.booleanValue();
-
+        return autoWireCandidate == null || autoWireCandidate;
     }
 
     private static void addAutowireEscapeWarning(SpringBean springBean, DomElementAnnotationHolder holder) {
@@ -124,12 +127,15 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
                 return SpringLocalize.springBeanAutowireEscape();
             }
 
+            @Override
+            @RequiredUIAccess
             public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
                 if (!springBean.isValid()) {
                     return;
                 }
 
                 new WriteCommandAction(springBean.getManager().getProject(), DomUtil.getFile(springBean)) {
+                    @Override
                     protected void run(Result result) throws Throwable {
                         escapeAutowire(autowire.getValue(), springBean);
                     }
@@ -171,7 +177,6 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
         }
 
         springBean.getAutowire().undefine();
-
     }
 
     private static void escapeByNameAutowire(SpringBean springBean) {
@@ -227,6 +232,7 @@ public class AutowiredDependenciesInspection extends SpringBeanInspectionBase<Ob
     }
 
     @Nonnull
+    @Override
     public HighlightDisplayLevel getDefaultLevel() {
         return HighlightDisplayLevel.WARNING;
     }

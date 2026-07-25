@@ -1,11 +1,9 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.highlighting;
 
 import com.intellij.java.language.psi.PsiMethod;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.converters.SpringBeanFactoryMethodConverter;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
@@ -34,6 +32,7 @@ public class FactoryMethodInspection extends SpringBeanInspectionBase {
         return "SpringFactoryMethodInspection";
     }
 
+    @Override
     protected void checkBean(
         SpringBean springBean,
         Beans beans,
