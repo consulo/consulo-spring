@@ -4,15 +4,16 @@
  */
 package com.intellij.spring.impl.ide.model.xml.custom;
 
-import com.intellij.spring.impl.ide.SpringBundle;
-import com.intellij.spring.impl.ide.SpringIcons;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.access.RequiredWriteAction;
 import consulo.language.impl.psi.RenameableFakePsiElement;
 import consulo.language.psi.PsiElement;
 import consulo.language.util.IncorrectOperationException;
+import consulo.spring.impl.icon.SpringImplIconGroup;
+import consulo.spring.localize.SpringLocalize;
 import consulo.ui.image.Image;
 import consulo.xml.language.psi.XmlAttribute;
 import consulo.xml.language.psi.XmlTag;
-import org.jetbrains.annotations.NonNls;
 
 import jakarta.annotation.Nonnull;
 
@@ -28,11 +29,13 @@ public class CustomBeanFakePsiElement extends RenameableFakePsiElement
     myBean = bean;
   }
 
+  @Override
   public XmlTag getParent() {
     return myBean.getXmlTag();
   }
 
   @Override
+  @RequiredReadAction
   public String getName() {
     return myBean.getBeanName();
   }
@@ -46,12 +49,14 @@ public class CustomBeanFakePsiElement extends RenameableFakePsiElement
     return getParent();
   }
 
+  @Override
   public String getTypeName() {
-    return SpringBundle.message("spring.bean");
+    return SpringLocalize.springBean().get();
   }
 
   @Override
-    public PsiElement setName(@NonNls @Nonnull String name) throws IncorrectOperationException
+  @RequiredWriteAction
+  public PsiElement setName(@Nonnull String name) throws IncorrectOperationException
   {
     XmlAttribute idAttribute = myBean.getIdAttribute();
     if (idAttribute != null) {
@@ -69,7 +74,8 @@ public class CustomBeanFakePsiElement extends RenameableFakePsiElement
     return false;
   }
 
+  @Override
   public Image getIcon() {
-    return SpringIcons.SPRING_BEAN_ICON;
+    return SpringImplIconGroup.springbean();
   }
 }

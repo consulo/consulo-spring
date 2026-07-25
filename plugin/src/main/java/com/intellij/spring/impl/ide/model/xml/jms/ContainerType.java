@@ -14,6 +14,7 @@ public enum ContainerType implements NamedEnum {
     this.value = value;
   }
 
+  @Override
   public String getValue() {
     return value;
   }

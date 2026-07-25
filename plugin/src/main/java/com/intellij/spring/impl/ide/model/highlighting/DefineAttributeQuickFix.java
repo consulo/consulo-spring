@@ -33,6 +33,7 @@ public class DefineAttributeQuickFix implements LocalQuickFix {
         return SpringLocalize.aopQuickfixDefine0Attr(myAttrName);
     }
 
+    @Override
     public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
         try {
             XmlTag tag = (XmlTag) descriptor.getPsiElement();

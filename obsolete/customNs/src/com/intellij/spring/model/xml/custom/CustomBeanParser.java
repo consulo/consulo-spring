@@ -17,6 +17,7 @@ public class CustomBeanParser {
   public static void main(String[] args) {
     Logger.getLogger("").setLevel(Level.FINE);
     Logger.getLogger("").addHandler(new Handler() {
+      @Override
       public void publish(LogRecord record) {
         Throwable throwable = record.getThrown();
         if (throwable != null) {
@@ -24,9 +25,11 @@ public class CustomBeanParser {
         }
       }
 
+      @Override
       public void flush() {
       }
 
+      @Override
       public void close() throws SecurityException {
       }
     });
@@ -117,7 +120,7 @@ public class CustomBeanParser {
           case'u':
             if (idx + 4 < length) {
               try {
-                int code = Integer.valueOf(s1.substring(idx + 1, idx + 5), 16).intValue();
+                int code = Integer.valueOf(s1.substring(idx + 1, idx + 5), 16);
                 idx += 4;
                 buffer.append((char)code);
               }

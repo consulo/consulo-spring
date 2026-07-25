@@ -7,6 +7,7 @@ import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.constants.SpringConstants;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
 import com.intellij.xml.util.XmlUtil;
+import consulo.annotation.access.RequiredWriteAction;
 import consulo.language.editor.inspection.LocalQuickFix;
 import consulo.language.editor.inspection.ProblemDescriptor;
 import consulo.language.util.IncorrectOperationException;
@@ -37,6 +38,8 @@ public class EnableAspectJQuickFix implements LocalQuickFix {
         return SpringLocalize.aopEnableAspectjFixText();
     }
 
+    @Override
+    @RequiredWriteAction
     public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
         DomFileElement<Beans> fileElement = myModel.getRoots().get(0);
         if (ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(fileElement.getFile().getVirtualFile()).hasReadonlyFiles()) {
@@ -63,6 +66,7 @@ public class EnableAspectJQuickFix implements LocalQuickFix {
         return root != null && root.getNamespace().contains("http://www.springframework.org/schema/");
     }
 
+    @RequiredWriteAction
     public static void addAspectjAutoproxy(XmlTag root) {
         try {
             if (root.getPrefixByNamespace(SpringConstants.AOP_NAMESPACE) == null && root.getNamespaceByPrefix("aop") == XmlUtil.EMPTY_URI) {

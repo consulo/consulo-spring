@@ -1,11 +1,11 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks.ui;
 
-import consulo.language.editor.template.Template;
-import consulo.java.ex.facet.LibrariesValidationComponent;
-import consulo.project.Project;
-import consulo.ui.ex.awt.DialogWrapper;
 import consulo.disposer.Disposer;
-import com.intellij.spring.impl.ide.SpringBundle;
+import consulo.language.editor.template.Template;
+import consulo.project.Project;
+import consulo.spring.localize.SpringLocalize;
+import consulo.ui.annotation.RequiredUIAccess;
+import consulo.ui.ex.awt.DialogWrapper;
 
 import javax.swing.*;
 import java.util.LinkedList;
@@ -18,25 +18,25 @@ public class ChooseTemplatesDialogWrapper extends DialogWrapper {
     super(project, true);
 
     myTemplatesForm = new ChooseTemplatesForm(infos, libInfo);
-    myTemplatesForm.getLibrariesValidationComponent().addValidityListener(new LibrariesValidationComponent.ValidityListener() {
-      public void valididyChanged(boolean isValid) {
-        setOKActionEnabled(isValid);
-      }
-    });
+    myTemplatesForm.getLibrariesValidationComponent().addValidityListener(this::setOKActionEnabled);
     setOKActionEnabled(myTemplatesForm.getLibrariesValidationComponent().isValid());
-    setTitle(SpringBundle.message("spring.choose.bean.templates.dialog.title", frameworkTitle));
+    setTitle(SpringLocalize.springChooseBeanTemplatesDialogTitle(frameworkTitle));
 
     init();
   }
 
+  @Override
   protected Action[] createActions() {
     return new Action[]{getOKAction(), getCancelAction()};
   }
 
+  @Override
   protected JComponent createCenterPanel() {
     return myTemplatesForm.getComponent();
   }
 
+  @Override
+  @RequiredUIAccess
   public JComponent getPreferredFocusedComponent() {
     return myTemplatesForm.getComponent();
   }
@@ -46,7 +46,7 @@ public class ChooseTemplatesDialogWrapper extends DialogWrapper {
   }
 
   public List<Template> getSelectedTemplates() {
-    List<Template> templates = new LinkedList<Template>();
+    List<Template> templates = new LinkedList<>();
     for (TemplateInfo info : myTemplatesForm.getTemplateInfos()) {
       if (info.isAccepted()) {
         templates.add(info.getTemplate());
@@ -55,10 +55,9 @@ public class ChooseTemplatesDialogWrapper extends DialogWrapper {
     return templates;
   }
 
+  @Override
   protected void dispose() {
     Disposer.dispose(myTemplatesForm);
     super.dispose();
   }
-
-
 }

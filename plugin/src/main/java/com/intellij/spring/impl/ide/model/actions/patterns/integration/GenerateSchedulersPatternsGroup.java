@@ -7,28 +7,53 @@ import consulo.spring.localize.SpringLocalize;
 import consulo.ui.ex.action.DefaultActionGroup;
 
 public class GenerateSchedulersPatternsGroup extends DefaultActionGroup {
-
     public GenerateSchedulersPatternsGroup() {
         super(SpringLocalize.springPatternsSchedulingGroupName(), SpringLocalize.springPatternsSchedulingGroupName(), PatternIcons.SCHEDULER_ICON);
 
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyJobDetailBean().get(), "quartz-job-detail"), PatternIcons.SCHEDULER_ICON));
-        add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationOpensymphonyMethodInvokingFactoryBean().get()) {
-            protected String getClassName() {
-                return "org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean";
-            }
-        }, PatternIcons.SCHEDULER_ICON));
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonySimpleTrigger().get(), "quartz-simple-trigger"), PatternIcons.SCHEDULER_ICON));
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyCronTrigger().get(), "quartz-cron-trigger"), PatternIcons.SCHEDULER_ICON));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyJobDetailBean(), "quartz-job-detail"),
+            PatternIcons.SCHEDULER_ICON
+        ));
+        add(new GenerateSpringDomElementAction(
+            new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationOpensymphonyMethodInvokingFactoryBean()) {
+                @Override
+                protected String getClassName() {
+                    return "org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean";
+                }
+            },
+            PatternIcons.SCHEDULER_ICON
+        ));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonySimpleTrigger(), "quartz-simple-trigger"),
+            PatternIcons.SCHEDULER_ICON
+        ));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyCronTrigger(), "quartz-cron-trigger"),
+            PatternIcons.SCHEDULER_ICON
+        ));
 
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyScheduler().get(), "quartz-scheduler-factory"), PatternIcons.SCHEDULER_ICON));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationOpensymphonyScheduler(), "quartz-scheduler-factory"),
+            PatternIcons.SCHEDULER_ICON
+        ));
         addSeparator();
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkScheduledTimerTask().get(), "jdk-scheduled-timer-task"), PatternIcons.JDK_ICON));
-        add(new GenerateSpringDomElementAction(new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationJdkMethodInvokingFactoryBean().get()) {
-            protected String getClassName() {
-                return "org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean";
-            }
-        }, PatternIcons.JDK_ICON));
-        add(new GenerateSpringDomElementAction(new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkTimerFactoryBean().get(), "jdk-timer-factory-bean"), PatternIcons.JDK_ICON));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkScheduledTimerTask(), "jdk-scheduled-timer-task"),
+            PatternIcons.JDK_ICON
+        ));
+        add(new GenerateSpringDomElementAction(
+            new MethodInvokingFactoryBean(SpringLocalize.springPatternsIntegrationJdkMethodInvokingFactoryBean()) {
+                @Override
+                protected String getClassName() {
+                    return "org.springframework.scheduling.timer.MethodInvokingTimerTaskFactoryBean";
+                }
+            },
+            PatternIcons.JDK_ICON
+        ));
+        add(new GenerateSpringDomElementAction(
+            new SpringBeanGenerateProvider(SpringLocalize.springPatternsIntegrationJdkTimerFactoryBean(), "jdk-timer-factory-bean"),
+            PatternIcons.JDK_ICON
+        ));
 
         setPopup(true);
     }

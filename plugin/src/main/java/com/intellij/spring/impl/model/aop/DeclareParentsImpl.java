@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.model.aop;
 
 import jakarta.annotation.Nullable;
@@ -16,17 +15,19 @@ import consulo.language.psi.PsiManager;
  * @author peter
  */
 public abstract class DeclareParentsImpl implements DeclareParents {
-
   @Nullable
+  @Override
   public PsiFile getContainingFile() {
     return DomUtil.getFile(this);
   }
 
   @Nullable
+  @Override
   public PsiElement getIdentifyingPsiElement() {
     return getXmlTag();
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return PsiManager.getInstance(getManager().getProject());
   }

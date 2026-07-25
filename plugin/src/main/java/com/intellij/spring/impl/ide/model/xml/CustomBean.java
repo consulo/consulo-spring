@@ -16,21 +16,17 @@ import jakarta.annotation.Nullable;
  * @author peter
  */
 public interface CustomBean extends CommonSpringBean {
-
   @Nonnull
+  @Override
   XmlTag getXmlTag();
 
-  @Nullable
-  String getClassName();
+  @Nullable String getClassName();
 
-  @Nullable
-  GenericValue<PsiMethod> getFactoryMethod();
+  @Nullable GenericValue<PsiMethod> getFactoryMethod();
 
   @Nullable GenericValue<SpringBeanPointer> getFactoryBean();
 
-  @Nonnull
-  CustomBeanWrapper getWrapper();
+  @Nonnull CustomBeanWrapper getWrapper();
 
-  @Nullable
-  XmlAttribute getIdAttribute();
+  @Nullable XmlAttribute getIdAttribute();
 }

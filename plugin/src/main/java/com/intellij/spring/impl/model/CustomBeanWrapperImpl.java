@@ -11,6 +11,7 @@ import com.intellij.spring.impl.ide.model.xml.CustomBean;
 import com.intellij.spring.impl.ide.model.xml.CustomBeanWrapper;
 import com.intellij.spring.impl.ide.model.xml.custom.CustomNamespaceSpringBean;
 import com.intellij.xml.util.XmlUtil;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.NotNullLazyValue;
 import consulo.language.psi.PsiElement;
 import consulo.module.Module;
@@ -27,9 +28,10 @@ import java.util.List;
  * @author peter
  */
 public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements CustomBeanWrapper {
-
-  private final NotNullLazyValue<List<CustomBean>> myBeans = new NotNullLazyValue<List<CustomBean>>() {
+  private final NotNullLazyValue<List<CustomBean>> myBeans = new NotNullLazyValue<>() {
     @Nonnull
+    @Override
+    @RequiredReadAction
     protected List<CustomBean> compute() {
       XmlTag tag = getXmlTag();
       List<CustomBeanInfo> infos = CustomBeanRegistry.getInstance(getPsiManager().getProject()).getParseResult(tag);
@@ -38,7 +40,7 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
         return bean != null ? Collections.singletonList(bean) : Collections.<CustomBean>emptyList();
       }
 
-      ArrayList<CustomBean> result = new ArrayList<CustomBean>(infos.size());
+      List<CustomBean> result = new ArrayList<>(infos.size());
       Module module = getModule();
       for (CustomBeanInfo info : infos) {
         result.add(new CustomNamespaceSpringBean(info, module, CustomBeanWrapperImpl.this));
@@ -92,6 +94,7 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
   }
 
   @Nullable
+  @Override
   public String getBeanName() {
     if (!isParsed()) {
       return super.getBeanName();
@@ -101,24 +104,27 @@ public abstract class CustomBeanWrapperImpl extends DomSpringBeanImpl implements
   }
 
   @Nonnull
+  @Override
   public List<CustomBean> getCustomBeans() {
     return getCachedValue();
   }
 
+  @Override
   public boolean isDummy() {
     return getCachedValue().isEmpty();
   }
 
+  @Override
   public boolean isParsed() {
     List<CustomBean> customBeans = getCachedValue();
     return !customBeans.isEmpty() || customBeans != Collections.<CustomBean>emptyList();
   }
 
   @Nullable
+  @Override
   public String getClassName() {
     return null;
   }
-
 }
 
 

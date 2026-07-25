@@ -1,14 +1,17 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.values.converters;
 
 import com.intellij.java.impl.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
-import com.intellij.java.language.psi.*;
+import com.intellij.java.language.psi.JavaPsiFacade;
+import com.intellij.java.language.psi.PsiClass;
+import com.intellij.java.language.psi.PsiField;
+import com.intellij.java.language.psi.PsiType;
 import com.intellij.spring.impl.ide.model.converters.SpringConverterUtil;
 import com.intellij.spring.impl.ide.model.xml.CommonSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringProperty;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.document.util.TextRange;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiManager;
@@ -20,21 +23,18 @@ import consulo.project.Project;
 import consulo.util.collection.ArrayUtil;
 import consulo.util.lang.Pair;
 import consulo.util.lang.StringUtil;
-import consulo.util.lang.function.Condition;
 import consulo.xml.dom.*;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class FieldRetrievingFactoryBeanConverter extends Converter<String> implements CustomReferenceConverter<String> {
-  private static final String FIELD_RETRIVING_FACTORY_BEAN_CLASS = "org.springframework.beans.factory.config.FieldRetrievingFactoryBean";
-  @NonNls
+  private static final String FIELD_RETRIEVING_FACTORY_BEAN_CLASS = "org.springframework.beans.factory.config.FieldRetrievingFactoryBean";
   private static final String STATIC_FIELD_PROPERTY_NAME = "staticField";
   private final boolean mySoft;
-
 
   public FieldRetrievingFactoryBeanConverter() {
     this(true);
@@ -45,6 +45,8 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PsiReference[] createReferences(GenericDomValue<String> genericDomValue,
                                          PsiElement element,
                                          ConvertContext context) {
@@ -52,13 +54,14 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
   }
 
   @Nonnull
+  @RequiredReadAction
   public PsiReference[] createReferences(GenericDomValue<String> genericDomValue, PsiElement element) {
     String stringValue = genericDomValue.getStringValue();
     if (stringValue == null) {
       return PsiReference.EMPTY_ARRAY;
     }
 
-    List<PsiReference> collectedReferences = new ArrayList<PsiReference>();
+    List<PsiReference> collectedReferences = new ArrayList<>();
 
     JavaClassReferenceProvider provider = new JavaClassReferenceProvider();
     provider.setSoft(mySoft);
@@ -83,6 +86,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
     return collectedReferences.toArray(new PsiReference[collectedReferences.size()]);
   }
 
+  @RequiredReadAction
   private PsiReference createFieldReference(final PsiClass psiClass,
                                             final PsiElement element,
                                             String stringValue,
@@ -96,14 +100,14 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
       ? TextRange.from(element.getText().indexOf(className) + className.length() + 1, 0)
       : TextRange.from(element.getText().indexOf(fieldName), fieldName.length());
 
-    return new PsiReferenceBase<PsiElement>(element, textRange, mySoft) {
+    return new PsiReferenceBase<>(element, textRange, mySoft) {
+      @Override
+      @RequiredReadAction
       public PsiElement resolve() {
         if (fieldName.length() != 0) {
           PsiField[] psiFields = psiClass.getFields();
           for (PsiField psiField : psiFields) {
-            if (psiField.hasModifierProperty(PsiModifier.PUBLIC) &&
-              psiField.hasModifierProperty(PsiModifier.STATIC) &&
-              fieldName.equals(psiField.getName())) {
+            if (psiField.isPublic() && psiField.isStatic() && fieldName.equals(psiField.getName())) {
               return psiField;
             }
           }
@@ -120,13 +124,13 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
         return getElement();
       }
 
+      @Override
+      @RequiredReadAction
       public Object[] getVariants() {
-        List<String> staticFields = new ArrayList<String>();
+        List<String> staticFields = new ArrayList<>();
         PsiField[] psiFields = psiClass.getFields();
         for (PsiField psiField : psiFields) {
-          if (psiField.hasModifierProperty(PsiModifier.PUBLIC) &&
-            psiField.hasModifierProperty(PsiModifier.STATIC) &&
-            psiField.getName() != null) {
+          if (psiField.isPublic() && psiField.isStatic() && psiField.getName() != null) {
             staticFields.add(psiField.getName());
           }
         }
@@ -135,29 +139,32 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
     };
   }
 
-  public String fromString(@Nullable @NonNls String s, ConvertContext context) {
+  @Override
+  public String fromString(@Nullable String s, ConvertContext context) {
     return s;
   }
 
+  @Override
   public String toString(@Nullable String s, ConvertContext context) {
     return s;
   }
 
-
-  public static class FactoryClassCondition implements Condition<GenericDomValue> {
-    public boolean value(GenericDomValue context) {
-      return checkbeanClass(context);
+  public static class FactoryClassCondition implements Predicate<GenericDomValue> {
+    @Override
+    public boolean test(GenericDomValue context) {
+      return checkBeanClass(context);
     }
   }
 
-  public static class FactoryClassAndPropertyCondition implements Condition<Pair<PsiType, GenericDomValue>> {
-    public boolean value(Pair<PsiType, GenericDomValue> pair) {
+  public static class FactoryClassAndPropertyCondition implements Predicate<Pair<PsiType, GenericDomValue>> {
+    @Override
+    public boolean test(Pair<PsiType, GenericDomValue> pair) {
       GenericDomValue element = pair.getSecond();
-      return checkbeanClass(element) && checkPropertyName(element);
+      return checkBeanClass(element) && checkPropertyName(element);
     }
   }
 
-  private static boolean checkbeanClass(DomElement element) {
+  private static boolean checkBeanClass(DomElement element) {
     return isFieldRetrivingFactoryBean(SpringConverterUtil.getCurrentBean(element));
   }
 
@@ -171,7 +178,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
 
     PsiClass beanClass = springBean.getBeanClass();
 
-    return beanClass != null && FIELD_RETRIVING_FACTORY_BEAN_CLASS.equals(beanClass.getQualifiedName());
+    return beanClass != null && FIELD_RETRIEVING_FACTORY_BEAN_CLASS.equals(beanClass.getQualifiedName());
   }
 
   public static boolean isResolved(Project project, String field) {
@@ -188,7 +195,7 @@ public class FieldRetrievingFactoryBeanConverter extends Converter<String> imple
     PsiClass psiClass = JavaPsiFacade.getInstance(psiManager.getProject()).findClass(className, GlobalSearchScope.allScope(project));
     if (psiClass != null) {
       for (PsiField psiField : psiClass.getFields()) {
-        if (psiField.hasModifierProperty(PsiModifier.STATIC) && fieldName.equals(psiField.getName())) {
+        if (psiField.isStatic() && fieldName.equals(psiField.getName())) {
           return true;
         }
       }

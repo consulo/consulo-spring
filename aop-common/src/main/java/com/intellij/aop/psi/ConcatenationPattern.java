@@ -35,13 +35,13 @@ public class ConcatenationPattern extends AopPsiTypePattern{
     return myRight;
   }
 
+  @Override
   public boolean accepts(@Nonnull PsiType type) {
-    if (type instanceof PsiClassType) {
-      PsiClassType classType = (PsiClassType)type;
+    if (type instanceof PsiClassType classType) {
       PsiClass psiClass = classType.resolve();
       if (psiClass != null) {
-        String qname = psiClass.getQualifiedName();
-        if (qname != null && accepts(qname)) {
+        String qName = psiClass.getQualifiedName();
+        if (qName != null && accepts(qName)) {
           return true;
         }
       }
@@ -49,6 +49,7 @@ public class ConcatenationPattern extends AopPsiTypePattern{
     return false;
   }
 
+  @Override
   public boolean accepts(@Nonnull String qualifiedName) {
     String[] strings = qualifiedName.split("\\.");
     int[] indices = new int[strings.length];

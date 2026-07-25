@@ -2,13 +2,12 @@ package com.intellij.spring.impl.ide.model.values.converters;
 
 import com.intellij.java.language.psi.*;
 import com.intellij.spring.impl.ide.model.values.PropertyValueConverter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiReference;
 import consulo.language.psi.PsiReferenceBase;
 import consulo.util.lang.Pair;
-import consulo.util.lang.function.Condition;
 import consulo.xml.dom.*;
-import org.jetbrains.annotations.NonNls;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -16,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 /**
  * @author Taras Tielkes
  */
 public class EnumValueConverter extends Converter<PsiField> implements CustomReferenceConverter {
-
   @Nonnull
   public static PsiReference[] createReferences(PsiType type, GenericDomValue genericDomValue, PsiElement element) {
     String stringValue = genericDomValue.getStringValue();
@@ -36,7 +35,9 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
   }
 
   private static PsiReference createReference(final PsiClass psiClass, final PsiElement element, final String stringValue) {
-    return new PsiReferenceBase<PsiElement>(element, true) {
+    return new PsiReferenceBase<>(element, true) {
+      @Override
+      @RequiredReadAction
       public PsiElement resolve() {
         PsiField psiField = psiClass.findFieldByName(stringValue, false);
         if (psiField == null && !psiClass.isEnum()) {
@@ -45,26 +46,31 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
         return psiField;
       }
 
+      @Override
+      @RequiredReadAction
       public Object[] getVariants() {
         return getFields(psiClass);
       }
     };
   }
 
-  public PsiField fromString(@Nullable @NonNls String s, ConvertContext context) {
+  @Override
+  public PsiField fromString(@Nullable String s, ConvertContext context) {
     return null;
   }
 
+  @Override
   public String toString(@Nullable PsiField s, ConvertContext context) {
     return null;
   }
 
   @Nonnull
+  @Override
   public PsiReference[] createReferences(GenericDomValue genericDomValue, PsiElement element, ConvertContext context) {
     Converter converter = genericDomValue.getConverter();
     while (converter instanceof WrappingConverter) {
-      if (converter instanceof PropertyValueConverter) {
-        List<? extends PsiType> types = ((PropertyValueConverter)converter).getValueTypes(genericDomValue);
+      if (converter instanceof PropertyValueConverter valueConverter) {
+        List<? extends PsiType> types = valueConverter.getValueTypes(genericDomValue);
         for (PsiType type : types) {
           PsiReference[] psiReferences = createReferences(type, genericDomValue, element);
           if (psiReferences.length > 0) {
@@ -77,11 +83,11 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
     return PsiReference.EMPTY_ARRAY;
   }
 
-  public static class TypeCondition implements Condition<Pair<PsiType, GenericDomValue>> {
+  public static class TypeCondition implements Predicate<Pair<PsiType, GenericDomValue>> {
     private final List<String> EXCLUDE_CLASSES = Arrays.asList(Boolean.class.getName(), Locale.class.getName());
 
-    public boolean value(Pair<PsiType, GenericDomValue> pair) {
-
+    @Override
+    public boolean test(Pair<PsiType, GenericDomValue> pair) {
       PsiType type = pair.getFirst();
       if (type != null && type instanceof PsiClassType) {
         if (EXCLUDE_CLASSES.contains(type.getCanonicalText())) return false;
@@ -92,9 +98,7 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
             return true;
           }
           for (PsiField psiField: psiClass.getFields()) {
-            if (psiField.hasModifierProperty(PsiModifier.STATIC) &&
-                psiField.hasModifierProperty(PsiModifier.PUBLIC) &&
-                psiField.getType().equals(type)) {
+            if (psiField.isStatic() && psiField.isPublic() && psiField.getType().equals(type)) {
                 return true;
             }
           }
@@ -105,17 +109,14 @@ public class EnumValueConverter extends Converter<PsiField> implements CustomRef
   }
 
   private static PsiField[] getFields(@Nonnull PsiClass psiClass) {
-    ArrayList<PsiField> fields = new ArrayList<PsiField>();
+    List<PsiField> fields = new ArrayList<>();
     PsiField[] psiFields = psiClass.getFields();
     for (PsiField psiField : psiFields) {
-      if (psiField.hasModifierProperty(PsiModifier.STATIC) && psiField.hasModifierProperty(PsiModifier.PUBLIC)) {
-        PsiType type = psiField.getType();
-        if (type instanceof PsiClassType) {
-          PsiClass typeClass = ((PsiClassType)type).resolve();
-          if (typeClass != null && typeClass.equals(psiClass)) {
-            fields.add(psiField);
-          }
-        }
+      if (psiField.isStatic()
+        && psiField.isPublic()
+        && psiField.getType() instanceof PsiClassType classType
+        && psiClass.equals(classType.resolve())) {
+          fields.add(psiField);
       }
     }
 

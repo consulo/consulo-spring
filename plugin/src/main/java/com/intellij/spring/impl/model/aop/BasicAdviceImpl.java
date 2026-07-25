@@ -22,29 +22,32 @@ import jakarta.annotation.Nullable;
  * @author peter
  */
 public abstract class BasicAdviceImpl extends BaseImpl implements BasicAdvice {
+    @Nullable
+    @Override
+    public PsiPointcutExpression getPointcutExpression() {
+        AopPointcut aopPointcut = getPointcutRef().getValue();
+        return aopPointcut != null ? aopPointcut.getExpression().getValue() : getPointcut().getValue();
+    }
 
-  @Nullable
-  public PsiPointcutExpression getPointcutExpression() {
-    AopPointcut aopPointcut = getPointcutRef().getValue();
-    return aopPointcut != null ? aopPointcut.getExpression().getValue() : getPointcut().getValue();
-  }
+    @Nonnull
+    @Override
+    public SpringAdvisedElementsSearcher getSearcher() {
+        return new SpringAdvisedElementsSearcher(getPsiManager(), SpringUtils.getNonEmptySpringModelsByFile(DomUtil.getFile(this)));
+    }
 
-  @Nonnull
-  public SpringAdvisedElementsSearcher getSearcher() {
-    return new SpringAdvisedElementsSearcher(getPsiManager(), SpringUtils.getNonEmptySpringModelsByFile(DomUtil.getFile(this)));
-  }
+    @Nonnull
+    @Override
+    public AopAdviceType getAdviceType() {
+        return AopAdviceType.valueOf(getXmlElementName().replace('-', '_').toUpperCase());
+    }
 
-  @Nonnull
-  public AopAdviceType getAdviceType() {
-    return AopAdviceType.valueOf(getXmlElementName().replace('-', '_').toUpperCase());
-  }
+    @Override
+    public PointcutMatchDegree accepts(PsiMethod method) {
+        PsiPointcutExpression expression = getPointcutExpression();
+        if (expression == null) {
+            return PointcutMatchDegree.FALSE;
+        }
 
-  public PointcutMatchDegree accepts(PsiMethod method) {
-    PsiPointcutExpression expression = getPointcutExpression();
-    if (expression == null) return PointcutMatchDegree.FALSE;
-
-    return expression.acceptsSubject(new PointcutContext(getMethod().getValue()), method);
-  }
-
-
+        return expression.acceptsSubject(new PointcutContext(getMethod().getValue()), method);
+    }
 }

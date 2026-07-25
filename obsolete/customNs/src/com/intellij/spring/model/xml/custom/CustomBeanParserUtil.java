@@ -118,6 +118,7 @@ public class CustomBeanParserUtil {
     reads.down();
     final Throwable[] exception = new Throwable[1];
     Thread thread = new Thread() {
+      @Override
       public void run() {
         try {
           reader.loadBeanDefinitions(resource);

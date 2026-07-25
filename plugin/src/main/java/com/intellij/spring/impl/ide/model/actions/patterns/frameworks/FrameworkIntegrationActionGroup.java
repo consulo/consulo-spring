@@ -1,37 +1,37 @@
 package com.intellij.spring.impl.ide.model.actions.patterns.frameworks;
 
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.model.actions.patterns.AbstarctSpringConfigActionGroup;
 import consulo.spring.impl.icon.SpringImplIconGroup;
+import consulo.spring.localize.SpringLocalize;
 import consulo.ui.image.Image;
-
 import jakarta.annotation.Nullable;
 
 public class FrameworkIntegrationActionGroup extends AbstarctSpringConfigActionGroup {
+    public FrameworkIntegrationActionGroup() {
+        super();
+        add(new AddHibernateAction());
+        add(new AddJdoAction());
+        add(new AddToplinkAction());
+        add(new AddIbatisAction());
 
-  public FrameworkIntegrationActionGroup() {
-    super();
-    add(new AddHibernateAction());
-    add(new AddJdoAction());
-    add(new AddToplinkAction());
-    add(new AddIbatisAction());
+        addSeparator();
 
-    addSeparator();
+        add(new AddWebflowAction());
 
-    add(new AddWebflowAction());
+        addSeparator();
 
-    addSeparator();
+        add(new AddOpenSymphonyTimerAction());
+        add(new AddJdkTimerAction());
+    }
 
-    add(new AddOpenSymphonyTimerAction());
-    add(new AddJdkTimerAction());
-  }
+    @Override
+    protected String getDescription() {
+        return SpringLocalize.springPatterns().get();
+    }
 
-  protected String getDescription() {
-    return SpringBundle.message("spring.patterns");
-  }
-
-  @Nullable
-  protected Image getIcon() {
-    return SpringImplIconGroup.spring();
-  }
+    @Nullable
+    @Override
+    protected Image getIcon() {
+        return SpringImplIconGroup.spring();
+    }
 }

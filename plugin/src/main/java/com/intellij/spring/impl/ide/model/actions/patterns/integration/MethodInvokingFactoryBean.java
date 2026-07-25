@@ -3,7 +3,6 @@ package com.intellij.spring.impl.ide.model.actions.patterns.integration;
 import com.intellij.java.impl.codeInsight.lookup.LookupItemUtil;
 import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiMethod;
-import com.intellij.java.language.psi.PsiModifier;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.actions.generate.SpringBeanGenerateProvider;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBean;
@@ -16,16 +15,18 @@ import consulo.language.editor.template.*;
 import consulo.language.editor.template.macro.MacroCallNode;
 import consulo.language.editor.template.macro.MacroFactory;
 import consulo.language.psi.PsiFile;
+import consulo.localize.LocalizeValue;
 import consulo.xml.dom.GenericDomValue;
 import consulo.xml.util.xml.actions.generate.DomTemplateRunner;
 import consulo.xml.util.xml.impl.DomTemplateRunnerImpl;
-
 import jakarta.annotation.Nullable;
+
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvider {
-  public MethodInvokingFactoryBean(String text) {
+  public MethodInvokingFactoryBean(LocalizeValue text) {
     super(text, null);
   }
 
@@ -68,21 +69,24 @@ public abstract class MethodInvokingFactoryBean extends SpringBeanGenerateProvid
   private static Expression getTargetMethodExpression(SpringBean springBean) {
     final SpringBean copy = springBean.createStableCopy();
     return new Expression() {
+      @Override
       public Result calculateResult(ExpressionContext context) {
         return new TextResult("");
       }
 
+      @Override
       public Result calculateQuickResult(ExpressionContext context) {
         return calculateResult(context);
       }
 
+      @Override
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
         PsiClass psiClass = getTargetObjectPsiClass(copy);
         if(psiClass == null) return LookupItem.EMPTY_ARRAY;
 
-        LinkedHashSet<LookupElement> items = new LinkedHashSet<LookupElement>();
+        Set<LookupElement> items = new LinkedHashSet<>();
         for (PsiMethod psiMethod : psiClass.getAllMethods()) {
-           if (psiMethod.hasModifierProperty(PsiModifier.PUBLIC) && psiMethod.getParameterList().getParametersCount() == 0) {
+           if (psiMethod.isPublic() && psiMethod.getParameterList().getParametersCount() == 0) {
              items.add(LookupItemUtil.objectToLookupItem(psiMethod));
            }
         }
