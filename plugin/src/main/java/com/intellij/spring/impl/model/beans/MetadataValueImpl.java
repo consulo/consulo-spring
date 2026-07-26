@@ -18,17 +18,19 @@ import java.util.List;
  * @author peter
  */
 public abstract class MetadataValueImpl implements MetadataValue {
-
   @Nonnull
+  @Override
   public List<? extends PsiType> getRequiredTypes() {
     return Collections.singletonList(((MetadataPropertyValueConverter)getConverter()).getRequiredType());
   }
 
+  @Override
   public GenericDomValue<SpringBeanPointer> getRefElement() {
     return null;
   }
 
+  @Override
   public GenericDomValue<?> getValueElement() {
-    return (GenericDomValue)this;
+    return this;
   }
 }

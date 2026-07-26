@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.converters;
 
 import com.intellij.spring.impl.ide.SpringModel;
@@ -14,9 +13,9 @@ import java.util.Collection;
 
 /**
  * @author Dmitry Avdeev
-*/
+ */
 public class ParentRefConverter extends SpringBeanResolveConverter.PropertyBean {
-
+  @Override
   public SpringBeanPointer fromString(@Nullable String s, ConvertContext context) {
     if (s == null) return null;
     SpringModel model = getSpringModel(context);
@@ -24,6 +23,7 @@ public class ParentRefConverter extends SpringBeanResolveConverter.PropertyBean 
   }
 
   @Nonnull
+  @Override
   public Collection<SpringBeanPointer> getVariants(ConvertContext context) {
     return getVariants(context, true);
   }

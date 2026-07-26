@@ -33,29 +33,28 @@ import java.util.List;
 public class MethodResolveProcessor implements PsiScopeProcessor, ElementClassHint {
 
   private final NameHint myNameHint;
-  private final List<PsiMethod> myMethods = new ArrayList<PsiMethod>();
+  private final List<PsiMethod> myMethods = new ArrayList<>();
 
   public MethodResolveProcessor() {
     myNameHint = null;
   }
 
-  public MethodResolveProcessor(final String name) {
-    myNameHint = new NameHint() {
-      public String getName(ResolveState state) {
-        return name;
-      }
-    };
+  public MethodResolveProcessor(String name) {
+    myNameHint = state -> name;
   }
 
   public PsiMethod[] getMethods() {
     return myMethods.toArray(new PsiMethod[myMethods.size()]);
   }
 
+  @Override
   public boolean execute(PsiElement element, ResolveState state) {
     myMethods.add((PsiMethod)element);
     return true;
   }
 
+  @Override
+  @SuppressWarnings("unchecked")
   public <T> T getHint(Key<T> hintKey) {
     if (hintKey == ElementClassHint.KEY) {
       return (T)this;
@@ -66,9 +65,11 @@ public class MethodResolveProcessor implements PsiScopeProcessor, ElementClassHi
     return null;
   }
 
+  @Override
   public void handleEvent(Event event, Object associated) {
   }
 
+  @Override
   public boolean shouldProcess(ElementClassHint.DeclarationKind kind) {
     return kind == ElementClassHint.DeclarationKind.METHOD;
   }

@@ -13,28 +13,31 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.intellij.spring.impl.ide.model.jam;
 
 import com.intellij.jam.annotations.JamPsiConnector;
 import com.intellij.java.language.psi.PsiClass;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.util.lang.StringUtil;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 public abstract class JamPsiClassSpringBean extends JamPsiMemberSpringBean<PsiClass> {
-
   @Nonnull
   @JamPsiConnector
+  @Override
   public abstract PsiClass getPsiElement();
 
   @Nullable
+  @Override
+  @RequiredReadAction
   public String getBeanName() {
     return StringUtil.decapitalize(getPsiElement().getName());
   }
 
   @Nullable
+  @Override
   public PsiClass getBeanClass() {
     return getPsiElement();
   }

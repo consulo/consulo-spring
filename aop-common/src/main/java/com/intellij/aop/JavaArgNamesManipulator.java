@@ -10,11 +10,10 @@ import com.intellij.aop.jam.PointcutContainer;
 import com.intellij.jam.JamStringAttributeElement;
 import com.intellij.java.language.psi.PsiAnnotationMemberValue;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiReference;
 import consulo.language.util.IncorrectOperationException;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -30,39 +29,44 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
   }
 
   @Nullable
+  @Override
   public String getArgNames() {
     return myContainer.getArgNames().getStringValue();
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PsiElement getArgNamesProblemElement() {
     PsiAnnotationMemberValue value = myContainer.getArgNames().getPsiElement();
     return value == null ? getCommonProblemElement() : value;
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PsiElement getCommonProblemElement() {
     return myContainer.getAnnotation().getNameReferenceElement();
   }
 
   @Override
   public PsiParameter getReturningParameter() {
-    return myContainer instanceof AopAfterReturningAdviceImpl ? ((AopAfterReturningAdviceImpl)myContainer).getReturning().getValue() : null;
-
+    return myContainer instanceof AopAfterReturningAdviceImpl afterReturningAdvice ? afterReturningAdvice.getReturning().getValue() : null;
   }
 
   @Override
   public PsiParameter getThrowingParameter() {
-    return myContainer instanceof AopAfterThrowingAdviceImpl ? ((AopAfterThrowingAdviceImpl)myContainer).getThrowing().getValue() : null;
+    return myContainer instanceof AopAfterThrowingAdviceImpl afterThrowingAdvice ? afterThrowingAdvice.getThrowing().getValue() : null;
   }
 
   @Nonnull
-  @NonNls
+  @Override
   public String getArgNamesAttributeName() {
     return AopConstants.ARG_NAMES_PARAM;
   }
 
   @Nullable
+  @Override
   public PsiReference getReturningReference() {
     if (!(myContainer instanceof AopAfterReturningAdviceImpl)) return null;
 
@@ -72,19 +76,21 @@ public class JavaArgNamesManipulator extends ArgNamesManipulator {
   }
 
   @Nullable
+  @Override
   public PsiReference getThrowingReference() {
     if (!(myContainer instanceof AopAfterThrowingAdviceImpl)) return null;
 
     JamStringAttributeElement<PsiParameter> throwing = ((AopAfterThrowingAdviceImpl)myContainer).getThrowing();
     PsiReference[] references = throwing.getConverter().createReferences(throwing);
     return references.length == 0 ? null : references[0];
-
   }
 
+  @Override
   public AopAdviceType getAdviceType() {
-    return myContainer instanceof AopAdvice ? ((AopAdvice)myContainer).getAdviceType() : null;
+    return myContainer instanceof AopAdvice advice ? advice.getAdviceType() : null;
   }
 
+  @Override
   public void setArgNames(@Nullable String argNames) throws IncorrectOperationException
   {
     myContainer.getArgNames().setStringValue(argNames);

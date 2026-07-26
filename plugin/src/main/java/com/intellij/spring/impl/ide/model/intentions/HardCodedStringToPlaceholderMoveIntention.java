@@ -21,6 +21,8 @@ import consulo.language.psi.util.PsiTreeUtil;
 import consulo.localize.LocalizeValue;
 import consulo.project.Project;
 import consulo.spring.localize.SpringLocalize;
+import consulo.ui.annotation.RequiredUIAccess;
+import consulo.util.lang.Couple;
 import consulo.util.lang.Pair;
 import consulo.util.lang.StringUtil;
 import consulo.xml.language.psi.XmlElement;
@@ -34,7 +36,7 @@ import java.util.*;
 @ExtensionImpl
 @IntentionMetaData(ignoreId = "spring.hardcode.string2placeholder.move", fileExtensions = "xml", categories = {"XML", "Spring"})
 public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropertyFix {
-    private static final Map<String, List<String>> myExcludedProperties = new HashMap<String, List<String>>();
+    private static final Map<String, List<String>> myExcludedProperties = new HashMap<>();
     private static final String[] myEscapes = new String[]{":", "_", "/", "\\", "#", "$", "{", "}"};
 
     public HardCodedStringToPlaceholderMoveIntention() {
@@ -43,8 +45,9 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
         );
     }
 
+    @Override
     public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
-        if (!(file instanceof XmlFile) || DomManager.getDomManager(project).getFileElement((XmlFile) file, Beans.class) == null) {
+        if (!(file instanceof XmlFile xmlFile) || DomManager.getDomManager(project).getFileElement(xmlFile, Beans.class) == null) {
             return false;
         }
         GenericDomValue<?> genericDomValue = getValueElement(editor, file);
@@ -59,6 +62,8 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
         return domElement instanceof GenericDomValue ? (GenericDomValue) domElement : null;
     }
 
+    @Override
+    @RequiredUIAccess
     public void invoke(@Nonnull Project project, Editor editor, @Nonnull PsiFile file) {
         GenericDomValue<?> domElement = getValueElement(editor, file);
 
@@ -70,7 +75,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
         if (placeholderConfigurerBeans.size() > 0) {
             String suggestedKey = suggestKey(domElement);
 
-            List<PropertiesFile> propertiesFiles = new ArrayList<PropertiesFile>();
+            List<PropertiesFile> propertiesFiles = new ArrayList<>();
             for (SpringBaseBeanPointer placeholder : placeholderConfigurerBeans) {
                 propertiesFiles.addAll(PlaceholderUtils.getResources(placeholder.getSpringBean()));
             }
@@ -141,7 +146,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
                 return key;
             }
         }
-        LinkedList<String> keyFragments = new LinkedList<String>();
+        List<String> keyFragments = new LinkedList<>();
 
         // iterate injections up to top-level bean
         SpringInjection current = domElement.getParentOfType(SpringInjection.class, false);
@@ -267,10 +272,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
         return value;
     }
 
-    private static Pair<String, String> getPrefixAndSuffix(
-        List<SpringBaseBeanPointer> springBeans,
-        Collection<PropertiesFile> propertiesFiles
-    ) {
+    private static Pair<String, String> getPrefixAndSuffix(List<SpringBaseBeanPointer> springBeans, Collection<PropertiesFile> propertiesFiles) {
         for (PropertiesFile propertiesFile : propertiesFiles) {
             if (propertiesFile != null) {
                 for (SpringBaseBeanPointer springBean : springBeans) {
@@ -281,7 +283,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
                 }
             }
         }
-        return new Pair<String, String>(PlaceholderUtils.DEFAULT_PLACEHOLDER_PREFIX, PlaceholderUtils.DEFAULT_PLACEHOLDER_SUFFIX);
+        return Couple.of(PlaceholderUtils.DEFAULT_PLACEHOLDER_PREFIX, PlaceholderUtils.DEFAULT_PLACEHOLDER_SUFFIX);
     }
 
     private static boolean isMultiline(String s) {
@@ -292,6 +294,7 @@ public class HardCodedStringToPlaceholderMoveIntention extends JavaCreatePropert
         myExcludedProperties.put(baseClassName, Arrays.asList(properties));
     }
 
+    @Override
     public boolean startInWriteAction() {
         return true;
     }

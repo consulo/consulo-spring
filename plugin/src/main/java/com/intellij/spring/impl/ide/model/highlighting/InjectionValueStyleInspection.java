@@ -40,6 +40,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
     private static final String KEY_REF = "key-ref";
     private static final String REF = "ref";
 
+    @Override
     protected SpringModelVisitor createVisitor(
         final DomElementAnnotationHolder holder,
         Beans beans,
@@ -47,6 +48,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
         Object state
     ) {
         return new SpringModelVisitor() {
+            @Override
             protected boolean visitValueHolder(SpringValueHolder valueHolder) {
                 checkValueHolder(holder, valueHolder);
                 return true;
@@ -54,6 +56,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
         };
     }
 
+    @Override
     protected void checkBean(
         SpringBean springBean,
         Beans beans,
@@ -83,7 +86,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
         GenericDomValue<?> value = valueHolder.getValueElement();
         if (value != null && !(value instanceof GenericAttributeValue)) {
             String s = value.getStringValue();
-            if (s != null && !isMultiline(s) && (!(value instanceof SpringValue) || !DomUtil.hasXml(((SpringValue) value).getType()))) {
+            if (s != null && !isMultiline(s) && (!(value instanceof SpringValue springValue) || !DomUtil.hasXml(springValue.getType()))) {
                 LocalQuickFix fix = new ValueQuickFix(valueHolder);
                 holder.createProblem(
                     value,
@@ -124,6 +127,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
     }
 
     @Nonnull
+    @Override
     public HighlightDisplayLevel getDefaultLevel() {
         return HighlightDisplayLevel.WARNING;
     }
@@ -141,6 +145,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
             return SpringLocalize.modelInspectionInjectionValueStyleValueFix(myValueHolder instanceof SpringKey ? KEY : VALUE);
         }
 
+        @Override
         public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             XmlElement xmlElement = myValueHolder.getXmlElement();
             if (xmlElement == null || !CodeInsightUtilCore.getInstance().preparePsiElementForWrite(xmlElement)) {
@@ -197,6 +202,7 @@ public class InjectionValueStyleInspection extends SpringBeanInspectionBase {
             return SpringLocalize.modelInspectionInjectionValueStyleRefFix(attr);
         }
 
+        @Override
         public void applyFix(@Nonnull Project project, @Nonnull ProblemDescriptor descriptor) {
             XmlElement element = myValueHolder.getXmlElement();
             if (element == null || !CodeInsightUtilCore.getInstance().preparePsiElementForWrite(element)) {

@@ -1,12 +1,10 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.highlighting;
 
 import com.intellij.java.language.psi.*;
 import com.intellij.java.language.psi.util.InheritanceUtil;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
@@ -18,9 +16,6 @@ import consulo.localize.LocalizeValue;
 import consulo.spring.localize.SpringLocalize;
 import consulo.util.lang.StringUtil;
 import consulo.xml.dom.editor.DomElementAnnotationHolder;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 
 @ExtensionImpl
@@ -79,10 +74,10 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
         PsiMethod method
     ) {
 
-        if (!(method.hasModifierProperty(PsiModifier.PUBLIC) || method.hasModifierProperty(PsiModifier.PROTECTED))) {
+        if (!(method.isPublic() || method.isProtected())) {
             holder.createProblem(lookupMethod.getName(), SpringLocalize.springBeanLookupMethodMustBePublicOrProtected().get());
         }
-        if (method.hasModifierProperty(PsiModifier.STATIC)) {
+        if (method.isStatic()) {
             holder.createProblem(lookupMethod.getName(), SpringLocalize.springBeanLookupMethodMustBeNotStatic().get());
         }
         if (method.getParameterList().getParametersCount() > 0) {
@@ -90,6 +85,7 @@ public class LookupMethodInspection extends SpringBeanInspectionBase {
         }
     }
 
+    @Override
     protected void checkBean(
         SpringBean springBean,
         Beans beans,

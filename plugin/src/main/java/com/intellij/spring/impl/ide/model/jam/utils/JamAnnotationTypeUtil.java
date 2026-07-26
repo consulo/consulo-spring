@@ -12,6 +12,7 @@ import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.CommonSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBaseBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringPropertyDefinition;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.CachedValue;
 import consulo.application.util.CachedValueProvider;
 import consulo.application.util.CachedValuesManager;
@@ -34,19 +35,21 @@ import java.lang.annotation.Target;
 import java.util.*;
 
 /**
- * User: Sergey.Vasiliev
+ * @author Sergey.Vasiliev
  */
 public class JamAnnotationTypeUtil {
-  private static final Key<CachedValue<Collection<PsiClass>>> SPRING_MODULE_QUALIIFIER_ANNOTATIONS =
-    new Key<CachedValue<Collection<PsiClass>>>("SPRING_MODULE_QUALIIFIER_ANNOTATIONS");
+  private static final Key<CachedValue<Collection<PsiClass>>> SPRING_MODULE_QUALIFIER_ANNOTATIONS =
+    new Key<>("SPRING_MODULE_QUALIIFIER_ANNOTATIONS");
   private static final Key<CachedValue<Collection<PsiClass>>> SPRING_MODULE_COMPONENT_ANNOTATIONS =
-    new Key<CachedValue<Collection<PsiClass>>>("SPRING_MODULE_COMPONENT_ANNOTATIONS");
-  private static final HashingStrategy<PsiClass> HASHING_STRATEGY = new HashingStrategy<PsiClass>() {
+    new Key<>("SPRING_MODULE_COMPONENT_ANNOTATIONS");
+  private static final HashingStrategy<PsiClass> HASHING_STRATEGY = new HashingStrategy<>() {
+    @Override
     public int hashCode(PsiClass object) {
       String qualifiedName = object.getQualifiedName();
       return qualifiedName == null ? 0 : qualifiedName.hashCode();
     }
 
+    @Override
     public boolean equals(PsiClass o1, PsiClass o2) {
       return Comparing.equal(o1.getQualifiedName(), o2.getQualifiedName());
     }
@@ -70,19 +73,22 @@ public class JamAnnotationTypeUtil {
   }
 
   @Nonnull
+  @RequiredReadAction
   public static List<PsiClass> getQualifierAnnotationTypesWithChildren(Module module) {
-    List<PsiClass> list = new ArrayList<PsiClass>();
+    List<PsiClass> list = new ArrayList<>();
 
     list.addAll(
-      getAnnotationTypesWithChildren(module, SPRING_MODULE_QUALIIFIER_ANNOTATIONS, SpringAnnotationsConstants.QUALIFIER_ANNOTATION));
+      getAnnotationTypesWithChildren(module, SPRING_MODULE_QUALIFIER_ANNOTATIONS, SpringAnnotationsConstants.QUALIFIER_ANNOTATION)
+    );
     list.addAll(getImplicitQualifierAnnotations(module)); // IDEADEV-27559
 
     return list;
   }
 
   // IDEADEV-27559
-  public static List<PsiClass> getImplicitQualifierAnnotations(consulo.module.Module module) {
-    List<PsiClass> list = new ArrayList<PsiClass>();
+  @RequiredReadAction
+  public static List<PsiClass> getImplicitQualifierAnnotations(Module module) {
+    List<PsiClass> list = new ArrayList<>();
 
     JavaPsiFacade facade = JavaPsiFacade.getInstance(module.getProject());
     GlobalSearchScope moduleSearchScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module);
@@ -114,7 +120,7 @@ public class JamAnnotationTypeUtil {
   }
 
   @Nonnull
-  public static List<String> getUserDefinedCustomComponentAnnotations(consulo.module.Module module) {
+  public static List<String> getUserDefinedCustomComponentAnnotations(Module module) {
     List<String> annotations = getCustomComponentAnnotations(module);
     for (String annotation : SpringAnnotationsConstants.SPRING_COMPONENT_ANNOTATIONS) {
       annotations.remove(annotation);
@@ -123,26 +129,26 @@ public class JamAnnotationTypeUtil {
   }
 
   @Nonnull
-  public static List<String> getCustomComponentAnnotations(consulo.module.Module module) {
+  public static List<String> getCustomComponentAnnotations(Module module) {
     Collection<PsiClass> classes =
       getAnnotationTypesWithChildren(module, SPRING_MODULE_COMPONENT_ANNOTATIONS, SpringAnnotationsConstants.COMPONENT_ANNOTATION);
-    return ContainerUtil.mapNotNull(classes, psiClass -> psiClass.getQualifiedName());
+    return ContainerUtil.mapNotNull(classes, PsiClass::getQualifiedName);
   }
 
-  private static Collection<PsiClass> getAnnotationTypesWithChildren(@Nullable final Module module,
+  private static Collection<PsiClass> getAnnotationTypesWithChildren(@Nullable Module module,
                                                                      Key<CachedValue<Collection<PsiClass>>> key,
-                                                                     final String annotationName) {
+                                                                     String annotationName) {
     if (module == null) return Collections.emptyList();
 
     CachedValue<Collection<PsiClass>> cachedValue = module.getUserData(key);
     if (cachedValue == null) {
-      cachedValue = CachedValuesManager.getManager(module.getProject())
-        .createCachedValue(new CachedValueProvider<Collection<PsiClass>>() {
-          public Result<Collection<PsiClass>> compute() {
-            Collection<PsiClass> classes = getAnnotationTypesWithChildren(annotationName, module);
-            return new Result<Collection<PsiClass>>(classes, PsiModificationTracker.MODIFICATION_COUNT);
-          }
-        }, false);
+      cachedValue = CachedValuesManager.getManager(module.getProject()).createCachedValue(
+        () -> {
+          Collection<PsiClass> classes = getAnnotationTypesWithChildren(annotationName, module);
+          return new CachedValueProvider.Result<>(classes, PsiModificationTracker.MODIFICATION_COUNT);
+        },
+        false
+      );
 
       module.putUserData(key, cachedValue);
     }
@@ -179,6 +185,7 @@ public class JamAnnotationTypeUtil {
     return result;
   }
 
+  @RequiredReadAction
   public static boolean isAcceptedFor(PsiClass psiClass, ElementType... elementTypes) {
     PsiModifierList modifierList = psiClass.getModifierList();
     if (modifierList != null) {

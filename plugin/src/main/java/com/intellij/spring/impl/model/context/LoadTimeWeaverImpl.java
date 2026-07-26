@@ -6,6 +6,7 @@ import jakarta.annotation.Nullable;
 
 public abstract class LoadTimeWeaverImpl extends DomSpringBeanImpl implements LoadTimeWeaver {
   @Nullable
+  @Override
   public String getClassName() {
     return null; //todo
   }

@@ -4,7 +4,6 @@
 package com.intellij.spring.impl.ide.model.highlighting;
 
 import com.intellij.java.language.psi.*;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringBeanEffectiveTypeProvider;
 import com.intellij.spring.impl.ide.model.SpringUtils;
@@ -26,8 +25,6 @@ import consulo.xml.dom.DomElement;
 import consulo.xml.dom.GenericDomValue;
 import consulo.xml.dom.editor.DomElementAnnotationHolder;
 import consulo.xml.util.xml.impl.ConvertContextImpl;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -147,7 +144,7 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
         }
         for (Idref idref : collection.getIdrefs()) {
             if (!CommonClassNames.JAVA_LANG_STRING.equals(type.getCanonicalText())) {
-                holder.createProblem(idref, SpringBundle.message("idref.cannot.be.added.in.collection", type.getCanonicalText()));
+                holder.createProblem(idref, SpringLocalize.idrefCannotBeAddedInCollection(type.getCanonicalText()).get());
             }
         }
         if (type instanceof PsiClassType) {
@@ -195,12 +192,8 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
         if (beanPointer == null) {
             return;
         }
-        CommonSpringBean springBean = beanPointer.getSpringBean();
-        if (springBean instanceof SpringJavaBean) {
-            if (!((SpringJavaBean) springBean).isPublic()) {
-                String message = SpringBundle.message("bean.must.be.public");
-                holder.createProblem(annotatedElement, message);
-            }
+        if (beanPointer.getSpringBean() instanceof SpringJavaBean springJavaBean && !springJavaBean.isPublic()) {
+            holder.createProblem(annotatedElement, SpringLocalize.beanMustBePublic().get());
         }
     }
 
@@ -276,14 +269,13 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
                 if (genericType != null && !genericType.isAssignableFrom(JavaPsiFacade.getInstance(project)
                     .getElementFactory()
                     .createType(beanClass))) {
-                    String message =
-                        SpringBundle.message("bean.must.be.of.types", psiType.getCanonicalText(), genericType.getCanonicalText());
-                    holder.createProblem(annotatedElement, message);
+                    LocalizeValue message = SpringLocalize.beanMustBeOfTypes(psiType.getCanonicalText(), genericType.getCanonicalText());
+                    holder.createProblem(annotatedElement, message.get());
                 }
             }
             else {
-                String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
-                holder.createProblem(annotatedElement, message);
+                LocalizeValue message = SpringLocalize.beanMustBeOfType(psiType.getCanonicalText());
+                holder.createProblem(annotatedElement, message.get());
             }
         }
         else if (annotatedElement instanceof GenericDomValue) {
@@ -306,13 +298,13 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
                         }
 
                         if (list.size() == 1) {
-                            String message = SpringBundle.message("bean.must.be.of.type", psiType.getCanonicalText());
-                            holder.createProblem(annotatedElement, message);
+                            LocalizeValue message = SpringLocalize.beanMustBeOfType(psiType.getCanonicalText());
+                            holder.createProblem(annotatedElement, message.get());
                         }
                         else {
-                            String classNames = StringUtil.join(list, psiClassType -> psiClassType.getCanonicalText(), ",");
-                            String message = SpringBundle.message("bean.must.be.one.of.this.types", classNames);
-                            holder.createProblem(annotatedElement, message);
+                            String classNames = StringUtil.join(list, PsiType::getCanonicalText, ",");
+                            LocalizeValue message = SpringLocalize.beanMustBeOneOfThisTypes(classNames);
+                            holder.createProblem(annotatedElement, message.get());
                         }
                     }
                 }
@@ -351,12 +343,12 @@ public class InjectionValueTypeInspection extends DomSpringBeanInspectionBase<Ob
         PsiType requiredType = SpringConverterUtil.findType(requiredClass, project);
         if (requiredType != null && !requiredType.isAssignableFrom(propertyType) &&
             !SpringConverterUtil.isConvertable(requiredType, propertyType, project)) {
-            String message =
-                SpringBundle.message("bean.bad.property.type", propertyType.getCanonicalText(), requiredClass.getCanonicalName());
-            holder.createProblem(value, message);
+            LocalizeValue message = SpringLocalize.beanBadPropertyType(propertyType.getCanonicalText(), requiredClass.getCanonicalName());
+            holder.createProblem(value, message.get());
         }
     }
 
+    @Override
     protected void checkBean(
         DomSpringBean springBean,
         Beans beans,

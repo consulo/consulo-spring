@@ -12,6 +12,7 @@ import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.util.PsiTreeUtil;
 import consulo.project.Project;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.lang.Pair;
 
 import java.util.List;
@@ -27,6 +28,8 @@ public class GenerateSpringBeanDependenciesActionHandler implements CodeInsightA
     return mySetterDependency;
   }
 
+  @Override
+  @RequiredUIAccess
   public void invoke(Project project, Editor editor, PsiFile file) {
     int offset = editor.getCaretModel().getOffset();
     PsiElement element = file.findElementAt(offset);
@@ -34,6 +37,8 @@ public class GenerateSpringBeanDependenciesActionHandler implements CodeInsightA
       final PsiClass psiClass = PsiTreeUtil.getParentOfType(element, PsiClass.class);
 
       List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = new WriteCommandAction<List<Pair<SpringInjection,SpringGenerateTemplatesHolder>>>(psiClass.getProject()) {
+        @Override
+        @RequiredUIAccess
         protected void run(Result<List<Pair<SpringInjection, SpringGenerateTemplatesHolder>>> result) throws Throwable {
           List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> list = GenerateSpringBeanDependenciesUtil
                   .generateDependenciesFor(GenerateSpringBeanDependenciesUtil.getSpringModel(psiClass), psiClass, mySetterDependency);
@@ -48,6 +53,7 @@ public class GenerateSpringBeanDependenciesActionHandler implements CodeInsightA
     }
   }
 
+  @Override
   public boolean startInWriteAction() {
     return false;
   }
