@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package consulo.java.ex.facet;
 
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nullable;
+
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author nik
@@ -27,15 +26,18 @@ import java.util.Arrays;
 public class LibraryInfo {
   public static final LibraryInfo[] EMPTY_ARRAY = new LibraryInfo[0];
 
-  private @Nullable
-  final LibraryDownloadInfo myDownloadInfo;
-  private @NonNls final String myName;
-  @Nullable private String myMd5;
-  private @NonNls final String[] myRequiredClasses;
+  private final @Nullable LibraryDownloadInfo myDownloadInfo;
+  private final String myName;
+  private @Nullable String myMd5;
+  private final String[] myRequiredClasses;
 
-  public LibraryInfo(@NonNls String name,
-                     @Nullable @NonNls String downloadingUrl,
-                     @Nullable String presentableUrl, @Nullable String md5, @NonNls String... requiredClasses) {
+  public LibraryInfo(
+      String name,
+      @Nullable String downloadingUrl,
+      @Nullable String presentableUrl,
+      @Nullable String md5,
+      String... requiredClasses
+  ) {
     myName = name;
     myMd5 = md5;
     myRequiredClasses = requiredClasses;
@@ -50,18 +52,16 @@ public class LibraryInfo {
     }
   }
 
-  public LibraryInfo(@NonNls String name, @Nullable LibraryDownloadInfo downloadInfo, String... requiredClasses) {
+  public LibraryInfo(String name, @Nullable LibraryDownloadInfo downloadInfo, String... requiredClasses) {
     myName = name;
     myRequiredClasses = requiredClasses;
     myDownloadInfo = downloadInfo;
   }
 
-  @NonNls
   public String getName() {
     return myName;
   }
 
-  @NonNls
   public String[] getRequiredClasses() {
     return myRequiredClasses;
   }
@@ -71,19 +71,19 @@ public class LibraryInfo {
     return myDownloadInfo;
   }
 
-  public boolean equals(Object o) {
+  @Override
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
     LibraryInfo that = (LibraryInfo)o;
 
-    if (myDownloadInfo != null ? !myDownloadInfo.equals(that.myDownloadInfo) : that.myDownloadInfo != null) return false;
-    if (!myName.equals(that.myName)) return false;
-    if (!Arrays.equals(myRequiredClasses, that.myRequiredClasses)) return false;
-
-    return true;
+      return Objects.equals(myDownloadInfo, that.myDownloadInfo)
+          && myName.equals(that.myName)
+          && Arrays.equals(myRequiredClasses, that.myRequiredClasses);
   }
 
+  @Override
   public int hashCode() {
     int result;
     result = (myDownloadInfo != null ? myDownloadInfo.hashCode() : 0);

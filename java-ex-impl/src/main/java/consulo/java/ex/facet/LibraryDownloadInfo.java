@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package consulo.java.ex.facet;
-
-import consulo.util.lang.Comparing;
-import org.jetbrains.annotations.NonNls;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import org.jetbrains.annotations.NonNls;
+
+import java.util.Objects;
 
 /**
  * @author nik
@@ -102,27 +101,27 @@ public class LibraryDownloadInfo {
     return myPresentableUrl != null ? myPresentableUrl : mirror;
   }
 
-  public boolean equals(Object o) {
+  @Override
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
     LibraryDownloadInfo that = (LibraryDownloadInfo)o;
 
-    if (!myFileNamePrefix.equals(that.myFileNamePrefix)) return false;
-    if (!myFileNameSuffix.equals(that.myFileNameSuffix)) return false;
-    if (!Comparing.equal(myPresentableUrl, that.myPresentableUrl)) return false;
-    if (!myRelativeDownloadUrl.equals(that.myRelativeDownloadUrl)) return false;
-    if (!Comparing.equal(myRemoteRepository, that.myRemoteRepository)) return false;
-
-    return true;
+    return myFileNamePrefix.equals(that.myFileNamePrefix)
+      && myFileNameSuffix.equals(that.myFileNameSuffix)
+      && Objects.equals(myPresentableUrl, that.myPresentableUrl)
+      && myRelativeDownloadUrl.equals(that.myRelativeDownloadUrl)
+      && Objects.equals(myRemoteRepository, that.myRemoteRepository);
   }
 
+  @Override
   public int hashCode() {
-    int result = myRemoteRepository != null ? myRemoteRepository.hashCode() : 0;
-    result = 31 * result + (myRelativeDownloadUrl != null ? myRelativeDownloadUrl.hashCode() : 0);
-    result = 31 * result + (myFileNamePrefix != null ? myFileNamePrefix.hashCode() : 0);
-    result = 31 * result + (myFileNameSuffix != null ? myFileNameSuffix.hashCode() : 0);
-    result = 31 * result + (myPresentableUrl != null ? myPresentableUrl.hashCode() : 0);
+    int result = Objects.hashCode(myRemoteRepository);
+    result = 31 * result + Objects.hashCode(myRelativeDownloadUrl);
+    result = 31 * result + Objects.hashCode(myFileNamePrefix);
+    result = 31 * result + Objects.hashCode(myFileNameSuffix);
+    result = 31 * result + Objects.hashCode(myPresentableUrl);
     return result;
   }
 }

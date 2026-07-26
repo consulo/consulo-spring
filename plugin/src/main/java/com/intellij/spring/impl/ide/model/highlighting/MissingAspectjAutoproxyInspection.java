@@ -18,15 +18,13 @@ import com.intellij.spring.impl.ide.constants.SpringConstants;
 import com.intellij.spring.impl.ide.model.SpringUtils;
 import com.intellij.spring.impl.ide.model.xml.CommonSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.application.Application;
 import consulo.application.util.NotNullLazyValue;
-import consulo.language.editor.inspection.LocalQuickFix;
 import consulo.language.editor.inspection.ProblemDescriptor;
-import consulo.language.editor.inspection.ProblemHighlightType;
 import consulo.language.editor.inspection.scheme.InspectionManager;
 import consulo.language.psi.PsiFile;
-import consulo.language.util.ModuleUtilCore;
 import consulo.localize.LocalizeValue;
 import consulo.module.Module;
 import consulo.spring.localize.SpringLocalize;
@@ -40,8 +38,9 @@ import java.util.List;
  */
 @ExtensionImpl
 public class MissingAspectjAutoproxyInspection extends AOPLocalInspectionTool {
-    private final NotNullLazyValue<SpringAopProvider> mySpringAopProvider = new NotNullLazyValue<SpringAopProvider>() {
+    private final NotNullLazyValue<SpringAopProvider> mySpringAopProvider = new NotNullLazyValue<>() {
         @Nonnull
+        @Override
         protected SpringAopProvider compute() {
             SpringAopProvider provider = Application.get().getExtensionPoint(AopProvider.class).findExtension(SpringAopProvider.class);
             if (provider != null) {
@@ -56,32 +55,29 @@ public class MissingAspectjAutoproxyInspection extends AOPLocalInspectionTool {
         return true;
     }
 
+    @Override
+    @RequiredReadAction
     public ProblemDescriptor[] checkFile(@Nonnull PsiFile file, @Nonnull InspectionManager manager, boolean isOnTheFly) {
-        if (file instanceof PsiJavaFile) {
-            Module module = ModuleUtilCore.findModuleForPsiElement(file);
+        if (file instanceof PsiJavaFile javaFile) {
+            Module module = file.getModule();
             if (module == null || SpringUtils.isSpring25(module)) {
                 return null;
             }
 
-            for (PsiClass aClass : ((PsiJavaFile) file).getClasses()) {
+            for (PsiClass aClass : javaFile.getClasses()) {
                 PsiModifierList modifierList = aClass.getModifierList();
                 if (modifierList != null) {
                     PsiAnnotation annotation = modifierList.findAnnotation(AopConstants.ASPECT_ANNO);
                     if (annotation != null) {
                         AopAdvisedElementsSearcher searcher = mySpringAopProvider.getValue().getAdvisedElementsSearcher(aClass);
-                        if (searcher instanceof SpringAdvisedElementsSearcher) {
-                            List<SpringModel> models = ((SpringAdvisedElementsSearcher) searcher).getSpringModels();
+                        if (searcher instanceof SpringAdvisedElementsSearcher advisedElementsSearcher) {
+                            List<SpringModel> models = advisedElementsSearcher.getSpringModels();
                             if (!models.isEmpty() && !isAspectJSupportEnabled(models)) {
-                                LocalQuickFix[] fixes = models.isEmpty()
-                                    ? LocalQuickFix.EMPTY_ARRAY
-                                    : new LocalQuickFix[]{new EnableAspectJQuickFix(models.get(0))};
                                 return new ProblemDescriptor[]{
-                                    manager.createProblemDescriptor(
-                                        annotation.getNameReferenceElement(),
-                                        SpringLocalize.aopWarningAspectjIsntEnabled().get(),
-                                        fixes,
-                                        ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-                                    )};
+                                    manager.newProblemDescriptor(SpringLocalize.aopWarningAspectjIsntEnabled())
+                                        .range(annotation.getNameReferenceElement())
+                                        .withOptionalFix(models.isEmpty() ? null : new EnableAspectJQuickFix(models.get(0)))
+                                        .create()};
                             }
                         }
                     }

@@ -28,6 +28,7 @@ public class GenericPattern extends AopPsiTypePattern{
     return myParameters;
   }
 
+  @Override
   public boolean accepts(@Nonnull PsiType type) {
     return accepts(type, false);
   }
@@ -55,6 +56,7 @@ public class GenericPattern extends AopPsiTypePattern{
   }
 
   @Nonnull
+  @Override
   public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     if (accepts(type, true)) return PointcutMatchDegree.TRUE;
     boolean maybe = false;
@@ -65,5 +67,4 @@ public class GenericPattern extends AopPsiTypePattern{
     }
     return maybe ? PointcutMatchDegree.MAYBE : PointcutMatchDegree.FALSE;
   }
-  
 }

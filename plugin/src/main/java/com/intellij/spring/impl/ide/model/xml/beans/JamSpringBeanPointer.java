@@ -1,15 +1,14 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.xml.beans;
 
 import com.intellij.java.language.psi.PsiClass;
-import com.intellij.spring.impl.ide.SpringIcons;
 import com.intellij.spring.impl.ide.model.jam.JamPsiMemberSpringBean;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
+import consulo.spring.impl.icon.SpringImplIconGroup;
 import consulo.ui.image.Image;
 import consulo.util.lang.Comparing;
 
@@ -26,67 +25,74 @@ public final class JamSpringBeanPointer extends SpringBaseBeanPointer {
   }
 
   @Nonnull
+  @Override
   public JamPsiMemberSpringBean getSpringBean() {
     return mySpringBean;
   }
 
+  @Override
   public boolean isAbstract() {
     return false;
   }
 
   @Nullable
+  @Override
   public SpringBeanPointer getParentPointer() {
     return null;
   }
 
   @Nullable
+  @Override
   public PsiElement getPsiElement() {
     JamPsiMemberSpringBean springBean = getSpringBean();
 
     return springBean.getIdentifyingPsiElement();
   }
 
+  @Override
   public SpringBeanPointer derive(@Nonnull String name) {
     return Comparing.equal(name, getName()) ? this : new DerivedSpringBeanPointer(getBasePointer(), name);
   }
 
-  public boolean equals(Object o) {
+  @Override
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (!(o instanceof JamSpringBeanPointer)) return false;
     if (!super.equals(o)) return false;
 
     JamSpringBeanPointer that = (JamSpringBeanPointer)o;
 
-    if (!mySpringBean.equals(that.mySpringBean)) return false;
-
-    return true;
+    return mySpringBean.equals(that.mySpringBean);
   }
 
+  @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + mySpringBean.hashCode();
-    return result;
+    return 31 * super.hashCode() + mySpringBean.hashCode();
   }
 
   @Nullable
+  @Override
   public PsiClass getBeanClass() {
     return getSpringBean().getBeanClass();
   }
 
+  @Override
   public PsiManager getPsiManager() {
     return getSpringBean().getPsiManager();
   }
 
+  @Override
   public PsiFile getContainingFile() {
     return getSpringBean().getContainingFile();
   }
 
+  @Override
   public Image getBeanIcon() {
-    return SpringIcons.SPRING_JAVA_BEAN_ICON;
+    return SpringImplIconGroup.springjavabean();
   }
 
+  @Override
   public boolean isValid() {
     return getSpringBean().isValid();
   }
-
 }

@@ -18,8 +18,8 @@ import java.util.List;
 
 @SuppressWarnings({"AbstractClassNeverImplemented"})
 public abstract class ListOrSetImpl extends TypedCollectionImpl implements ListOrSet {
-
   @Nonnull
+  @Override
   public List<? extends PsiType> getRequiredTypes() {
     List<? extends PsiType> list = super.getRequiredTypes();
     if (!list.isEmpty()) {
@@ -29,8 +29,8 @@ public abstract class ListOrSetImpl extends TypedCollectionImpl implements ListO
     Project project = getManager().getProject();
 
     PsiType type = fromGenerics != null
-                         ? fromGenerics
-                         : PsiType.getJavaLangObject(PsiManager.getInstance(project), GlobalSearchScope.allScope(project));
+      ? fromGenerics
+      : PsiType.getJavaLangObject(PsiManager.getInstance(project), GlobalSearchScope.allScope(project));
     return Collections.singletonList(type);  
   }
 

@@ -32,6 +32,7 @@ import consulo.project.Project;
 import consulo.util.collection.ArrayUtil;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.dataholder.Key;
+import consulo.util.lang.Couple;
 import consulo.util.lang.Pair;
 import consulo.util.lang.StringUtil;
 import consulo.util.lang.function.Condition;
@@ -252,18 +253,16 @@ public class PlaceholderUtils {
         return false;
     }
 
-    public static Pair<String, String> getPlaceholderPrefixAndSuffix(final DomSpringBean placeholderBean) {
+    public static Pair<String, String> getPlaceholderPrefixAndSuffix(DomSpringBean placeholderBean) {
         CachedValue<Pair<String, String>> cachedValue = placeholderBean.getUserData(PLACEHOLDER_PREFIX_SUFFIX);
         if (cachedValue == null) {
-            cachedValue =
-                CachedValuesManager.getManager(placeholderBean.getPsiManager().getProject())
-                    .createCachedValue(new CachedValueProvider<Pair<String, String>>() {
-                        @Override
-                        public Result<Pair<String, String>> compute() {
-                            return new Result<Pair<String, String>>(getPlaceholderPrefixAndSuffixInner(placeholderBean),
-                                placeholderBean.getXmlElement());
-                        }
-                    }, false);
+            cachedValue = CachedValuesManager.getManager(placeholderBean.getPsiManager().getProject()).createCachedValue(
+                () -> new CachedValueProvider.Result<>(
+                    getPlaceholderPrefixAndSuffixInner(placeholderBean),
+                    placeholderBean.getXmlElement()
+                ),
+                false
+            );
             placeholderBean.putUserData(PLACEHOLDER_PREFIX_SUFFIX, cachedValue);
         }
         return cachedValue.getValue();

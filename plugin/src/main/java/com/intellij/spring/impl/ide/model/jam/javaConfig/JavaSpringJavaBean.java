@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.intellij.spring.impl.ide.model.jam.javaConfig;
 
 import com.intellij.jam.JamPomTarget;
@@ -43,12 +42,12 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
   private static final JamStringAttributeMeta.Single<PsiMethod> DESTROY_METHOD_META =
     JamAttributeMeta.singleString("destroyMethod", new PsiMethodReferenceConverter());
 
+  public static JamAnnotationMeta META = new JamAnnotationMeta(SpringAnnotationsConstants.SPRING_BEAN_ANNOTATION)
+      .addAttribute(NAME_VALUE_META)
+      .addAttribute(INIT_METHOD_META)
+      .addAttribute(DESTROY_METHOD_META);
 
-  public static JamAnnotationMeta META =
-    new JamAnnotationMeta(SpringAnnotationsConstants.SPRING_BEAN_ANNOTATION).addAttribute(NAME_VALUE_META)
-                                                                            .addAttribute(INIT_METHOD_META).addAttribute(DESTROY_METHOD_META);
-
-
+  @Override
   public PsiAnnotation getPsiAnnotation() {
     return META.getAnnotation(getPsiElement());
   }
@@ -64,6 +63,7 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
   }
 
   @Nonnull
+  @Override
   public String[] getAliases() {
    // @Bean "name" attribute: The name of this bean, or if plural, aliases for this bean.
     List<JamStringAttributeElement<String>> elements = META.getAttribute(getPsiElement(), NAME_VALUE_META);
@@ -76,7 +76,7 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
   }
 
   public List<PomNamedTarget> getPomTargets() {
-    List<PomNamedTarget> pomTargets = new ArrayList<PomNamedTarget>();
+    List<PomNamedTarget> pomTargets = new ArrayList<>();
 
     List<JamStringAttributeElement<String>> elements = META.getAttribute(getPsiElement(), NAME_VALUE_META);
     if (!elements.isEmpty()) {
@@ -91,6 +91,7 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
   }
 
   private static class PsiMethodReferenceConverter extends JamSimpleReferenceConverter<PsiMethod> {
+    @Override
     public PsiMethod fromString(@Nullable String s, JamStringAttributeElement<PsiMethod> context) {
       for (PsiMethod psiMethod : getAppropriateMethods(context)) {
         if (psiMethod.getName().equals(s)) {
@@ -101,17 +102,13 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
     }
 
     private List<PsiMethod> getAppropriateMethods(JamStringAttributeElement<PsiMethod> context) {
-      List<PsiMethod> methods = new ArrayList<PsiMethod>();
+      List<PsiMethod> methods = new ArrayList<>();
       PsiMethod method = PsiTreeUtil.getParentOfType(context.getPsiElement(), PsiMethod.class);
 
-      if (method != null) {
-        PsiType type = method.getReturnType();
-        if (type instanceof PsiClassType) {
-          PsiClass psiClass = ((PsiClassType)type).resolve();
-          for (PsiMethod psiMethod : psiClass.getAllMethods()) {
-            if (!psiMethod.isConstructor() && psiMethod.getParameterList().getParametersCount() == 0) {
-              methods.add(psiMethod);
-            }
+      if (method != null && method.getReturnType() instanceof PsiClassType classType) {
+        for (PsiMethod psiMethod : classType.resolve().getAllMethods()) {
+          if (!psiMethod.isConstructor() && psiMethod.getParameterList().getParametersCount() == 0) {
+            methods.add(psiMethod);
           }
         }
       }
@@ -120,7 +117,7 @@ public abstract class JavaSpringJavaBean extends SpringJavaBean {
 
     @Override
     public Collection<PsiMethod> getVariants(JamStringAttributeElement<PsiMethod> context) {
-      List<PsiMethod> methods = new ArrayList<PsiMethod>();
+      List<PsiMethod> methods = new ArrayList<>();
       for (PsiMethod method : getAppropriateMethods(context)) {
         if (!CommonClassNames.JAVA_LANG_OBJECT.equals(method.getContainingClass().getQualifiedName())) {
           methods.add(method);

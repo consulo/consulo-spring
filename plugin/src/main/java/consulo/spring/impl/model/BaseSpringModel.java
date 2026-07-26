@@ -24,13 +24,12 @@ import consulo.application.util.ConcurrentFactoryMap;
 import consulo.module.Module;
 import consulo.util.collection.MultiMap;
 import consulo.util.collection.SmartList;
-import consulo.xml.language.psi.XmlAttribute;
-import consulo.xml.language.psi.XmlTag;
 import consulo.xml.dom.DomFileElement;
 import consulo.xml.dom.DomUtil;
+import consulo.xml.language.psi.XmlAttribute;
+import consulo.xml.language.psi.XmlTag;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.jetbrains.annotations.NonNls;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -207,14 +206,12 @@ public abstract class BaseSpringModel implements SpringModel {
   }
 
   @Override
-  @Nullable
-  public SpringBeanPointer findBean(@NonNls @Nonnull String beanName) {
+  public @Nullable SpringBeanPointer findBean(@Nonnull String beanName) {
     return getBeanNamesMapper().getBean(beanName);
   }
 
   @Override
-  @Nullable
-  public SpringBeanPointer findParentBean(@NonNls @Nonnull String beanName) {
+  public @Nullable SpringBeanPointer findParentBean(@Nonnull String beanName) {
     for (SpringModel dependency : myDependencies) {
       SpringBeanPointer springBean = dependency.findBean(beanName);
       if (springBean != null) {
@@ -274,19 +271,19 @@ public abstract class BaseSpringModel implements SpringModel {
 
   @Override
   @Nonnull
-  public synchronized Collection<? extends SpringBaseBeanPointer> getAllCommonBeans(boolean withDepenedencies) {
-    if (!withDepenedencies || myDependencies.length == 0) {
+  public synchronized Collection<? extends SpringBaseBeanPointer> getAllCommonBeans(boolean withDependencies) {
+    if (!withDependencies || myDependencies.length == 0) {
       return myBeansWithoutDependencies == null
-        ? myBeansWithoutDependencies = calculateBeans(withDepenedencies)
+        ? myBeansWithoutDependencies = calculateBeans(withDependencies)
         : myBeansWithoutDependencies;
     }
     else {
-      return myBeans == null ? myBeans = calculateBeans(withDepenedencies) : myBeans;
+      return myBeans == null ? myBeans = calculateBeans(withDependencies) : myBeans;
     }
   }
 
-  private Collection<SpringBaseBeanPointer> calculateBeans(boolean withDepenedencies) {
-    Collection<SpringBaseBeanPointer> domBeans = getAllDomBeans(withDepenedencies);
+  private Collection<SpringBaseBeanPointer> calculateBeans(boolean withDependencies) {
+    Collection<SpringBaseBeanPointer> domBeans = getAllDomBeans(withDependencies);
     Collection<SpringBaseBeanPointer> allBeans = new ArrayList<>(domBeans);
 
     processNonDomBeans(bean -> {
@@ -355,7 +352,6 @@ public abstract class BaseSpringModel implements SpringModel {
     }
     return beans;
   }
-
 
   @Override
   @Nonnull
@@ -482,11 +478,11 @@ public abstract class BaseSpringModel implements SpringModel {
   }
 
   @Override
-  @Nullable
-  public Module getModule() {
+  public @Nullable Module getModule() {
     return myModule;
   }
 
+  @Override
   public String toString() {
     return getId();
   }

@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Namespace(SpringConstants.LANG_NAMESPACE_KEY)
 public interface LangProperty extends SpringProperty {
-
   @Convert(value = BeanPropertyConverter.class, soft = true)
+  @Override
   GenericAttributeValue<List<BeanProperty>> getName();
 }

@@ -7,7 +7,6 @@ import consulo.fileTemplate.FileTemplate;
 import consulo.fileTemplate.FileTemplateUtil;
 import consulo.ide.action.CreateFileAction;
 import consulo.ide.localize.IdeLocalize;
-import consulo.language.editor.LangDataKeys;
 import consulo.language.psi.PsiDirectory;
 import consulo.language.psi.PsiElement;
 import consulo.module.Module;
@@ -37,7 +36,7 @@ public class CreateSpringConfigAction extends CreateFileAction {
     if (!super.isAvailable(dataContext)) {
       return false;
     }
-    consulo.module.Module module = dataContext.getData(LangDataKeys.MODULE);
+    consulo.module.Module module = dataContext.getData(Module.KEY);
     return module != null && JavaPsiFacade.getInstance(module.getProject()).findPackage("org.springframework") != null;
   }
 
@@ -57,6 +56,7 @@ public class CreateSpringConfigAction extends CreateFileAction {
   }
 
   @Nonnull
+  @Override
   @RequiredUIAccess
   protected PsiElement[] create(String newName, PsiDirectory directory) throws Exception {
     Module module = directory.getModule();

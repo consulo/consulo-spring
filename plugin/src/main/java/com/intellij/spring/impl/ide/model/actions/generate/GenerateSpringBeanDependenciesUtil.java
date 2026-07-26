@@ -5,8 +5,6 @@ import com.intellij.java.language.psi.*;
 import com.intellij.java.language.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.java.language.psi.codeStyle.VariableKind;
 import com.intellij.java.language.psi.util.PropertyUtil;
-import com.intellij.spring.impl.ide.SpringBundle;
-import com.intellij.spring.impl.ide.SpringIcons;
 import com.intellij.spring.impl.ide.SpringManager;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.SpringUtils;
@@ -14,6 +12,8 @@ import com.intellij.spring.impl.ide.model.highlighting.SpringConstructorArgResol
 import com.intellij.spring.impl.ide.model.xml.CommonSpringBean;
 import com.intellij.spring.impl.ide.model.xml.DomSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.*;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.access.RequiredWriteAction;
 import consulo.ide.impl.idea.ide.util.MemberChooser;
 import consulo.language.codeStyle.CodeStyleManager;
 import consulo.language.editor.completion.lookup.LookupElement;
@@ -24,24 +24,24 @@ import consulo.language.psi.PsiDocumentManager;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
 import consulo.language.util.IncorrectOperationException;
-import consulo.localize.LocalizeValue;
 import consulo.module.Module;
 import consulo.module.content.ProjectFileIndex;
 import consulo.module.content.layer.orderEntry.OrderEntry;
 import consulo.project.Project;
+import consulo.spring.impl.icon.SpringImplIconGroup;
 import consulo.spring.impl.module.extension.SpringModuleExtension;
+import consulo.spring.localize.SpringLocalize;
+import consulo.ui.annotation.RequiredUIAccess;
 import consulo.util.lang.Pair;
 import consulo.util.lang.StringUtil;
 import consulo.virtualFileSystem.ReadonlyStatusHandler;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.xml.dom.DomElement;
 import consulo.xml.dom.DomUtil;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.*;
-import java.util.function.Supplier;
 
 public class GenerateSpringBeanDependenciesUtil {
 
@@ -49,6 +49,7 @@ public class GenerateSpringBeanDependenciesUtil {
     return getCandidates(springBean, isSetterDependency).size() > 0;
   }
 
+  @RequiredReadAction
   public static boolean acceptPsiClass(PsiClass psiClass, boolean isSetterDependency) {
     SpringModel model = getSpringModel(psiClass);
     if (model == null) return false;
@@ -57,22 +58,21 @@ public class GenerateSpringBeanDependenciesUtil {
     return beansByPsiClass != null && beansByPsiClass.size() > 0 && getCandidates(model, psiClass, isSetterDependency).size() > 0;
   }
 
+  @RequiredUIAccess
   public static List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> generateDependenciesFor(@Nullable SpringModel springModel,
                                                                                                    @Nullable PsiClass psiClass,
                                                                                                    boolean isSetterDependency) {
-    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> createdProperties =
-      new ArrayList<Pair<SpringInjection, SpringGenerateTemplatesHolder>>();
+    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> createdProperties = new ArrayList<>();
 
     if (springModel != null && psiClass != null) {
       List<SpringBeanPointer> list =
         SpringUtils.findBeansByClassName(springModel.getAllCommonBeans(true), psiClass.getQualifiedName());
       if (list.size() > 0) {
         for (SpringBeanPointer pointer : list) {
-          CommonSpringBean springBean = pointer.getSpringBean();
-          if (springBean instanceof SpringBean && acceptBean((SpringBean)springBean, isSetterDependency)) {
-            return ensureFileWritable((SpringBean)springBean)
-              ? generateDependenciesFor((SpringBean)springBean, isSetterDependency)
-              : new ArrayList<Pair<SpringInjection, SpringGenerateTemplatesHolder>>();
+          if (pointer.getSpringBean() instanceof SpringBean springBean && acceptBean(springBean, isSetterDependency)) {
+            return ensureFileWritable(springBean)
+              ? generateDependenciesFor(springBean, isSetterDependency)
+              : new ArrayList<>();
           }
         }
       }
@@ -90,19 +90,17 @@ public class GenerateSpringBeanDependenciesUtil {
   public static List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> createBeanAndGenerateDependencies(PsiClass psiClass,
                                                                                                              boolean isSetterDependency,
                                                                                                              List<SpringBeanPointer> beans) {
-    CommonSpringBean springBean = beans.get(0).getSpringBean();
     SpringBean bean = null;
-    if (springBean instanceof DomSpringBean) {
-      DomSpringBean domSpringBean = (DomSpringBean)springBean;
-      bean = createSpingBean(domSpringBean.getParentOfType(Beans.class, false), psiClass);
+    if (beans.get(0).getSpringBean() instanceof DomSpringBean domSpringBean) {
+      bean = createSpringBean(domSpringBean.getParentOfType(Beans.class, false), psiClass);
     }
     return bean == null
-      ? new ArrayList<Pair<SpringInjection, SpringGenerateTemplatesHolder>>()
+      ? new ArrayList<>()
       : generateDependencies(bean, beans, isSetterDependency);
   }
 
   @Nullable
-  private static SpringBean createSpingBean(Beans parentBeans, PsiClass psiClass) {
+  private static SpringBean createSpringBean(Beans parentBeans, PsiClass psiClass) {
     if (!ensureFileWritable(parentBeans)) return null;
 
     SpringBean springBean = parentBeans.addBean();
@@ -126,6 +124,7 @@ public class GenerateSpringBeanDependenciesUtil {
     return true;
   }
 
+  @RequiredUIAccess
   public static List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> generateDependenciesFor(@Nullable SpringBean springBean,
                                                                                                    boolean isSetterDependency) {
     if (springBean == null || springBean.getBeanClass() == null) return Collections.emptyList();
@@ -137,11 +136,11 @@ public class GenerateSpringBeanDependenciesUtil {
     return generateDependencies(springBean, dependencies, isSetterDependency);
   }
 
+  @RequiredWriteAction
   public static List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> generateDependencies(@Nonnull SpringBean springBean,
                                                                                                 List<SpringBeanPointer> dependencies,
                                                                                                 boolean isSetterDependency) {
-    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> springInjections =
-      new ArrayList<Pair<SpringInjection, SpringGenerateTemplatesHolder>>();
+    List<Pair<SpringInjection, SpringGenerateTemplatesHolder>> springInjections = new ArrayList<>();
 
     SpringModel model = SpringUtils.getSpringModel(springBean);
     for (SpringBeanPointer bean : dependencies) {
@@ -151,28 +150,29 @@ public class GenerateSpringBeanDependenciesUtil {
       if (pair != null) springInjections.add(pair);
     }
     return springInjections;
-
   }
 
   @Nonnull
+  @RequiredUIAccess
   private static List<SpringBeanPointer> chooseDependentBeans(List<SpringBeanClassMember> candidates,
                                                               final Project project,
                                                               final boolean setterDependency) {
-    List<SpringBeanPointer> chosenBeans = new ArrayList<SpringBeanPointer>();
+    List<SpringBeanPointer> chosenBeans = new ArrayList<>();
 
-    MemberChooser<SpringBeanClassMember> chooser = new MemberChooser<SpringBeanClassMember>(
+    MemberChooser<SpringBeanClassMember> chooser = new MemberChooser<>(
       candidates.toArray(new SpringBeanClassMember[candidates.size()]), false, setterDependency, project) {
+      @Override
       protected ShowContainersAction getShowContainersAction() {
-        return new ShowContainersAction(LocalizeValue.of(SpringBundle.message("spring.beans.chooser.show.context.files")),
-                                        SpringIcons.CONFIG_FILE);
+        return new ShowContainersAction(SpringLocalize.springBeansChooserShowContextFiles(), SpringImplIconGroup.springconfig());
       }
 
+      @Override
       protected String getAllContainersNodeName() {
-        return SpringBundle.message("spring.beans.chooser.all.context.files");
+        return SpringLocalize.springBeansChooserAllContextFiles().get();
       }
     };
 
-    chooser.setTitle(SpringBundle.message("spring.bean.dependencies.chooser.title"));
+    chooser.setTitle(SpringLocalize.springBeanDependenciesChooserTitle());
     chooser.setCopyJavadocVisible(false);
     chooser.show();
 
@@ -190,7 +190,7 @@ public class GenerateSpringBeanDependenciesUtil {
 
   @Nonnull
   public static List<SpringBeanClassMember> getCandidates(SpringBean springBean, boolean setterDependency) {
-    List<SpringBeanClassMember> beanClassMembers = new ArrayList<SpringBeanClassMember>();
+    List<SpringBeanClassMember> beanClassMembers = new ArrayList<>();
 
     SpringModel model = SpringUtils.getSpringModel(springBean);
     PsiClass springBeanClass = springBean.getBeanClass();
@@ -224,8 +224,7 @@ public class GenerateSpringBeanDependenciesUtil {
   public static List<SpringBeanClassMember> getCandidates(@Nonnull SpringModel model,
                                                           PsiClass psiClass,
                                                           boolean setterDependency) {
-
-    List<SpringBeanClassMember> beanClassMembers = new ArrayList<SpringBeanClassMember>();
+    List<SpringBeanClassMember> beanClassMembers = new ArrayList<>();
 
     Collection<? extends SpringBeanPointer> allBeans = model.getAllCommonBeans();
     for (SpringBeanPointer bean : allBeans) {
@@ -325,7 +324,7 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   private static List<PsiType> getParameterTypes(PsiMethod method) {
-    List<PsiType> psiParameterTypes = new ArrayList<PsiType>();
+    List<PsiType> psiParameterTypes = new ArrayList<>();
     PsiParameter[] parameters = method.getParameterList().getParameters();
     for (PsiParameter parameter : parameters) {
       psiParameterTypes.add(parameter.getType());
@@ -370,7 +369,7 @@ public class GenerateSpringBeanDependenciesUtil {
         property.getName().ensureXmlElementExists();
         property.getName().setStringValue(PropertyUtil.getPropertyNameBySetter(setter));
         property.getRefAttr().setStringValue(getReferencedName(currentBean, bean));
-        return new Pair<SpringInjection, SpringGenerateTemplatesHolder>(property, templatesHolder);
+        return new Pair<>(property, templatesHolder);
       }
     }
 
@@ -378,6 +377,7 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   @Nullable
+  @RequiredWriteAction
   private static Pair<SpringInjection, SpringGenerateTemplatesHolder> createConstructorArg(SpringBean currentBean,
                                                                                            SpringBeanPointer bean,
                                                                                            SpringModel model) {
@@ -412,7 +412,7 @@ public class GenerateSpringBeanDependenciesUtil {
       }
     }
 
-    return new Pair<SpringInjection, SpringGenerateTemplatesHolder>(arg, holder);
+    return new Pair<>(arg, holder);
   }
 
   @Nullable
@@ -489,6 +489,7 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   @Nonnull
+  @RequiredWriteAction
   private static PsiMethod createConstructor(SpringBean springBean) {
     PsiClass instantiationClass = null;
     PsiMethod instantiationMethod = null;
@@ -503,14 +504,14 @@ public class GenerateSpringBeanDependenciesUtil {
         if (beanPointer != null) {
           instantiationClass = beanPointer.getBeanClass();
           String methodName = getInstantiationMethodName(instantiationClass, springBean);
-          @NonNls String methodText = PsiModifier.PUBLIC + " " + beanClass.getName() + " " + methodName + "() { return null; }";
+          String methodText = PsiModifier.PUBLIC + " " + beanClass.getName() + " " + methodName + "() { return null; }";
           instantiationMethod = elementFactory.createMethodFromText(methodText, null);
         }
       }
       else if (isInstantiatedByFactoryMethod(springBean)) {
         instantiationClass = beanClass;
         String methodName = getInstantiationMethodName(instantiationClass, springBean);
-        @NonNls String methodText =
+        String methodText =
           PsiModifier.PUBLIC + " " + PsiModifier.STATIC + " " + beanClass.getName() + " " + methodName + "() { return null; }";
         instantiationMethod = elementFactory.createMethodFromText(methodText, null);
       }
@@ -535,12 +536,13 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   @Nonnull
+  @RequiredReadAction
   private static String getInstantiationMethodName(PsiClass factoryBeanClass, SpringBean springBean) {
     String methodName = springBean.getFactoryMethod().getStringValue();
     if (!StringUtil.isEmptyOrSpaces(methodName)) return methodName;
     PsiClass beanClass = springBean.getBeanClass();
 
-    @NonNls String methodPrefix = "create";
+    String methodPrefix = "create";
     methodName = methodPrefix + beanClass.getName();
     int i = 0;
     while (factoryBeanClass.findMethodsByName(methodName, true).length > 0) {
@@ -558,6 +560,7 @@ public class GenerateSpringBeanDependenciesUtil {
     return DomUtil.hasXml(springBean.getFactoryBean());
   }
 
+  @RequiredWriteAction
   private static void addConstructorParameter(PsiClass currentBeanClass,
                                               PsiClass candidateBeanClass,
                                               PsiMethod constructor) {
@@ -589,6 +592,7 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   @Nonnull
+  @RequiredWriteAction
   private static PsiMethod createSetter(SpringBeanPointer candidateBean,
                                         PsiClass currentBeanClass,
                                         PsiClass[] candidateBeanClasses) {
@@ -602,7 +606,7 @@ public class GenerateSpringBeanDependenciesUtil {
       PsiManager psiManager = PsiManager.getInstance(currentBeanClass.getProject());
       PsiElementFactory elementFactory = JavaPsiFacade.getInstance(psiManager.getProject()).getElementFactory();
 
-      @NonNls String methodText = "public void set" + StringUtil.capitalize(name) + "(" + candidateBeanClasses[0].getQualifiedName() +
+      String methodText = "public void set" + StringUtil.capitalize(name) + "(" + candidateBeanClasses[0].getQualifiedName() +
         " " + StringUtil.decapitalize(name) + ") { }";
 
       method = elementFactory.createMethodFromText(methodText, null);
@@ -626,36 +630,36 @@ public class GenerateSpringBeanDependenciesUtil {
     addCreateSetterTemplate(method, psiClasses, bean, templatesHolder, 0, model);
   }
 
-  private static void addCreateSetterTemplate(final PsiMethod method,
-                                              final PsiClass[] psiClasses,
-                                              final SpringBeanPointer bean,
-                                              SpringGenerateTemplatesHolder templatesHolder,
-                                              final int paramId,
-                                              final SpringModel model) {
-    templatesHolder.addTemplateFactory(method.getParameterList(), new Supplier<Template>() {
-      public Template get() {
-        PsiParameter parameter = method.getParameterList().getParameters()[paramId];
-        PsiTypeElement typeElement = parameter.getTypeElement();
+  private static void addCreateSetterTemplate(
+    PsiMethod method,
+    PsiClass[] psiClasses,
+    SpringBeanPointer bean,
+    SpringGenerateTemplatesHolder templatesHolder,
+    int paramId,
+    SpringModel model
+  ) {
+    templatesHolder.addTemplateFactory(method.getParameterList(), () -> {
+      PsiParameter parameter = method.getParameterList().getParameters()[paramId];
+      PsiTypeElement typeElement = parameter.getTypeElement();
 
-        Collection<PsiClass> variants = getSuperTypeVariants(psiClasses);
-        Expression interfaces = getSuperTypesExpression(typeElement.getType().getCanonicalText(), variants);
+      Collection<PsiClass> variants = getSuperTypeVariants(psiClasses);
+      Expression interfaces = getSuperTypesExpression(typeElement.getType().getCanonicalText(), variants);
 
-        Expression ids = getSuggestNamesExpression(method, bean, paramId, model);
+      Expression ids = getSuggestNamesExpression(method, bean, paramId, model);
 
-        TemplateBuilder builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(method.getParameterList());
+      TemplateBuilder builder = TemplateBuilderFactory.getInstance().createTemplateBuilder(method.getParameterList());
 
-        if (variants.size() > 1) {
-          builder.replaceElement(typeElement, "type", interfaces, true);
-        }
-        builder.replaceElement(parameter.getNameIdentifier(), "names", ids, true);
-
-        return builder.buildInlineTemplate();
+      if (variants.size() > 1) {
+        builder.replaceElement(typeElement, "type", interfaces, true);
       }
+      builder.replaceElement(parameter.getNameIdentifier(), "names", ids, true);
+
+      return builder.buildInlineTemplate();
     });
   }
 
   private static Collection<PsiClass> getSuperTypeVariants(PsiClass[] psiClasses) {
-    Collection<PsiClass> variants = new HashSet<PsiClass>();
+    Collection<PsiClass> variants = new HashSet<>();
     for (PsiClass beanClass : psiClasses) {
       variants.add(beanClass);
       variants.addAll(Arrays.asList(beanClass.getInterfaces()));
@@ -672,6 +676,8 @@ public class GenerateSpringBeanDependenciesUtil {
                                                       final SpringModel model) {
     final PsiParameter parameter = method.getParameterList().getParameters()[paramId];
     return new Expression() {
+      @Override
+      @RequiredReadAction
       public Result calculateResult(ExpressionContext context) {
         PsiDocumentManager.getInstance(context.getProject()).commitAllDocuments();
         PsiIdentifier psiIdentifier = parameter.getNameIdentifier();
@@ -679,13 +685,16 @@ public class GenerateSpringBeanDependenciesUtil {
         return new TextResult(psiIdentifier != null ? psiIdentifier.getText() : "foo");
       }
 
+      @Override
+      @RequiredReadAction
       public Result calculateQuickResult(ExpressionContext context) {
         return calculateResult(context);
       }
 
+      @Override
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
         PsiDocumentManager.getInstance(context.getProject()).commitAllDocuments();
-        LinkedHashSet<LookupElement> items = new LinkedHashSet<LookupElement>();
+        Set<LookupElement> items = new LinkedHashSet<>();
         for (String name : getSuggestedNames()) {
           items.add(LookupItemUtil.objectToLookupItem(name));
         }
@@ -695,7 +704,7 @@ public class GenerateSpringBeanDependenciesUtil {
 
       private Collection<String> getSuggestedNames() {
         PsiNameHelper psiNameHelper = JavaPsiFacade.getInstance(method.getProject()).getNameHelper();
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         String beanName = bean.getName();
         if (beanName != null) {
           for (String name : model.getAllBeanNames(beanName)) {
@@ -721,16 +730,19 @@ public class GenerateSpringBeanDependenciesUtil {
 
   private static Expression getSuperTypesExpression(final String psiType, final Collection<PsiClass> psiClasses) {
     return new Expression() {
+      @Override
       public Result calculateResult(ExpressionContext context) {
         return new TextResult(psiType);
       }
 
+      @Override
       public Result calculateQuickResult(ExpressionContext context) {
         return calculateResult(context);
       }
 
+      @Override
       public LookupElement[] calculateLookupItems(ExpressionContext context) {
-        LinkedHashSet<LookupElement> items = new LinkedHashSet<LookupElement>();
+        Set<LookupElement> items = new LinkedHashSet<>();
         for (PsiClass psiClass : psiClasses) {
           items.add(LookupItemUtil.objectToLookupItem(psiClass));
         }
@@ -756,6 +768,7 @@ public class GenerateSpringBeanDependenciesUtil {
   }
 
   @Nullable
+  @RequiredReadAction
   public static Module getSpringModule(@Nonnull PsiClass psiClass) {
     ProjectFileIndex index = ProjectFileIndex.getInstance(psiClass.getProject());
 
@@ -779,11 +792,13 @@ public class GenerateSpringBeanDependenciesUtil {
     return isSpringModule(module) ? module : null;
   }
 
+  @RequiredReadAction
   private static boolean isSpringModule(Module module) {
     return module != null && SpringModuleExtension.getInstance(module) != null;
   }
 
   @Nullable
+  @RequiredReadAction
   public static SpringModel getSpringModel(@Nullable PsiClass psiClass) {
     if (psiClass == null) return null;
 

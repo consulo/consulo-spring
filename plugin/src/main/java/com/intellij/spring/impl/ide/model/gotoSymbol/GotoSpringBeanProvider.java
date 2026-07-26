@@ -3,6 +3,7 @@ package com.intellij.spring.impl.ide.model.gotoSymbol;
 import com.intellij.spring.impl.ide.SpringManager;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBaseBeanPointer;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.language.psi.PsiElement;
 import consulo.module.Module;
@@ -17,11 +18,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * User: Sergey.Vasiliev
+ * @author Sergey.Vasiliev
  */
 @ExtensionImpl
 public class GotoSpringBeanProvider extends GoToSymbolProvider {
-
+  @Override
+  @RequiredReadAction
   protected void addNames(@Nonnull Module module, Set<String> result) {
     SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     if(springModel != null) {
@@ -31,12 +33,14 @@ public class GotoSpringBeanProvider extends GoToSymbolProvider {
     }
   }
 
-  private void addNonNull(Set<String> result, String aliase) {
-    if (!StringUtil.isEmptyOrSpaces(aliase)) {
-      result.add(aliase);
+  private void addNonNull(Set<String> result, String alias) {
+    if (!StringUtil.isEmptyOrSpaces(alias)) {
+      result.add(alias);
     }
   }
 
+  @Override
+  @RequiredReadAction
   protected void addItems(@Nonnull Module module, String name, List<NavigationItem> result) {
     SpringModel springModel = SpringManager.getInstance(module.getProject()).getCombinedModel(module);
     if(springModel != null) {
@@ -54,15 +58,17 @@ public class GotoSpringBeanProvider extends GoToSymbolProvider {
   }
 
   private Set<String> getNames(SpringBaseBeanPointer pointer) {
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new HashSet<>();
     addNonNull(names, pointer.getName());
 
-    for (String aliase : pointer.getAliases()) {
-      addNonNull(names, aliase);
+    for (String alias : pointer.getAliases()) {
+      addNonNull(names, alias);
     }
     return names;
   }
 
+  @Override
+  @RequiredReadAction
   protected boolean acceptModule(Module module) {
     return SpringModuleExtension.getInstance(module) != null;
   }

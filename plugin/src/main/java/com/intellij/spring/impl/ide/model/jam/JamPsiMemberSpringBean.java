@@ -21,20 +21,23 @@ public abstract class JamPsiMemberSpringBean<T extends PsiMember> extends Common
 
   @Nonnull
   @JamPsiConnector
+  @Override
   public abstract T getPsiElement();
 
   @Nullable
+  @Override
   public PsiClass getBeanClass(boolean considerFactories) {
     return getBeanClass();
   }
 
   @Nonnull
+  @Override
   public String[] getAliases() {
     return ArrayUtil.EMPTY_STRING_ARRAY;
   }
 
   protected List<String> getStringNames(List<JamStringAttributeElement<String>> elements) {
-    List<String> aliases = new ArrayList<String>();
+    List<String> aliases = new ArrayList<>();
     for (JamStringAttributeElement<String> element : elements) {
       String aliasName = element.getStringValue();
       if (!StringUtil.isEmptyOrSpaces(aliasName)) {
@@ -44,6 +47,7 @@ public abstract class JamPsiMemberSpringBean<T extends PsiMember> extends Common
     return aliases;
   }
 
+  @Override
   public SpringQualifier getSpringQualifier() {
     return null;
   }

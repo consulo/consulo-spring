@@ -12,8 +12,8 @@ import com.intellij.spring.impl.ide.model.xml.lang.LangBean;
  * @author peter
  */
 public abstract class LangBeanImpl extends DomSpringBeanImpl implements LangBean {
-
   @Nullable
+  @Override
   public String getClassName() {
     return null;
   }

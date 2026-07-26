@@ -1,6 +1,5 @@
 // Generated on Thu Nov 09 17:15:14 MSK 2006
 // DTD/Schema  :    http://www.springframework.org/schema/jee
-
 package com.intellij.spring.impl.ide.model.xml.jee;
 
 import com.intellij.java.language.psi.PsiClass;
@@ -15,7 +14,6 @@ import jakarta.annotation.Nonnull;
  * http://www.springframework.org/schema/jee:jndi-lookupElemType interface.
  */
 public interface JndiLookup extends DomSpringBean, JndiLocated {
-
 	/**
 	 * Returns the value of the cache child.
 	 * <pre>
@@ -28,7 +26,6 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	 */
 	@Nonnull
 	GenericAttributeValue<Boolean> getCache();
-
 
 	/**
 	 * Returns the value of the expected-type child.
@@ -43,7 +40,6 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	@Nonnull
 	GenericAttributeValue<PsiClass> getExpectedType();
 
-
 	/**
 	 * Returns the value of the lookup-on-startup child.
 	 * <pre>
@@ -56,7 +52,6 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	 */
 	@Nonnull
 	GenericAttributeValue<Boolean> getLookupOnStartup();
-
 
 	/**
 	 * Returns the value of the proxy-interface child.
@@ -76,7 +71,6 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	@Nonnull
 	GenericAttributeValue<PsiClass> getProxyInterface();
 
-
 	/**
 	 * Returns the value of the jndi-name child.
 	 * <pre>
@@ -87,6 +81,7 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	 * @return the value of the jndi-name child.
 	 */
 	@Nonnull
+    @Override
 	@Required
 	GenericAttributeValue<String> getJndiName();
 
@@ -103,8 +98,8 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	 * @return the value of the resource-ref child.
 	 */
 	@Nonnull
+    @Override
 	GenericAttributeValue<Boolean> getResourceRef();
-
 
 	/**
 	 * Returns the value of the environment child.
@@ -117,7 +112,6 @@ public interface JndiLookup extends DomSpringBean, JndiLocated {
 	 * @return the value of the environment child.
 	 */
 	@Nonnull
+    @Override
 	GenericDomValue<String> getEnvironment();
-
-
 }

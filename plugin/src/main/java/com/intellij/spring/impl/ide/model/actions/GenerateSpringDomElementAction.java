@@ -10,7 +10,6 @@ import consulo.xml.util.xml.ui.actions.generate.GenerateDomElementAction;
 import consulo.xml.util.xml.ui.actions.generate.GenerateDomElementProvider;
 
 public class GenerateSpringDomElementAction extends GenerateDomElementAction {
-
   public GenerateSpringDomElementAction(GenerateDomElementProvider provider) {
     super(provider);
   }
@@ -20,6 +19,7 @@ public class GenerateSpringDomElementAction extends GenerateDomElementAction {
     getTemplatePresentation().setIcon(icon);
   }
 
+  @Override
   public boolean isValidForFile(Project project, Editor editor, PsiFile file) {
     return super.isValidForFile(project, editor, file) &&
            file instanceof XmlFile &&

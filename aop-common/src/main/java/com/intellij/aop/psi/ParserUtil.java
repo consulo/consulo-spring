@@ -3,13 +3,12 @@
  */
 package com.intellij.aop.psi;
 
-import consulo.language.parser.PsiBuilder;
-import com.intellij.aop.AopBundle;
-import consulo.language.ast.TokenSet;
+import consulo.aop.localize.AopLocalize;
 import consulo.language.ast.IElementType;
-import org.jetbrains.annotations.NonNls;
-import jakarta.annotation.Nullable;
+import consulo.language.ast.TokenSet;
+import consulo.language.parser.PsiBuilder;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @author peter
@@ -17,6 +16,7 @@ import jakarta.annotation.Nonnull;
 public class ParserUtil {
   protected static ParsingCommand sequence(final ParsingCommand... commands) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         for (ParsingCommand command : commands) {
           if (!command.perform(builder)) return false;
@@ -34,38 +34,41 @@ public class ParserUtil {
 
   protected static ParsingCommand token(final String text) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         if (text.equals(builder.getTokenText())) {
           builder.advanceLexer();
           return true;
         }
-        builder.error(AopBundle.message("error.0.expected", text));
+        builder.error(AopLocalize.error0Expected(text));
         return false;
       }
     };
   }
 
-  protected static ParsingCommand token(final AopElementType tokenType, final @NonNls @Nullable String expected) {
+  protected static ParsingCommand token(final AopElementType tokenType, final @Nullable String expected) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         if (tokenType.equals(builder.getTokenType())) {
           builder.advanceLexer();
           return true;
         }
-        builder.error(AopBundle.message("error.0.expected", expected));
+        builder.error(AopLocalize.error0Expected(expected));
         return false;
       }
     };
   }
 
-  protected static ParsingCommand token(final TokenSet set, final @NonNls String expected) {
+  protected static ParsingCommand token(final TokenSet set, final String expected) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         if (set.contains(builder.getTokenType())) {
           builder.advanceLexer();
           return true;
         }
-        builder.error(AopBundle.message("error.0.expected", expected));
+        builder.error(AopLocalize.error0Expected(expected));
         return false;
       }
     };
@@ -87,6 +90,7 @@ public class ParserUtil {
 
   protected static ParsingCommand condition(final IElementType type, final ParsingCommand then, final ParsingCommand elze) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         return builder.getTokenType() == type ? then.perform(builder) : elze.perform(builder);
       }
@@ -99,6 +103,7 @@ public class ParserUtil {
 
   private static ParsingCommand or(final int main, final ParsingCommand... commands) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder myBuilder) {
         for (ParsingCommand command : commands) {
           PsiBuilder.Marker marker = myBuilder.mark();
@@ -116,6 +121,7 @@ public class ParserUtil {
 
   protected static ParsingCommand parseList(@Nonnull final ParsingCommand member, @Nullable final ParsingCommand separator, @Nullable final IElementType endType, final boolean canBeEmpty) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         if (canBeEmpty) {
           if (!tryParse(member, builder, endType)) return true;
@@ -151,6 +157,7 @@ public class ParserUtil {
 
   protected static ParsingCommand handleError(final ParsingCommand command, final String message) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         int offset = builder.getCurrentOffset();
         PsiBuilder.Marker marker = builder.mark();
@@ -171,6 +178,7 @@ public class ParserUtil {
 
   protected static ParsingCommand parseBinary(final AopElementType exprType, final IElementType separatorType, final ParsingCommand lower) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         PsiBuilder.Marker expr = builder.mark();
         if (!lower.perform(builder)) return dropMarker(expr);
@@ -188,6 +196,7 @@ public class ParserUtil {
 
   protected static ParsingCommand wrap(final ParsingCommand inner, final IElementType type) {
     return new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         return doMarker(inner, builder.mark(), type, builder);
       }
@@ -197,6 +206,7 @@ public class ParserUtil {
 
   protected static abstract class ParsingCommand {
     public static ParsingCommand TRUE = new ParsingCommand() {
+      @Override
       public boolean perform(PsiBuilder builder) {
         return true;
       }
@@ -214,5 +224,4 @@ public class ParserUtil {
 
     public abstract boolean perform(PsiBuilder builder);
   }
-  
 }

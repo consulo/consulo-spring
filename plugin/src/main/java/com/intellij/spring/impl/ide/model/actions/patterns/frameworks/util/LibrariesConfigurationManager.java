@@ -11,7 +11,6 @@ import consulo.util.collection.ArrayUtil;
 import consulo.util.lang.StringUtil;
 import consulo.util.xml.serializer.XmlSerializer;
 import jakarta.inject.Singleton;
-import org.jetbrains.annotations.NonNls;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -24,7 +23,7 @@ import java.util.Map;
 @ServiceImpl
 @Singleton
 public class LibrariesConfigurationManager implements Disposable {
-  private final Map<String, List<LibraryInfo>> myLibraries = new HashMap<String, List<LibraryInfo>>();
+  private final Map<String, List<LibraryInfo>> myLibraries = new HashMap<>();
   private static final String REQUIRED_CLASSES_DELIMITER = ",";
 
   @Nonnull
@@ -34,7 +33,6 @@ public class LibrariesConfigurationManager implements Disposable {
     }
   }
 
-  @NonNls
   private static final String DOC_LINKS_RESOURCE_XML = "/resources/frameworks/libraries.xml";
 
   public LibrariesConfigurationManager() {
@@ -47,15 +45,15 @@ public class LibrariesConfigurationManager implements Disposable {
     for (LibraryConfigurationInfo libInfo : libs.getLibraryConfigurationInfos()) {
       String frameworkId = libInfo.getFrameworkId();
       LibraryInfo info = new LibraryInfo(libInfo.getJarName(), libInfo.getVersion(), libInfo.getDownloadUrl(),
-                                               libInfo.getPresentationdUrl(), getRequredClasses(libInfo.getRequiredClasses()));
+                                               libInfo.getPresentationdUrl(), getRequiredClasses(libInfo.getRequiredClasses()));
 
-      if (myLibraries.get(frameworkId) == null) myLibraries.put(frameworkId, new ArrayList<LibraryInfo>());
+      if (myLibraries.get(frameworkId) == null) myLibraries.put(frameworkId, new ArrayList<>());
 
       myLibraries.get(frameworkId).add(info);
     }
   }
 
-  private static String[] getRequredClasses(String requiredClasses) {
+  private static String[] getRequiredClasses(String requiredClasses) {
     List<String> strings = StringUtil.split(requiredClasses, REQUIRED_CLASSES_DELIMITER);
     return ArrayUtil.toStringArray(strings);
   }
@@ -67,7 +65,7 @@ public class LibrariesConfigurationManager implements Disposable {
     return libraryInfos == null ? LibraryInfo.EMPTY_ARRAY : libraryInfos.toArray(new LibraryInfo[libraryInfos.size()]);
   }
 
+  @Override
   public void dispose() {
-
   }
 }

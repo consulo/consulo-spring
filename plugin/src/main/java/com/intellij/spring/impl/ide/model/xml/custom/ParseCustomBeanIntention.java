@@ -4,8 +4,9 @@ import com.intellij.spring.impl.ide.CustomBeanInfo;
 import com.intellij.spring.impl.ide.CustomBeanRegistry;
 import com.intellij.spring.impl.ide.model.xml.CustomBeanWrapper;
 import com.intellij.spring.impl.ide.model.xml.DomSpringBean;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
-import consulo.application.ApplicationManager;
+import consulo.application.Application;
 import consulo.application.progress.ProgressManager;
 import consulo.codeEditor.Editor;
 import consulo.execution.unscramble.UnscrambleService;
@@ -24,9 +25,9 @@ import consulo.ui.ex.action.ActionsBundle;
 import consulo.ui.ex.awt.Messages;
 import consulo.ui.ex.awt.UIUtil;
 import consulo.util.lang.StringUtil;
-import consulo.util.lang.ref.Ref;
-import consulo.xml.language.psi.XmlTag;
+import consulo.util.lang.ref.SimpleReference;
 import consulo.xml.dom.DomUtil;
+import consulo.xml.language.psi.XmlTag;
 import jakarta.annotation.Nonnull;
 
 import java.util.Arrays;
@@ -45,11 +46,15 @@ public class ParseCustomBeanIntention implements IntentionAction {
         return SpringLocalize.parseCustomBeanIntention();
     }
 
+    @Override
+    @RequiredReadAction
     public boolean isAvailable(@Nonnull Project project, Editor editor, PsiFile file) {
         return DomUtil.findDomElement(file.findElementAt(editor.getCaretModel().getOffset()), DomSpringBean.class)
             instanceof CustomBeanWrapper;
     }
 
+    @Override
+    @RequiredUIAccess
     public void invoke(@Nonnull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         CustomBeanWrapper wrapper =
             DomUtil.findDomElement(file.findElementAt(editor.getCaretModel().getOffset()), CustomBeanWrapper.class);
@@ -58,27 +63,23 @@ public class ParseCustomBeanIntention implements IntentionAction {
     }
 
     @RequiredUIAccess
-    public static void invokeCustomBeanParsers(final Project project, final Collection<XmlTag> tags) {
-        final Ref<CustomBeanRegistry.ParseResult> ref = Ref.create(null);
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(new Runnable() {
-            public void run() {
+    public static void invokeCustomBeanParsers(Project project, Collection<XmlTag> tags) {
+        SimpleReference<CustomBeanRegistry.ParseResult> ref = SimpleReference.create(null);
+        Application application = Application.get();
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(
+            () -> {
                 ProgressManager.getInstance().getProgressIndicator().setIndeterminate(true);
-                ApplicationManager.getApplication().runReadAction(new Runnable() {
-                    public void run() {
-                        ref.set(CustomBeanRegistry.getInstance(project).parseBeans(tags));
-                    }
-                });
-            }
-        }, SpringLocalize.parsingCustomBean().get(), false, project);
+                application.runReadAction(() -> ref.set(CustomBeanRegistry.getInstance(project).parseBeans(tags)));
+            },
+            SpringLocalize.parsingCustomBean(),
+            false,
+            project
+        );
 
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            public void run() {
-                PsiModificationTracker.getInstance(project).incCounter();
-            }
-        });
+        application.runWriteAction(() -> PsiModificationTracker.getInstance(project).incCounter());
         DaemonCodeAnalyzer.getInstance(project).restart();
 
-        if (ApplicationManager.getApplication().isUnitTestMode()) {
+        if (application.isUnitTestMode()) {
             return; //the rest deals only with pretty feedback to user
         }
 
@@ -153,6 +154,7 @@ public class ParseCustomBeanIntention implements IntentionAction {
         Messages.showInfoMessage(project, parsedMessage.get(), SpringLocalize.parseCustomBeanSuccess().get());
     }
 
+    @Override
     public boolean startInWriteAction() {
         return false;
     }

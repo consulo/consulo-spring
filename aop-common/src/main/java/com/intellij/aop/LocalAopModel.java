@@ -7,23 +7,24 @@ import com.intellij.aop.jam.AopConstants;
 import com.intellij.aop.jam.AopModuleService;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.NotNullLazyValue;
 import consulo.language.psi.PsiElement;
-import consulo.language.util.ModuleUtilCore;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.collection.SmartList;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.List;
 
 /**
  * @author peter
  */
 public class LocalAopModel implements AopModel {
-  private final NotNullLazyValue<AopModel> myDelegate = new NotNullLazyValue<AopModel>() {
+  private final NotNullLazyValue<AopModel> myDelegate = new NotNullLazyValue<>() {
     @Nonnull
+    @Override
+    @RequiredReadAction
     protected AopModel compute() {
       return getAopModel();
     }
@@ -31,8 +32,9 @@ public class LocalAopModel implements AopModel {
   private final AopAdvisedElementsSearcher myAdvisedElementsSearcher;
 
 
+  @RequiredReadAction
   private AopModel getAopModel() {
-    return AopModuleService.getAopModel(myHost != null ? ModuleUtilCore.findModuleForPsiElement(myHost) : null);
+      return AopModuleService.getAopModel(myHost != null ? myHost.getModule() : null);
   }
 
   private final PsiMethod myMethod;
@@ -52,16 +54,18 @@ public class LocalAopModel implements AopModel {
     return myHost;
   }
 
+  @Override
   public List<? extends AopAspect> getAspects() {
     return myDelegate.getValue().getAspects();
   }
 
+  @Override
   public List<? extends AopPointcut> getPointcuts() {
     return myDelegate.getValue().getPointcuts();
   }
 
   public List<AopIntroduction> getIntroductions() {
-    consulo.util.collection.SmartList<AopIntroduction> introductions = new SmartList<AopIntroduction>();
+    List<AopIntroduction> introductions = new SmartList<>();
     for (AopAspect aspect : getAspects()) {
       introductions.addAll(aspect.getIntroductions());
     }
@@ -74,7 +78,7 @@ public class LocalAopModel implements AopModel {
   }
 
   @Nonnull
-  public List<PsiParameter> resolveParameters(@Nonnull @NonNls String name) {
+  public List<PsiParameter> resolveParameters(@Nonnull String name) {
     return ContainerUtil.createMaybeSingletonList(findParameter(name, getPointcutMethod()));
   }
 
