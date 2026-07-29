@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.values;
 
 import com.intellij.java.impl.util.xml.converters.values.GenericDomValueConvertersRegistry;
@@ -27,7 +26,6 @@ import java.util.List;
  * @author Dmitry Avdeev
  */
 public class PropertyValueConverter extends WrappingConverter {
-
   @Nonnull
   public List<? extends PsiType> getValueTypes(GenericDomValue element) {
     if (element instanceof TypeHolder) {
@@ -40,11 +38,12 @@ public class PropertyValueConverter extends WrappingConverter {
   }
 
   @Nonnull
+  @Override
   public List<Converter> getConverters(@Nonnull GenericDomValue element) {
     
     XmlElement xmlElement = element.getXmlElement();
-    if (xmlElement instanceof XmlAttribute) {
-      PsiLanguageInjectionHost host = (PsiLanguageInjectionHost)((XmlAttribute)xmlElement).getValueElement();
+    if (xmlElement instanceof XmlAttribute attribute) {
+      PsiLanguageInjectionHost host = (PsiLanguageInjectionHost) attribute.getValueElement();
       if (host == null || InjectedLanguageManager.getInstance(xmlElement.getProject()).getInjectedPsiFiles(xmlElement) != null) {
         return Collections.emptyList();
       }
@@ -52,7 +51,7 @@ public class PropertyValueConverter extends WrappingConverter {
     Project project = element.getManager().getProject();
     GenericDomValueConvertersRegistry registry = SpringManager.getInstance(project).getValueProvidersRegistry();
     List<? extends PsiType> types = getValueTypes(element);
-    ArrayList<Converter> list = new ArrayList<Converter>(types.size());
+    List<Converter> list = new ArrayList<>(types.size());
     if (types.isEmpty()) {
       Converter converter = registry.getConverter(element, null);
       if (converter != null) {
@@ -70,6 +69,7 @@ public class PropertyValueConverter extends WrappingConverter {
     return list;
   }
 
+  @Override
   public Converter getConverter(@Nonnull GenericDomValue domElement) {
     List<Converter> converters = getConverters(domElement);
     return converters.isEmpty() ? null : converters.get(0);

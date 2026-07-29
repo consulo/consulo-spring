@@ -12,18 +12,19 @@ import jakarta.annotation.Nonnull;
 /**
  * @author peter
  */
-public class PsiCallExpression extends MethodPatternPointcut{
-  public PsiCallExpression(@Nonnull ASTNode node) {
-    super(node);
-  }
+public class PsiCallExpression extends MethodPatternPointcut {
+    public PsiCallExpression(@Nonnull ASTNode node) {
+        super(node);
+    }
 
-  @Nonnull
-  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
-    return PointcutMatchDegree.FALSE;
-  }
+    @Nonnull
+    @Override
+    public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+        return PointcutMatchDegree.FALSE;
+    }
 
-  @Override
-  public String toString() {
-    return "PsiCallExpression";
-  }
+    @Override
+    public String toString() {
+        return "PsiCallExpression";
+    }
 }

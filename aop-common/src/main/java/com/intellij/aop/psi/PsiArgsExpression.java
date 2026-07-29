@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.impl.psi.impl.PsiElementFactoryImpl;
 import com.intellij.java.language.psi.*;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.util.lang.Comparing;
 
@@ -19,6 +19,7 @@ import java.util.Collection;
  */
 public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpression{
   private static final TypeArgumentMatcher ARGS_MATCHER = new TypeArgumentMatcher() {
+      @Override
       public PointcutMatchDegree fun(PsiType actualType, AopReferenceTarget target) {
         if (super.fun(actualType, target) == PointcutMatchDegree.TRUE || target.isAssignableFrom(actualType)) {
           return PointcutMatchDegree.TRUE;
@@ -42,16 +43,20 @@ public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpr
     super(node);
   }
 
+  @Override
   public String toString() {
     return "PsiArgsExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public AopParameterList getParameterList() {
     return findChildByClass(AopParameterList.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     if (member instanceof PsiMethod) {
       AopParameterList parameterList = getParameterList();
@@ -61,6 +66,7 @@ public class PsiArgsExpression extends AopElementBase implements PsiPointcutExpr
   }
 
   @Nonnull
+  @Override
   public Collection<AopPsiTypePattern> getPatterns() {
     return Arrays.asList(AopPsiTypePattern.TRUE);
   }

@@ -9,17 +9,15 @@ import jakarta.annotation.Nullable;
 import jakarta.annotation.Nonnull;
 
 public class PropertyKeyConverter extends WrappingConverter {
+    @Nullable
+    @Override
+    public Converter getConverter(@Nonnull GenericDomValue domValue) {
+        CustomConverterRegistry registry = getRegistry(domValue.getManager().getProject());
 
-  @Nullable
-  public Converter getConverter(@Nonnull GenericDomValue domValue) {
-    CustomConverterRegistry registry = getRegistry(domValue.getManager().getProject());
+        return registry.getCustomConverter(getClass(), domValue);
+    }
 
-    return registry.getCustomConverter(getClass(), domValue);
-  }
-
-  private static CustomConverterRegistry getRegistry(Project project) {
-    return SpringManager.getInstance(project).getCustomConverterRegistry();
-  }
-
-
+    private static CustomConverterRegistry getRegistry(Project project) {
+        return SpringManager.getInstance(project).getCustomConverterRegistry();
+    }
 }

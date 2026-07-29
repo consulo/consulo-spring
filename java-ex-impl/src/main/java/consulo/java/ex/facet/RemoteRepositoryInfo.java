@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package consulo.java.ex.facet;
 
 import consulo.logging.Logger;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 
 /**
@@ -31,7 +27,7 @@ public class RemoteRepositoryInfo {
   private final String myPresentableName;
   private final String[] myMirrors;
 
-  public RemoteRepositoryInfo(@Nonnull @NonNls String id, @Nonnull @Nls String presentableName, @Nonnull @NonNls String[] mirrors) {
+  public RemoteRepositoryInfo(@Nonnull String id, @Nonnull String presentableName, @Nonnull String[] mirrors) {
     myId = id;
     LOG.assertTrue(mirrors.length > 0);
     myPresentableName = presentableName;
@@ -54,15 +50,16 @@ public class RemoteRepositoryInfo {
     return myMirrors[0];
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
     RemoteRepositoryInfo that = (RemoteRepositoryInfo)o;
     return myId.equals(that.myId);
-
   }
 
+  @Override
   public int hashCode() {
     return myId.hashCode();
   }

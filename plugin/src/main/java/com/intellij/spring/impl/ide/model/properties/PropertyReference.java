@@ -1,19 +1,22 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.properties;
 
 import com.intellij.java.impl.psi.impl.beanProperties.CreateBeanPropertyFix;
-import com.intellij.java.language.psi.*;
+import com.intellij.java.language.psi.PsiClass;
+import com.intellij.java.language.psi.PsiClassType;
+import com.intellij.java.language.psi.PsiMethod;
+import com.intellij.java.language.psi.PsiType;
 import com.intellij.java.language.psi.util.InheritanceUtil;
 import com.intellij.java.language.psi.util.PropertyUtil;
-import com.intellij.spring.impl.ide.SpringBundle;
 import com.intellij.spring.impl.ide.SpringModel;
 import com.intellij.spring.impl.ide.model.converters.SpringConverterUtil;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBaseBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBeanPointer;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringPropertyDefinition;
+import consulo.annotation.access.RequiredReadAction;
+import consulo.annotation.access.RequiredWriteAction;
 import consulo.document.util.TextRange;
 import consulo.language.editor.completion.lookup.LookupValueFactory;
 import consulo.language.editor.inspection.LocalQuickFix;
@@ -21,12 +24,13 @@ import consulo.language.editor.inspection.LocalQuickFixProvider;
 import consulo.language.psi.*;
 import consulo.language.util.IncorrectOperationException;
 import consulo.localize.LocalizeValue;
-import consulo.spring.impl.SpringIcons;
+import consulo.spring.impl.icon.SpringImplIconGroup;
+import consulo.spring.localize.SpringLocalize;
 import consulo.util.collection.ContainerUtil;
 import consulo.util.lang.StringUtil;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -35,7 +39,6 @@ import java.util.function.Function;
  */
 public class PropertyReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference, EmptyResolveMessageProvider, LocalQuickFixProvider
 {
-
   private final PropertyReferenceSet myReferenceSet;
   private final int myIndex;
 
@@ -56,9 +59,8 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
       ResolveResult[] results = myReferenceSet.getReference(myIndex - 1).multiResolve(false);
       if (results.length > 0) {
         PsiMethod method = chooseMethod(ContainerUtil.map2List(results, resolveResult -> (PsiMethod)resolveResult.getElement()));
-        PsiType type = method.getReturnType();
-        if (type instanceof PsiClassType) {
-          return ((PsiClassType)type).resolve();
+        if (method.getReturnType() instanceof PsiClassType classType) {
+          return classType.resolve();
         }
       }
     }
@@ -70,7 +72,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
     boolean acceptSetters = forCompletion || isLast();
     boolean acceptGetters = !isLast();
 
-    Set<PsiMethod> maps = new HashSet<PsiMethod>();
+    Set<PsiMethod> maps = new HashSet<>();
     String propertyName = getValue();
     for (PsiClass beanClass : beanClasses) {
       if (acceptSetters) {
@@ -106,7 +108,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
     boolean acceptSetters = forCompletion || isLast();
     boolean acceptGetters = !isLast();
 
-    List<Map<String, PsiMethod>> maps = new ArrayList<Map<String, PsiMethod>>();
+    List<Map<String, PsiMethod>> maps = new ArrayList<>();
     for (PsiClass beanClass : beanClasses) {
       maps.add(PropertyUtil.getAllProperties(beanClass, acceptSetters, acceptGetters));
     }
@@ -115,14 +117,17 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
 
 
   @Nullable
+  @Override
+  @RequiredReadAction
   public PsiMethod resolve() {
     ResolveResult[] resolveResults = multiResolve(false);
     return (PsiMethod) (resolveResults.length == 1 ? resolveResults[0].getElement() : null);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public ResolveResult[] multiResolve(boolean incompleteCode) {
-
     String propertyName = getValue();
     if (isFirst()) {
       SpringModel model = SpringConverterUtil.getSpringModel(myReferenceSet.getContext());
@@ -150,9 +155,10 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
   @Nullable
   private PsiMethod resolve(PsiClass psiClass, String propertyName) {
     boolean isLast = isLast();
-    PsiMethod method = isLast ? PropertyUtil.findPropertySetter(psiClass, propertyName, false, true) :
-                             PropertyUtil.findPropertyGetter(psiClass, propertyName, false, true);
-    return method == null || !method.hasModifierProperty(PsiModifier.PUBLIC) ? null : method;
+    PsiMethod method = isLast
+      ? PropertyUtil.findPropertySetter(psiClass, propertyName, false, true)
+      : PropertyUtil.findPropertyGetter(psiClass, propertyName, false, true);
+    return method == null || !method.isPublic() ? null : method;
   }
 
   private boolean isLast() {
@@ -163,6 +169,8 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
     return myIndex == 0;
   }
 
+  @Override
+  @RequiredReadAction
   public Object[] getVariants() {
     SpringModel model = SpringConverterUtil.getSpringModel(myReferenceSet.getContext());
     if (model == null) return EMPTY_ARRAY;
@@ -173,7 +181,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
     if (!descendants.isEmpty() && isFirst()) {
       Map<String, Set<PsiMethod>> sharedProperties = getAllSharedProperties(descendants, true);
 
-      properties = new HashMap<String, PsiMethod>();
+      properties = new HashMap<>();
       for (Map.Entry<String,Set<PsiMethod>> entry : sharedProperties.entrySet()) {
         String propertyName = entry.getKey();
         PsiMethod firstMethod = entry.getValue().iterator().next();
@@ -190,19 +198,27 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
       String propertyName = entry.getKey();
       PsiType propertyType = PropertyUtil.getPropertyType(entry.getValue());
       assert propertyType != null;
-      variants[i++] = LookupValueFactory.createLookupValueWithHint(propertyName, SpringIcons.SpringProperty, propertyType.getPresentableText());
+      variants[i++] = LookupValueFactory.createLookupValueWithHint(
+        propertyName,
+        SpringImplIconGroup.springproperty(),
+        propertyType.getPresentableText()
+      );
     }
     return variants;
   }
 
+  @Override
+  @RequiredWriteAction
   public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
     String name = PropertyUtil.getPropertyName(newElementName);
     return super.handleElementRename(name == null ? newElementName : name);
   }
 
+  @Override
+  @RequiredWriteAction
   public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
-    if (element instanceof PsiMethod) {
-      String propertyName = PropertyUtil.getPropertyName((PsiMember)element);
+    if (element instanceof PsiMethod method) {
+      String propertyName = PropertyUtil.getPropertyName(method);
       if (propertyName != null) {
         return super.handleElementRename(propertyName);
       }
@@ -213,7 +229,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
   @Nonnull
   private static Set<PsiClass> getUniqueBeanClasses(@Nonnull Collection<SpringBaseBeanPointer> beans) {
     if (beans.isEmpty()) return Collections.emptySet();
-    Set<PsiClass> classes = new HashSet<PsiClass>();
+    Set<PsiClass> classes = new HashSet<>();
     for (SpringBeanPointer bean : beans) {
       PsiClass psiClass = bean.getBeanClass();
       if (psiClass != null) {
@@ -225,12 +241,12 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
 
   @Nonnull
   private static <K,V> Map<K,Set<V>> reduce(@Nonnull Collection<Map<K,V>> maps) {
-    Map<K, Set<V>> intersection = new HashMap<K, Set<V>>();
+    Map<K, Set<V>> intersection = new HashMap<>();
     Iterator<Map<K, V>> i = maps.iterator();
     if (i.hasNext()) {
       Map<K, V> first = i.next();
       for (Map.Entry<K, V> entry : first.entrySet()) {
-        Set<V> values = new HashSet<V>();
+        Set<V> values = new HashSet<>();
         values.add(entry.getValue());
         intersection.put(entry.getKey(), values);
       }
@@ -249,7 +265,7 @@ public class PropertyReference extends PsiReferenceBase<PsiElement> implements P
   @Nonnull
   @Override
   public LocalizeValue buildUnresolvedMessage(@Nonnull String s) {
-    return LocalizeValue.localizeTODO(SpringBundle.message("model.property.error.message", getValue()));
+    return SpringLocalize.modelPropertyErrorMessage(getValue());
   }
 
   @Override

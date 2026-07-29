@@ -83,6 +83,7 @@ public class PointcutAcceptTest extends JavaCodeInsightFixtureTestCase {
   private void createAopPoincut(final PsiMethod method) {
     new AopPointcutImpl() {
       @Nonnull
+      @Override
       public PsiMethod getPsiElement() {
         return method;
       }

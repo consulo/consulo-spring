@@ -12,21 +12,22 @@ import jakarta.annotation.Nonnull;
 /**
  * @author peter
  */
-public class PsiInitializationPointcutExpression extends MethodPatternPointcut{
-  private final boolean myPre;
+public class PsiInitializationPointcutExpression extends MethodPatternPointcut {
+    private final boolean myPre;
 
-  public PsiInitializationPointcutExpression(@Nonnull ASTNode node, boolean isPre) {
-    super(node);
-    myPre = isPre;
-  }
+    public PsiInitializationPointcutExpression(@Nonnull ASTNode node, boolean isPre) {
+        super(node);
+        myPre = isPre;
+    }
 
-  @Nonnull
-  public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
-    return PointcutMatchDegree.FALSE;
-  }
+    @Nonnull
+    @Override
+    public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
+        return PointcutMatchDegree.FALSE;
+    }
 
-  @Override
-  public String toString() {
-    return "PsiInitializationPointcutExpression";
-  }
+    @Override
+    public String toString() {
+        return "PsiInitializationPointcutExpression";
+    }
 }

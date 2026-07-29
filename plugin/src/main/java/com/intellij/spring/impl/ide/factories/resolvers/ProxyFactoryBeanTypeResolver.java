@@ -8,10 +8,9 @@ import com.intellij.spring.impl.ide.model.xml.beans.SpringBean;
 import consulo.language.psi.PsiManager;
 import consulo.language.psi.scope.GlobalSearchScope;
 import consulo.project.Project;
-import org.jetbrains.annotations.NonNls;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -32,20 +31,20 @@ import java.util.Set;
  */
 @SuppressWarnings({"UnnecessaryFullyQualifiedName"})
 public class ProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResolver {
-  @NonNls private static final String FACTORY_CLASS = "org.springframework.aop.framework.ProxyFactoryBean";
+  private static final String FACTORY_CLASS = "org.springframework.aop.framework.ProxyFactoryBean";
 
-  @NonNls private static final String PROXY_INTERFACES_PROPERTY_NAME = "proxyInterfaces";
-  @NonNls private static final String INTERFACES_PROPERTY_NAME = "interfaces";
-  @NonNls private static final String AUTODETECT_INTERFACES_PROPERTY_NAME = "autodetectInterfaces";
+  private static final String PROXY_INTERFACES_PROPERTY_NAME = "proxyInterfaces";
+  private static final String INTERFACES_PROPERTY_NAME = "interfaces";
+  private static final String AUTODETECT_INTERFACES_PROPERTY_NAME = "autodetectInterfaces";
 
-  @NonNls private static final String TARGET_PROPERTY_NAME = "target";
-  @NonNls private static final String TARGET_NAME_PROPERTY_NAME = "targetName";
-  @NonNls private static final String TARGET_CLASS_PROPERTY_NAME = "targetClass";
+  private static final String TARGET_PROPERTY_NAME = "target";
+  private static final String TARGET_NAME_PROPERTY_NAME = "targetName";
+  private static final String TARGET_CLASS_PROPERTY_NAME = "targetClass";
 
   @Nonnull
+  @Override
   public Set<String> getObjectType(@Nonnull CommonSpringBean context) {
-    if (context instanceof SpringBean) {
-      SpringBean springBean = (SpringBean) context;
+    if (context instanceof SpringBean springBean) {
       PsiClassType type = getTargetType(springBean);
 
       if (isCglibExplicitlyEnabled(springBean) && type != null) {
@@ -106,6 +105,7 @@ public class ProxyFactoryBeanTypeResolver extends AbstractProxiedTypeResolver {
     return !isBooleanProperySetAndFalse(context, AUTODETECT_INTERFACES_PROPERTY_NAME);
   }
 
+  @Override
   public boolean accept(@Nonnull String factoryClassName) {
     return FACTORY_CLASS.equals(factoryClassName);
   }

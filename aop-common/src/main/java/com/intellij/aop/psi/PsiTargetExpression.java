@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.*;
@@ -19,16 +18,17 @@ import java.util.Collection;
  * @author peter
  */
 public class PsiTargetExpression extends PsiTypedPointcutExpression {
-
   public PsiTargetExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "PsiTargetExpression";
   }
 
   @Nonnull
+  @Override
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     PsiClass psiClass = member.getContainingClass();
     AopReferenceHolder baseClassPattern = getTypeReference();
@@ -47,6 +47,7 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
+  @Override
   public Collection<AopPsiTypePattern> getPatterns() {
     return Arrays.asList(AopPsiTypePattern.TRUE);
   }
@@ -69,7 +70,8 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
     boolean maybe = false;
     for (AopPsiTypePattern typePattern : typePatterns) {
       PointcutMatchDegree degree = typePattern.canBeAssignableFrom(
-        JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass));
+        JavaPsiFacade.getInstance(psiClass.getProject()).getElementFactory().createType(psiClass)
+      );
       if (degree == PointcutMatchDegree.TRUE) return PointcutMatchDegree.TRUE;
       if (degree == PointcutMatchDegree.MAYBE) maybe = true;
     }
@@ -81,7 +83,7 @@ public class PsiTargetExpression extends PsiTypedPointcutExpression {
     if (subClass.getManager().areElementsEquivalent(subClass, superClass) || !allowPatterns && subClass.isInheritor(superClass, true)) {
       return PointcutMatchDegree.TRUE;
     }
-    if (subClass.hasModifierProperty(PsiModifier.FINAL)) return PointcutMatchDegree.FALSE;
+    if (subClass.isFinal()) return PointcutMatchDegree.FALSE;
     if (!allowPatterns && superClass.isInterface()) return PointcutMatchDegree.MAYBE;
     return null;
   }

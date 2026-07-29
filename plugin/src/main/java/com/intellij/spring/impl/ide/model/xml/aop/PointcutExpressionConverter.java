@@ -5,24 +5,26 @@ package com.intellij.spring.impl.ide.model.xml.aop;
 
 import com.intellij.aop.psi.AopPointcutExpressionFile;
 import com.intellij.aop.psi.PsiPointcutExpression;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.document.util.TextRange;
 import consulo.language.inject.InjectedLanguageManager;
 import consulo.language.psi.PsiElement;
 import consulo.util.lang.Pair;
-import consulo.xml.language.psi.XmlAttributeValue;
 import consulo.xml.dom.ConvertContext;
 import consulo.xml.dom.Converter;
 import consulo.xml.dom.GenericAttributeValue;
-import org.jetbrains.annotations.NonNls;
-
+import consulo.xml.language.psi.XmlAttributeValue;
 import jakarta.annotation.Nullable;
+
 import java.util.List;
 
 /**
  * @author peter
  */
 public class PointcutExpressionConverter extends Converter<PsiPointcutExpression> {
-  public PsiPointcutExpression fromString(@Nullable @NonNls String s, ConvertContext context) {
+  @Override
+  @RequiredReadAction
+  public PsiPointcutExpression fromString(@Nullable String s, ConvertContext context) {
     XmlAttributeValue attributeValue = ((GenericAttributeValue)context.getInvocationElement()).getXmlAttributeValue();
     if (attributeValue == null) return null;
 
@@ -36,6 +38,7 @@ public class PointcutExpressionConverter extends Converter<PsiPointcutExpression
     return null;
   }
 
+  @Override
   public String toString(@Nullable PsiPointcutExpression psiPointcutExpression, ConvertContext context) {
     throw new UnsupportedOperationException("Method toString is not yet implemented in " + getClass().getName());
   }

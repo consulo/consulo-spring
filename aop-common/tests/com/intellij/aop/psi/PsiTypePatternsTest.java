@@ -273,12 +273,10 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
   }
 
   private void assertPackages(AopPsiTypePattern pattern, String... packages) {
-    final Set<String> actual = new THashSet<String>();
-    assertTrue(pattern.processPackages(getPsiManager(), new Processor<PsiPackage>() {
-      public boolean process(PsiPackage psiPackage) {
-        actual.add(psiPackage.getQualifiedName());
-        return true;
-      }
+    Set<String> actual = new THashSet<String>();
+    assertTrue(pattern.processPackages(getPsiManager(), psiPackage -> {
+      actual.add(psiPackage.getQualifiedName());
+      return true;
     }));
     assertTrue(actual.containsAll(Arrays.asList(packages)));
   }
@@ -289,5 +287,4 @@ public class PsiTypePatternsTest extends JavaCodeInsightFixtureTestCase {
     assertFalse(pattern.accepts(createPsiType("java.lang.Object")));
     assertFalse(pattern.accepts(createPsiType("FooAnno")));
   }
-
 }

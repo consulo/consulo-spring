@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.highlighting;
 
 import com.intellij.java.impl.codeInsight.daemon.impl.quickfix.ExtendsListFix;
@@ -24,6 +23,7 @@ import jakarta.annotation.Nonnull;
 
 @ExtensionImpl
 public class ReplacedMethodsInspection extends SpringBeanInspectionBase {
+    @Override
     protected void checkBean(
         SpringBean springBean,
         Beans beans,

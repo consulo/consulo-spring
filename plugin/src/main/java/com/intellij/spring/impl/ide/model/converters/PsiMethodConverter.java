@@ -1,12 +1,14 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.converters;
 
-import com.intellij.java.language.psi.*;
+import com.intellij.java.language.psi.PsiClass;
+import com.intellij.java.language.psi.PsiMethod;
+import com.intellij.java.language.psi.PsiSubstitutor;
+import com.intellij.java.language.psi.PsiType;
 import com.intellij.java.language.psi.util.PsiFormatUtil;
-import com.intellij.spring.impl.ide.SpringBundle;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.editor.completion.lookup.LookupElementBuilder;
 import consulo.language.editor.inspection.LocalQuickFix;
 import consulo.language.editor.inspection.LocalQuickFixProvider;
@@ -18,21 +20,22 @@ import consulo.language.psi.PsiReferenceBase;
 import consulo.language.psi.resolve.ResolveState;
 import consulo.language.util.IncorrectOperationException;
 import consulo.localize.LocalizeValue;
+import consulo.spring.localize.SpringLocalize;
 import consulo.util.collection.ArrayUtil;
 import consulo.xml.dom.ConvertContext;
 import consulo.xml.dom.Converter;
 import consulo.xml.dom.CustomReferenceConverter;
 import consulo.xml.dom.GenericDomValue;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Dmitry Avdeev
  */
 public abstract class PsiMethodConverter extends Converter<PsiMethod> implements CustomReferenceConverter<PsiMethod> {
-
   protected final static Object[] EMPTY_ARRAY = ArrayUtil.EMPTY_OBJECT_ARRAY;
 
   private final MethodAccepter myMethodAccepter;
@@ -47,12 +50,11 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
 
   protected static class MethodAccepter {
     public boolean accept(PsiMethod method) {
-      return !method.isConstructor() &&
-        method.hasModifierProperty(PsiModifier.PUBLIC) &&
-        !method.hasModifierProperty(PsiModifier.STATIC);
+      return !method.isConstructor() && method.isPublic() && !method.isStatic();
     }
   }
 
+  @Override
   public PsiMethod fromString(@Nullable String methodName, ConvertContext context) {
     if (methodName == null || methodName.length() == 0) {
       return null;
@@ -76,6 +78,7 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     }
   }
 
+  @Override
   public String toString(@Nullable PsiMethod psiMethods, ConvertContext context) {
     return null;
   }
@@ -87,12 +90,13 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     return myMethodAccepter;
   }
 
+  @RequiredReadAction
   private Object[] getVariants(ConvertContext context) {
     PsiClass psiClass = getPsiClass(context);
     if (psiClass == null) {
       return EMPTY_ARRAY;
     }
-    ArrayList<Object> result = new ArrayList<Object>();
+    List<Object> result = new ArrayList<>();
     MethodAccepter methodAccepter = getMethodAccepter(context, true);
     PsiMethod[] methods;
     if (psiClass.isEnum()) {
@@ -122,10 +126,8 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
   }
 
   @Nonnull
-  public PsiReference[] createReferences(GenericDomValue<PsiMethod> genericDomValue,
-                                         PsiElement element,
-                                         ConvertContext context) {
-
+  @Override
+  public PsiReference[] createReferences(GenericDomValue<PsiMethod> genericDomValue, PsiElement element, ConvertContext context) {
     return new PsiReference[]{new MyReference(element, genericDomValue, context)};
   }
 
@@ -133,27 +135,31 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     private final GenericDomValue<PsiMethod> myGenericDomValue;
     private final ConvertContext myContext;
 
-    public MyReference(PsiElement element,
-                       GenericDomValue<PsiMethod> genericDomValue,
-                       ConvertContext context) {
+    public MyReference(PsiElement element, GenericDomValue<PsiMethod> genericDomValue, ConvertContext context) {
       super(element);
       myGenericDomValue = genericDomValue;
       myContext = context;
     }
 
+    @Override
+    @RequiredReadAction
     public Object[] getVariants() {
       return PsiMethodConverter.this.getVariants(myContext);
     }
 
     @Nullable
+    @Override
+    @RequiredReadAction
     public PsiElement resolve() {
       return myGenericDomValue.getValue();
     }
 
+    @Override
     public boolean isSoft() {
       return true;
     }
 
+    @Override
     public PsiElement bindToElement(@Nonnull PsiElement element) throws IncorrectOperationException {
       assert element instanceof PsiMethod : "PsiMethod expected";
       PsiMethod psiMethod = (PsiMethod)element;
@@ -161,6 +167,7 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
       return psiMethod;
     }
 
+    @Override
     public LocalQuickFix[] getQuickFixes() {
       return PsiMethodConverter.this.getQuickFixes(myContext);
     }
@@ -168,7 +175,7 @@ public abstract class PsiMethodConverter extends Converter<PsiMethod> implements
     @Nonnull
     @Override
     public LocalizeValue buildUnresolvedMessage(@Nonnull String s) {
-      return LocalizeValue.localizeTODO(SpringBundle.message("cannot.resolve.method", myGenericDomValue.getStringValue()));
+      return SpringLocalize.cannotResolveMethod(myGenericDomValue.getStringValue());
     }
   }
 
