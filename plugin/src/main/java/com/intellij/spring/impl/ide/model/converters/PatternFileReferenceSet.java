@@ -1,10 +1,9 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.ide.model.converters;
 
-import com.intellij.spring.impl.ide.SpringBundle;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.document.util.TextRange;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiElementResolveResult;
@@ -12,9 +11,10 @@ import consulo.language.psi.PsiFileSystemItem;
 import consulo.language.psi.ResolveResult;
 import consulo.language.psi.path.FileReference;
 import consulo.language.psi.path.FileReferenceSet;
+import consulo.spring.localize.SpringLocalize;
 import consulo.util.io.FileUtil;
-
 import jakarta.annotation.Nonnull;
+
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -23,11 +23,11 @@ import java.util.regex.Pattern;
 */
 public class PatternFileReferenceSet extends FileReferenceSet
 {
-
   public PatternFileReferenceSet(String str, PsiElement element, int offset) {
     super(str, element, offset, null, true);
   }
 
+  @Override
   public FileReference createFileReference(TextRange range, int index, String text) {
     if (!isAntPattern(text)) return super.createFileReference(range, index, text);
 
@@ -39,6 +39,7 @@ public class PatternFileReferenceSet extends FileReferenceSet
     return (str.indexOf('*') != -1 || str.indexOf('?') != -1);
   }
 
+  @Override
   protected boolean isSoft() {
     return true;
   }
@@ -52,11 +53,14 @@ public class PatternFileReferenceSet extends FileReferenceSet
       super(referenceSet, range, index, text);
     }
 
-    protected void innerResolveInContext(@Nonnull String text,
-										 @Nonnull PsiFileSystemItem context,
-										 Collection<ResolveResult> result, boolean caseSensitive) {
-
-
+    @Override
+    @RequiredReadAction
+    protected void innerResolveInContext(
+      @Nonnull String text,
+      @Nonnull PsiFileSystemItem context,
+      Collection<ResolveResult> result,
+      boolean caseSensitive
+    ) {
       if (text.equals("**")) {
         addDirectoryResolves(context, result);
       }
@@ -66,17 +70,16 @@ public class PatternFileReferenceSet extends FileReferenceSet
 
         PsiElement[] psiElements = context.getChildren();
         for (PsiElement psiElement : psiElements) {
-          if (psiElement instanceof PsiFileSystemItem) {
-            if (pattern.matcher(((PsiFileSystemItem)psiElement).getName()).matches()) {
-              result.add(new PsiElementResolveResult(psiElement));
-            }
+          if (psiElement instanceof PsiFileSystemItem fsItem && pattern.matcher(fsItem.getName()).matches()) {
+            result.add(new PsiElementResolveResult(fsItem));
           }
         }
       }
     }
 
+    @RequiredReadAction
     private static void addDirectoryResolves(PsiElement context, Collection<ResolveResult> result) {
-      if (context instanceof PsiFileSystemItem && ((PsiFileSystemItem)context).isDirectory()) {
+      if (context instanceof PsiFileSystemItem fsItem && fsItem.isDirectory()) {
         result.add(new PsiElementResolveResult(context));
         for (PsiElement psiElement : context.getChildren()) {
            addDirectoryResolves(psiElement, result);
@@ -85,7 +88,7 @@ public class PatternFileReferenceSet extends FileReferenceSet
     }
 
     public String getUnresolvedMessagePattern() {
-      return SpringBundle.message("spring.resource.ant.style.reference.error.message");
+      return SpringLocalize.springResourceAntStyleReferenceErrorMessage().get();
     }
   }
 }

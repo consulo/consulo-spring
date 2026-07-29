@@ -6,9 +6,9 @@ import com.intellij.spring.impl.ide.model.xml.context.PropertyPlaceholder;
 import jakarta.annotation.Nonnull;
 
 public abstract class PropertyPlaceholderImpl extends DomSpringBeanImpl implements PropertyPlaceholder {
-
-  @Nonnull
-  public String getClassName() {
-    return PlaceholderUtils.PLACEHOLDER_CONFIGURER_CLASS;
-  }
+    @Nonnull
+    @Override
+    public String getClassName() {
+        return PlaceholderUtils.PLACEHOLDER_CONFIGURER_CLASS;
+    }
 }

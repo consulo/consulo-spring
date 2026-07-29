@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.aop.AopIntroduction;
@@ -10,6 +9,7 @@ import com.intellij.java.language.psi.JavaPsiFacade;
 import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiElementFactory;
 import com.intellij.java.language.psi.PsiMember;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 
 import jakarta.annotation.Nonnull;
@@ -20,16 +20,18 @@ import java.util.Collection;
  * @author peter
  */
 public class PsiThisExpression extends PsiTypedPointcutExpression {
-
   public PsiThisExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "PsiThisExpression";
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     AopReferenceHolder reference = getTypeReference();
     if (reference == null) return PointcutMatchDegree.FALSE;
@@ -56,6 +58,7 @@ public class PsiThisExpression extends PsiTypedPointcutExpression {
   }
 
   @Nonnull
+  @Override
   public Collection<AopPsiTypePattern> getPatterns() {
     return Arrays.asList(AopPsiTypePattern.TRUE);
   }

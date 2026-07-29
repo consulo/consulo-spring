@@ -11,9 +11,10 @@ import jakarta.annotation.Nonnull;
  * @author peter
  */
 public interface PsiPointcutExpression extends AopPatternContainer {
-  @Nonnull
-  PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member);
+    @Nonnull
+    PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member);
 
-  @Nonnull
-  AopPointcutExpressionFile getContainingFile();
+    @Nonnull
+    @Override
+    AopPointcutExpressionFile getContainingFile();
 }

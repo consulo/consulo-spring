@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2006 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl;
 
 import com.intellij.java.impl.util.xml.converters.values.GenericDomValueConvertersRegistry;
@@ -46,7 +45,6 @@ import java.util.*;
 @Singleton
 @ServiceImpl
 public class SpringManagerImpl extends SpringManager {
-
   @Deprecated
   private final SpringModelFactory myModelFactory;
   private final GenericDomValueConvertersRegistry myValueProvidersRegistry;
@@ -83,12 +81,13 @@ public class SpringManagerImpl extends SpringManager {
     myValueProvidersRegistry.registerConverter(new EnumValueConverter(), new EnumValueConverter.TypeCondition());
   }
 
-  @RequiredReadAction
   @Override
+  @RequiredReadAction
   public SpringModel getModel(@Nonnull Module module) {
-    return myCachedValuesManager.getCachedValue(module, () -> {
-      return CachedValueProvider.Result.create(getModelImpl(module), PsiModificationTracker.MODIFICATION_COUNT);
-    });
+    return myCachedValuesManager.getCachedValue(
+      module,
+      () -> CachedValueProvider.Result.create(getModelImpl(module), PsiModificationTracker.MODIFICATION_COUNT)
+    );
   }
 
   @RequiredReadAction
@@ -143,7 +142,6 @@ public class SpringManagerImpl extends SpringManager {
     return list;
   }
 
-
   @RequiredReadAction
   private SpringModel getCombinedModelImpl(Module module) {
     List<SpringModel> allModels = getAllModels(module);
@@ -181,12 +179,10 @@ public class SpringManagerImpl extends SpringManager {
 
   @Override
   @Nullable
+  @RequiredReadAction
   public SpringModel getLocalSpringModel(@Nonnull XmlFile file) {
     DomFileElement<Beans> beans = myModelFactory.getDomRoot(file);
-    return beans == null ? null : new DomSpringModelImpl2(beans,
-                                                          Collections.singleton(file),
-                                                          ModuleUtilCore.findModuleForPsiElement(file),
-                                                          null);
+    return beans == null ? null : new DomSpringModelImpl2(beans, Collections.singleton(file), file.getModule(), null);
   }
 
   @Override
@@ -203,8 +199,9 @@ public class SpringManagerImpl extends SpringManager {
 
   @Override
   @Nonnull
+  @RequiredReadAction
   public Set<SpringFileSet> getAllSets(@Nonnull SpringModuleExtension extension) {
-    Set<SpringFileSet> fileSets = new HashSet<SpringFileSet>(extension.getFileSets());
+    Set<SpringFileSet> fileSets = new HashSet<>(extension.getFileSets());
     List<SpringFileSet> providedModels = getProvidedModels(extension);
     fileSets.addAll(providedModels);
     return fileSets;

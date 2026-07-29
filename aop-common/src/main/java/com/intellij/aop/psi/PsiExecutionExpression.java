@@ -4,6 +4,7 @@
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.*;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 
 import jakarta.annotation.Nonnull;
@@ -15,23 +16,23 @@ import java.util.Set;
  * @author peter
  */
 public class PsiExecutionExpression extends MethodPatternPointcut {
-
   public PsiExecutionExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "PsiExecutionExpression";
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
-    if (!(member instanceof PsiMethod)) return PointcutMatchDegree.FALSE;
+    if (!(member instanceof PsiMethod method)) return PointcutMatchDegree.FALSE;
 
     AopMemberReferenceExpression methodReference = getMethodReference();
     if (methodReference == null) return PointcutMatchDegree.FALSE;
-
-    PsiMethod method = (PsiMethod)member;
 
     AopReferenceExpression expression = methodReference.getReferenceExpression();
     if (expression == null || !expression.getRegex().matcher(method.getName()).matches()) return PointcutMatchDegree.FALSE;
@@ -48,10 +49,9 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
     if (parameterList != null && parameterList.matches(context, method.getParameterList(), TypeArgumentMatcher.NO_AUTOBOXING) != PointcutMatchDegree.TRUE) return PointcutMatchDegree.FALSE;
     if (annotationHolder != null && !annotationHolder.accepts(method)) return PointcutMatchDegree.FALSE;
 
-    if (processClass(member.getContainingClass(), method, new HashSet<PsiClass>(), methodReference.getPatterns())) return PointcutMatchDegree.TRUE;
+    if (processClass(member.getContainingClass(), method, new HashSet<>(), methodReference.getPatterns())) return PointcutMatchDegree.TRUE;
 
     return PointcutMatchDegree.FALSE;
-
   }
 
   private static boolean processClass(PsiClass aClass, PsiMethod method, Set<PsiClass> visited, Collection<AopPsiTypePattern> patterns) {
@@ -75,18 +75,13 @@ public class PsiExecutionExpression extends MethodPatternPointcut {
   }
 
   private static boolean acceptsMethodClassAndName(@Nonnull PsiClass declaringClass, Collection<AopPsiTypePattern> patterns) {
-    if (AopPsiTypePattern.accepts(patterns, JavaPsiFacade.getInstance(declaringClass.getProject()).getElementFactory().createType(
-        declaringClass)) ==
-        PointcutMatchDegree.TRUE) {
-      return true;
-    }
-    return false;
+    return AopPsiTypePattern.accepts(patterns, JavaPsiFacade.getInstance(declaringClass.getProject())
+      .getElementFactory().createType(declaringClass)) == PointcutMatchDegree.TRUE;
   }
 
+  @RequiredReadAction
   private static boolean acceptsReturnType(AopReferenceHolder returnType, PsiType methodReturnType) {
     if (returnType == null || methodReturnType == null) return true;
-    if (returnType.accepts(methodReturnType) == PointcutMatchDegree.TRUE) return true;
-    return false;
+    return returnType.accepts(methodReturnType) == PointcutMatchDegree.TRUE;
   }
-
 }

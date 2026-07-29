@@ -1,15 +1,14 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.*;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
-import consulo.util.lang.function.PairFunction;
-
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,50 +18,53 @@ import java.util.Set;
  * @author peter
  */
 public class PsiAtArgsExpression extends AopElementBase implements PsiPointcutExpression, PsiAtPointcutDesignator{
-
   public PsiAtArgsExpression(@Nonnull ASTNode node) {
     super(node);
   }
 
+  @Override
   public String toString() {
     return "PsiAtArgsExpression";
   }
 
   @Nullable
+  @RequiredReadAction
   public AopParameterList getParameterList() {
     return findChildByClass(AopParameterList.class);
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
-    if (!(member instanceof PsiMethod)) return PointcutMatchDegree.FALSE;
+    if (!(member instanceof PsiMethod method)) return PointcutMatchDegree.FALSE;
 
     AopParameterList list = getParameterList();
     if (list == null) return PointcutMatchDegree.FALSE;
 
-
-
-    return list.matches(context, ((PsiMethod)member).getParameterList(), new PairFunction<PsiType, AopReferenceTarget, PointcutMatchDegree>() {
-      public PointcutMatchDegree fun(PsiType actualType, AopReferenceTarget holder) {
-        return actualType instanceof PsiClassType
-               ? canHaveAnnotation(((PsiClassType)actualType).resolve(), holder, PointcutMatchDegree.TRUE, PointcutMatchDegree.MAYBE)
-               : PointcutMatchDegree.FALSE;
-      }
-    });
+    return list.matches(
+      context,
+      method.getParameterList(),
+      (actualType, holder) -> actualType instanceof PsiClassType classType
+       ? canHaveAnnotation(classType.resolve(), holder, PointcutMatchDegree.TRUE, PointcutMatchDegree.MAYBE)
+       : PointcutMatchDegree.FALSE
+    );
   }
 
   @Nonnull
+  @Override
   public Collection<AopPsiTypePattern> getPatterns() {
     return Arrays.asList(AopPsiTypePattern.TRUE);
   }
 
-
+  @RequiredReadAction
   public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nullable AopReferenceHolder holder, PointcutContext context,
                                                       PointcutMatchDegree maybeTrue, PointcutMatchDegree maybeFalse) {
     if (holder == null) return PointcutMatchDegree.FALSE;
     return canHaveAnnotation(psiClass, context.resolve(holder), maybeTrue, maybeFalse);
   }
 
+  @RequiredReadAction
   public static PointcutMatchDegree canHaveAnnotation(@Nullable PsiClass psiClass, @Nonnull AopReferenceTarget holder,
                                                       PointcutMatchDegree maybeTrue, PointcutMatchDegree maybeFalse) {
     if (psiClass == null) return PointcutMatchDegree.FALSE;
@@ -84,7 +86,7 @@ public class PsiAtArgsExpression extends AopElementBase implements PsiPointcutEx
 
     if (psiClass.isInterface()) return maybeFalse;
 
-    Set<PsiClass> visited = new HashSet<PsiClass>();
+    Set<PsiClass> visited = new HashSet<>();
     visited.add(psiClass);
 
     while (true) {

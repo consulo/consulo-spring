@@ -8,6 +8,7 @@ import com.intellij.java.language.psi.PsiMember;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiParameter;
 import com.intellij.java.language.psi.PsiParameterList;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
 
@@ -25,20 +26,25 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
   }
 
   @Nullable
+  @RequiredReadAction
   public AopReferenceExpression getReferenceExpression() {
     return findChildByClass(AopReferenceExpression.class);
   }
 
   @Nullable
+  @RequiredReadAction
   public AopParameterList getParameterList() {
     return findChildByClass(AopParameterList.class);
   }
 
+  @Override
   public String toString() {
     return "PsiPointcutReferenceExpression";
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree acceptsSubject(PointcutContext context, PsiMember member) {
     AopReferenceExpression expression = getReferenceExpression();
     if (expression != null) {
@@ -54,6 +60,8 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public Collection<AopPsiTypePattern> getPatterns() {
     AopReferenceExpression expression = getReferenceExpression();
     if (expression != null) {
@@ -68,6 +76,7 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
     return Arrays.asList(AopPsiTypePattern.FALSE);
   }
 
+  @RequiredReadAction
   private PointcutContext createContext(PointcutContext context, PsiPointcutExpression pointcutExpression) {
     PsiMethod pointcutMethod = pointcutExpression.getContainingFile().getAopModel().getPointcutMethod();
     PointcutContext newContext = new PointcutContext(pointcutMethod);
@@ -79,9 +88,8 @@ public class PsiPointcutReferenceExpression extends AopElementBase implements Ps
         PsiParameter[] psiParameters = javaList.getParameters();
         if (javaList.getParametersCount() == aopParameters.length) {
           for (int i = 0; i < psiParameters.length; i++) {
-            PsiElement aopParameter = aopParameters[i];
-            if (aopParameter instanceof AopReferenceHolder) {
-              newContext.addParameter(psiParameters[i].getName(), context.resolve((AopReferenceHolder)aopParameter));
+            if (aopParameters[i] instanceof AopReferenceHolder referenceHolder) {
+              newContext.addParameter(psiParameters[i].getName(), context.resolve(referenceHolder));
             }
           }
         }

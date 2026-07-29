@@ -4,9 +4,9 @@
 package com.intellij.aop.psi;
 
 import com.intellij.java.language.psi.*;
-import consulo.language.psi.PsiElement;
-
+import consulo.annotation.access.RequiredReadAction;
 import jakarta.annotation.Nonnull;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,39 +24,42 @@ public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
     return myAnnotationPattern;
   }
 
+  @Override
+  @RequiredReadAction
   public boolean accepts(@Nonnull PsiType type) {
-    if (type instanceof PsiClassType) {
-      PsiClass psiClass = ((PsiClassType)type).resolve();
+    if (type instanceof PsiClassType classType) {
+      PsiClass psiClass = classType.resolve();
       if (psiClass != null && acceptsAnnotationPattern(psiClass, myAnnotationPattern, false)) return true;
     }
     return false;
   }
 
-  public static boolean acceptsAnnotationPattern(@Nonnull PsiModifierListOwner owner, AopPsiTypePattern annoPattern, boolean shoulBeInherited) {
-    return acceptsAnnotationPattern(owner, annoPattern, shoulBeInherited, new HashSet<PsiModifierListOwner>());
+  @RequiredReadAction
+  public static boolean acceptsAnnotationPattern(@Nonnull PsiModifierListOwner owner, AopPsiTypePattern annoPattern, boolean shouldBeInherited) {
+    return acceptsAnnotationPattern(owner, annoPattern, shouldBeInherited, new HashSet<>());
   }
 
-  private static boolean acceptsAnnotationPattern(PsiModifierListOwner owner, AopPsiTypePattern annoPattern,
-                                                  boolean shoulBeInherited,
-                                                  Set<PsiModifierListOwner> visited) {
+  @RequiredReadAction
+  private static boolean acceptsAnnotationPattern(
+    PsiModifierListOwner owner,
+    AopPsiTypePattern annoPattern,
+    boolean shouldBeInherited,
+    Set<PsiModifierListOwner> visited
+  ) {
     visited.add(owner);
-    if (annoPattern instanceof NotPattern) {
-      return !acceptsAnnotationPattern(owner, ((NotPattern)annoPattern).getInnerPattern(), shoulBeInherited);
+    if (annoPattern instanceof NotPattern notPattern) {
+      return !acceptsAnnotationPattern(owner, notPattern.getInnerPattern(), shouldBeInherited);
     }
 
     PsiModifierList modifierList = owner.getModifierList();
     if (modifierList != null) {
       for (PsiAnnotation annotation : modifierList.getAnnotations()) {
         PsiJavaCodeReferenceElement element = annotation.getNameReferenceElement();
-        if (element != null) {
-          PsiElement psiElement = element.resolve();
-          if (psiElement instanceof PsiClass) {
-            PsiClass annoClass = (PsiClass)psiElement;
-            if (annoPattern.accepts(JavaPsiFacade.getInstance(psiElement.getProject()).getElementFactory().createType(annoClass))) {
-              PsiModifierList list = annoClass.getModifierList();
-              return !shoulBeInherited || list != null && list.findAnnotation(CommonClassNames.JAVA_LANG_ANNOTATION_INHERITED) != null;
-            }
-          }
+        if (element != null
+          && element.resolve() instanceof PsiClass annoClass
+          && annoPattern.accepts(JavaPsiFacade.getInstance(annoClass.getProject()).getElementFactory().createType(annoClass))) {
+          PsiModifierList list = annoClass.getModifierList();
+          return !shouldBeInherited || list != null && list.findAnnotation(CommonClassNames.JAVA_LANG_ANNOTATION_INHERITED) != null;
         }
         String qualifiedName = annotation.getQualifiedName();
         if (qualifiedName != null && annoPattern.accepts(qualifiedName)) {
@@ -64,8 +67,8 @@ public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
         }
       }
     }
-    if (owner instanceof PsiClass) {
-      PsiClass superClass = ((PsiClass) owner).getSuperClass();
+    if (owner instanceof PsiClass psiClass) {
+      PsiClass superClass = psiClass.getSuperClass();
       return superClass != null && !visited.contains(superClass) && acceptsAnnotationPattern(superClass, annoPattern, true);
     }
 
@@ -73,6 +76,8 @@ public class PsiAnnotatedTypePattern extends AopPsiTypePattern{
   }
 
   @Nonnull
+  @Override
+  @RequiredReadAction
   public PointcutMatchDegree canBeAssignableFrom(@Nonnull PsiType type) {
     return PointcutMatchDegree.valueOf(accepts(type));
   }

@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2000-2007 JetBrains s.r.o. All Rights Reserved.
  */
-
 package com.intellij.spring.impl.model.beans;
 
 import com.intellij.java.language.psi.*;
@@ -24,34 +23,27 @@ import java.util.*;
  */
 @SuppressWarnings({"UnnecessaryFullyQualifiedName"})
 class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
-
   /**
    * @see org.springframework.beans.factory.support.AutowireUtils#sortConstructors(java.lang.reflect.Constructor[])
    */
-  private static final Comparator<PsiMethod> CTOR_COMPARATOR = new Comparator<PsiMethod>() {
-    public int compare(PsiMethod o1, PsiMethod o2) {
-      boolean p1 = o1.hasModifierProperty(PsiModifier.PUBLIC);
-      boolean p2 = o2.hasModifierProperty(PsiModifier.PUBLIC);
-      if (p1 != p2) {
-        return (p1 ? -1 : 1);
-      }
-      return o1.getParameterList().getParametersCount() - o2.getParameterList().getParametersCount();
+  private static final Comparator<PsiMethod> CTOR_COMPARATOR = (o1, o2) -> {
+    boolean p1 = o1.isPublic();
+    boolean p2 = o2.isPublic();
+    if (p1 != p2) {
+      return (p1 ? -1 : 1);
     }
+    return o1.getParameterList().getParametersCount() - o2.getParameterList().getParametersCount();
   };
 
-  private static final Comparator<ConstructorArg> ARG_COMPARATOR = new Comparator<ConstructorArg>() {
-    public int compare(ConstructorArg o1, ConstructorArg o2) {
-      boolean hasValue1 = DomUtil.hasXml(o1.getValueElement());
-      boolean hasValue2 = DomUtil.hasXml(o2.getValueElement());
-      return hasValue1 ? (hasValue2 ? 0 : 1) : (hasValue2 ? -1 : 0);
-    }
+  private static final Comparator<ConstructorArg> ARG_COMPARATOR = (o1, o2) -> {
+    boolean hasValue1 = DomUtil.hasXml(o1.getValueElement());
+    boolean hasValue2 = DomUtil.hasXml(o2.getValueElement());
+    return hasValue1 ? (hasValue2 ? 0 : 1) : (hasValue2 ? -1 : 0);
   };
 
   @Nullable private PsiMethod myResolvedMethod;
-  private final Map<PsiMethod, Map<ConstructorArg, PsiParameter>> myResolvedArgs =
-    new HashMap<PsiMethod, Map<ConstructorArg, PsiParameter>>();
-  private final Map<PsiMethod, Map<PsiParameter, Collection<SpringBaseBeanPointer>>> myAutowiredParams =
-    new HashMap<PsiMethod, Map<PsiParameter, Collection<SpringBaseBeanPointer>>>();
+  private final Map<PsiMethod, Map<ConstructorArg, PsiParameter>> myResolvedArgs = new HashMap<>();
+  private final Map<PsiMethod, Map<PsiParameter, Collection<SpringBaseBeanPointer>>> myAutowiredParams = new HashMap<>();
 
   private final boolean myResolved;
   private List<PsiMethod> myCheckedMethods;
@@ -60,29 +52,35 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     myResolved = resolve(bean, SpringUtils.getSpringModel(bean));
   }
 
+  @Override
   public boolean isResolved() {
     return myResolved;
   }
 
   @Nullable
+  @Override
   public PsiMethod getResolvedMethod() {
     return myResolvedMethod;
   }
 
   @Nullable
+  @Override
   public List<PsiMethod> getCheckedMethods() {
     return myCheckedMethods;
   }
 
   @Nullable
+  @Override
   public Map<ConstructorArg, PsiParameter> getResolvedArgs() {
     return myResolvedMethod == null ? null : getResolvedArgs(myResolvedMethod);
   }
 
+  @Override
   public Map<ConstructorArg, PsiParameter> getResolvedArgs(@Nonnull PsiMethod method) {
     return myResolvedArgs.get(method);
   }
 
+  @Override
   public Map<PsiParameter, Collection<SpringBaseBeanPointer>> getAutowiredParams(@Nonnull PsiMethod method) {
     return myAutowiredParams.get(method);
   }
@@ -117,7 +115,7 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     }
 
     // there is at least one candidate here
-    myCheckedMethods = new ArrayList<PsiMethod>(methods.size());
+    myCheckedMethods = new ArrayList<>(methods.size());
 
     Set<ConstructorArg> args = bean.getAllConstructorArgs();
     boolean constructorAutowire = SpringAutowireUtil.isConstructorAutowire(bean);
@@ -130,11 +128,11 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
       if (myResolvedMethod != null && params.length < myResolvedMethod.getParameterList().getParametersCount()) {
         return true;
       }
-      HashMap<ConstructorArg, PsiParameter> resolvedArgs = new HashMap<ConstructorArg, PsiParameter>(params.length);
+      Map<ConstructorArg, PsiParameter> resolvedArgs = new HashMap<>(params.length);
       myResolvedArgs.put(method, resolvedArgs);
-      HashMap<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = new HashMap<PsiParameter, Collection<SpringBaseBeanPointer>>();
+      Map<PsiParameter, Collection<SpringBaseBeanPointer>> autowiredParams = new HashMap<>();
       myAutowiredParams.put(method, autowiredParams);
-      Set<ConstructorArg> usedArgs = new HashSet<ConstructorArg>(args.size());
+      Set<ConstructorArg> usedArgs = new HashSet<>(args.size());
       int autowired = 0;
       for (int i = 0; i < params.length; i++) {
         PsiParameter param = params[i];
@@ -167,15 +165,15 @@ class ResolvedConstructorArgsImpl implements ResolvedConstructorArgs {
     List<ConstructorArg> genericArgs;
 
     private int init(Set<ConstructorArg> args) {
-      indexedArgs = new HashMap<Integer, ConstructorArg>(args.size());
-      genericArgs = new ArrayList<ConstructorArg>(args.size());
+      indexedArgs = new HashMap<>(args.size());
+      genericArgs = new ArrayList<>(args.size());
 
       int minNrOfArgs = args.size();
       for (ConstructorArg arg : args) {
         Integer index = arg.getIndex().getValue();
         if (index != null) {
           indexedArgs.put(index, arg);
-          minNrOfArgs = Math.max(minNrOfArgs, index.intValue());
+          minNrOfArgs = Math.max(minNrOfArgs, index);
         }
         else {
           genericArgs.add(arg);

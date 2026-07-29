@@ -8,14 +8,15 @@ import consulo.util.lang.ComparatorUtil;
  */
 @SuppressWarnings({"AbstractClassNeverImplemented"})
 public abstract class ReplacedMethodImpl implements ReplacedMethod {
+    @Override
+    public int hashCode() {
+        String value = getName().getStringValue();
+        return value == null ? 0 : value.hashCode();
+    }
 
-  public int hashCode() {
-    String value = getName().getStringValue();
-    return value == null ? 0 : value.hashCode();
-  }
-
-  public boolean equals(Object obj) {
-    return obj instanceof ReplacedMethod &&
-           ComparatorUtil.equalsNullable(getName().getStringValue(), ((ReplacedMethod)obj).getName().getStringValue());
-  }
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ReplacedMethod replacedMethod
+            && ComparatorUtil.equalsNullable(getName().getStringValue(), replacedMethod.getName().getStringValue());
+    }
 }
