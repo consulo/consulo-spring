@@ -3,16 +3,16 @@
   "project" : "consulo-spring",
   "projectVersion" : "master",
   "sourceLocale" : "en-US",
-  "generatedAt" : "2026-07-24T17:04:48.835694516Z",
+  "generatedAt" : "2026-10-12T16:24:32.110108666Z",
   "documents" : {
     "consulo.aop.AopLocalize" : {
       "source" : {
-        "sig" : "26e1f70df4ac2abada6e02fecd55acdf"
+        "sig" : "4200f94bf92f2cfc481364b27e67b0d4"
       }
     },
     "consulo.spring.SpringLocalize" : {
       "source" : {
-        "sig" : "ec03122061465fc2c35b347faaec2d2b"
+        "sig" : "afc1efa4de76365c8c91231e24466e70"
       }
     }
   }
