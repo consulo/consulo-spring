@@ -1,7 +1,6 @@
 package com.intellij.spring.impl.ide.model.highlighting;
 
 import com.intellij.spring.impl.ide.SpringManager;
-import com.intellij.spring.impl.ide.facet.FileSetEditor;
 import com.intellij.spring.impl.ide.facet.SpringFileSet;
 import com.intellij.spring.impl.ide.facet.XmlSpringFileSet;
 import com.intellij.spring.impl.ide.model.xml.beans.Beans;
@@ -29,7 +28,9 @@ import consulo.module.content.layer.ModifiableRootModel;
 import consulo.project.Project;
 import consulo.spring.impl.module.extension.SpringModuleExtension;
 import consulo.spring.impl.module.extension.SpringMutableModuleExtension;
+import consulo.spring.impl.module.extension.ui.SpringFileSetEditorDialogDescriptor;
 import consulo.spring.localize.SpringLocalize;
+import consulo.ui.UIAccess;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.ex.popup.BaseListPopupStep;
 import consulo.ui.ex.popup.JBPopupFactory;
@@ -266,11 +267,19 @@ public class SpringExtensionInspection extends SpringBeanInspectionBase<SpringEx
         @RequiredUIAccess
         protected void editSet(Module module, Set<SpringFileSet> sets, SpringFileSet set) {
             set.addFile(myVirtualFile);
-            FileSetEditor editor = new FileSetEditor(myModule, set, sets);
-            editor.show();
-            if (editor.isOK()) {
-                modifyExtensionOnce(module, it -> it.getFileSets().add(editor.getEditedFileSet().cloneTo(it)));
-            }
+
+            UIAccess uiAccess = UIAccess.current();
+            SpringFileSetEditorDialogDescriptor.showAsync(null, myModule, set, sets).whenCompleteAsync((edited, error) -> {
+                if (error != null || edited == null || module.isDisposed()) {
+                    return;
+                }
+
+                modifyExtensionOnce(module, it -> it.getFileSets().add(edited.cloneTo(it)));
+
+                Project project = module.getProject();
+                DomElementAnnotationsManager.getInstance(project).dropAnnotationsCache();
+                DaemonCodeAnalyzer.getInstance(project).restart();
+            }, uiAccess);
         }
 
         @Nonnull

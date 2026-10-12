@@ -22,7 +22,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
   private static final String ID_PREFIX = "fileset";
   private boolean myAutodetected;
 
-  public static String getUniqueId(Set<SpringFileSet> list) {
+  public static String getUniqueId(Collection<SpringFileSet> list) {
     int index = 0;
     for (SpringFileSet fileSet : list) {
       if (fileSet.getId().startsWith(ID_PREFIX)) {
@@ -39,7 +39,7 @@ public abstract class SpringFileSet implements ElementsChooser.ElementProperties
     return ID_PREFIX + (index + 1);
   }
 
-  public static String getUniqueName(String prefix, Set<SpringFileSet> list) {
+  public static String getUniqueName(String prefix, Collection<SpringFileSet> list) {
     int index = 0;
     for (SpringFileSet fileSet : list) {
       if (fileSet.getName().startsWith(prefix)) {

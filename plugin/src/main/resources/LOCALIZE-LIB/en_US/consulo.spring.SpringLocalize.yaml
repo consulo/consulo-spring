@@ -94,6 +94,8 @@ config.fileset.autodetected:
     text: (autodetected)
 config.fileset.editor.title:
     text: Edit File Set
+config.fileset.search.progress:
+    text: Searching for Spring configuration files...
 config.input.fileset:
     text: 'Fileset &name:'
 config.input.fileset.title:

@@ -9,8 +9,10 @@ import com.intellij.spring.impl.ide.model.xml.DomSpringBean;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringBaseBeanPointer;
 import consulo.fileEditor.structureView.StructureViewTreeElement;
 import consulo.fileEditor.structureView.tree.TreeElement;
+import consulo.localize.LocalizeValue;
 import consulo.navigation.ItemPresentation;
 import consulo.spring.impl.icon.SpringImplIconGroup;
+import consulo.spring.localize.SpringLocalize;
 import consulo.ui.image.Image;
 import consulo.xml.ide.structureView.impl.xml.XmlTagTreeElement;
 import consulo.xml.language.psi.XmlDocument;
@@ -102,8 +104,8 @@ public class SpringModelTreeElement implements StructureViewTreeElement, ItemPre
   }
 
   @Override
-  public String getPresentableText() {
-    return SpringBundle.message("spring.beans");
+  public LocalizeValue getPresentableText() {
+    return SpringLocalize.springBeans();
   }
 
   @Override

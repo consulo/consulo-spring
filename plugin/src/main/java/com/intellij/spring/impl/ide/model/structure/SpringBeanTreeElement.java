@@ -10,6 +10,7 @@ import com.intellij.spring.impl.ide.model.xml.beans.ConstructorArg;
 import com.intellij.spring.impl.ide.model.xml.beans.SpringPropertyDefinition;
 import consulo.fileEditor.structureView.StructureViewTreeElement;
 import consulo.fileEditor.structureView.tree.TreeElement;
+import consulo.localize.LocalizeValue;
 import consulo.navigation.ItemPresentation;
 import consulo.ui.image.Image;
 import consulo.util.lang.StringUtil;
@@ -46,8 +47,8 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
     return this;
   }
 
-  public String getPresentableText() {
-    if (!myBean.isValid()) return "";
+  public LocalizeValue getPresentableText() {
+    if (!myBean.isValid()) return LocalizeValue.empty();
 
     String name = myBean.getBeanName();
     PsiClass[] psiClass = getPsiClasses();
@@ -64,7 +65,7 @@ public class SpringBeanTreeElement implements StructureViewTreeElement, ItemPres
         name += ": " + psiClassName;
       }
     }
-    return name;
+    return LocalizeValue.ofNullable(name);
   }
 
   private PsiClass[] getPsiClasses() {

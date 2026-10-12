@@ -1,23 +1,19 @@
 package consulo.spring.impl.module.extension;
 
-import com.intellij.spring.impl.ide.facet.SpringConfigurationTab;
 import consulo.disposer.Disposable;
 import consulo.module.content.layer.ModuleRootLayer;
-import consulo.module.extension.swing.SwingMutableModuleExtension;
+import consulo.spring.impl.module.extension.ui.SpringModuleExtensionPanel;
 import consulo.ui.Component;
-import consulo.ui.Label;
 import consulo.ui.annotation.RequiredUIAccess;
-import consulo.ui.layout.VerticalLayout;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import javax.swing.*;
 
 /**
  * @author VISTALL
  * @since 14-Jan-17
  */
-public class SpringMutableModuleExtensionImpl extends SpringModuleExtensionImpl implements SpringMutableModuleExtension, SwingMutableModuleExtension {
+public class SpringMutableModuleExtensionImpl extends SpringModuleExtensionImpl implements SpringMutableModuleExtension {
   public SpringMutableModuleExtensionImpl(@Nonnull String id, @Nonnull ModuleRootLayer moduleRootLayer) {
     super(id, moduleRootLayer);
   }
@@ -25,16 +21,8 @@ public class SpringMutableModuleExtensionImpl extends SpringModuleExtensionImpl 
   @RequiredUIAccess
   @Nullable
   @Override
-  public JComponent createConfigurablePanel(@Nonnull Disposable disposable, @Nonnull Runnable runnable) {
-    SpringConfigurationTab tab = new SpringConfigurationTab(this);
-    return tab.createComponent();
-  }
-
-  @RequiredUIAccess
-  @Nullable
-  @Override
   public Component createConfigurationComponent(@Nonnull Disposable disposable, @Nonnull Runnable runnable) {
-    return VerticalLayout.create().add(Label.create("Unsupported platform"));
+    return SpringModuleExtensionPanel.create(this, disposable);
   }
 
   @Override

@@ -10,6 +10,7 @@ import com.intellij.spring.impl.ide.model.xml.beans.SpringValueHolderDefinition;
 import consulo.application.AllIcons;
 import consulo.fileEditor.structureView.StructureViewTreeElement;
 import consulo.fileEditor.structureView.tree.TreeElement;
+import consulo.localize.LocalizeValue;
 import consulo.navigation.ItemPresentation;
 import consulo.ui.image.Image;
 import consulo.xml.dom.DomElementNavigationProvider;
@@ -25,7 +26,7 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
 
   private final SpringValueHolderDefinition myInjection;
   @NonNls
-  private static final String CONSTRUCTOR_ARG = "constructor-arg";
+  private static final LocalizeValue CONSTRUCTOR_ARG = LocalizeValue.of("constructor-arg");
   @NonNls
   private static final String PROPERTY_TAG = "property";
 
@@ -41,7 +42,7 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
     return this;
   }
 
-  public String getPresentableText() {
+  public LocalizeValue getPresentableText() {
     if (isConstructorArg()) {
       return CONSTRUCTOR_ARG;
     }
@@ -53,7 +54,7 @@ public class SpringInjectionTreeElement implements StructureViewTreeElement, Ite
       if (type != null) {
         propertyName += ": " + type.getCanonicalText();
       }
-      return propertyName;
+      return LocalizeValue.ofNullable(propertyName);
     }
   }
 

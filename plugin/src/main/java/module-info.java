@@ -158,6 +158,7 @@ open module com.intellij.spring {
     exports consulo.spring.impl.icon;
     exports consulo.spring.impl.model;
     exports consulo.spring.impl.module.extension;
+    exports consulo.spring.impl.module.extension.ui;
     exports consulo.spring.impl.toolWindow;
     exports consulo.spring.impl.toolWindow.tree.node;
 }
