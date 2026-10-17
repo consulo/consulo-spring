@@ -2,6 +2,7 @@ package com.intellij.spring.impl.ide.java.providers;
 
 import com.intellij.aop.jam.AopConstants;
 import com.intellij.java.language.codeInsight.AnnotationUtil;
+import com.intellij.java.language.psi.PsiAnnotation;
 import com.intellij.java.language.psi.PsiClass;
 import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiModifierListOwner;
@@ -11,6 +12,7 @@ import com.intellij.spring.impl.ide.model.SpringUtils;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.language.editor.ImplicitUsageProvider;
 import consulo.language.psi.PsiElement;
+import consulo.spring.impl.web.endpoint.SpringRequestMappingSearch;
 
 import java.util.List;
 
@@ -36,13 +38,25 @@ public class SpringImplicitUsageProvider implements ImplicitUsageProvider {
 
   @Override
   public boolean isImplicitUsage(PsiElement element) {
-    return isImplicitWrite(element) || isBeanConstructor(element);
+    return isImplicitWrite(element) || isBeanConstructor(element) || isRequestHandler(element);
   }
 
   @Override
   public boolean isImplicitWrite(PsiElement element) {
     return element instanceof PsiModifierListOwner &&
       AnnotationUtil.isAnnotated((PsiModifierListOwner)element, WUSED_SYMBOL_ANNOTATIONS, 0);
+  }
+
+  private static boolean isRequestHandler(PsiElement element) {
+    if (!(element instanceof PsiMethod method)) {
+      return false;
+    }
+    for (PsiAnnotation annotation : method.getModifierList().getAnnotations()) {
+      if (SpringRequestMappingSearch.isMappingAnnotation(annotation)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static boolean isBeanConstructor(PsiElement element) {

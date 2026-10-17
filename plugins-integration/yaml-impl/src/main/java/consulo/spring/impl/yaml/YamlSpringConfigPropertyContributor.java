@@ -23,6 +23,7 @@ import org.jetbrains.yaml.YAMLUtil;
 import org.jetbrains.yaml.psi.YAMLFile;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLScalar;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -48,6 +49,11 @@ public class YamlSpringConfigPropertyContributor implements SpringConfigProperty
         if (keyValue != null) {
             results.add(keyValue);
         }
+    }
+
+    @Override
+    public @Nullable String getValue(PsiElement definition) {
+        return definition instanceof YAMLKeyValue keyValue ? keyValue.getValueText() : null;
     }
 
     @Override

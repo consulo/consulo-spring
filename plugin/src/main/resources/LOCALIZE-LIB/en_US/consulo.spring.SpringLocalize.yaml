@@ -690,6 +690,26 @@ util.schema.inspection.name:
     text: Util Schema
 warning.pointcut.should.have.id:
     text: Pointcut should have id
+web.inspection.duplicate.mapping.display.name:
+    text: Ambiguous request mappings
+web.inspection.duplicate.mapping:
+    text: "Ambiguous mapping ''{0}'': also mapped by {1}"
+web.inspection.group.name:
+    text: Spring Web
+web.inspection.mapping.conflict.display.name:
+    text: Several request mapping annotations on one element
+web.inspection.mapping.conflict.remove.fix:
+    text: "Remove ''{0}''"
+web.inspection.mapping.conflict:
+    text: "Only the first request mapping annotation, ''{0}'', is used"
+web.inspection.path.variable.add.fix:
+    text: "Add @PathVariable parameter ''{0}''"
+web.inspection.path.variable.display.name:
+    text: URI template variables and @PathVariable parameters
+web.inspection.path.variable.missing:
+    text: "URI template variable ''{0}'' is not bound to a @PathVariable parameter"
+web.inspection.path.variable.unmatched:
+    text: "Cannot find URI template variable ''{0}'' in the request mapping"
 xml.schema.update.is.required:
     text: XML schema update is required
 xml.schema.will.be.updated:

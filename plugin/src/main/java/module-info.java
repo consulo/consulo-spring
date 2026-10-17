@@ -17,6 +17,7 @@ open module com.intellij.spring {
     requires consulo.datacontext.api;
     requires consulo.disposer.api;
     requires consulo.document.api;
+    requires consulo.endpoint.api;
     requires consulo.execution.api;
     requires consulo.file.chooser.api;
     requires consulo.file.editor.api;

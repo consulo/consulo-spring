@@ -21,6 +21,7 @@ import consulo.component.extension.ExtensionPointName;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.module.Module;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -52,6 +53,13 @@ public interface SpringConfigPropertyContributor {
      * Collect all property keys defined inside a single config file PSI tree.
      */
     void collectKeys(PsiFile psiFile, List<String> keys);
+
+    /**
+     * Returns the value text of a definition previously returned by {@link #resolveKey}.
+     */
+    default @Nullable String getValue(PsiElement definition) {
+        return null;
+    }
 
     /**
      * Optionally contribute property metadata loaded from elsewhere
