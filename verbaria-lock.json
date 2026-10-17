@@ -3,7 +3,7 @@
   "project" : "consulo-spring",
   "projectVersion" : "master",
   "sourceLocale" : "en-US",
-  "generatedAt" : "2026-10-12T16:24:32.110108666Z",
+  "generatedAt" : "2026-10-17T22:21:50.785328683Z",
   "documents" : {
     "consulo.aop.AopLocalize" : {
       "source" : {
@@ -12,7 +12,7 @@
     },
     "consulo.spring.SpringLocalize" : {
       "source" : {
-        "sig" : "afc1efa4de76365c8c91231e24466e70"
+        "sig" : "e28f260fe55f9feb34cf0861962f5f4c"
       }
     }
   }
