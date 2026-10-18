@@ -8,6 +8,7 @@ import com.intellij.java.language.psi.PsiMethod;
 import com.intellij.java.language.psi.PsiModifierList;
 import com.intellij.java.language.psi.PsiModifierListOwner;
 import consulo.annotation.access.RequiredReadAction;
+import consulo.language.psi.PsiElement;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
@@ -21,23 +22,41 @@ public final class SpringRequestMapping {
     private static final String SHORT_DEPRECATED = "Deprecated";
 
     private final PsiMethod myMethod;
-    private final PsiAnnotation myAnnotation;
+    private final @Nullable PsiAnnotation myAnnotation;
+    private final PsiElement myDeclaration;
     private final String myPath;
     private final @Nullable String myHttpMethod;
 
     public SpringRequestMapping(PsiMethod method, PsiAnnotation annotation, String path, @Nullable String httpMethod) {
+        this(method, annotation, annotation, path, httpMethod);
+    }
+
+    private SpringRequestMapping(PsiMethod method, @Nullable PsiAnnotation annotation, PsiElement declaration, String path, @Nullable String httpMethod) {
         myMethod = method;
         myAnnotation = annotation;
+        myDeclaration = declaration;
         myPath = path;
         myHttpMethod = httpMethod;
+    }
+
+    public static SpringRequestMapping route(PsiMethod handler, PsiElement declaration, String path, @Nullable String httpMethod) {
+        return new SpringRequestMapping(handler, null, declaration, path, httpMethod);
     }
 
     public PsiMethod getMethod() {
         return myMethod;
     }
 
-    public PsiAnnotation getAnnotation() {
+    public @Nullable PsiAnnotation getAnnotation() {
         return myAnnotation;
+    }
+
+    public PsiElement getDeclaration() {
+        return myDeclaration;
+    }
+
+    public boolean isRoute() {
+        return myAnnotation == null;
     }
 
     public String getPath() {
@@ -50,7 +69,7 @@ public final class SpringRequestMapping {
 
     @RequiredReadAction
     public boolean isValid() {
-        return myMethod.isValid() && myAnnotation.isValid();
+        return myMethod.isValid() && myDeclaration.isValid();
     }
 
     @RequiredReadAction
@@ -92,6 +111,7 @@ public final class SpringRequestMapping {
             return false;
         }
         return myMethod.equals(that.myMethod)
+            && myDeclaration.equals(that.myDeclaration)
             && myPath.equals(that.myPath)
             && Objects.equals(myHttpMethod, that.myHttpMethod);
     }

@@ -1,0 +1,5 @@
+<consulo-plugin-requires>
+    <plugins>
+        <plugin>consulo.graphql</plugin>
+    </plugins>
+</consulo-plugin-requires>

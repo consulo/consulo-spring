@@ -4,6 +4,7 @@ import com.intellij.java.analysis.impl.codeInspection.BaseJavaLocalInspectionToo
 import com.intellij.java.language.psi.JavaElementVisitor;
 import com.intellij.java.language.psi.PsiAnnotation;
 import com.intellij.java.language.psi.PsiClass;
+import com.intellij.java.language.psi.PsiJavaCodeReferenceElement;
 import com.intellij.java.language.psi.PsiMethod;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
@@ -78,8 +79,12 @@ public final class SpringDuplicateMappingInspection extends BaseJavaLocalInspect
                 continue;
             }
             PsiAnnotation annotation = mapping.getAnnotation();
+            if (annotation == null) {
+                continue;
+            }
+            PsiJavaCodeReferenceElement reference = annotation.getNameReferenceElement();
             holder.newProblem(SpringLocalize.webInspectionDuplicateMapping(presentation, String.join(", ", others)))
-                .range(annotation.getNameReferenceElement() != null ? annotation.getNameReferenceElement() : annotation)
+                .range(reference != null ? reference : annotation)
                 .create();
         }
     }

@@ -16,6 +16,7 @@
   <depends optional="true">org.jetbrains.idea.maven</depends>
   <depends optional="true">org.jetbrains.plugins.yaml</depends>
   <depends optional="true">consulo.json</depends>
+  <depends optional="true">consulo.graphql</depends>
 
   <tags>
     <tag>software.framework</tag>

@@ -43,6 +43,11 @@ public abstract class SpringEndpointProviderBase<E> implements EndpointUrlTarget
 
     protected abstract SpringRequestMapping getMapping(E endpoint);
 
+    @RequiredReadAction
+    protected boolean isApplicable(@Nullable Module module) {
+        return hasSpring(module);
+    }
+
     @Override
     public Status getStatus() {
         return ModuleExtensionHelper.getInstance(myProject).hasModuleExtension(SpringModuleExtension.class)
@@ -54,7 +59,7 @@ public abstract class SpringEndpointProviderBase<E> implements EndpointUrlTarget
     @RequiredReadAction
     public Iterable<PsiClass> getEndpointGroups(EndpointFilter filter) {
         if (filter instanceof ModuleEndpointFilter moduleFilter) {
-            if (!hasSpring(moduleFilter.getModule())) {
+            if (!isApplicable(moduleFilter.getModule())) {
                 return List.of();
             }
             GlobalSearchScope scope = moduleFilter.isFromLibraries()
@@ -65,7 +70,7 @@ public abstract class SpringEndpointProviderBase<E> implements EndpointUrlTarget
         if (filter instanceof SearchScopeEndpointFilter scopeFilter) {
             List<PsiClass> result = new ArrayList<>();
             for (PsiClass group : findGroups(scopeFilter.getContentSearchScope())) {
-                if (hasSpring(ModuleUtilCore.findModuleForPsiElement(group))) {
+                if (isApplicable(ModuleUtilCore.findModuleForPsiElement(group))) {
                     result.add(group);
                 }
             }
@@ -118,6 +123,12 @@ public abstract class SpringEndpointProviderBase<E> implements EndpointUrlTarget
     @Override
     public @Nullable PsiElement getDocumentationElement(PsiClass group, E endpoint) {
         return getMapping(endpoint).getMethod();
+    }
+
+    @Override
+    public @Nullable PsiElement getNavigationElement(PsiClass group, E endpoint) {
+        SpringRequestMapping mapping = getMapping(endpoint);
+        return mapping.isRoute() ? mapping.getDeclaration() : mapping.getMethod();
     }
 
     public static boolean hasSpring(@Nullable Module module) {

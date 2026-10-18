@@ -23,6 +23,9 @@ import java.util.List;
  * @since 2026-10-17
  */
 public final class SpringMvcUrlResolver extends HttpUrlResolver {
+    private static final List<String> ROUTER_FUNCTION_TYPES =
+        List.of(SpringWebConstants.MVC_ROUTER_FUNCTION, SpringWebConstants.WEBFLUX_ROUTER_FUNCTION);
+
     private final Project myProject;
 
     public SpringMvcUrlResolver(Project project) {
@@ -69,9 +72,17 @@ public final class SpringMvcUrlResolver extends HttpUrlResolver {
             if (!SpringEndpointProviderBase.hasSpring(module)) {
                 continue;
             }
-            for (PsiClass controller : SpringRequestMappingSearch.findControllers(project, GlobalSearchScope.moduleScope(module))) {
+            GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
+            for (PsiClass controller : SpringRequestMappingSearch.findControllers(project, scope)) {
                 for (SpringRequestMapping mapping : SpringRequestMappingSearch.findMappings(controller)) {
                     result.add(SpringMvcUrlTargetInfo.create(mapping));
+                }
+            }
+            for (String routerFunctionType : ROUTER_FUNCTION_TYPES) {
+                for (PsiClass routerClass : SpringFunctionalRouteSearch.findRouterClasses(project, scope, routerFunctionType)) {
+                    for (SpringRequestMapping mapping : SpringFunctionalRouteSearch.findRoutes(routerClass, routerFunctionType)) {
+                        result.add(SpringMvcUrlTargetInfo.create(mapping));
+                    }
                 }
             }
         }

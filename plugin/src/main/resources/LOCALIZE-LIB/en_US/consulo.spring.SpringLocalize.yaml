@@ -690,6 +690,8 @@ util.schema.inspection.name:
     text: Util Schema
 warning.pointcut.should.have.id:
     text: Pointcut should have id
+web.action.copy.url.text:
+    text: Copy URL
 web.inspection.duplicate.mapping.display.name:
     text: Ambiguous request mappings
 web.inspection.duplicate.mapping:

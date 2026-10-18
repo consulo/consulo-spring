@@ -333,7 +333,7 @@ public final class SpringRequestMappingSearch {
         if (metaInfo == null) {
             return null;
         }
-        return new SpringMappingInfo(readPaths(annotation, metaInfo.paths()), metaInfo.methods());
+        return new SpringMappingInfo(readPaths(annotation, pathAttributes(annotationClass), metaInfo.paths()), metaInfo.methods());
     }
 
     @RequiredReadAction
@@ -355,6 +355,26 @@ public final class SpringRequestMappingSearch {
             }
         }
         return null;
+    }
+
+    @RequiredReadAction
+    private static String[] pathAttributes(PsiClass annotationClass) {
+        List<String> result = new ArrayList<>(List.of(PATH_ATTRIBUTES));
+        for (PsiMethod attribute : annotationClass.getMethods()) {
+            PsiAnnotation alias = attribute.getModifierList().findAnnotation(SpringWebConstants.ALIAS_FOR);
+            if (alias == null) {
+                continue;
+            }
+            List<String> target = readStrings(alias, "attribute");
+            if (target.isEmpty()) {
+                target = readStrings(alias, "value");
+            }
+            String targetName = target.isEmpty() ? attribute.getName() : target.get(0);
+            if (("path".equals(targetName) || "value".equals(targetName)) && !result.contains(attribute.getName())) {
+                result.add(attribute.getName());
+            }
+        }
+        return result.toArray(String[]::new);
     }
 
     @RequiredReadAction
@@ -404,6 +424,11 @@ public final class SpringRequestMappingSearch {
     @RequiredReadAction
     private static @Nullable String evaluateString(PsiAnnotationMemberValue value) {
         return evaluateString(value, 0);
+    }
+
+    @RequiredReadAction
+    static @Nullable String evaluateText(PsiExpression expression) {
+        return evaluateString(expression, 0);
     }
 
     @RequiredReadAction
@@ -486,7 +511,7 @@ public final class SpringRequestMappingSearch {
         });
     }
 
-    private static String collapseSlashes(String path) {
+    static String collapseSlashes(String path) {
         return path.indexOf("//") < 0 ? path : path.replaceAll("/{2,}", "/");
     }
 

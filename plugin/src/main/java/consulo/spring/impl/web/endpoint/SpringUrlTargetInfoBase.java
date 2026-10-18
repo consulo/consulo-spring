@@ -31,7 +31,7 @@ public abstract class SpringUrlTargetInfoBase implements UrlTargetInfo {
     private final boolean myDeprecated;
     private final String mySource;
     private final SmartPsiElementPointer<PsiMethod> myPointer;
-    private final SmartPsiElementPointer<PsiAnnotation> myAnnotationPointer;
+    private final @Nullable SmartPsiElementPointer<PsiAnnotation> myAnnotationPointer;
     private final List<SpringQueryParameter> myQueryParameters;
     private final Set<String> myContentTypes;
 
@@ -55,7 +55,8 @@ public abstract class SpringUrlTargetInfoBase implements UrlTargetInfo {
         myDeprecated = mapping.isDeprecated();
         mySource = (containingClass == null ? "" : String.valueOf(containingClass.getName())) + "." + method.getName();
         myPointer = SmartPointerManager.createPointer(method);
-        myAnnotationPointer = SmartPointerManager.createPointer(mapping.getAnnotation());
+        PsiAnnotation annotation = mapping.getAnnotation();
+        myAnnotationPointer = annotation == null ? null : SmartPointerManager.createPointer(annotation);
         myQueryParameters = queryParameters;
         myContentTypes = contentTypes;
     }
@@ -63,8 +64,12 @@ public abstract class SpringUrlTargetInfoBase implements UrlTargetInfo {
     @RequiredReadAction
     protected static Set<String> readContentTypes(SpringRequestMapping mapping, String... attributes) {
         Set<String> result = new LinkedHashSet<>();
+        PsiAnnotation annotation = mapping.getAnnotation();
+        if (annotation == null) {
+            return result;
+        }
         for (String attribute : attributes) {
-            result.addAll(SpringRequestMappingSearch.readStrings(mapping.getAnnotation(), attribute));
+            result.addAll(SpringRequestMappingSearch.readStrings(annotation, attribute));
         }
         return result;
     }
@@ -76,7 +81,7 @@ public abstract class SpringUrlTargetInfoBase implements UrlTargetInfo {
     }
 
     public @Nullable PsiAnnotation getAnnotation() {
-        return myAnnotationPointer.getElement();
+        return myAnnotationPointer == null ? null : myAnnotationPointer.getElement();
     }
 
     @Override

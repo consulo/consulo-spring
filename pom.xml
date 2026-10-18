@@ -52,6 +52,7 @@
         <module>plugins-integration/maven-impl</module>
         <module>plugins-integration/json-impl</module>
         <module>plugins-integration/yaml-impl</module>
+        <module>plugins-integration/graphql-impl</module>
 
         <module>plugin</module>
     </modules>

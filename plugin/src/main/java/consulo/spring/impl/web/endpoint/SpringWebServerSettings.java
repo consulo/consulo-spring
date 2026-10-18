@@ -4,6 +4,7 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.CachedValueProvider;
 import consulo.application.util.CachedValuesManager;
 import consulo.module.Module;
+import consulo.module.ModuleManager;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -11,16 +12,18 @@ import org.jspecify.annotations.Nullable;
  * @since 2026-10-17
  */
 public final class SpringWebServerSettings {
-    public static final SpringWebServerSettings DEFAULT = new SpringWebServerSettings(SpringWebConstants.DEFAULT_PORT, "", "");
+    public static final SpringWebServerSettings DEFAULT = new SpringWebServerSettings(SpringWebConstants.DEFAULT_PORT, "", "", false);
 
     private final int myPort;
     private final String myContextPath;
     private final String myServletPath;
+    private final boolean myExplicit;
 
-    private SpringWebServerSettings(int port, String contextPath, String servletPath) {
+    private SpringWebServerSettings(int port, String contextPath, String servletPath, boolean explicit) {
         myPort = port;
         myContextPath = contextPath;
         myServletPath = servletPath;
+        myExplicit = explicit;
     }
 
     @RequiredReadAction
@@ -49,6 +52,23 @@ public final class SpringWebServerSettings {
 
     @RequiredReadAction
     private static SpringWebServerSettings compute(Module module) {
+        SpringWebServerSettings own = computeOwn(module);
+        if (own.myExplicit) {
+            return own;
+        }
+        for (Module dependent : ModuleManager.getInstance(module.getProject()).getModuleDependentModules(module)) {
+            if (SpringEndpointProviderBase.hasSpring(dependent)) {
+                SpringWebServerSettings settings = computeOwn(dependent);
+                if (settings.myExplicit) {
+                    return settings;
+                }
+            }
+        }
+        return own;
+    }
+
+    @RequiredReadAction
+    private static SpringWebServerSettings computeOwn(Module module) {
         int port = SpringWebConstants.DEFAULT_PORT;
         String portText = SpringConfigValues.readValue(module, SpringWebConstants.SERVER_PORT);
         if (portText != null) {
@@ -58,12 +78,14 @@ public final class SpringWebServerSettings {
             catch (NumberFormatException ignored) {
             }
         }
-        String contextPath = SpringConfigValues.readValue(module, SpringWebConstants.SERVLET_CONTEXT_PATH);
-        String servletPath = SpringConfigValues.readValue(module, SpringWebConstants.MVC_SERVLET_PATH);
+        boolean reactive = SpringWebStackDetector.detect(module) == SpringWebStack.REACTIVE;
+        String contextPath = SpringConfigValues.readValue(module, reactive ? SpringWebConstants.WEBFLUX_BASE_PATH : SpringWebConstants.SERVLET_CONTEXT_PATH);
+        String servletPath = reactive ? null : SpringConfigValues.readValue(module, SpringWebConstants.MVC_SERVLET_PATH);
         return new SpringWebServerSettings(
             port,
             contextPath == null ? "" : contextPath.trim(),
-            servletPath == null ? "" : servletPath.trim()
+            servletPath == null ? "" : servletPath.trim(),
+            portText != null || contextPath != null || servletPath != null
         );
     }
 }

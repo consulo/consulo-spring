@@ -133,6 +133,11 @@
             <artifactId>com.intellij.spring-yaml.impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>com.intellij.spring-graphql.impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- platform -->
         <dependency>

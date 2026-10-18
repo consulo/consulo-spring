@@ -1,5 +1,6 @@
 package consulo.spring.impl.web.endpoint;
 
+import com.intellij.java.language.psi.PsiAnnotation;
 import com.intellij.java.language.psi.PsiClass;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.application.util.CachedValueProvider;
@@ -35,8 +36,12 @@ public final class SpringMappingIndex {
     public static String getKey(SpringRequestMapping mapping) {
         StringBuilder builder = new StringBuilder();
         builder.append(getPresentation(mapping));
+        PsiAnnotation annotation = mapping.getAnnotation();
+        if (annotation == null) {
+            return builder.toString();
+        }
         for (String attribute : CONDITION_ATTRIBUTES) {
-            TreeSet<String> values = new TreeSet<>(SpringRequestMappingSearch.readStrings(mapping.getAnnotation(), attribute));
+            TreeSet<String> values = new TreeSet<>(SpringRequestMappingSearch.readStrings(annotation, attribute));
             if (!values.isEmpty()) {
                 builder.append(' ').append(attribute).append('=').append(values);
             }

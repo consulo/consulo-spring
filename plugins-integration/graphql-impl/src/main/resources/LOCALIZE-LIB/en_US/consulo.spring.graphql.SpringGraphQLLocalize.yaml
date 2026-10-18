@@ -1,0 +1,8 @@
+gutter.navigate.to.handler.title:
+    text: Spring for GraphQL handlers
+gutter.navigate.to.handler.tooltip:
+    text: Navigate to the Spring for GraphQL handler
+gutter.navigate.to.schema.title:
+    text: GraphQL schema fields
+gutter.navigate.to.schema.tooltip:
+    text: Navigate to the GraphQL schema field
