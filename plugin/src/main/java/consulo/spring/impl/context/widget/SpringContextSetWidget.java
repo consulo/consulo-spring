@@ -4,12 +4,11 @@ import com.intellij.spring.impl.ide.SpringManager;
 import com.intellij.spring.impl.ide.SpringModel;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.dataContext.DataContext;
-import consulo.ide.impl.idea.openapi.wm.impl.status.EditorBasedStatusBarPopup;
+import consulo.fileEditor.statusBar.EditorBasedStatusBarPopup;
 import consulo.language.util.ModuleUtilCore;
 import consulo.module.Module;
 import consulo.project.Project;
 import consulo.project.event.DumbModeListener;
-import consulo.project.ui.wm.CustomStatusBarWidget;
 import consulo.project.ui.wm.StatusBarWidget;
 import consulo.project.ui.wm.StatusBarWidgetFactory;
 import consulo.ui.ex.popup.ListPopup;
@@ -21,7 +20,7 @@ import jakarta.annotation.Nullable;
  * @author VISTALL
  * @since 2024-04-28
  */
-public class SpringContextSetWidget extends EditorBasedStatusBarPopup implements CustomStatusBarWidget {
+public class SpringContextSetWidget extends EditorBasedStatusBarPopup {
   public SpringContextSetWidget(@Nonnull Project project, @Nonnull StatusBarWidgetFactory factory) {
     super(project, factory, false);
 
