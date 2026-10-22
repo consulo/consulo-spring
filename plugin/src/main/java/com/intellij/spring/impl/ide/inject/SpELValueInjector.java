@@ -35,7 +35,7 @@ import static consulo.language.pattern.StandardPatterns.string;
 public class SpELValueInjector implements ConcatenationAwareInjector {
     private static final ElementPattern<PsiLiteralExpression> VALUE_PATTERN =
         PsiJavaPatterns.literalExpression()
-            .withText(string().contains("#{"))
+            .withText(string().matches("(?s).*[#$]\\{.*"))
             .insideAnnotationParam(string().oneOf(SpringAnnotationsConstants.VALUE_ANNOTATION), "value");
 
     @Override
@@ -53,49 +53,50 @@ public class SpELValueInjector implements ConcatenationAwareInjector {
 
         // remove surrounding quotes from the literal
         String content = text.substring(1, text.length() - 1);
-        boolean hasInjection = false;
 
         int pos = 0;
-        while (pos < content.length()) {
-            int spelStart = content.indexOf("#{", pos);
-            if (spelStart < 0) {
+        while (pos < content.length() - 1) {
+            char c = content.charAt(pos);
+            if ((c != '#' && c != '$') || content.charAt(pos + 1) != '{') {
+                pos++;
+                continue;
+            }
+
+            int end = findClosingBrace(content, pos + 2);
+            if (end < 0) {
                 break;
             }
 
-            int depth = 1;
-            int i = spelStart + 2;
-            while (i < content.length() && depth > 0) {
-                char c = content.charAt(i);
-                if (c == '{') {
-                    depth++;
-                }
-                else if (c == '}') {
-                    depth--;
-                }
-                i++;
+            // #{expression} injects the expression between the braces, a property placeholder ${key:default}
+            // is SpEL syntax by itself and injects whole. Text offsets are +1 for the opening quote of the literal.
+            TextRange range = c == '#' ? new TextRange(pos + 2 + 1, end + 1) : new TextRange(pos + 1, end + 1 + 1);
+            if (!range.isEmpty()) {
+                registrar.startInjecting(SpELLanguage.INSTANCE);
+                registrar.addPlace(null, null, (PsiLanguageInjectionHost) host, range);
+                registrar.doneInjecting();
             }
 
-            if (depth == 0) {
-                // After loop: i points past the closing }
-                // Content to inject: content[spelStart+2 .. i-2] (between #{ and })
-                // Text offset: +1 for the opening quote of the Java string literal
-                int rangeStart = spelStart + 2 + 1;
-                int rangeEnd = i - 1 + 1; // i-1 is } in content, +1 for quote offset, exclusive end lands on }
+            pos = end + 1;
+        }
+    }
 
-                if (rangeStart < rangeEnd) {
-                    if (!hasInjection) {
-                        registrar.startInjecting(SpELLanguage.INSTANCE);
-                        hasInjection = true;
-                    }
-                    registrar.addPlace(null, null, (PsiLanguageInjectionHost) host, new TextRange(rangeStart, rangeEnd));
+    /**
+     * @return the index of the brace which closes the one opened right before {@code from}, or -1
+     */
+    private static int findClosingBrace(String content, int from) {
+        int depth = 1;
+        for (int i = from; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') {
+                depth++;
+            }
+            else if (c == '}') {
+                depth--;
+                if (depth == 0) {
+                    return i;
                 }
             }
-
-            pos = i;
         }
-
-        if (hasInjection) {
-            registrar.doneInjecting();
-        }
+        return -1;
     }
 }

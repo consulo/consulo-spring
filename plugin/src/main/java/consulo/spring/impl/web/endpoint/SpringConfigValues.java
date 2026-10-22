@@ -95,7 +95,7 @@ public final class SpringConfigValues {
     }
 
     @RequiredReadAction
-    private static @Nullable String getValue(Module module, PsiElement element) {
+    public static @Nullable String getValue(Module module, PsiElement element) {
         if (element instanceof IProperty property) {
             return property.getValue();
         }
