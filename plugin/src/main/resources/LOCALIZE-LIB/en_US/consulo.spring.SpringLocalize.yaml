@@ -46,6 +46,90 @@ bean.must.be.one.of.this.types:
     text: 'Bean must be one of this types: {0}'
 bean.must.be.public:
     text: Bean must be public
+beans.action.refresh:
+    text: Refresh
+beans.count:
+    text: '{0, choice, 0#no beans|1#1 bean|2#{0} beans}'
+beans.details.active:
+    text: Active
+beans.details.active.profiles:
+    text: Active profiles
+beans.details.active.profiles.default:
+    text: '{0} (spring.profiles.active is not set)'
+beans.details.aliases:
+    text: Aliases
+beans.details.beans:
+    text: Beans
+beans.details.condition:
+    text: Condition
+beans.details.config.file:
+    text: Config file
+beans.details.context:
+    text: Context
+beans.details.contexts:
+    text: Contexts
+beans.details.declared.in:
+    text: Declared in
+beans.details.dependencies:
+    text: Dependencies
+beans.details.dependency:
+    text: '{0} → {1}'
+beans.details.empty:
+    text: Select a bean, profile or module to see its details
+beans.details.kind:
+    text: Kind
+beans.details.lazy:
+    text: Lazy
+beans.details.loading:
+    text: Loading...
+beans.details.module:
+    text: Module
+beans.details.name:
+    text: Name
+beans.details.no:
+    text: 'No'
+beans.details.no.candidates:
+    text: no matching bean
+beans.details.none:
+    text: None
+beans.details.primary:
+    text: Primary
+beans.details.profiles:
+    text: Profiles
+beans.details.profiles.inactive:
+    text: '{0} (not active)'
+beans.details.scope:
+    text: Scope
+beans.details.type:
+    text: Type
+beans.details.yes:
+    text: 'Yes'
+beans.kind.bean.method:
+    text: '@Bean methods'
+beans.kind.component:
+    text: Components
+beans.kind.configuration:
+    text: Configurations
+beans.kind.controller:
+    text: Controllers
+beans.kind.other:
+    text: Other
+beans.kind.repository:
+    text: Repositories
+beans.kind.service:
+    text: Services
+beans.kind.xml:
+    text: XML beans
+beans.location:
+    text: '{0} / {1}'
+beans.profile.active.mark:
+    text: active
+beans.profiles:
+    text: Profiles
+beans.profiles.active:
+    text: 'active: {0}'
+beans.search.everywhere.group:
+    text: Beans
 cannot.autowire.bean.of.type:
     text: Could not autowire. Bean should be of ''{0}'' type
 cannot.create.spring.context.file:

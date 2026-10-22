@@ -45,6 +45,7 @@ open module com.intellij.spring {
     requires consulo.project.content.api;
     requires consulo.project.ui.api;
     requires consulo.project.ui.view.api;
+    requires consulo.search.everywhere.api;
 
     requires consulo.ui.api;
     requires consulo.ui.ex.api;
@@ -161,5 +162,5 @@ open module com.intellij.spring {
     exports consulo.spring.impl.module.extension;
     exports consulo.spring.impl.module.extension.ui;
     exports consulo.spring.impl.toolWindow;
-    exports consulo.spring.impl.toolWindow.tree.node;
+    exports consulo.spring.impl.beans;
 }

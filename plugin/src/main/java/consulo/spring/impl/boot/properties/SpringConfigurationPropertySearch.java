@@ -151,7 +151,7 @@ public class SpringConfigurationPropertySearch {
         return keys;
     }
 
-    private List<VirtualFile> findConfigFiles(Module module) {
+    public List<VirtualFile> findConfigFiles(Module module) {
         List<VirtualFile> files = new ArrayList<>();
         VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
 
