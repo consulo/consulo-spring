@@ -1,0 +1,9 @@
+SpELFile: Placeholder.spel
+  SpELPropertyPlaceholderImpl(PROPERTY_PLACEHOLDER)
+    PsiElement(${)('${')
+    SpELPlaceholderKeyImpl(PLACEHOLDER_KEY)
+      PsiElement(PLACEHOLDER_CONTENT)('backoffice.versions.read-timeout-ms')
+    PsiElement(:)(':')
+    SpELPlaceholderDefaultValueImpl(PLACEHOLDER_DEFAULT_VALUE)
+      PsiElement(PLACEHOLDER_CONTENT)('10000')
+    PsiElement(})('}')

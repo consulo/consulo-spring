@@ -1,0 +1,6 @@
+SpELFile: PlaceholderKeyword.spel
+  SpELPropertyPlaceholderImpl(PROPERTY_PLACEHOLDER)
+    PsiElement(${)('${')
+    SpELPlaceholderKeyImpl(PLACEHOLDER_KEY)
+      PsiElement(PLACEHOLDER_CONTENT)('app.not.true')
+    PsiElement(})('}')
