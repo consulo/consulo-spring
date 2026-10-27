@@ -117,6 +117,31 @@ public class SpELParsingTest extends SimpleParsingTest<Object> {
         doTest(context, null);
     }
 
+    @Test
+    public void testPlaceholder(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    @Test
+    public void testPlaceholderNestedDefault(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    @Test
+    public void testPlaceholderKeyword(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    @Test
+    public void testPlaceholderInString(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    @Test
+    public void testPlaceholderInTernary(Context context) throws Exception {
+        doTest(context, null);
+    }
+
     @Override
     protected LanguageFileType getFileType(Context context, @Nullable Object o) {
         return SpELFileType.INSTANCE;

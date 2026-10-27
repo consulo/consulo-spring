@@ -38,7 +38,7 @@ public class SpELLexer extends DelegateLexer {
         Map.entry("T", SpELTokenTypes.T_KEYWORD)
     );
 
-    private static final TokenSet MERGE_TOKENS = TokenSet.create(SpELTokenTypes.STRING_LITERAL);
+    private static final TokenSet MERGE_TOKENS = TokenSet.create(SpELTokenTypes.STRING_LITERAL, SpELTokenTypes.PLACEHOLDER_CONTENT);
 
     public SpELLexer() {
         super(new MergingLexerAdapter(new _SpELLexer(), MERGE_TOKENS));

@@ -32,6 +32,11 @@ import consulo.spring.spel.language.SpELTokenTypes;
 %eof{  return;
 %eof}
 
+%{
+    // nesting of ${...} inside a placeholder default value, like ${a:${b:1}}
+    private int myDefaultDepth;
+%}
+
 %state STRING
 %state PLACEHOLDER
 %state PLACEHOLDER_DEFAULT
@@ -120,27 +125,29 @@ IDENTIFIER_PART=[a-zA-Z0-9_$]
 // Standalone placeholder: ${key.name:default} at top level
 <PLACEHOLDER> {
     "}"                                     { yybegin(YYINITIAL); return SpELTokenTypes.RBRACE; }
-    ":"                                     { yybegin(PLACEHOLDER_DEFAULT); return SpELTokenTypes.COLON; }
-    "."                                     { return SpELTokenTypes.DOT; }
-    {LETTER} {IDENTIFIER_PART}*             { return SpELTokenTypes.IDENTIFIER; }
-    [^}:.a-zA-Z_$]+                         { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    ":"                                     { myDefaultDepth = 0; yybegin(PLACEHOLDER_DEFAULT); return SpELTokenTypes.COLON; }
+    // the whole key is one token: property names may hold '-', '[0]' or words which are SpEL keywords
+    [^}:]+                                  { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
 }
 
 <PLACEHOLDER_DEFAULT> {
-    "}"                                     { yybegin(YYINITIAL); return SpELTokenTypes.RBRACE; }
-    [^}]+                                   { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "${"                                    { myDefaultDepth++; return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "}"                                     { if (myDefaultDepth > 0) { myDefaultDepth--; return SpELTokenTypes.PLACEHOLDER_CONTENT; } yybegin(YYINITIAL); return SpELTokenTypes.RBRACE; }
+    [^}$]+                                  { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "$"                                     { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
 }
 
 // Placeholder inside a string: ${key.name:default} returns to STRING on }
 <STR_PLACEHOLDER> {
     "}"                                     { yybegin(STRING); return SpELTokenTypes.RBRACE; }
-    ":"                                     { yybegin(STR_PLACEHOLDER_DEFAULT); return SpELTokenTypes.COLON; }
-    "."                                     { return SpELTokenTypes.DOT; }
-    {LETTER} {IDENTIFIER_PART}*             { return SpELTokenTypes.IDENTIFIER; }
-    [^}:.a-zA-Z_$]+                         { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    ":"                                     { myDefaultDepth = 0; yybegin(STR_PLACEHOLDER_DEFAULT); return SpELTokenTypes.COLON; }
+    [^}:']+                                 { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "'"                                     { yybegin(YYINITIAL); return SpELTokenTypes.STRING_LITERAL; }
 }
 
 <STR_PLACEHOLDER_DEFAULT> {
-    "}"                                     { yybegin(STRING); return SpELTokenTypes.RBRACE; }
-    [^}]+                                   { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "${"                                    { myDefaultDepth++; return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "}"                                     { if (myDefaultDepth > 0) { myDefaultDepth--; return SpELTokenTypes.PLACEHOLDER_CONTENT; } yybegin(STRING); return SpELTokenTypes.RBRACE; }
+    [^}$]+                                  { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
+    "$"                                     { return SpELTokenTypes.PLACEHOLDER_CONTENT; }
 }
