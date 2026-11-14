@@ -15,7 +15,7 @@ import consulo.language.psi.PsiElement;
 import consulo.language.psi.scope.GlobalSearchScope;
 import consulo.language.util.ModuleUtilCore;
 import consulo.module.Module;
-import consulo.module.extension.ModuleExtensionHelper;
+import consulo.module.extension.ModuleExtension;
 import consulo.navigation.ItemPresentation;
 import consulo.project.Project;
 import consulo.spring.impl.module.extension.SpringModuleExtension;
@@ -50,9 +50,12 @@ public abstract class SpringEndpointProviderBase<E> implements EndpointUrlTarget
 
     @Override
     public Status getStatus() {
-        return ModuleExtensionHelper.getInstance(myProject).hasModuleExtension(SpringModuleExtension.class)
-            ? Status.AVAILABLE
-            : Status.UNAVAILABLE;
+        return Status.AVAILABLE;
+    }
+
+    @Override
+    public Class<? extends ModuleExtension> getModuleExtensionClass() {
+        return SpringModuleExtension.class;
     }
 
     @Override
